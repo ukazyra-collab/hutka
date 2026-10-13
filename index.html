@@ -2569,6 +2569,7 @@ Object.assign(I18N.RU, {
   'Corners': 'Повороты',
   'Digest': 'Разбор',
   'Chart': 'График',
+  'Asking OpenStreetMap… (server {k} of {n}, up to a minute)': 'Спрашиваю OpenStreetMap… (сервер {k} из {n}, до минуты)', 'OpenStreetMap servers are busy — try again in a minute (big countries sometimes need two attempts).': 'Серверы OpenStreetMap заняты — попробуйте через минуту (большим странам иногда нужна вторая попытка).',
   'Move imagery': 'Подвинуть снимок', 'Move the photo': 'Подвинуть снимок', 'Move again': 'Подвинуть ещё', 'Photo shifted by hand. ': 'Снимок сдвинут вручную. ', 'The photo is a guide: GPS and the image can be a few metres apart.': 'Снимок — ориентир: GPS и фото могут расходиться на несколько метров.', 'The satellite photo is a guide: GPS and the image can be a few metres apart, so the line may seem to clip a wall.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров, поэтому линия может «задевать стену».', 'Drag the photo with one finger until the track sits under the line.': 'Тяни снимок одним пальцем, пока трасса не ляжет под линию.', 'Drag the photo until the track sits under the line (or use the arrows above).': 'Тяни снимок, пока трасса не ляжет под линию (или стрелками выше).',
   'Satellite imagery is approximate: GPS and the photo can be a few metres apart.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров.', 'Satellite imagery is approximate: GPS and the photo can be a few metres apart. If the line runs through a wall, move the picture.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров. Если линия идёт сквозь стену — подвиньте картинку.',
   'Align': 'Совместить', 'Save for everyone': 'Сохранить для всех', 'Done': 'Готово', 'Drag the picture until it sits under the line': 'Тяните картинку, пока она не ляжет под линию', 'Drag the picture (or use the arrows, 0.5 m) until it sits under the line': 'Тяните картинку (или стрелками по 0,5 м), пока она не ляжет под линию', '{x} m east, {y} m north': '{x} м на восток, {y} м на север', 'no shift': 'без сдвига', 'Imagery alignment saved for this layout.': 'Совмещение снимка сохранено для этой конфигурации.',
@@ -5149,13 +5150,19 @@ const ADMIN = (() => {
   const osmTag = (tg, ...keys) => { for (const k of keys) if (tg[k]) return String(tg[k]).trim(); return ''; };
   async function osmFind() {
     const cc = $('osmCountry').value; if (!cc) return; const b = $('osmFind'); b.classList.add('busy'); setStatus('osmStatus', t('Asking OpenStreetMap… (10–40 s)')); $('osmWrap').hidden = true; $('osmImport').hidden = true; OSM.rows = [];
-    const q = `[out:json][timeout:90];area["ISO3166-1"="${cc}"][admin_level=2]->.a;nwr["sport"="karting"](area.a);out center tags;`;
+    const q = `[out:json][timeout:60];area["ISO3166-1"="${cc}"][admin_level=2]->.a;nwr["sport"="karting"](area.a);out center tags;`;
     let data = null;
-    for (const ep of [(window.HUTKA_CONFIG || {}).overpassUrl || 'https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter']) {
-      try { const r = await fetch(ep, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); if (r.ok) { data = await r.json(); break; } } catch (e) { /* next mirror */ }
+    try { data = JSON.parse(sessionStorage.getItem('hutka.osm.' + cc) || 'null'); } catch (e) { data = null; }
+    // public Overpass servers queue or drop heavy queries: several mirrors, each with its own time limit
+    const mirrors = [(window.HUTKA_CONFIG || {}).overpassUrl, 'https://overpass.kumi.systems/api/interpreter', 'https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter'].filter(Boolean);
+    for (let k = 0; k < mirrors.length && !data; k++) {
+      setStatus('osmStatus', t('Asking OpenStreetMap… (server {k} of {n}, up to a minute)', { k: k + 1, n: mirrors.length }));
+      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 65000);
+      try { const r = await fetch(mirrors[k], { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, signal: ctl.signal }); if (r.ok) { const j = await r.json(); if (j && Array.isArray(j.elements)) { data = j; try { sessionStorage.setItem('hutka.osm.' + cc, JSON.stringify(j)); } catch (e) {} } } } catch (e) { /* timed out or refused: next mirror */ }
+      clearTimeout(timer);
     }
     b.classList.remove('busy');
-    if (!data || !Array.isArray(data.elements)) { setStatus('osmStatus', t('OpenStreetMap did not answer — try again in a minute.'), 'warn'); return; }
+    if (!data || !Array.isArray(data.elements)) { setStatus('osmStatus', t('OpenStreetMap servers are busy — try again in a minute (big countries sometimes need two attempts).'), 'warn'); return; }
     // one row per venue: named elements, merged when the same name sits within 400 m (a track way + a venue node)
     const raw = data.elements.map(e => { const tg = e.tags || {}; const lat = e.lat !== undefined ? e.lat : (e.center ? e.center.lat : null), lon = e.lon !== undefined ? e.lon : (e.center ? e.center.lon : null); const name = osmTag(tg, 'name:en', 'name', 'official_name'); if (!name || lat === null) return null;
       const indoor = tg.indoor === 'yes' || tg.covered === 'yes' || tg.building === 'yes' || /indoor|крыт/i.test(name) || tg.leisure === 'sports_centre' && tg.building;
