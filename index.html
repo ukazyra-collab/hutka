@@ -264,6 +264,11 @@ textarea{min-height:90px;resize:vertical}
 .modal{position:fixed;inset:0;background:rgba(10,14,24,.55);display:grid;place-items:center;padding:16px;z-index:40}
 .modal .box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;width:min(640px,100%);display:flex;flex-direction:column;gap:14px;max-height:92vh;overflow:auto;box-shadow:var(--shadow)}
 .modal h3{font-size:19px;font-weight:700}
+.box.onb{gap:16px}
+.onb-head h3{font-size:22px;margin-bottom:4px}
+.onb-photo{display:flex;gap:16px;align-items:center}
+.onb-foot{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
+body.onboarding #toast{z-index:50}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13.5px;box-shadow:var(--shadow);z-index:50;max-width:min(560px,calc(100% - 32px))}
 .flag{font-size:18px;line-height:1}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13.5px}
@@ -474,14 +479,34 @@ textarea{min-height:90px;resize:vertical}
 @keyframes rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .soon{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 8px}
 /* ---------- home feed ---------- */
-.home-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;background:linear-gradient(135deg,var(--accent-soft),var(--surface));border-color:color-mix(in srgb,var(--accent) 30%,var(--line))}
-.home-hero h1{font-size:28px;letter-spacing:-.02em;margin-bottom:4px}
-.home-hero p{color:var(--muted);font-size:14.5px;line-height:1.5;max-width:52ch}
-.home-hero .stats{display:flex;gap:22px;flex-wrap:wrap;justify-content:flex-end}
-.home-hero .stats .tile{min-width:0;padding:0;background:none;border:0;text-align:right}
-.home-hero .stats .tile .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.home-hero .stats .tile .v{font:600 22px/1.1 var(--mono);letter-spacing:-.02em}
-@media (max-width:900px){.home-hero{grid-template-columns:1fr}.home-hero .stats{justify-content:flex-start}}
+.home-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr);gap:22px;padding:28px 30px 24px;color:#eef1f8;background:radial-gradient(900px 420px at 110% -20%,rgba(255,90,90,.22),transparent 60%),radial-gradient(700px 360px at -10% 120%,rgba(47,107,240,.28),transparent 60%),linear-gradient(135deg,#131a33,#1b2340 55%,#171f3a);border-color:#2a3558;box-shadow:0 14px 40px rgba(16,22,48,.25)}
+.home-hero .trace{position:absolute;right:-20px;top:50%;transform:translateY(-54%);width:min(52%,560px);height:auto;pointer-events:none;opacity:.9}
+.home-hero .trace .tarmac{fill:none;stroke:rgba(255,255,255,.07);stroke-width:22;stroke-linejoin:round}
+.home-hero .trace .line{fill:none;stroke:url(#heroSpeed);stroke-width:3.5;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:1400;stroke-dashoffset:1400;animation:heroDraw 2.4s cubic-bezier(.4,0,.2,1) .2s forwards}
+@keyframes heroDraw{to{stroke-dashoffset:0}}
+.home-hero .trace .corners circle{fill:#0f1630;stroke:rgba(255,255,255,.7);stroke-width:1.5}
+.home-hero .trace .corners text{fill:rgba(255,255,255,.55);font:600 11px/1 var(--mono);text-anchor:middle;letter-spacing:.06em}
+.home-hero .trace .kart{fill:#fff}
+.home-hero .trace .kart-glow{fill:#ff5a5a;opacity:.8}
+.home-hero .t{position:relative;z-index:1;max-width:60ch}
+.home-hero .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#aab4d4;margin-bottom:10px}
+.home-hero .eyebrow i{width:8px;height:8px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 0 4px rgba(255,90,90,.25)}
+.home-hero h1{font-size:34px;line-height:1.08;letter-spacing:-.025em;margin-bottom:10px;color:#fff}
+.home-hero p{color:#c3cae0;font-size:15px;line-height:1.55;max-width:56ch}
+.home-hero .btn{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff}
+.home-hero .btn:hover{background:rgba(255,255,255,.12)}
+.home-hero .btn.primary{background:#fff;color:#141b33;border-color:#fff}
+.home-hero .btn.primary:hover{background:#eef1f8}
+.home-hero .btn svg{color:currentColor}
+.home-hero .feats{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px;font-size:12.5px;color:#aab4d4}
+.home-hero .feats>span{display:inline-flex;gap:8px;align-items:baseline}
+.home-hero .feats b{font:700 10.5px/1 var(--mono);color:#ff8a8a;letter-spacing:.08em}
+.home-hero .stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:0;border-top:1px solid rgba(255,255,255,.12);padding-top:16px}
+.home-hero .stats .tile{min-width:0;padding:0 26px 0 0;margin-right:26px;background:none;border:0;border-right:1px solid rgba(255,255,255,.12);text-align:left;border-radius:0}
+.home-hero .stats .tile:last-child{border-right:0;margin-right:0;padding-right:0}
+.home-hero .stats .tile .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#aab4d4}
+.home-hero .stats .tile .v{font:600 26px/1.15 var(--mono);letter-spacing:-.02em;color:#fff}
+@media (max-width:900px){.home-hero{padding:22px 20px 18px}.home-hero .trace{width:72%;right:-26%;top:0;transform:none;opacity:.35}.home-hero h1{font-size:27px}.home-hero p{font-size:14px}.home-hero .feats{gap:6px 14px;font-size:12px}.home-hero .stats{grid-template-columns:repeat(4,1fr)}.home-hero .stats .tile{padding:0 8px 0 0;margin-right:8px}.home-hero .stats .tile .v{font-size:20px}}
 .home-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start;margin-top:16px}
 @media (max-width:1100px){.home-grid{grid-template-columns:1fr}}
 .hh{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700;margin:4px 0 12px}
@@ -531,6 +556,23 @@ textarea{min-height:90px;resize:vertical}
 .ai-head b{font-size:16px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ai-new{display:grid;gap:8px;padding:12px;border:1px dashed var(--line-2);border-radius:12px;background:var(--surface-2)}
 .ai-log{flex:1;max-height:none;min-height:200px}
+.ai-lab{display:grid;grid-template-columns:132px minmax(0,1fr) auto;grid-template-areas:"pv t open" "pv corners corners";gap:8px 14px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.ai-lab .pv{grid-area:pv;width:132px;height:96px;border-radius:8px;overflow:hidden;background:var(--surface);border:1px solid var(--line)}
+.ai-lab .pv canvas{display:block;width:100%;height:100%}
+.ai-lab .t{grid-area:t;min-width:0}
+.ai-lab .t>b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ai-lab .nums{display:flex;gap:16px;flex-wrap:wrap;margin-top:6px}
+.ai-lab .nums span{display:grid;gap:1px}
+.ai-lab .nums i{font-style:normal;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ai-lab .nums b{font:600 15px/1.2 var(--mono)}
+.ai-lab #aiLabOpen{grid-area:open;white-space:nowrap}
+.ai-lab .corners{grid-area:corners;display:flex;flex-wrap:wrap;gap:6px}
+.ai-lab .corners .chip{cursor:pointer;font-family:var(--mono);font-size:11.5px;padding:3px 8px}
+.ai-lab .corners .chip b{font-weight:700;margin-right:4px}
+.ai-lab .corners .chip.warm{border-color:color-mix(in srgb,var(--limit,#e9a23b) 60%,var(--line));background:color-mix(in srgb,var(--limit,#e9a23b) 12%,var(--surface))}
+.ai-lab .corners .chip.hot{border-color:color-mix(in srgb,var(--brake,#e23d3d) 60%,var(--line));background:color-mix(in srgb,var(--brake,#e23d3d) 12%,var(--surface))}
+.ai-lab .corners .chip:hover{border-color:var(--accent)}
+@media (max-width:640px){.ai-lab{grid-template-columns:96px minmax(0,1fr);grid-template-areas:"pv t" "corners corners" "open open"}.ai-lab .pv{width:96px;height:72px}.ai-lab .nums{gap:12px}}
 .msg.ai p{margin:0 0 8px}.msg.ai p:last-child{margin:0}
 .msg.ai ul{margin:4px 0 8px;padding-left:18px}
 .msg .meta{display:block;font-size:11px;color:var(--muted);margin-top:4px}
@@ -583,8 +625,13 @@ textarea{min-height:90px;resize:vertical}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35) rotate(-8deg)}70%{transform:scale(.95)}100%{transform:scale(1)}}
 .post.low{opacity:.72}
 .post.low .pv{filter:grayscale(1)}
+.stat-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:14px}
+.stat-chart .lbl{margin-bottom:4px}
+.stat-chart canvas{display:block;width:100%}
 .karts{display:flex;flex-wrap:wrap;gap:6px}
 .karts .chip b{font-weight:600}
+.karts .chip i{font-style:normal;color:var(--muted)}
+.karts .chip.main{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--surface))}
 /* ---------- phone: app-like shell with a bottom tab bar (portrait, and a phone held sideways) ---------- */
 @media (max-width:700px), (max-height:520px) and (orientation:landscape) and (pointer:coarse){
   html{-webkit-text-size-adjust:100%}
@@ -615,9 +662,7 @@ textarea{min-height:90px;resize:vertical}
   .home-hero{padding:16px}
   .home-hero h1{font-size:24px}
   .home-hero p{font-size:14px}
-  .home-hero .stats .tile{min-width:0;flex:1;padding:10px 6px}
-  .home-hero .stats .tile .v{font-size:16px}
-  .home-hero .stats{flex-wrap:nowrap;gap:6px}
+  .home-hero .stats .tile .v{font-size:19px}
   .post .ph{padding:10px 12px}
   .post .pb{padding:0 12px 12px;gap:10px;grid-template-columns:1fr}
   .post .pv{height:130px}
@@ -881,7 +926,20 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     <!-- ========== HOME ========== -->
     <section class="page" id="pg-home" hidden>
       <div class="home-hero card">
-        <div class="t"><h1 data-t="See where the time is">See where the time is</h1><p id="homeSub"></p><div class="row" style="margin-top:14px"><button class="btn primary" id="homeUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#tracks"><svg><use href="#i-track"/></svg><span data-t="Browse tracks">Browse tracks</span></a><button class="btn" id="homeSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button></div></div>
+        <svg class="trace" viewBox="0 0 560 300" aria-hidden="true" preserveAspectRatio="xMaxYMid meet">
+          <defs><linearGradient id="heroSpeed" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff5a5a"/><stop offset=".35" stop-color="#ffb347"/><stop offset=".7" stop-color="#4ade80"/><stop offset="1" stop-color="#ff5a5a"/></linearGradient><filter id="heroGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter></defs>
+          <path class="tarmac" d="M70,205 C70,120 150,78 240,88 C330,98 345,40 430,58 C515,76 500,170 440,198 C380,226 310,178 250,208 C190,238 130,262 70,205 Z"/>
+          <path class="line" d="M70,205 C70,120 150,78 240,88 C330,98 345,40 430,58 C515,76 500,170 440,198 C380,226 310,178 250,208 C190,238 130,262 70,205 Z"/>
+          <g class="corners"><circle cx="240" cy="88" r="5"/><text x="240" y="72">T1</text><circle cx="430" cy="58" r="5"/><text x="430" y="42">T3</text><circle cx="440" cy="198" r="5"/><text x="462" y="203">T5</text><circle cx="250" cy="208" r="5"/><text x="250" y="232">T7</text></g>
+          <circle class="kart-glow" cx="150" cy="78" r="12" filter="url(#heroGlow)"/><circle class="kart" cx="150" cy="78" r="5"/>
+        </svg>
+        <div class="t">
+          <div class="eyebrow"><i></i>Hutka · <span data-t="racing AI">racing AI</span></div>
+          <h1 data-t="See where the time is">See where the time is</h1>
+          <p id="homeSub"></p>
+          <div class="row" style="margin-top:16px"><button class="btn primary" id="homeUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#tracks"><svg><use href="#i-track"/></svg><span data-t="Browse tracks">Browse tracks</span></a><button class="btn" id="homeSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button></div>
+          <div class="feats"><span><b>01</b><span data-t="Every braking point, apex and throttle point">Every braking point, apex and throttle point</span></span><span><b>02</b><span data-t="Corner-by-corner comparison with the fastest on the same layout">Corner-by-corner comparison with the fastest on the same layout</span></span><span><b>03</b><span data-t="An AI coach that has read your data before you ask">An AI coach that has read your data before you ask</span></span></div>
+        </div>
         <div class="stats" id="homeStats"></div>
       </div>
       <div class="home-grid">
@@ -1038,6 +1096,12 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
             <div class="field"><label data-t="What is this chat about?">What is this chat about?</label><select id="aiCtxSel"></select></div>
             <div class="hint" id="aiNewHint"></div>
           </div>
+          <div class="ai-lab" id="aiLab" hidden>
+            <div class="pv"><canvas id="aiLabPv"></canvas></div>
+            <div class="t"><b id="aiLabName"></b><div class="hint" id="aiLabMeta"></div><div class="nums"><span><i data-t="best lap">best lap</i><b id="aiLabBest"></b></span><span><i data-t="avg clean">avg clean</i><b id="aiLabAvg"></b></span><span><i data-t="laps">laps</i><b id="aiLabLaps"></b></span><span><i data-t="reserve">reserve</i><b id="aiLabRes">—</b></span></div></div>
+            <a class="btn xs" id="aiLabOpen" href="#lab"><svg><use href="#i-lab"/></svg><span data-t="Open in the Lab">Open in the Lab</span></a>
+            <div class="corners" id="aiLabCorners"></div>
+          </div>
           <div class="chat ai-log" id="aiLog"></div>
           <div class="chips" id="aiChips"></div>
           <div class="askrow"><textarea id="aiInput" rows="2"></textarea><div class="askbtns"><button class="btn primary" id="aiSend" type="button" data-t="Ask">Ask</button><button class="btn" id="aiStop" type="button" hidden data-t="Stop">Stop</button></div></div>
@@ -1052,9 +1116,12 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
       <div class="grid2">
         <div class="card"><div class="prof-head" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><img class="avatar" id="profAvatar" alt="" style="width:72px;height:72px"><div style="min-width:0;flex:1"><div style="font-size:20px;font-weight:800" id="profName">—</div><div class="hint" id="profMeta"></div></div><div class="row"><label class="btn sm filebtn"><span data-t="Change photo">Change photo</span><input type="file" id="profAvatarFile" accept="image/*"></label><button class="btn sm ghost" id="profAvatarClear" type="button" data-t="Remove">Remove</button></div></div>
           <div class="form" style="margin-top:18px">
-            <div class="field"><label data-t="Racing name">Racing name</label><input type="text" id="profRacing" maxlength="40"></div>
+            <div class="field"><label data-t="First name">First name</label><input type="text" id="profFirst" maxlength="40" autocomplete="given-name"></div>
+            <div class="field"><label data-t="Last name">Last name</label><input type="text" id="profLast" maxlength="40" autocomplete="family-name"></div>
             <div class="field"><label data-t="Country">Country</label><select id="profCountry"></select></div>
-            <div class="field wide"><label data-t="Home track">Home track</label><select id="profHome"></select></div>
+            <div class="field"><label data-t="Home track">Home track</label><select id="profHome"></select></div>
+            <div class="field"><label data-t="Birth year">Birth year</label><select id="profYear"></select></div>
+            <div class="field"><label data-t="Weight, kg">Weight, kg</label><input type="number" id="profWeight" min="20" max="200" inputmode="numeric" placeholder="—"></div>
             <div class="field wide"><label data-t="About you (one or two lines)">About you (one or two lines)</label><input type="text" id="profBio" maxlength="160" placeholder="Rental karting since 2021, Kartdrome regular, chasing 1:14"></div>
             <div class="field"><label>Instagram</label><input type="text" id="profIg" maxlength="80" placeholder="@name"></div>
             <div class="field"><label data-t="Contact link (Telegram / WhatsApp)">Contact link (Telegram / WhatsApp)</label><input type="text" id="profContact" maxlength="160" placeholder="https://t.me/name"></div>
@@ -1116,7 +1183,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
               <div class="field"><label>Facebook</label><input type="url" id="aFb" placeholder="https://facebook.com/..."></div>
               <div class="field"><label>TikTok</label><input type="url" id="aTt" placeholder="https://tiktok.com/..."></div>
               <div class="field wide"><label data-t="Description">Description</label><textarea id="aDesc"></textarea></div>
-              <div class="field wide"><label data-t="Karts — one per line (add “sport” after a sport kart)">Karts — one per line (add “sport” after a sport kart)</label><textarea id="aKarts" placeholder="Sodi RT8&#10;Sodi RT10&#10;Rotax Max · sport"></textarea></div>
+              <div class="field wide"><label data-t="Karts — one per line: * before the most common one, “· note” after the name, “· sport” for a sport kart">Karts — one per line: * before the most common one, “· note” after the name, “· sport” for a sport kart</label><textarea id="aKarts" placeholder="* Sodi RT10 13 hp · 390 cc&#10;Sodi RT10 9 hp&#10;Rotax Max · sport"></textarea></div>
               <div class="field"><label data-t="Logo">Logo</label><div class="row"><div class="logo" id="aLogoPrev"></div><label class="btn sm filebtn"><span data-t="Upload image">Upload image</span><input type="file" id="aLogoFile" accept="image/*"></label><button class="btn sm ghost" id="aLogoClear" type="button" data-t="Remove">Remove</button></div></div>
               <div class="field"><label data-t="Cover photo">Cover photo</label><div class="row"><img class="thumb" id="aCoverPrev" alt="" style="width:160px;height:72px;object-fit:cover" hidden><label class="btn sm filebtn"><span data-t="Upload image">Upload image</span><input type="file" id="aCoverFile" accept="image/*"></label><button class="btn sm ghost" id="aCoverClear" type="button" data-t="Remove">Remove</button></div></div>
             </div>
@@ -1157,6 +1224,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
               <div class="map-wrap"><div class="map-bar"><div class="seg"><button class="btn" id="eRotL" type="button">↺</button><button class="btn" id="eRotR" type="button">↻</button></div><div class="seg"><button class="btn" id="eZoomOut" type="button">−</button><button class="btn" id="eZoomIn" type="button">+</button><button class="btn" id="eZoomFit" type="button">⌂</button></div></div><div style="position:relative"><canvas id="emap"></canvas><div class="readout" id="eReadout" hidden></div></div></div>
             </div>
           </div>
+        <div class="card" id="admStatsCard" hidden><h2><svg><use href="#i-speed"/></svg><span data-t="Statistics">Statistics</span><span class="sub" id="admStatsSub"></span></h2><div id="admStats"></div></div>
         <div class="card" id="admAiCard" hidden><h2><svg><use href="#i-spark"/></svg><span data-t="AI coach · usage and cost">AI coach · usage and cost</span></h2><div id="admAiUsage"></div></div>
         </div>
       </div>
@@ -1185,7 +1253,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
         <div class="field"><label data-t="Layout — pick the one you drove">Layout — pick the one you drove</label><select id="uplLayout"></select></div>
         <div class="field wide" id="uplNewTrack" hidden><div class="newtrack"><div class="hint" id="uplNewHint"></div><div class="form" style="margin-top:8px"><div class="field"><label data-t="Track name">Track name</label><input type="text" id="uplNewName" placeholder="Dubai Kartdrome"></div><div class="field"><label data-t="City">City</label><input type="text" id="uplNewCity"></div><div class="field"><label data-t="Country">Country</label><select id="uplNewCountry"></select></div></div></div></div>
         <div class="field"><label data-t="Kart">Kart</label><select id="uplKart"></select></div>
-        <div class="field" id="uplKartOtherField" hidden><label data-t="Kart model">Kart model</label><input type="text" id="uplKartOther" placeholder="Sodi RT8, Rotax Max, X30…"></div>
+        <div class="field" id="uplKartOtherField" hidden><label data-t="Kart model">Kart model</label><input type="text" id="uplKartOther" maxlength="40" list="rentalModels" placeholder="Sodi RT8, Rotax Max, X30…"></div>
         <div class="field"><label data-t="Session type (optional)">Session type (optional)</label><select id="uplFormat"></select></div>
         <div class="field"><label data-t="Result (optional)">Result (optional)</label><div class="row" style="flex-wrap:nowrap;gap:8px;align-items:center"><input type="number" id="uplPos" min="1" max="500" placeholder="P" style="width:76px"><span class="hint" data-t="of">of</span><input type="number" id="uplDrivers" min="1" max="500" placeholder="drivers" style="width:96px"><span class="hint" data-t="drivers">drivers</span></div></div>
         <div class="field wide" id="uplLayoutPhotoField" hidden><img id="uplLayoutPhoto" alt="" style="max-width:100%;max-height:220px;border-radius:10px;display:block"></div>
@@ -1220,7 +1288,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     <div class="field"><label data-t="Track">Track</label><select id="seTrack"></select></div>
     <div class="field"><label data-t="Layout">Layout</label><select id="seLayout"></select></div>
     <div class="field"><label data-t="Kart">Kart</label><select id="seKart"></select></div>
-    <div class="field" id="seKartOtherField" hidden><label data-t="Kart model">Kart model</label><input type="text" id="seKartOther" maxlength="40" placeholder="Sodi RT8, Rotax Max…"></div>
+    <div class="field" id="seKartOtherField" hidden><label data-t="Kart model">Kart model</label><input type="text" id="seKartOther" maxlength="40" list="rentalModels" placeholder="Sodi RT8, Rotax Max…"></div>
     <div class="field"><label data-t="Session type (optional)">Session type (optional)</label><select id="seFormat"></select></div>
     <div class="field"><label data-t="Result (optional)">Result (optional)</label><div class="row" style="flex-wrap:nowrap;gap:8px;align-items:center"><input type="number" id="sePos" min="1" max="500" placeholder="P" style="width:76px"><span class="hint" data-t="of">of</span><input type="number" id="seDrivers" min="1" max="500" placeholder="drivers" style="width:96px"><span class="hint" data-t="drivers">drivers</span></div></div>
     <div class="field wide"><label data-t="Notes">Notes</label><input type="text" id="seNote" maxlength="120"></div>
@@ -1232,6 +1300,20 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
 </div></div>
 <!-- sign-in modal (standalone hosting) -->
 <div class="modal" id="authModal" hidden><div class="box" style="width:min(440px,100%)"><h3 data-t="Sign in to Hutka">Sign in to Hutka</h3><p class="hint" data-t="A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.">A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.</p><div class="field"><label>Email</label><input type="text" id="authEmail" placeholder="you@example.com" autocomplete="email"></div><div class="field" id="authPassField" hidden><label data-t="Password">Password</label><input type="password" id="authPass" autocomplete="current-password"></div><div class="row"><button class="btn primary" id="authEmailBtn" type="button" data-t="Email me a link">Email me a link</button><button class="btn primary" id="authPassBtn" type="button" hidden data-t="Sign in">Sign in</button><button class="btn" id="authAppleBtn" type="button" hidden> Apple</button><button class="btn" id="authGoogleBtn" type="button" hidden>Google</button><button class="btn ghost" id="authCancel" type="button" data-t="Cancel">Cancel</button></div><div class="row"><button class="btn xs ghost" id="authPassToggle" type="button" data-t="I have a password">I have a password</button></div><div class="status" id="authStatus"></div></div></div>
+<div class="modal" id="onbModal" hidden><div class="box onb" style="width:min(560px,100%)">
+  <div class="onb-head"><div><h3 data-t="Welcome to Hutka">Welcome to Hutka</h3><p class="hint" data-t="Set up your driver profile — other drivers see it next to your laps. One minute, and you can change it later in Profile.">Set up your driver profile — other drivers see it next to your laps. One minute, and you can change it later in Profile.</p></div></div>
+  <div class="onb-photo"><img class="avatar" id="onbAvatar" alt="" style="width:84px;height:84px"><div><label class="btn sm filebtn"><span data-t="Add photo">Add photo</span><input type="file" id="onbPhoto" accept="image/*"></label><div class="hint" style="margin-top:6px" data-t="Optional, but a face next to a lap time looks a lot better than a grey circle.">Optional, but a face next to a lap time looks a lot better than a grey circle.</div></div></div>
+  <div class="form">
+    <div class="field"><label><span data-t="First name">First name</span> *</label><input type="text" id="onbFirst" maxlength="40" autocomplete="given-name"></div>
+    <div class="field"><label><span data-t="Last name">Last name</span> *</label><input type="text" id="onbLast" maxlength="40" autocomplete="family-name"></div>
+    <div class="field"><label><span data-t="Country">Country</span> *</label><select id="onbCountry"></select></div>
+    <div class="field"><label><span data-t="Home track">Home track</span> *</label><select id="onbHome"></select></div>
+    <div class="field"><label data-t="Birth year (optional)">Birth year (optional)</label><select id="onbYear"></select></div>
+    <div class="field"><label data-t="Weight, kg (optional)">Weight, kg (optional)</label><input type="number" id="onbWeight" min="20" max="200" inputmode="numeric" placeholder="72"></div>
+  </div>
+  <div class="row"><button class="btn primary" id="onbSave" type="button" data-t="Save and continue">Save and continue</button><span class="status" id="onbStatus"></span></div>
+  <div class="hint onb-foot"><span id="onbWho"></span> <button class="btn xs ghost" id="onbSignOut" type="button" data-t="Sign out">Sign out</button></div>
+</div></div>
 <!-- confirm modal -->
 <div class="modal" id="cfModal" hidden><div class="box" style="width:min(440px,100%)"><h3 id="cfTitle"></h3><p class="hint" id="cfText"></p><div class="row" style="justify-content:flex-end"><button class="btn" id="cfNo" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="cfYes" type="button"></button></div></div></div>
 <div class="toast" id="toast" hidden></div>
@@ -2721,6 +2803,34 @@ Object.assign(I18N.RU, {
   'Compare': 'Сравнить', 'Comments': 'Комментарии', 'Lap on the map': 'Круг на карте', 'No layouts yet — the first uploaded session creates one.': 'Лейаутов пока нет — первая загруженная сессия создаст его.', 'Rental karts at this track': 'Прокатные карты этой трассы', 'Rental': 'Прокат', 'Other sport kart…': 'Другой спортивный карт…', 'Other': 'Другое', 'Showing every kart — different karts are not comparable corner by corner.': 'Показаны все карты — разные карты по поворотам не сравнить.', '{n} session(s) on another kart are hidden (different karts are not comparable corner by corner).': 'Скрыто сессий на другом карте: {n} (разные карты по поворотам не сравнить).', 'Each kart has its own ranking — a 270 cc rental and a KZ2 are different sports.': 'У каждого карта свой рейтинг — прокатный 270 cc и KZ2 это разные виды спорта.',
   'Upload session': 'Загрузить сессию', 'Karts people drive here': 'Карты, на которых здесь ездят', 'Karts — one per line (add “sport” after a sport kart)': 'Карты — по одному в строке (после спортивного допишите «sport»)', "Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.": 'Alfano .alf2 (эталон), AiM, RaceChrono, TrackAddict, Harry\'s LapTimer, VBOX, GPX — один файл на сессию; можно несколько сразу.',
 });
+
+// v29: registration profile, kart fleets
+Object.assign(I18N.RU, {
+  'Welcome to Hutka': 'Добро пожаловать в Hutka', 'Set up your driver profile — other drivers see it next to your laps. One minute, and you can change it later in Profile.': 'Заполни профиль гонщика — его видят другие рядом с твоими кругами. Одна минута, потом всё можно поменять в Профиле.',
+  'Add photo': 'Добавить фото', 'Optional, but a face next to a lap time looks a lot better than a grey circle.': 'Необязательно, но лицо рядом с временем круга смотрится куда лучше серого кружка.',
+  'First name': 'Имя', 'Last name': 'Фамилия', 'Birth year (optional)': 'Год рождения (по желанию)', 'Weight, kg (optional)': 'Вес, кг (по желанию)', 'Birth year': 'Год рождения', 'Weight, kg': 'Вес, кг',
+  'Save and continue': 'Сохранить и продолжить', '— choose —': '— выбери —', 'My track is not listed yet': 'Моей трассы пока нет в списке', 'Signed in as {email}': 'Вход: {email}',
+  'Enter your first name.': 'Введи имя.', 'Enter your last name.': 'Введи фамилию.', 'Choose your country.': 'Выбери страну.', 'Choose your home track (or “not listed yet”).': 'Выбери домашнюю трассу (или «пока нет в списке»).',
+  'Welcome, {name}! Your profile is set.': 'Добро пожаловать, {name}! Профиль готов.', '{n} year old|{n} years old': '{n} год|{n} года|{n} лет', 'kg': 'кг',
+  'most common here, likely yours': 'самый частый здесь — скорее всего, твой', 'I don’t know the model': 'Не знаю модель', 'Rental kart, model unknown': 'Прокатный карт, модель неизвестна',
+  'Karts — one per line: * before the most common one, “· note” after the name, “· sport” for a sport kart': 'Карты — по одному в строке: * перед самым частым, «· заметка» после названия, «· sport» для спортивного'
+});
+Object.assign(I18N.RU, {
+  'racing AI': 'racing AI', 'Upload a session from your lap timer: Hutka reads every corner — where you braked, where the apex was, where the throttle came back — and shows where the fastest drivers on the same layout gain on you.': 'Загрузи сессию с лап-таймера: Hutka читает каждый поворот — где ты тормозил, где был апекс, где снова открыл газ — и показывает, где самые быстрые на этом лейауте выигрывают у тебя.',
+  'Every braking point, apex and throttle point': 'Каждая точка торможения, апекс и точка газа', 'Corner-by-corner comparison with the fastest on the same layout': 'Сравнение по поворотам с самыми быстрыми на этом лейауте', 'An AI coach that has read your data before you ask': 'ИИ-тренер, который прочитал твои данные ещё до вопроса'
+});
+Object.assign(I18N.RU, {
+  'best lap': 'лучший круг', 'avg clean': 'ср. чистый', 'laps': 'кругов', 'reserve': 'резерв', 'Open in the Lab': 'Открыть в Lab', 'Reading the corners…': 'Читаю повороты…',
+  'Ask the coach about T{n}': 'Спросить тренера про T{n}', 'T{n}: what exactly am I losing here and what should I change?': 'T{n}: что именно я здесь теряю и что поменять?',
+  'reserve per corner vs your best passes · tap a corner to ask about it': 'резерв по поворотам против твоих лучших проездов · нажми на поворот, чтобы спросить', 'The corner breakdown appears once the session opens in the Lab.': 'Разбор по поворотам появится, когда сессия откроется в Lab.',
+  'Your name and photo are what other drivers see next to your laps.': 'Имя и фото — то, что другие гонщики видят рядом с твоими кругами.'
+});
+Object.assign(I18N.RU, {
+  'Statistics': 'Статистика', 'live, admins only': 'живые цифры, только для админов', 'Run supabase/stats.sql in the SQL editor once — the numbers appear here.': 'Запусти один раз supabase/stats.sql в SQL editor — цифры появятся здесь.',
+  'Active drivers': 'Активные гонщики', 'signed in within 7 days · {n} in 30': 'заходили за 7 дней · {n} за 30', 'Profiles filled': 'Профили заполнены', 'of {n}': 'из {n}', '+{n} in 7 days': '+{n} за 7 дней', '+{n} in 7 days · {p} published': '+{n} за 7 дней · {p} опубликовано',
+  '{n} comments · {f} follows': '{n} комментариев · {f} подписок', 'AI questions': 'Вопросов ИИ', '{n} layouts': '{n} лейаутов', 'Sign-ups, last 30 days': 'Регистрации за 30 дней', 'Uploads, last 30 days': 'Загрузки за 30 дней', 'today': 'сегодня', 'Tracks by sessions': 'Трассы по сессиям',
+  'Visits and devices: Google Analytics (analytics.google.com), when the measurement ID is in config.js.': 'Посещения и устройства — в Google Analytics (analytics.google.com), когда measurement ID прописан в config.js.', 'Could not load: {e}': 'Не загрузилось: {e}'
+});
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -2983,16 +3093,23 @@ const STORE = (() => {
       async saveSession(sid, meta, chunks) { must(await sb.from('sessions').upsert({ id: sid, owner: meta.owner, track_id: meta.track || '', layout_id: meta.layout || 'custom', published: !!meta.published, best_ms: meta.bestMs, meta, updated_at: new Date().toISOString() })); must(await sb.from('session_data').upsert({ id: sid, enc: meta.enc, data: chunks.join('') })); },
       async updateSession(sid, patch) { const cur = await A.getSessionMeta(sid); if (!cur) throw new Error('missing'); const meta = Object.assign(cur, patch, { updatedAt: Date.now() }); delete meta.id; must(await sb.from('sessions').update({ meta, published: !!meta.published, track_id: meta.track || '', layout_id: meta.layout || 'custom', updated_at: new Date().toISOString() }).eq('id', sid)); },
       deleteSession: async (sid) => must(await sb.from('sessions').delete().eq('id', sid)),
-      async getProfile(id) { const rows = must(await sb.from('profiles').select('*').eq('id', id).limit(1)); if (!rows.length) return null; const r = rows[0]; return { racingName: r.racing_name || '', country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', sws: r.sws_url || '', swsResults: r.sws_results || null, instagram: r.instagram || '', contact: r.contact || '', coach: !!r.coach, bio: r.bio || '', updatedAt: r.updated_at }; },
+      async getProfile(id) { const rows = must(await sb.from('profiles').select('*').eq('id', id).limit(1)); if (!rows.length) return null; const r = rows[0]; A.profilePerson = ('first_name' in r); return { racingName: r.racing_name || '', firstName: r.first_name || '', lastName: r.last_name || '', birthYear: r.birth_year || null, weightKg: r.weight_kg || null, country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', sws: r.sws_url || '', swsResults: r.sws_results || null, instagram: r.instagram || '', contact: r.contact || '', coach: !!r.coach, bio: r.bio || '', updatedAt: r.updated_at }; },
       async saveProfile(id, body) {
         const base = { id, racing_name: body.racingName || '', country: body.country || '', home_track: body.homeTrack || '', avatar: body.avatar || '', updated_at: new Date().toISOString() };
         const extra = { sws_url: body.sws || '', sws_results: body.swsResults || null, instagram: body.instagram || '', contact: body.contact || '', coach: !!body.coach, bio: body.bio || '' };
-        const r = await sb.from('profiles').upsert(Object.assign({}, base, extra));
-        if (r.error && /column|schema cache|PGRST204|42703/i.test((r.error.message || '') + ' ' + (r.error.code || ''))) { A.profileExtras = false; return must(await sb.from('profiles').upsert(base)); }   // update.sql not run yet
-        return must(r);
+        const person = { first_name: body.firstName || '', last_name: body.lastName || '', birth_year: body.birthYear || null, weight_kg: body.weightKg || null };   // profile.sql
+        // the SQL updates may not all be in: drop the newest column set and try again, down to the original four columns
+        for (const tier of [3, 2, 1]) {
+          if (tier === 3 && A.profilePerson === false) continue; if (tier === 2 && A.profileExtras === false) continue;
+          const row = Object.assign({}, base, tier >= 2 ? extra : {}, tier >= 3 ? person : {});
+          const r = await sb.from('profiles').upsert(row);
+          if (r.error && tier > 1 && noCol(r.error)) { if (tier === 3) A.profilePerson = false; else A.profileExtras = false; continue; }
+          return must(r);
+        }
       },
-      async allProfiles() { return must(await sb.from('profiles').select('*').limit(1000)).map(r => ({ id: r.id, racingName: r.racing_name || '', country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', coach: !!r.coach })); },
+      async allProfiles() { return must(await sb.from('profiles').select('*').limit(1000)).map(r => ({ id: r.id, racingName: r.racing_name || '', firstName: r.first_name || '', lastName: r.last_name || '', country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', coach: !!r.coach })); },
       async platformNames() { return {}; },
+      async adminStats() { return must(await sb.rpc('hutka_stats')); },
       addClaim: async (body) => must(await sb.from('claims').insert({ track_id: body.track, by: body.by, text: body.text || '' })),
       async listClaims() { return must(await sb.from('claims').select('*').order('created_at', { ascending: false })).map(r => ({ id: String(r.id), track: r.track_id, by: r.by, text: r.text, createdAt: new Date(r.created_at).getTime() })); },
       deleteClaim: async (id) => must(await sb.from('claims').delete().eq('id', +id)),
@@ -3199,7 +3316,7 @@ const STORE = (() => {
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta,
-    profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid,
+    profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal };
 })();
@@ -3222,7 +3339,7 @@ function createMapView(canvas, host) {
     if (tr) { x0 = Infinity; y0 = Infinity; x1 = -Infinity; y1 = -Infinity; const pad = (host.getWidthM ? host.getWidthM() : 8) * 2.5 / tr.mpp; for (let i = 0; i < tr.N; i += 2) { const x = tr.cx[i] / tr.mpp, y = tr.cy[i] / tr.mpp; x0 = Math.min(x0, x - pad); x1 = Math.max(x1, x + pad); y0 = Math.min(y0, y - pad); y1 = Math.max(y1, y + pad); } }
     const xs = [], ys = []; for (const [x, y] of [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]) { xs.push(c * x - si * y); ys.push(si * x + c * y); }
     const I = inset(w, h), s = Math.min(I.w / (Math.max(...xs) - Math.min(...xs)), I.h / (Math.max(...ys) - Math.min(...ys))) * 0.94, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-    V.s = s; V.ts = s; V.sFit = s; V.anchor = null; V.tx = I.cx - s * (c * cx - si * cy); V.ty = I.cy - s * (si * cx + c * cy); V.auto = true;
+    V.s = s; V.ts = s; V.sFit = s; V.anchor = null; V.tx = I.cx - s * (c * cx - si * cy); V.ty = I.cy - s * (si * cx + c * cy); V.auto = true; turnFix = null;
   }
   // the part of the canvas that overlays leave free (the cockpit HUD, the scrub bar, a side sheet): fit and focus aim at its centre
   function inset(w, h) { const o = host.viewInset ? host.viewInset(w, h) : null; const l = o && o.l || 0, t = o && o.t || 0, r = o && o.r || 0, b = o && o.b || 0; const iw = Math.max(60, w - l - r), ih = Math.max(60, h - t - b); return { l, t, r, b, w: iw, h: ih, cx: l + iw / 2, cy: t + ih / 2 }; }
@@ -3303,8 +3420,15 @@ function createMapView(canvas, host) {
   function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
   function arrow(ctx, x1, y1, x2, y2, col) { const a = Math.atan2(y2 - y1, x2 - x1), L = 9; ctx.strokeStyle = 'rgba(0,0,0,0.8)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.moveTo(x2, y2); ctx.lineTo(x2 - L * Math.cos(a - 0.5), y2 - L * Math.sin(a - 0.5)); ctx.moveTo(x2, y2); ctx.lineTo(x2 - L * Math.cos(a + 0.5), y2 - L * Math.sin(a + 0.5)); ctx.stroke(); ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke(); }
   const lapPos = (tr, P, i) => [(tr.cx[i] + P.o[i] * tr.nx[i]) / tr.mpp, (tr.cy[i] + P.o[i] * tr.ny[i]) / tr.mpp];
+  // the phone turned: the map stays where it is on the device (as if taped to it) and only the interface re-lays out — so the
+  // picture rotates the other way in screen coordinates and the point that was in the middle of the screen stays in the middle
+  let centreImg = null, turnFix = null;
+  function deviceTurn(deltaDeg) { const { w, h } = setup(); const c0 = centreImg || toI(w / 2, h / 2); V.rot -= deltaDeg * Math.PI / 180; turnFix = { px: c0[0], py: c0[1], w0: w, h0: h, until: Date.now() + 1500 }; recentre(); draw(); }
+  function recentre() { if (!turnFix) return; if (Date.now() > turnFix.until) { turnFix = null; return; } const { w, h } = setup(), I = inset(w, h), c = Math.cos(V.rot), si = Math.sin(V.rot); V.tx = I.cx - V.s * (c * turnFix.px - si * turnFix.py); V.ty = I.cy - V.s * (si * turnFix.px + c * turnFix.py); V.anchor = null; fly = null; }   // stays armed for a moment: the box changes size in a few steps while the interface re-lays out
   function paint() {
+    if (turnFix) recentre();
     const { ctx, w, h } = setup(), C = tokens(), sc = V.s, T = toS, O = host.getOverlay ? host.getOverlay() : {};
+    { const I = inset(w, h); centreImg = toI(I.cx, I.cy); }
     const rc = Math.cos(V.rot), rs = Math.sin(V.rot), RN = (nx, ny) => [rc * nx - rs * ny, rs * nx + rc * ny];
     const tr = host.getTrack ? host.getTrack() : null, mpp = tr ? tr.mpp : null, widthM = host.getWidthM ? host.getWidthM() : 8, im = host.getImage ? host.getImage() : null;
     ctx.fillStyle = C.surface2; ctx.fillRect(0, 0, w, h);
@@ -3514,7 +3638,7 @@ function createMapView(canvas, host) {
   };
   canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
   canvas.addEventListener('pointerleave', () => { if (M.hoverIdx >= 0 && M.dragIdx < 0) { M.hoverIdx = -1; if (host.onHover) host.onHover(-1); draw(); } });
-  canvas.addEventListener('wheel', (e) => { e.preventDefault(); const [sx, sy] = getPos(e); if (M.tool === 'photo' && host.onPhotoScale) { const [ix, iy] = toI(sx, sy); host.onPhotoScale(Math.exp(-e.deltaY * 0.0012), ix, iy); draw(); return; } zoomAt(Math.exp(-e.deltaY * 0.0012), sx, sy); }, { passive: false });
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); turnFix = null; const [sx, sy] = getPos(e); if (M.tool === 'photo' && host.onPhotoScale) { const [ix, iy] = toI(sx, sy); host.onPhotoScale(Math.exp(-e.deltaY * 0.0012), ix, iy); draw(); return; } zoomAt(Math.exp(-e.deltaY * 0.0012), sx, sy); }, { passive: false });
   canvas.addEventListener('contextmenu', (e) => { e.preventDefault(); const [sx, sy] = getPos(e); if (M.tool === 'corner') { if (host.onCorner) host.onCorner(sx, sy, true); return; } const hit = hitPoint(sx, sy); if (hit >= 0 && host.onPointDel) { host.onPointDel(hit); M.selIdx = -1; } });
   function setTool(tl) { M.tool = tl; canvas.className = tl === 'pan' ? '' : (tl === 'trace' ? 'edit' : 'pick'); canvas.style.touchAction = tl === 'sat' ? 'none' : (M.touchFree ? 'none' : (coarse ? 'pan-y' : 'none')); draw(); }
   function setHover(i) { if (i !== M.hoverIdx) { M.hoverIdx = i; draw(); } }
@@ -3537,8 +3661,8 @@ function createMapView(canvas, host) {
     flyTo(sz, I.cx - sz * cx, I.cy - sz * cy, 300);
   }
   function fitAnimated() { const keep = { s: V.s, tx: V.tx, ty: V.ty }; fit(true); const to = { s: V.s, tx: V.tx, ty: V.ty }; V.s = keep.s; V.tx = keep.tx; V.ty = keep.ty; flyTo(to.s, to.tx, to.ty, 280); V.auto = true; }
-  canvas.addEventListener('pointerdown', () => { fly = null; });
-  return { V, M, fit, fitAnimated, focusWindow, keepInView, draw, zoomAt, zoomCenter, rotateBy, toS, toI, setTool, setHover, setTouchFree, nearestStation, nearestLineIdx, badgeAt, setup, tokens, lapPos: (P, i) => lapPos(host.getTrack(), P, i) };
+  canvas.addEventListener('pointerdown', () => { fly = null; turnFix = null; });
+  return { V, M, host, fit, fitAnimated, focusWindow, keepInView, draw, zoomAt, zoomCenter, rotateBy, deviceTurn, toS, toI, setTool, setHover, setTouchFree, nearestStation, nearestLineIdx, badgeAt, setup, tokens, lapPos: (P, i) => lapPos(host.getTrack(), P, i) };
 }
 (() => {
 const $ = (id) => document.getElementById(id);
@@ -3648,18 +3772,35 @@ const kartKeyIsSport = (key) => !/^rental(:|$)/.test(key);
 function kartKeyLabel(key, sample) { const c = sportClass(key); if (c) return c[1]; if (key === 'rental') return t('rental kart'); if (key === 'sport') return t('sport kart'); const nm = sample && sample.kart ? sample.kart : key.replace(/^(rental|sport):/, ''); return key.startsWith('sport:') ? `${nm} · ${t('sport')}` : nm; }
 const kartLabel = (m) => { if (!m) return ''; const cls = kartClassOf(m); if (cls === 'sport') { const c = sportClass((m.kartCat && sportClass(m.kartCat) ? m.kartCat : '') || matchSport(m.kart)); return c ? c[1] : (m.kart ? `${m.kart} · ${t('sport')}` : kartClassName(cls)); } return m.kart || kartClassName(cls); };
 // the kart <select> for the upload window and the session editor: the track's rental models, then the sport classes by family
+// rental fleets we know for tracks whose card has no kart list yet (the list in the track card wins once the admin fills it);
+// main = the kart most people drive there, so an ordinary session can keep the default
+const KNOWN_FLEETS = {
+  'dubai-kartdrome': [{ name: 'Sodi RT10 13 hp', main: true, note: '390 cc' }, { name: 'Sodi RT10 9 hp', note: '270 cc' }],
+  'dubai-indoor-kartdrome': [{ name: 'Sodi RT10 9 hp', main: true, note: '270 cc' }, { name: 'Sodi LR5', note: 'junior' }]
+};
+// common rental models (suggestions for the free-text field)
+const RENTAL_MODELS = ['Sodi RT10', 'Sodi RT8', 'Sodi RX8', 'Sodi RX7', 'Sodi SR5', 'Sodi GT5', 'Sodi LR5', 'Sodi 2Drive', 'Birel N35', 'Birel C28', 'CRG Centurion', 'Rimo EVO 8', 'Rimo Sinus iON', 'OTL Storm', 'Praga Dragon Evo', 'Tony Kart Rookie', 'Biz Kart', 'Bowman'];
+{ const dl = document.createElement('datalist'); dl.id = 'rentalModels'; for (const m of RENTAL_MODELS) { const o = document.createElement('option'); o.value = m; dl.appendChild(o); } document.body.appendChild(dl); }
+// a track's rental fleet: what the admin listed, else what we know; the main kart first
+function rentalFleet(tr) {
+  const own = (tr && Array.isArray(tr.karts) ? tr.karts : []).filter(k => k && k.name && (k.cls || 'rental') !== 'sport');
+  const list = own.length ? own : (tr && KNOWN_FLEETS[tr.id] ? KNOWN_FLEETS[tr.id] : []);
+  if (list.length && !list.some(k => k.main)) list[0] = Object.assign({}, list[0], { main: true });
+  return list.slice().sort((a, b) => (b.main ? 1 : 0) - (a.main ? 1 : 0));
+}
 function kartOptions(tr) {
-  const list = (tr && Array.isArray(tr.karts) ? tr.karts : []).filter(k => k && k.name && (k.cls || 'rental') !== 'sport'), grp = t('Rental karts at this track');
-  const opts = list.map(k => [`rental|${k.name}`, k.name, grp]);
-  opts.push(['rental|', list.length ? t('Other rental kart…') : t('Rental kart (model below)'), list.length ? grp : t('Rental')]);
+  const list = rentalFleet(tr), grp = t('Rental karts at this track');
+  const opts = list.map(k => [`rental|${k.name}`, k.name + (k.note ? ` · ${k.note}` : '') + (k.main ? ` — ${t('most common here, likely yours')}` : ''), grp]);
+  opts.push(['rental|?', list.length ? t('I don’t know the model') : t('Rental kart, model unknown'), list.length ? grp : t('Rental')]);
+  opts.push(['rental|', t('Other rental kart…'), list.length ? grp : t('Rental')]);
   for (const [id, label, g] of SPORT_CLASSES) opts.push([`sport|${id}`, label, g]);
   opts.push(['sport|', t('Other sport kart…'), t('Other')]);
   return opts;
 }
 // select value (+ the free-text field) → { cls, name, cat }
-function kartFromValue(v, other) { v = v || 'rental|'; const cls = v.split('|')[0] === 'sport' ? 'sport' : 'rental', rest = v.split('|').slice(1).join('|'), typed = String(other || '').trim().slice(0, 40); if (cls === 'sport') { const c = sportClass(rest); if (c) return { cls, name: c[1], cat: c[0] }; return { cls, name: typed, cat: matchSport(typed) }; } return { cls, name: rest || typed, cat: '' }; }
+function kartFromValue(v, other) { v = v || 'rental|'; const cls = v.split('|')[0] === 'sport' ? 'sport' : 'rental', rest = v.split('|').slice(1).join('|'), typed = String(other || '').trim().slice(0, 40); if (cls === 'rental' && rest === '?') return { cls, name: '', cat: '' }; if (cls === 'sport') { const c = sportClass(rest); if (c) return { cls, name: c[1], cat: c[0] }; return { cls, name: typed, cat: matchSport(typed) }; } return { cls, name: rest || typed, cat: '' }; }
 // a session → the select value and the free-text it needs (for editing)
-function kartValueOf(m, tr) { const cls = kartClassOf(m); if (cls === 'sport') { const cat = (m.kartCat && sportClass(m.kartCat) ? m.kartCat : '') || matchSport(m.kart); return cat ? { v: 'sport|' + cat, other: '' } : { v: 'sport|', other: m.kart || '' }; } const listed = !!(m.kart && tr && Array.isArray(tr.karts) && tr.karts.some(k => k && k.name && k.name.toLowerCase() === m.kart.toLowerCase())); return listed ? { v: 'rental|' + tr.karts.find(k => k.name.toLowerCase() === m.kart.toLowerCase()).name, other: '' } : { v: 'rental|', other: m.kart || '' }; }
+function kartValueOf(m, tr) { const cls = kartClassOf(m); if (cls === 'sport') { const cat = (m.kartCat && sportClass(m.kartCat) ? m.kartCat : '') || matchSport(m.kart); return cat ? { v: 'sport|' + cat, other: '' } : { v: 'sport|', other: m.kart || '' }; } const fleet = rentalFleet(tr), hit = m.kart ? fleet.find(k => k.name.toLowerCase() === m.kart.toLowerCase()) : null; if (hit) return { v: 'rental|' + hit.name, other: '' }; return m.kart ? { v: 'rental|', other: m.kart } : { v: 'rental|?', other: '' }; }
 // comparable sessions: the same category; a rental session whose model is unknown goes with every rental kart
 function kartCompatible(a, b) { const ka = kartKeyOf(a), kb = kartKeyOf(b); if (ka === kb) return true; if (!kartKeyIsSport(ka) && !kartKeyIsSport(kb)) return ka === 'rental' || kb === 'rental'; return false; }
 // group sessions by category, the busiest category first (rental before sport on a tie)
@@ -3779,6 +3920,8 @@ $('authPassBtn').onclick = async () => { const email = $('authEmail').value.trim
 $('authPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authPassBtn').click(); });
 $('authEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authEmailBtn').click(); });
 
+// ---------- visits: Google Analytics when config.js names a measurement id (not a secret) ----------
+(() => { const cfg = window.HUTKA_CONFIG || {}, id = cfg.analytics || cfg.gaId; if (!id || !/^G-[A-Z0-9]+$/.test(id) || location.protocol !== 'https:') return; try { if (navigator.doNotTrack === '1') return; } catch (e) {} const sc = document.createElement('script'); sc.async = true; sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + id; document.head.appendChild(sc); window.dataLayer = window.dataLayer || []; window.gtag = function () { window.dataLayer.push(arguments); }; gtag('js', new Date()); gtag('config', id, { anonymize_ip: true, send_page_view: true }); addEventListener('hashchange', () => gtag('event', 'page_view', { page_location: location.href, page_path: location.pathname + location.hash })); })();
 // ---------- search ----------
 let qT = null;
 $('q').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(renderSearch, 120); });
@@ -3973,10 +4116,10 @@ async function renderTrackPage(tid, lid) {
     render();
   }
   // the karts people drive here: the track's own list plus whatever drivers reported with their sessions
-  { const box = $('tKarts'); box.innerHTML = ''; const seen = new Map(); for (const k of (Array.isArray(tr.karts) ? tr.karts : [])) if (k && k.name && (k.cls || 'rental') !== 'sport') seen.set('rental:' + kartSlug(k.name), { name: k.name, sport: false, n: 0 });
+  { const box = $('tKarts'); box.innerHTML = ''; const seen = new Map(); for (const k of rentalFleet(tr)) seen.set('rental:' + kartSlug(k.name), { name: k.name, note: k.note || '', main: !!k.main, sport: false, n: 0 });
     for (const g of groupByKart(pubs.filter(s => s.kart || kartClassOf(s) === 'sport'))) { const o = seen.get(g.key) || { name: g.label, sport: g.sport, n: 0 }; o.n += g.items.length; seen.set(g.key, o); }
-    const list = [...seen.values()].sort((a, b) => a.sport - b.sport || b.n - a.n); $('tKartsCard').hidden = !list.length;
-    for (const k of list) { const c = el('span', 'chip' + (k.sport ? ' sport' : '')); c.innerHTML = `${esc(k.name)}${k.n ? ` <b>${k.n}</b>` : ''}`; box.appendChild(c); } }
+    const list = [...seen.values()].sort((a, b) => a.sport - b.sport || (b.main ? 1 : 0) - (a.main ? 1 : 0) || b.n - a.n); $('tKartsCard').hidden = !list.length;
+    for (const k of list) { const c = el('span', 'chip' + (k.sport ? ' sport' : '') + (k.main ? ' main' : '')); c.title = k.main ? t('most common here, likely yours') : ''; c.innerHTML = `${esc(k.name)}${k.note ? ` <i>${esc(k.note)}</i>` : ''}${k.n ? ` <b>${k.n}</b>` : ''}`; box.appendChild(c); } }
   // stats tiles
   const tiles = $('tTiles'); tiles.innerHTML = '';
   const tile = (icon, k, v) => { const d = el('div', 'tile'); const kk = el('div', 'k'); kk.appendChild(svgUse(icon)); kk.appendChild(document.createTextNode(k)); d.appendChild(kk); d.appendChild(el('div', 'v', v)); tiles.appendChild(d); };
@@ -4255,7 +4398,7 @@ function syncLand() {
   const hint = $('landHint'); let seen = false; try { seen = !!localStorage.getItem('hutka.landHint'); } catch (e) {}
   hint.hidden = !(has && isPhone() && !ck && !seen);
   $('landHintText').textContent = t('Turn the phone sideways: the Lab becomes a full-screen cockpit — the satellite photo, the lap line, live numbers and a scrub bar along the lap.');
-  if (ck !== was) { applyMobTab(); if (LAB.map && LAB.G) { LAB.hoverIdx = ck ? clamp(LAB.scrubIdx | 0, 0, LAB.G.track.N - 1) : -1; LAB.map.setHover(LAB.hoverIdx); requestAnimationFrame(() => { LAB.map.fit(true); LAB.map.draw(); if (LAB.dcmp) { renderHud(); renderCkStep(); drawScrub(); drawDataCharts(); renderInspector(); showReadout(); } }); } }
+  if (ck !== was) { applyMobTab(); if (LAB.map && LAB.G) { LAB.hoverIdx = ck ? clamp(LAB.scrubIdx | 0, 0, LAB.G.track.N - 1) : -1; LAB.map.setHover(LAB.hoverIdx); requestAnimationFrame(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); if (LAB.dcmp) { renderHud(); renderCkStep(); drawScrub(); drawDataCharts(); renderInspector(); showReadout(); } }); } }   // a view the driver zoomed or twisted stays as it is
 }
 let vpT = null;
 function onViewportChange() {
@@ -4392,7 +4535,7 @@ function labEnsureMap() {
   // full screen: map, charts, readout and the corner inspector on one screen
   const placePickbar = (fs) => { const pb = $('pickbar'), h = $('hero'); if (fs) { if (pb.parentElement !== h) h.insertBefore(pb, h.firstChild); } else if (pb.parentElement === h) { h.parentElement.insertBefore(pb, h); pb.classList.remove('open'); } };
   $('fsCompare').onclick = () => $('pickbar').classList.toggle('open');
-  const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); placePickbar(on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); syncLand(); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); if (isCockpit()) { renderHud(); renderCkStep(); drawScrub(); } } }, 60); };
+  const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); placePickbar(on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); syncLand(); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (isCockpit()) { renderHud(); renderCkStep(); drawScrub(); } } }, 60); };
   $('lmMap').onclick = () => fsFallbackOn(true);
   $('lmCompare').onclick = () => { $('pickbar').classList.toggle('open'); };
   $('pickClose').onclick = () => $('pickbar').classList.remove('open');
@@ -4402,6 +4545,9 @@ function labEnsureMap() {
   $('btnFullExit').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); };
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('hero').classList.contains('fs-fallback')) fsFallbackOn(false); });
   document.addEventListener('fullscreenchange', () => { const fs = document.fullscreenElement === $('hero'); placePickbar(fs); $('fsHead').hidden = !fs; $('btnFull').classList.toggle('active', fs); syncLand(); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); if (isCockpit()) { renderHud(); renderCkStep(); drawScrub(); } } }, 60); });
+  { const ang = () => (screen.orientation && typeof screen.orientation.angle === 'number') ? screen.orientation.angle : (typeof window.orientation === 'number' ? (window.orientation + 360) % 360 : 0); let last = ang();
+    const onTurn = () => { const a = ang(), d = ((a - last + 540) % 360) - 180; last = a; if (d && LAB.map && LAB.G) LAB.map.deviceTurn(d); };
+    if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', onTurn); else window.addEventListener('orientationchange', onTurn); }
   window.addEventListener('resize', () => { if (APP.route === 'lab' && LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (LAB.dcmp) { renderInspector(); if (isCockpit()) { renderHud(); drawScrub(); } } } });
   window.addEventListener('keydown', (e) => { if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if (APP.route !== 'lab') return; if (e.key === 'Escape' && LAB.selN) { LAB.selN = 0; afterSelect(true); } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { if (LAB.dcmp) { e.preventDefault(); stepCorner(e.key === 'ArrowRight' ? 1 : -1); } } else if (e.key === 'q' || e.key === 'Q') LAB.map.rotateBy(-Math.PI / 24); else if (e.key === 'e' || e.key === 'E') LAB.map.rotateBy(Math.PI / 24); else if (e.key === 'f' || e.key === 'F') $('btnFull').click(); });
   for (const c of [$('chDataSpeed'), $('chDataDelta')]) { c.addEventListener('pointermove', (e) => { const G = LAB.G; if (!G || !LAB.dcmp) return; const r = c.getBoundingClientRect(), x = e.clientX - r.left; const s = (x - PAD.l) / (r.width - PAD.l - PAD.r) * G.track.lengthM, i = Math.round(s / G.track.ds), ni = (i >= 0 && i < G.track.N) ? i : -1; if (ni !== LAB.hoverIdx) { LAB.hoverIdx = ni; if (isCockpit() && ni >= 0) LAB.scrubIdx = ni; LAB.map.setHover(ni); hoverChanged(); } }); c.addEventListener('pointerleave', () => { if (LAB.hoverIdx >= 0) { hoverOff(); if (!isCockpit()) renderInspector(); } }); }
@@ -4970,7 +5116,7 @@ const UPLOAD = (() => {
   // the kart: the track's own list first, then any other rental kart or a sport kart (named by hand)
   function fillKarts() {
     const tid = $('uplTrack').value, tr = tid && tid !== '__new__' ? STORE.getTrack(tid) : null, opts = kartOptions(tr);
-    const cur = $('uplKart').value; fillSelect($('uplKart'), opts, opts.some(o => o[0] === cur) ? cur : (opts[0][0])); syncKart();
+    const cur = $('uplKart').value, keep = opts.some(o => o[0] === cur) && !(/^rental\|\??$/.test(cur) && rentalFleet(tr).length); fillSelect($('uplKart'), opts, keep ? cur : (opts[0][0])); syncKart();
   }
   function syncKart() { const v = $('uplKart').value || 'rental|'; const custom = /\|$/.test(v); $('uplKartOtherField').hidden = !custom; $('uplKartOther').placeholder = v.startsWith('sport') ? 'Rotax Max, X30, KZ2…' : 'Sodi RT8, Birel N35…'; }
   const kartPick = () => kartFromValue($('uplKart').value, $('uplKartOther').value);
@@ -5031,7 +5177,7 @@ function drawPreview(cv, pv, color) {
   return true;
 }
 async function renderHomePage() {
-  $('homeSub').textContent = t('Upload a session — every braking point, apex and throttle point, and a comparison with drivers on the same layout.');
+  $('homeSub').textContent = t('Upload a session from your lap timer: Hutka reads every corner — where you braked, where the apex was, where the throttle came back — and shows where the fastest drivers on the same layout gain on you.');
   $('homeUpload').onclick = () => UPLOAD.open({});
   $('homeSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity); $('homeSignIn').onclick = () => AUTH.open();
   const feed = $('homeFeed'); feed.innerHTML = '';
@@ -5167,19 +5313,37 @@ async function startNew(sessionMeta, quiet) {
   $('aiRename').hidden = true; $('aiDelete').hidden = true; $('aiNewBox').hidden = false;
   const mine = await STORE.mySessions();
   fillSelect($('aiCtxSel'), [['', t('General — my driving, my sessions, what to work on')]].concat(mine.slice(0, 60).map(m => { const tr = STORE.getTrack(m.track); return [m.id, `${m.label || m.name} · ${tr ? tr.name : (m.trackName || t('Custom'))} · ${fmtDate(m.date)} · ${fmtMs(m.bestMs)}`]; })), AI.newCtx);
-  $('aiCtxSel').onchange = () => { AI.newCtx = $('aiCtxSel').value; renderAiChips(); };
+  $('aiCtxSel').onchange = () => { AI.newCtx = $('aiCtxSel').value; renderAiChips(); renderAiLab(AI.newCtx); };
   $('aiNewHint').textContent = t('Pick a session and the coach gets its full corner-by-corner breakdown; the general chat knows your library and the fastest laps on your layouts.');
-  renderAiChips(); renderAiLog(); renderAiNote(); $('aiInput').focus();
+  renderAiChips(); renderAiLog(); renderAiNote(); $('aiInput').focus(); renderAiLab(AI.newCtx);
 }
 async function openChat(c) {
   AI.cur = c; $('aiGrid').classList.add('chat-open'); renderChatList();
   $('aiTitle').textContent = c.title || t('Chat'); const tr = c.track_id ? STORE.getTrack(c.track_id) : null;
   $('aiCtx').innerHTML = c.session_id ? `${t('About session')} <a href="#lab~${esc(c.session_id)}">${esc(tr ? tr.name + (c.layout_id ? ' · ' + c.layout_id : '') : t('open in the Lab'))}</a>` : t('General chat');
   $('aiRename').hidden = false; $('aiDelete').hidden = false; $('aiNewBox').hidden = true;
-  AI.msgs = []; renderAiLog(true);
+  AI.msgs = []; renderAiLog(true); renderAiLab(c.session_id || '');
   AI.msgs = (await STORE.chatMessages(c.id)).map(m => ({ role: m.role, content: m.content, at: m.created_at }));
   if (AI.cur !== c) return;
   renderAiChips(); renderAiLog(); renderAiNote();
+}
+// the Lab insert: what the chat is about — the session's shape, numbers and corners, each one a question away
+let aiLabSeq = 0;
+async function renderAiLab(sid) {
+  const box = $('aiLab'), seq = ++aiLabSeq; if (!sid) { box.hidden = true; return; }
+  let meta = null; try { meta = await STORE.getSessionMeta(sid); } catch (e) {} if (seq !== aiLabSeq) return; if (!meta) { box.hidden = true; return; }
+  box.hidden = false; const tr = STORE.getTrack(meta.track); const ls = meta.track ? await STORE.getLayouts(meta.track) : []; const l = ls.find(x => x.id === meta.layout); if (seq !== aiLabSeq) return;
+  $('aiLabName').textContent = meta.label || meta.name || t('Session'); $('aiLabMeta').textContent = [tr ? tr.name : (meta.trackName || t('Custom')), l ? l.name : '', fmtDate(meta.date), kartLabel(meta)].filter(Boolean).join(' · ');
+  $('aiLabBest').textContent = fmtMs(meta.bestMs); $('aiLabAvg').textContent = fmtMs(meta.avgMs); $('aiLabLaps').textContent = `${meta.nLaps || 0} (${meta.cleanLaps || 0})`; $('aiLabRes').textContent = '—'; $('aiLabOpen').href = '#lab~' + meta.id;
+  const cv = $('aiLabPv'); cv.getContext('2d').clearRect(0, 0, cv.width, cv.height); if (meta.preview && meta.preview.pts) requestAnimationFrame(() => { if (seq === aiLabSeq) drawPreview(cv, meta.preview); });
+  const cb = $('aiLabCorners'); cb.innerHTML = ''; cb.appendChild(el('span', 'hint', t('Reading the corners…')));
+  try { if (!(LAB.current && LAB.current.id === sid && LAB.dcmp)) await LAB.open(meta, false); } catch (e) {}
+  if (seq !== aiLabSeq) return; cb.innerHTML = '';
+  if (LAB.dcmp && LAB.current && LAB.current.id === sid) {
+    const D = LAB.dcmp, coach = LAB.coach; let total = 0;
+    for (const r of D.rows) { const c = coach && coach.corners.find(x => x.n === r.w.n); const res = c ? Math.max(0, r.R.time - c.tTop) : 0; total += res; const ch = el('button', 'chip' + (res > 0.25 ? ' hot' : res > 0.1 ? ' warm' : '')); ch.type = 'button'; ch.innerHTML = `<b>T${r.w.n}</b>${res >= 0.005 ? '−' + res.toFixed(2) + ' s' : '✓'}`; ch.title = t('Ask the coach about T{n}', { n: r.w.n }); ch.onclick = () => { $('aiInput').value = t('T{n}: what exactly am I losing here and what should I change?', { n: r.w.n }); aiSend(); }; cb.appendChild(ch); }
+    $('aiLabRes').textContent = total.toFixed(2) + ' s'; cb.appendChild(el('span', 'hint', t('reserve per corner vs your best passes · tap a corner to ask about it')));
+  } else cb.appendChild(el('span', 'hint', t('The corner breakdown appears once the session opens in the Lab.')));
 }
 function renderAiChips() {
   const box = $('aiChips'); box.innerHTML = ''; const sid = AI.cur ? AI.cur.session_id : AI.newCtx;
@@ -5311,23 +5475,70 @@ const SWS = (() => {
 })();
 // ---------- profile ----------
 let pendingAvatar;
+const cleanName = (v) => String(v || '').replace(/[<>{}\[\]\\\/|@#$%^*_=+~`"]/g, '').replace(/\s+/g, ' ').trim().slice(0, 40);
+const cleanWeight = (v) => { const n = Math.round(+v); return n >= 20 && n <= 200 ? n : null; };
+// first / last name of a profile: the stored pair, else the racing name split in two (older profiles), else the sign-in name
+function splitName(prof, fallback) { if (prof && (prof.firstName || prof.lastName)) return { first: prof.firstName || '', last: prof.lastName || '' }; const full = String((prof && prof.racingName) || fallback || '').trim(), local = String(STORE.me.email || '').split('@')[0].toLowerCase(); if (!full || /@/.test(full) || (local && full.toLowerCase() === local)) return { first: '', last: '' }; const w = full.split(/\s+/); return { first: w[0], last: w.slice(1).join(' ') }; }
+function fillYears(sel, value) { const y0 = new Date().getFullYear() - 5; const opts = [['', '—']]; for (let y = y0; y >= 1930; y--) opts.push([String(y), String(y)]); fillSelect(sel, opts, value ? String(value) : ''); }
+const ageOf = (y) => { if (!y) return null; const a = new Date().getFullYear() - y; return a >= 5 && a <= 100 ? a : null; };
+function personBits(prof) { const a = ageOf(prof && prof.birthYear); return [a ? tn(a, '{n} year old', '{n} years old').replace('{n}', a) : '', prof && prof.weightKg ? `${prof.weightKg} ${t('kg')}` : ''].filter(Boolean).join(' · '); }
+// first sign-in: the profile has to be filled before anything else — bare profiles (an email prefix as the name) are what we had
+const ONBOARD = {
+  needed(prof) { if (!STORE.hasIdentity) return false; const p = prof || {}; const a = STORE.adapter || {}; if (a.profilePerson === false) return !p.racingName || /@/.test(p.racingName) || !p.country || (!!STORE.me.email && p.racingName.toLowerCase() === String(STORE.me.email).split('@')[0].toLowerCase()); return !p.firstName || !p.lastName || !p.country; },
+  async check() { if (!STORE.hasIdentity) return false; let prof = null; try { prof = await STORE.profile(STORE.me.id); } catch (e) {} if (!ONBOARD.needed(prof)) return false; ONBOARD.open(prof || {}); return true; },
+  photo: undefined,
+  open(prof) {
+    const me = STORE.me, nm = splitName(prof, me.name);
+    ONBOARD.photo = undefined; $('onbAvatar').src = (prof && prof.avatar) || me.avatarUrl || GENERIC_AVATAR;
+    $('onbFirst').value = nm.first; $('onbLast').value = nm.last;
+    fillCountries($('onbCountry'), true); $('onbCountry').querySelector('option').textContent = t('— choose —'); $('onbCountry').value = prof.country || guessCountry() || '';
+    const trs = STORE.getTracks().slice().sort((a, b) => (a.country || '').localeCompare(b.country || '') || a.name.localeCompare(b.name));
+    fillSelect($('onbHome'), [['', t('— choose —')]].concat(trs.map(x => [x.id, `${x.name}${x.city ? ' · ' + x.city : ''} ${flag(x.country)}`])).concat([['-', t('My track is not listed yet')]]), prof.homeTrack || '');
+    fillYears($('onbYear'), prof.birthYear); $('onbWeight').value = prof.weightKg || '';
+    $('onbWho').textContent = me.email ? t('Signed in as {email}', { email: me.email }) : '';
+    setStatus('onbStatus', ''); $('onbModal').hidden = false; document.body.classList.add('onboarding');
+    setTimeout(() => { (nm.first ? (nm.last ? $('onbCountry') : $('onbLast')) : $('onbFirst')).focus(); }, 50);
+  },
+  close() { $('onbModal').hidden = true; document.body.classList.remove('onboarding'); }
+};
+function guessCountry() { try { const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; const m = { 'Asia/Dubai': 'AE', 'Asia/Muscat': 'OM', 'Asia/Qatar': 'QA', 'Asia/Bahrain': 'BH', 'Asia/Riyadh': 'SA', 'Asia/Kuwait': 'KW', 'Europe/Minsk': 'BY', 'Europe/Moscow': 'RU', 'Europe/Kiev': 'UA', 'Europe/Kyiv': 'UA', 'Europe/Warsaw': 'PL', 'Europe/Vilnius': 'LT', 'Europe/Riga': 'LV', 'Europe/Tallinn': 'EE', 'Asia/Almaty': 'KZ', 'Asia/Tbilisi': 'GE', 'Asia/Yerevan': 'AM', 'Europe/London': 'GB', 'Europe/Berlin': 'DE', 'Europe/Paris': 'FR', 'Europe/Madrid': 'ES', 'Europe/Rome': 'IT', 'Europe/Istanbul': 'TR', 'Asia/Bangkok': 'TH', 'Asia/Singapore': 'SG', 'Asia/Kolkata': 'IN', 'America/New_York': 'US', 'America/Los_Angeles': 'US', 'America/Chicago': 'US' }; return m[tz] || ''; } catch (e) { return ''; } }
+$('onbPhoto').onchange = async (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; try { ONBOARD.photo = await imageToDataUrl(f, 256, 60000); $('onbAvatar').src = ONBOARD.photo; } catch (err) { setStatus('onbStatus', t('Could not read the image.'), 'warn'); } e.target.value = ''; };
+$('onbSignOut').onclick = async () => { try { await STORE.adapter.signOut(); } catch (e) {} STORE.reload(); };
+$('onbSave').onclick = async () => {
+  const first = cleanName($('onbFirst').value), last = cleanName($('onbLast').value), country = $('onbCountry').value, home = $('onbHome').value;
+  if (!first) { setStatus('onbStatus', t('Enter your first name.'), 'warn'); $('onbFirst').focus(); return; }
+  if (!last) { setStatus('onbStatus', t('Enter your last name.'), 'warn'); $('onbLast').focus(); return; }
+  if (!country) { setStatus('onbStatus', t('Choose your country.'), 'warn'); $('onbCountry').focus(); return; }
+  if (!home) { setStatus('onbStatus', t('Choose your home track (or “not listed yet”).'), 'warn'); $('onbHome').focus(); return; }
+  const b = $('onbSave'); b.classList.add('busy'); setStatus('onbStatus', t('Saving…'));
+  try {
+    const prof = (await STORE.profile(STORE.me.id)) || {};
+    const body = Object.assign({}, prof, { firstName: first, lastName: last, racingName: `${first} ${last}`.slice(0, 40), country, homeTrack: home === '-' ? '' : home, birthYear: +$('onbYear').value || null, weightKg: cleanWeight($('onbWeight').value), avatar: ONBOARD.photo === undefined ? (prof.avatar || '') : (ONBOARD.photo || '') });
+    await STORE.saveProfile(body); await STORE.refreshProfile();
+    ONBOARD.close(); toast(t('Welcome, {name}! Your profile is set.', { name: first })); renderShell(); if (APP.route === 'profile') renderProfile();
+  } catch (e) { setStatus('onbStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
+  b.classList.remove('busy');
+};
+for (const id of ['onbFirst', 'onbLast', 'onbWeight']) $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') $('onbSave').click(); });
 async function renderProfile() {
   const me = STORE.me, prof = (STORE.hasIdentity ? await STORE.profile(me.id) : STORE.localProfile()) || {};
   pendingAvatar = undefined;
   $('profAvatar').src = await myAvatar();
   $('profName').textContent = prof.racingName || me.name || t('Guest');
   const home = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null;
-  $('profMeta').textContent = STORE.hasIdentity ? [me.canEdit ? t('Hutka admin') : t('Driver'), prof.country ? flag(prof.country) + ' ' + countryName(prof.country) : '', home ? t('Home track: {name}', { name: home.name }) : ''].filter(Boolean).join(' · ') : t('Guest — this library lives in this browser only');
-  $('profSub').textContent = STORE.hasIdentity ? t('Your racing name and photo are what other drivers see next to your laps.') : (STORE.hasAuth ? t('Sign in to get a library that works on every device and to publish sessions.') : t('Sign in to claude.ai and open the shared Hutka link to get an account that works on every device.'));
+  $('profMeta').textContent = STORE.hasIdentity ? [me.canEdit ? t('Hutka admin') : t('Driver'), prof.country ? flag(prof.country) + ' ' + countryName(prof.country) : '', home ? t('Home track: {name}', { name: home.name }) : '', personBits(prof)].filter(Boolean).join(' · ') : t('Guest — this library lives in this browser only');
+  $('profSub').textContent = STORE.hasIdentity ? t('Your name and photo are what other drivers see next to your laps.') : (STORE.hasAuth ? t('Sign in to get a library that works on every device and to publish sessions.') : t('Sign in to claude.ai and open the shared Hutka link to get an account that works on every device.'));
   $('profSignOut').hidden = !(STORE.hasAuth && STORE.hasIdentity);
   fillCountries($('profCountry'), true); $('profCountry').value = prof.country || '';
   const trs = STORE.getTracks(); fillSelect($('profHome'), [['', '—']].concat(trs.map(x => [x.id, x.name])), prof.homeTrack || '');
-  $('profRacing').value = prof.racingName || ''; $('profBio').value = prof.bio || ''; $('profIg').value = prof.instagram || ''; $('profContact').value = prof.contact || ''; $('profCoach').checked = !!prof.coach; $('profSws').value = prof.sws || '';
+  { const nm = splitName(prof); $('profFirst').value = nm.first; $('profLast').value = nm.last; } fillYears($('profYear'), prof.birthYear); $('profWeight').value = prof.weightKg || ''; $('profBio').value = prof.bio || ''; $('profIg').value = prof.instagram || ''; $('profContact').value = prof.contact || ''; $('profCoach').checked = !!prof.coach; $('profSws').value = prof.sws || '';
   $('profSwsHint').textContent = t('Paste the link to your SWS driver page; it is shown on your public page. “Import SWS results” brings your race history here.');
   $('profSwsImport').onclick = () => SWS.open({});
   { const card = $('profSwsCard'); card.hidden = true; }   // SWS lives inside the session editor for now (less noise on the profile)
   $('profSave').onclick = async () => {
-    const body = { racingName: $('profRacing').value.trim().slice(0, 40), country: $('profCountry').value, homeTrack: $('profHome').value, avatar: pendingAvatar === undefined ? (prof.avatar || '') : (pendingAvatar || ''), bio: $('profBio').value.trim().slice(0, 160), instagram: $('profIg').value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@').replace(/\/$/, '').slice(0, 80), contact: $('profContact').value.trim().slice(0, 160), coach: $('profCoach').checked, sws: $('profSws').value.trim().slice(0, 200), swsResults: prof.swsResults || null };
+    const first = cleanName($('profFirst').value), last = cleanName($('profLast').value);
+    if (!first) { setStatus('profStatus', t('Enter your first name.'), 'warn'); $('profFirst').focus(); return; }
+    const body = { firstName: first, lastName: last, racingName: [first, last].filter(Boolean).join(' ').slice(0, 40), birthYear: +$('profYear').value || null, weightKg: cleanWeight($('profWeight').value), country: $('profCountry').value, homeTrack: $('profHome').value, avatar: pendingAvatar === undefined ? (prof.avatar || '') : (pendingAvatar || ''), bio: $('profBio').value.trim().slice(0, 160), instagram: $('profIg').value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@').replace(/\/$/, '').slice(0, 80), contact: $('profContact').value.trim().slice(0, 160), coach: $('profCoach').checked, sws: $('profSws').value.trim().slice(0, 200), swsResults: prof.swsResults || null };
     const b = $('profSave'); b.classList.add('busy'); setStatus('profStatus', t('Saving…'));
     try {
       await STORE.saveProfile(body);
@@ -5336,7 +5547,7 @@ async function renderProfile() {
       Object.assign(prof, back || body); pendingAvatar = undefined;
       setStatus('profStatus', t('Saved ✓ {when}', { when: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }), 'ok');
       renderShell(); $('profName').textContent = prof.racingName || me.name || t('Guest'); $('profAvatar').src = await myAvatar();
-      const h2 = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null; $('profMeta').textContent = [me.canEdit ? t('Hutka admin') : t('Driver'), prof.country ? flag(prof.country) + ' ' + countryName(prof.country) : '', h2 ? t('Home track: {name}', { name: h2.name }) : ''].filter(Boolean).join(' · ');
+      const h2 = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null; $('profMeta').textContent = [me.canEdit ? t('Hutka admin') : t('Driver'), prof.country ? flag(prof.country) + ' ' + countryName(prof.country) : '', h2 ? t('Home track: {name}', { name: h2.name }) : '', personBits(prof)].filter(Boolean).join(' · ');
     } catch (e) { setStatus('profStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');
   };
@@ -5416,11 +5627,34 @@ const ADMIN = (() => {
     fillCountries($('aCountry'), true);
     await renderTrackList(); if (admin) await renderClaims();
     $('admAiCard').hidden = !(admin && STORE.aiOn); if (admin && STORE.aiOn) renderAiUsage($('admAiUsage'));
+    $('admStatsCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderSiteStats();
     $('admImportCard').hidden = !admin; if (admin && !$('osmCountry').options.length) { fillCountries($('osmCountry'), false); $('osmCountry').value = 'AE'; }
     if (tid && STORE.getTrack(tid)) { A.tid = tid; A.lid = lid || null; await renderTrackForm(); await renderLayouts(); if (lid) await renderLayoutEditor(); else $('admLayoutCard').hidden = true; }
     else { A.tid = null; A.lid = null; $('admEmpty').hidden = false; $('admTrackCard').hidden = true; $('admLayoutsCard').hidden = true; $('admLayoutCard').hidden = true; }
   }
   async function addTrack() { const id = await STORE.saveTrack({ name: t('New track'), city: '', country: 'AE', lat: 25.2, lon: 55.3, createdAt: Date.now() }); go('admin~' + id); }
+  // site statistics (hutka_stats(): stats.sql)
+  async function renderSiteStats() {
+    const box = $('admStats'); box.innerHTML = ''; $('admStatsSub').textContent = ''; let S = null;
+    try { S = await STORE.adminStats(); } catch (e) { box.appendChild(el('div', 'hint', /hutka_stats|function|404|PGRST202/i.test(String(e && e.message || e)) ? t('Run supabase/stats.sql in the SQL editor once — the numbers appear here.') : t('Could not load: {e}', { e: e && e.message || e }))); return; }
+    if (!S) return; $('admStatsSub').textContent = t('live, admins only');
+    const tiles = el('div', 'tiles');
+    for (const [k, v, sub] of [[t('Drivers'), S.drivers, t('+{n} in 7 days', { n: S.drivers_7d })], [t('Active drivers'), S.active_7d, t('signed in within 7 days · {n} in 30', { n: S.active_30d })], [t('Profiles filled'), S.profiles_done, t('of {n}', { n: S.drivers })], [t('Sessions'), S.sessions, t('+{n} in 7 days · {p} published', { n: S.sessions_7d, p: S.published })], [t('Laps'), S.laps, ''], [t('Likes'), S.likes, t('{n} comments · {f} follows', { n: S.comments, f: S.follows })], [t('AI questions'), S.ai_questions, t('+{n} in 7 days', { n: S.ai_7d })], [t('Tracks'), S.tracks, t('{n} layouts', { n: S.layouts })]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${esc(String(v))}</div>${sub ? `<div class="hint">${esc(sub)}</div>` : ''}`; tiles.appendChild(d); }
+    box.appendChild(tiles);
+    const charts = el('div', 'stat-charts');
+    for (const [title, rows] of [[t('Sign-ups, last 30 days'), S.signups_by_day || []], [t('Uploads, last 30 days'), S.uploads_by_day || []]]) { const w = el('div', 'stat-chart'); w.appendChild(el('div', 'lbl', title + ' · ' + rows.reduce((a, r) => a + (r.n || 0), 0))); const cv = document.createElement('canvas'); w.appendChild(cv); charts.appendChild(w); requestAnimationFrame(() => drawDays(cv, rows)); }
+    box.appendChild(charts);
+    if (S.top_tracks && S.top_tracks.length) { const l = el('div', 'list'); l.style.marginTop = '12px'; for (const r of S.top_tracks) { const tr = STORE.getTrack(r.track); const a = el('a', 'item'); a.href = '#track~' + esc(r.track); a.append(el('span', 'name', tr ? tr.name : r.track), el('span', 'meta', tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n))); l.appendChild(a); } box.appendChild(el('div', 'lbl', t('Tracks by sessions'))); box.appendChild(l); }
+    box.appendChild(el('div', 'hint', t('Visits and devices: Google Analytics (analytics.google.com), when the measurement ID is in config.js.')));
+  }
+  function drawDays(cv, rows) {
+    const box = cv.parentElement, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = box.clientWidth || 300, h = 72; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); cv.style.width = w + 'px'; cv.style.height = h + 'px';
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); const cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue('--accent').trim() || '#2f6bf0', line = cs.getPropertyValue('--line').trim() || '#ddd', muted = cs.getPropertyValue('--muted').trim() || '#888';
+    const days = []; for (let i = 29; i >= 0; i--) { const d = new Date(Date.now() - i * 864e5); days.push(d.toISOString().slice(0, 10)); } const by = {}; for (const r of rows) by[String(r.d).slice(0, 10)] = r.n || 0; const vals = days.map(d => by[d] || 0), mx = Math.max(1, ...vals), bw = w / 30;
+    ctx.strokeStyle = line; ctx.beginPath(); ctx.moveTo(0, h - 14.5); ctx.lineTo(w, h - 14.5); ctx.stroke();
+    ctx.fillStyle = acc; vals.forEach((v, i) => { const bh = Math.round((h - 20) * v / mx); if (v) ctx.fillRect(i * bw + 1, h - 15 - bh, Math.max(2, bw - 2), bh); });
+    ctx.fillStyle = muted; ctx.font = '10px system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.fillText(days[0].slice(5), 0, h - 3); ctx.textAlign = 'right'; ctx.fillText(t('today'), w, h - 3); ctx.textAlign = 'center'; ctx.fillText(String(mx), w / 2, 10);
+  }
   async function renderTrackList() { const box = $('admTracks'); box.innerHTML = ''; for (const tr of STORE.getTracks().filter(tr => STORE.canEditTrack(tr))) { const a = el('a', 'item' + (tr.id === A.tid ? ' sel' : '')); a.href = '#admin~' + tr.id; const lg = el('div', 'logo'); logoInto(lg, tr); a.append(lg, el('span', 'name', tr.name), el('span', 'meta', [tr.city, flag(tr.country)].filter(Boolean).join(' '))); box.appendChild(a); } if (!STORE.getTracks().length) box.appendChild(el('div', 'hint', t('No tracks yet.'))); }
   async function renderClaims() { const box = $('admClaims'); box.innerHTML = ''; const cl = await STORE.claims(); if (!cl.length) { box.appendChild(el('div', 'hint', t('No requests.'))); return; } const names = await STORE.names(cl.map(c => c.by)); for (const c of cl) { const row = el('div', 'item'); const tr = STORE.getTrack(c.track); row.append(el('span', 'name', `${tr ? tr.name : c.track} — ${names[c.by] ? names[c.by].name : c.by}`), el('span', 'meta', fmtDate(c.createdAt))); const x = el('button', 'x', '×'); x.type = 'button'; x.onclick = async () => { await STORE.deleteClaim(c.id); renderClaims(); }; row.appendChild(x); box.appendChild(row); } }
   const F = { aName: 'name', aCity: 'city', aCountry: 'country', aLat: 'lat', aLon: 'lon', aAddress: 'address', aPhone: 'phone', aWeb: 'website', aBooking: 'booking', aVideo: 'video', aOpen: 'open', aClose: 'close', aLen: 'lengthM', aCorners: 'corners', aVmax: 'vmax', aSessMin: 'sessMin', aFia: 'fia', aIg: 'instagram', aYt: 'youtube', aFb: 'facebook', aTt: 'tiktok', aDesc: 'description' };
@@ -5429,7 +5663,7 @@ const ADMIN = (() => {
     const tr = STORE.getTrack(A.tid); if (!tr) return;
     $('admEmpty').hidden = true; $('admTrackCard').hidden = false; $('admLayoutsCard').hidden = false; $('admTrackId').textContent = '#' + tr.id;
     for (const id in F) { const k = F[id], v = tr[k]; $(id).value = v === undefined || v === null ? '' : (k === 'fia' ? (v === true || v === 1 || v === '1' ? '1' : (v === false || v === 0 || v === '0' ? '0' : '')) : v); }
-    $('aKarts').value = (Array.isArray(tr.karts) ? tr.karts : []).filter(k => k && k.name).map(k => k.name + (k.cls === 'sport' ? ' · sport' : '')).join('\n');
+    $('aKarts').value = (Array.isArray(tr.karts) ? tr.karts : []).filter(k => k && k.name).map(k => (k.main ? '* ' : '') + k.name + (k.note ? ' · ' + k.note : '') + (k.cls === 'sport' ? ' · sport' : '')).join('\n');
     pendingCover = undefined; pendingLogo = undefined;
     logoInto($('aLogoPrev'), tr);
     const cover = await STORE.getMedia(`tracks/${A.tid}/media/cover`); $('aCoverPrev').hidden = !cover; if (cover) $('aCoverPrev').src = cover;
@@ -5443,7 +5677,7 @@ const ADMIN = (() => {
     const tr = Object.assign({}, STORE.getTrack(A.tid)); if (!tr.id) return;
     for (const id in F) { const k = F[id]; let v = $(id).value; if (['lat', 'lon', 'lengthM', 'corners', 'vmax', 'sessMin'].includes(k)) v = v === '' ? null : +v; if (k === 'fia') v = v === '' ? '' : v === '1'; tr[k] = typeof v === 'string' ? v.trim() : v; }
     if (pendingLogo !== undefined) tr.logo = pendingLogo || '';
-    tr.karts = $('aKarts').value.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(l => { const sport = /(^|[\s·|,(-])(sport|спорт)\b/i.test(l); const name = l.replace(/[\s·|,(-]*(sport|спорт)[\s)]*$/i, '').trim(); return { name: name.slice(0, 40), cls: sport ? 'sport' : 'rental' }; }).filter(k => k.name);
+    tr.karts = $('aKarts').value.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(l => { const main = /^\*/.test(l); l = l.replace(/^\*\s*/, ''); const sport = /(^|[\s·|,(-])(sport|спорт)\b/i.test(l); l = l.replace(/[\s·|,(-]*(sport|спорт)[\s)]*$/i, '').trim(); const parts = l.split(/\s*·\s*/); const k = { name: parts[0].trim().slice(0, 40), cls: sport ? 'sport' : 'rental' }; if (parts.length > 1) k.note = parts.slice(1).join(' · ').slice(0, 40); if (main) k.main = true; return k; }).filter(k => k.name);
     const b = $('aSave'); b.classList.add('busy');
     try { await STORE.saveTrack(tr); if (pendingCover !== undefined) await STORE.setMedia(`tracks/${A.tid}/media/cover`, pendingCover); setStatus('aStatus', t('Saved'), 'ok'); renderTrackList(); if (APP.geo) APP.geo.draw(); } catch (e) { setStatus('aStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');
@@ -5567,7 +5801,8 @@ const ADMIN = (() => {
   $('q').placeholder = t('Search tracks, drivers...');
   try { await STORE.init(); } catch (e) {}
   renderShell(); I18N.applyStatic();
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  try { await ONBOARD.check(); } catch (e) {}
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { await NATIVE.init(); } catch (e) {}
