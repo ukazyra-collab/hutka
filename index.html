@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="Hutka">
 <style>[hidden]{display:none!important}html{color-scheme:light}</style>
 <script src="config.js"></script>
-<script>if ("serviceWorker" in navigator && location.protocol === "https:") addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));</script>
+<script>if ("serviceWorker" in navigator && location.protocol === "https:") addEventListener("load", () => { navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => { const u = (r.active || r.waiting || r.installing || {}).scriptURL || ""; if (u && !/\/sw\.js$/.test(u)) r.unregister(); })).catch(() => {}); if (window.caches) caches.keys().then(ks => ks.forEach(k => { if (!k.startsWith("hutka-")) caches.delete(k); })).catch(() => {}); navigator.serviceWorker.register("sw.js").catch(() => {}); });</script>
 <script src="supabase.js"></script>
 </head>
 <body>
@@ -653,53 +653,105 @@ textarea{min-height:90px;resize:vertical}
   .tbl.resp td:last-child::before,.tbl.resp td.noLbl::before{display:none}
   .tbl.resp td .row{flex-wrap:wrap}
 }
-/* ---------- phone held sideways: the Lab becomes a cockpit — map on the left, corners on the right ---------- */
-@media (max-height:520px) and (orientation:landscape) and (pointer:coarse){
-  body.lab-land{overflow:hidden}
-  body.lab-land .top,body.lab-land .tabbar{display:none!important}
-  body.lab-land .page{padding:0;gap:0;max-width:none}
-  #pg-lab.has{display:grid;grid-template-columns:minmax(0,1fr) 46%;grid-template-rows:40px auto minmax(0,1fr);height:100vh;height:100dvh;overflow:hidden;padding:0;gap:0}
-  #pg-lab.has .ph,#pg-lab.has #labGuestNote,#pg-lab.has #landHint,#pg-lab.has #labStart{display:none!important}
-  #pg-lab.has #labMob{grid-column:1 / -1;grid-row:1;position:static;margin:0;padding:0 8px;height:40px;gap:6px;border-bottom:1px solid var(--line)}
-  #pg-lab.has #labMob .lm-t{flex-direction:row;align-items:baseline;gap:8px}
-  #pg-lab.has #labMob .lm-t b{font-size:17px}
-  #pg-lab.has #labMob .lm-t .lbl{max-width:28vw}
-  #pg-lab.has #labMob .btn.sm{height:30px;padding:0 9px;font-size:12.5px}
-  #pg-lab.has #lmBack{padding:0 10px;font-size:20px;line-height:1}
-  #pg-lab.has .land-only{display:flex!important}
-  #pg-lab.has #lmStep .btn{height:30px;padding:0 10px;font-size:15px;line-height:1}
-  #pg-lab.has #lmStep #lmCorner{font-weight:700;min-width:52px;font-size:13px}
-  #pg-lab.has #hero{grid-column:1;grid-row:2 / 4;min-height:0;display:flex;flex-direction:column;align-items:stretch;gap:0;border-right:1px solid var(--line)}
-  #pg-lab.has .map-wrap{border:0;border-radius:0;flex:1;min-height:0;display:flex;flex-direction:column;width:100%}
-  #pg-lab.has #mapBox{flex:1;min-height:0;overflow:hidden}
-  #pg-lab.has .map-bar{padding:3px 6px;gap:3px;flex:none}
-  #pg-lab.has .map-bar .btn{height:28px;padding:0 8px;font-size:12px}
-  #pg-lab.has .map-bar #btnFull{display:none}
-  #pg-lab.has .legend,#pg-lab.has .map-title{display:none}
-  #pg-lab.has .readout{font-size:11px}
-  #pg-lab.has.tab-chart #mapBox,#pg-lab.has.tab-chart .map-bar{display:none}
-  #pg-lab.has.tab-chart .charts.under{flex:1;min-height:0;overflow:auto;border-top:0}
-  #pg-lab.has #labTabs{grid-column:2;grid-row:2;padding:4px 6px 2px;gap:4px;margin:0}
-  #pg-lab.has #labTabs button{padding:5px 10px;font-size:12px}
-  #pg-lab.has #cornersPanel,#pg-lab.has #digestPanel,#pg-lab.has #discussPanel,#pg-lab.has #askPanel{grid-column:2;grid-row:3;min-height:0;overflow:auto;border:0;border-radius:0;padding:4px 8px 12px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-  #pg-lab.has #cornersPanel h2{display:none}
-  #pg-lab.has #digestPanel h2,#pg-lab.has #discussPanel h2,#pg-lab.has #askPanel h2{font-size:13px;margin-bottom:6px}
-  #pg-lab.has .crow{padding:7px 8px;border-radius:10px;gap:2px 8px}
-  #pg-lab.has .crow b{font-size:14px}
-  #pg-lab.has .crow .k{font-size:11.5px}
-  #pg-lab.has .digest{font-size:13px}
-  #pg-lab.has .hero .inspector{left:auto;right:0;top:40px;bottom:0;width:46%;max-height:none;border-radius:0;border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.15);transform:translateX(110%);padding:10px 12px 14px;overscroll-behavior:contain}
-  #pg-lab.has .hero .inspector.open{transform:none}
-  #pg-lab.has .insp-head b{font-size:18px}
-  #pg-lab.has #pickbar.open{left:auto;right:0;top:40px;bottom:0;width:62%;max-height:none;border-radius:0;border-left:1px solid var(--line)}
-  #pg-lab.has .hero.fs-fallback{border:0}
-  #pg-lab.has .hero.fs-fallback .charts.under{display:none!important}
-  #pg-lab.has .hero.fs-fallback .inspector{top:0;width:46%}
-  #pg-lab.has .hero.fs-fallback .fs-head{padding:0 10px;height:40px;flex:none}
-  #pg-lab.has .hero.fs-fallback .fs-head .lapline .big{font-size:18px}
-  #pg-lab.has .hero.fs-fallback .fs-head .btn{height:30px;font-size:12.5px;padding:0 10px}
-  .toast{bottom:12px}
-}
+/* ---------- the phone cockpit: a phone held sideways, or the full-screen map on a phone — a logger-app layout over the whole screen:
+   live data at the top left, round buttons on the right, the lap scrub bar at the bottom; corners, digest, coach and the comparison open as sheets ---------- */
+.ck-hud,.ck-btns,.ck-scrub{display:none}
+@media (max-height:520px) and (orientation:landscape) and (pointer:coarse){ .toast{bottom:12px} }
+body.cockpit{overflow:hidden}
+body.cockpit .top,body.cockpit .tabbar,body.cockpit #labMob,body.cockpit .land-hint{display:none!important}
+body.cockpit .page{padding:0;gap:0;max-width:none}
+body.cockpit #pg-lab.has{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
+body.cockpit #pg-lab.has .ph,body.cockpit #pg-lab.has #labGuestNote,body.cockpit #pg-lab.has #labStart{display:none!important}
+body.cockpit #hero{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:stretch;gap:0;padding:0;background:var(--bg);border:0;border-radius:0;overflow:hidden;height:auto}
+body.cockpit #hero .fs-head{display:none!important}
+body.cockpit #hero .map-wrap{flex:1;min-height:0;display:flex;flex-direction:column;width:100%;border:0;border-radius:0;background:var(--bg);max-height:none}
+body.cockpit #mapBox{flex:1;min-height:0;overflow:hidden}
+body.cockpit .legend,body.cockpit .map-title,body.cockpit .readout,body.cockpit .mapnote{display:none!important}
+/* the toolbar (markers, labels, rotate, zoom, imagery) is a strip above the scrub bar, shown by the ⋯ button */
+body.cockpit #hero .map-bar{display:none;position:absolute;left:8px;right:56px;bottom:76px;z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);backdrop-filter:blur(10px);padding:5px 6px;gap:4px;overflow-x:auto;justify-content:flex-start;flex-wrap:nowrap;scrollbar-width:none}
+body.cockpit.ck-tools #hero .map-bar{display:flex}
+body.cockpit #hero .map-bar .btn{height:30px;padding:0 9px;font-size:12px;background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.16);flex:none}
+body.cockpit #hero .map-bar .seg{border-color:rgba(255,255,255,.16)}
+body.cockpit #hero .map-bar .btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+body.cockpit #hero .map-bar #btnFull,body.cockpit #hero .map-bar #tglTiles{display:none}
+body.cockpit .align-bar{position:absolute;left:8px;right:56px;top:70px;z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);color:#fff;backdrop-filter:blur(10px);font-size:12px}
+body.cockpit .align-bar .hint{color:rgba(255,255,255,.8)}
+body.cockpit .align-bar .btn.xs{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.18)}
+body.cockpit .align-bar .btn.xs.primary{background:var(--accent);border-color:var(--accent)}
+body.cockpit .sat-pill{left:8px;right:56px;bottom:76px;max-width:none;font-size:11px;padding:4px 4px 4px 10px}
+body.cockpit .sat-pill .btn.xs{height:26px;padding:0 9px;font-size:11.5px}
+body.cockpit #hero .charts.under{display:none}
+body.cockpit.ck-chart #hero .charts.under{display:block;position:absolute;left:8px;right:56px;bottom:76px;z-index:5;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(10px);padding:2px 6px 4px;max-height:calc(100% - 150px);overflow:hidden}
+body.cockpit.ck-chart #dataSub{display:none}
+/* the HUD: lap rows — colour, lap time, then the speed, time and distance at the scrub position (and Δt against the comparison) */
+body.cockpit .ck-hud{display:flex;position:absolute;left:8px;top:8px;align-items:flex-start;gap:8px;z-index:4;max-width:calc(100% - 64px)}
+.ck-rb{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(10,14,24,.7);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;font:600 22px/1 var(--body);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25);padding:0;flex:none;-webkit-tap-highlight-color:transparent}
+.ck-rb svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ck-rb.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.ck-rb[hidden]{display:none}
+.ck-panel{background:rgba(10,14,24,.7);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:5px 10px;color:#fff;display:grid;grid-template-columns:12px minmax(40px,1fr) auto auto auto auto;gap:3px 9px;align-items:baseline;min-width:0;box-shadow:0 2px 10px rgba(0,0,0,.25);font:11px/1.25 var(--mono);white-space:nowrap;cursor:pointer}
+.ck-panel > span{min-width:0;opacity:.68}
+.ck-panel > span.on{opacity:1}
+.ck-panel .sw{align-self:center}
+.ck-panel .sw i{display:block;width:12px;height:3px;border-radius:2px;background:var(--c)}
+.ck-panel .sw.dash i{background:repeating-linear-gradient(90deg,var(--c) 0 3px,transparent 3px 5px)}
+.ck-panel .nm{overflow:hidden;text-overflow:ellipsis;font-size:10.5px}
+.ck-panel .nm b{font-size:14px;font-weight:700;margin-right:6px}
+.ck-panel .v{font-size:9.5px;text-align:right}
+.ck-panel .v b{font-size:13px;font-weight:600}
+.ck-panel .v.dt.loss b{color:#ff8a8a}.ck-panel .v.dt.gain b{color:#5fe08f}
+.ck-panel > span.on.v,.ck-panel > span.on.nm{opacity:1}
+/* upright: the back button alone in the corner, the data panel on a line of its own under it */
+body.cockpit:not(.lab-land) .ck-hud{display:block;left:8px;right:8px;max-width:none}
+body.cockpit:not(.lab-land) .ck-hud #ckBack{position:absolute;left:0;top:0}
+body.cockpit:not(.lab-land) .ck-hud .ck-panel{margin-top:48px;max-width:calc(100% - 48px)}
+/* round buttons on the right: satellite, compare, corners, chart, coach, more */
+body.cockpit .ck-btns{display:flex;position:absolute;right:8px;top:8px;flex-direction:column;gap:6px;z-index:6;transition:right .25s ease}
+/* the scrub bar: previous / corner / next on the left, then the speed trace of the lap with the position marker — drag anywhere along it */
+body.cockpit .ck-scrub{display:flex;position:absolute;left:8px;right:8px;bottom:8px;height:60px;align-items:stretch;z-index:4;border-radius:14px;background:rgba(10,14,24,.7);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 18px rgba(0,0,0,.28);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+.ck-step{display:flex;align-items:center;flex:none;border-right:1px solid rgba(255,255,255,.12);padding:0 2px;touch-action:manipulation}
+.ck-step button{background:none;border:0;color:#fff;height:100%;padding:0 10px;font:600 22px/1 var(--body);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ck-step .ck-ct{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 4px;width:136px;gap:2px}
+body.cockpit:not(.lab-land) .ck-step .ck-ct{width:104px}
+body.cockpit:not(.lab-land) .ck-step button{padding:0 6px}
+.ck-step .ck-ct b{font:700 15px/1 var(--mono)}
+.ck-step .ck-ct span{font:10px/1.1 var(--body);opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ck-step .ck-ct.sel b{color:#8db4ff}
+body.cockpit .ck-scrub canvas{flex:1;min-width:0;width:auto;display:block;height:100%;cursor:ew-resize}
+@media (max-height:360px){ .ck-rb{width:34px;height:34px;font-size:19px} .ck-rb svg{width:18px;height:18px} body.cockpit .ck-btns{gap:5px} body.cockpit .ck-scrub{height:52px} }
+/* sheets: corners / digest / discussion / coach (tabs on top), the comparison picker and the corner inspector — on the right when sideways, from the bottom when upright */
+body.cockpit #labTabs{display:none!important}
+body.cockpit #cornersPanel,body.cockpit #digestPanel,body.cockpit #discussPanel,body.cockpit #askPanel{display:none}
+body.cockpit.ck-side #labTabs{display:flex!important;position:fixed;z-index:63;margin:0;padding:6px 8px;gap:4px;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);align-items:center;overflow-x:auto}
+body.cockpit.ck-side #labTabs button[data-tab]{padding:5px 10px;font-size:12px}
+body.cockpit.ck-side #labTabs button[data-tab="chart"]{display:none}
+#labTabs .x{display:none}
+body.cockpit.ck-side #labTabs .x{display:grid;place-items:center;margin-left:auto;flex:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);font-size:17px;line-height:1;padding:0;cursor:pointer}
+body.cockpit.ck-side #cornersPanel,body.cockpit.ck-side #digestPanel,body.cockpit.ck-side #discussPanel,body.cockpit.ck-side #askPanel{display:block;position:fixed;z-index:62;margin:0;overflow:auto;border:0;border-radius:0;padding:6px 10px 14px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px)}
+body.cockpit.lab-land.ck-side #labTabs{right:0;top:0;width:46%;height:42px;border-left:1px solid var(--line);border-bottom:1px solid var(--line)}
+body.cockpit.lab-land.ck-side #cornersPanel,body.cockpit.lab-land.ck-side #digestPanel,body.cockpit.lab-land.ck-side #discussPanel,body.cockpit.lab-land.ck-side #askPanel{right:0;top:42px;bottom:0;width:46%;border-left:1px solid var(--line)}
+body.cockpit:not(.lab-land).ck-side #labTabs{left:0;right:0;bottom:56vh;height:42px;border-top:1px solid var(--line);border-radius:16px 16px 0 0}
+body.cockpit:not(.lab-land).ck-side #cornersPanel,body.cockpit:not(.lab-land).ck-side #digestPanel,body.cockpit:not(.lab-land).ck-side #discussPanel,body.cockpit:not(.lab-land).ck-side #askPanel{left:0;right:0;bottom:0;height:56vh}
+body.cockpit #cornersPanel h2{display:none}
+body.cockpit #digestPanel h2,body.cockpit #discussPanel h2,body.cockpit #askPanel h2{font-size:13px;margin-bottom:6px}
+body.cockpit .crow{padding:7px 8px;border-radius:10px;gap:2px 8px}
+body.cockpit .crow b{font-size:14px}
+body.cockpit .crow .k{font-size:11.5px}
+body.cockpit .digest{font-size:13px}
+body.cockpit .hero .inspector{z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px)}
+body.cockpit.lab-land .hero .inspector{left:auto;right:0;top:0;bottom:0;width:46%;max-height:none;border-radius:0;border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.15);transform:translateX(110%);padding:10px 12px 14px;overscroll-behavior:contain}
+body.cockpit.lab-land .hero .inspector.open{transform:none}
+body.cockpit:not(.lab-land) .hero .inspector{bottom:0;max-height:60vh}
+body.cockpit .insp-head b{font-size:18px}
+body.cockpit.lab-land #pickbar.open{left:auto;right:0;top:0;bottom:0;width:62%;max-height:none;border-radius:0;border-left:1px solid var(--line);z-index:64}
+body.cockpit:not(.lab-land) #pickbar.open{bottom:0;z-index:64}
+/* with a sheet open on the right, the buttons, the scrub bar and the overlays keep to the visible part of the map */
+body.cockpit.lab-land.ck-side .ck-btns,body.cockpit.lab-land.ck-insp .ck-btns{right:calc(46% + 8px)}
+body.cockpit.lab-land.ck-pick .ck-btns{right:calc(62% + 8px)}
+body.cockpit.lab-land.ck-side .ck-scrub,body.cockpit.lab-land.ck-insp .ck-scrub{right:calc(46% + 8px)}
+body.cockpit.lab-land.ck-pick .ck-scrub{right:calc(62% + 8px)}
+body.cockpit.lab-land.ck-side .ck-hud,body.cockpit.lab-land.ck-insp .ck-hud{max-width:calc(54% - 64px)}
+body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero .map-bar,body.cockpit.lab-land.ck-side #hero .charts.under,body.cockpit.lab-land.ck-insp #hero .charts.under,body.cockpit.lab-land.ck-side .sat-pill,body.cockpit.lab-land.ck-insp .sat-pill,body.cockpit.lab-land.ck-side .align-bar,body.cockpit.lab-land.ck-insp .align-bar{right:calc(46% + 56px)}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -889,13 +941,24 @@ textarea{min-height:90px;resize:vertical}
           <div class="map-title" id="map1Title" hidden></div>
           <div class="readout" id="readout" hidden></div>
           <div class="sat-pill" id="satPill" hidden><span id="satPillText"></span><button class="btn xs primary" id="satPillBtn" type="button"></button><button class="x" id="satPillClose" type="button" aria-label="Close">×</button></div>
-          <div class="mapnote" id="mapNote" hidden></div></div>
+          <div class="mapnote" id="mapNote" hidden></div>
+          <!-- the phone cockpit (sideways, or the full-screen map): a logger-app layout — live data at the top, round buttons on the right, a scrub bar along the lap at the bottom -->
+          <div class="ck-hud" id="ckHud" hidden><button class="ck-rb" id="ckBack" type="button" aria-label="Back">‹</button><div class="ck-panel" id="ckLaps"></div></div>
+          <div class="ck-btns" id="ckBtns" hidden>
+            <button class="ck-rb" id="ckSat" type="button" title="Satellite" aria-label="Satellite"><svg><use href="#i-globe"/></svg></button>
+            <button class="ck-rb" id="ckCmp" type="button" title="Compare" aria-label="Compare"><svg><use href="#i-layouts"/></svg></button>
+            <button class="ck-rb" id="ckList" type="button" title="Corners" aria-label="Corners"><svg><use href="#i-corner"/></svg></button>
+            <button class="ck-rb" id="ckChart" type="button" title="Chart" aria-label="Chart"><svg><use href="#i-speed"/></svg></button>
+            <button class="ck-rb" id="ckCoach" type="button" title="Coach" aria-label="Coach"><svg><use href="#i-spark"/></svg></button>
+            <button class="ck-rb" id="ckMore" type="button" title="More" aria-label="More">⋯</button>
+          </div>
+          <div class="ck-scrub" id="ckScrub" hidden><div class="ck-step"><button type="button" id="ckPrev" aria-label="Previous corner">‹</button><button type="button" class="ck-ct" id="ckStepBtn"><b id="ckStepT">T1</b><span id="ckStepX"></span></button><button type="button" id="ckNext" aria-label="Next corner">›</button></div><canvas id="ckScrubC"></canvas></div></div>
           <div class="legend" id="legendData"></div>
           <div class="charts under" id="dataPanel"><div class="hint" id="dataSub" style="margin:8px 0 4px"></div><canvas class="chart" id="chDataSpeed" height="150"></canvas><canvas class="chart" id="chDataDelta" height="84"></canvas></div>
         </div>
         <div class="inspector" id="inspector"><button class="insp-close" id="inspClose" type="button" aria-label="Close">×</button><div class="insp-nav mobile-only" id="inspNav"><button class="btn sm" id="inspPrev" type="button" aria-label="Previous corner">‹</button><span id="inspNavLbl"></span><button class="btn sm" id="inspNext" type="button" aria-label="Next corner">›</button></div><div class="insp-empty" id="inspEmpty"></div><div id="inspBody" hidden></div></div>
       </div>
-      <div class="lab-tabs mobile-only" id="labTabs" hidden><button type="button" class="active" data-tab="corners" data-t="Corners">Corners</button><button type="button" data-tab="digest" data-t="Digest">Digest</button><button type="button" data-tab="chart" data-t="Chart">Chart</button><button type="button" data-tab="discuss" data-t="Discussion">Discussion</button><button type="button" data-tab="ai" data-t="Coach">Coach</button></div>
+      <div class="lab-tabs mobile-only" id="labTabs" hidden><button type="button" class="active" data-tab="corners" data-t="Corners">Corners</button><button type="button" data-tab="digest" data-t="Digest">Digest</button><button type="button" data-tab="chart" data-t="Chart">Chart</button><button type="button" data-tab="discuss" data-t="Discussion">Discussion</button><button type="button" data-tab="ai" data-t="Coach">Coach</button><button type="button" class="x" id="labTabsClose" aria-label="Close">×</button></div>
       <div class="card" id="digestPanel" hidden><h2><svg><use href="#i-clip"/></svg><span data-t="Session digest">Session digest</span><span class="sub" id="digestSub"></span></h2><div class="digest" id="digest"></div><details class="gloss"><summary class="hint" data-t="What the terms mean">What the terms mean</summary><ul id="glossList"></ul></details></div>
       <div class="card" id="askPanel" hidden><h2><svg><use href="#i-lab"/></svg><span data-t="Ask the AI about this session">Ask the AI about this session</span></h2><div class="chat" id="chatLog"></div><div class="chips" id="askChips"></div><div class="askrow"><textarea id="askInput"></textarea><div class="askbtns"><button class="btn primary" id="askBtn" type="button" data-t="Ask">Ask</button><button class="btn" id="askStop" type="button" hidden data-t="Stop">Stop</button></div></div><div class="hint" id="askNote" style="margin-top:6px"></div></div>
       <div class="card" id="cornersPanel" hidden><h2><svg><use href="#i-corner"/></svg><span data-t="Corner by corner">Corner by corner</span><span class="sub" data-t="click a row to pin it on the map">click a row to pin it on the map</span></h2><div class="crows mobile-only" id="cornersMob"></div><div class="tblwrap" id="cornersWrap"><table class="tbl corners" id="cornersTable"><thead><tr><th>#</th><th data-t="Type">Type</th><th class="you" id="youColHead"></th><th id="cmpColHead"></th><th>Δt</th><th data-t="Reserve">Reserve</th><th data-t="Main difference">Main difference</th></tr></thead><tbody></tbody></table></div></div>
@@ -2596,6 +2659,7 @@ Object.assign(I18N.RU, {
   'Turn the phone sideways: the map and the corners side by side, step corner by corner.': 'Поверните телефон горизонтально: карта и повороты рядом, листайте от поворота к повороту.', 'Corner': 'Поворот',
   'Showing every kart class — a sport kart and a rental kart are not comparable corner by corner.': 'Показаны все классы картов — спортивный и прокатный карт по поворотам не сравнить.', '{n} session(s) on another kart class are hidden (a sport kart and a rental kart are not comparable).': 'Скрыто сессий на другом классе картов: {n} (спортивный и прокатный карт не сравнить).', 'Hide them': 'Скрыть', 'Show anyway': 'Всё равно показать',
   'Add a new track…': 'Добавить новую трассу…', '— no track (private, custom) —': '— без трассы (приватно, своя) —', 'Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.': 'Трассы ещё нет в Hutka? Назовите её — страница трассы создастся вместе с этой сессией, потом её можно править, а другие гонщики найдут её по GPS.', 'Other rental kart…': 'Другой прокатный карт…', 'Rental kart (model below)': 'Прокатный карт (модель ниже)', 'Sport kart (Rotax, X30, KZ…)': 'Спортивный карт (Rotax, X30, KZ…)', 'Give the new track a name.': 'Дайте новой трассе название.', 'Main': 'Основной', 'Could not create the track: {e}': 'Не удалось создать трассу: {e}', 'Track name': 'Название трассы',
+  'Turn the phone sideways: the Lab becomes a full-screen cockpit — the satellite photo, the lap line, live numbers and a scrub bar along the lap.': 'Поверните телефон горизонтально: Лаборатория становится кокпитом на весь экран — спутниковый снимок, линия круга, живые цифры и бегунок по кругу.', '{n} corners · ‹ › to step': 'Поворотов: {n} · ‹ › листать', 'The photo can sit a few metres off the GPS line.': 'Снимок может быть смещён на несколько метров от линии GPS.', 'Move': 'Сдвинуть',
   'Upload session': 'Загрузить сессию', 'Karts people drive here': 'Карты, на которых здесь ездят', 'Karts — one per line (add “sport” after a sport kart)': 'Карты — по одному в строке (после спортивного допишите «sport»)', "Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.": 'Alfano .alf2 (эталон), AiM, RaceChrono, TrackAddict, Harry\'s LapTimer, VBOX, GPX — один файл на сессию; можно несколько сразу.',
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
@@ -3094,8 +3158,17 @@ function createMapView(canvas, host) {
     let x0 = 0, y0 = 0, x1 = W, y1 = H;
     if (tr) { x0 = Infinity; y0 = Infinity; x1 = -Infinity; y1 = -Infinity; const pad = (host.getWidthM ? host.getWidthM() : 8) * 2.5 / tr.mpp; for (let i = 0; i < tr.N; i += 2) { const x = tr.cx[i] / tr.mpp, y = tr.cy[i] / tr.mpp; x0 = Math.min(x0, x - pad); x1 = Math.max(x1, x + pad); y0 = Math.min(y0, y - pad); y1 = Math.max(y1, y + pad); } }
     const xs = [], ys = []; for (const [x, y] of [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]) { xs.push(c * x - si * y); ys.push(si * x + c * y); }
-    const s = Math.min(w / (Math.max(...xs) - Math.min(...xs)), h / (Math.max(...ys) - Math.min(...ys))) * 0.94, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-    V.s = s; V.ts = s; V.sFit = s; V.anchor = null; V.tx = w / 2 - s * (c * cx - si * cy); V.ty = h / 2 - s * (si * cx + c * cy); V.auto = true;
+    const I = inset(w, h), s = Math.min(I.w / (Math.max(...xs) - Math.min(...xs)), I.h / (Math.max(...ys) - Math.min(...ys))) * 0.94, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    V.s = s; V.ts = s; V.sFit = s; V.anchor = null; V.tx = I.cx - s * (c * cx - si * cy); V.ty = I.cy - s * (si * cx + c * cy); V.auto = true;
+  }
+  // the part of the canvas that overlays leave free (the cockpit HUD, the scrub bar, a side sheet): fit and focus aim at its centre
+  function inset(w, h) { const o = host.viewInset ? host.viewInset(w, h) : null; const l = o && o.l || 0, t = o && o.t || 0, r = o && o.r || 0, b = o && o.b || 0; const iw = Math.max(60, w - l - r), ih = Math.max(60, h - t - b); return { l, t, r, b, w: iw, h: ih, cx: l + iw / 2, cy: t + ih / 2 }; }
+  // pan just enough to keep a lap position inside the free part of the canvas (the scrub bar drags the marker out of a zoomed-in view)
+  function keepInView(P, i) {
+    const tr = host.getTrack ? host.getTrack() : null; if (!tr || !P) return; const { w, h } = setup(), I = inset(w, h), [px, py] = lapPos(tr, P, i), [sx, sy] = toS(px, py), m = 28;
+    const x0 = I.l + m, x1 = w - I.r - m, y0 = I.t + m, y1 = h - I.b - m; let dx = 0, dy = 0;
+    if (sx < x0) dx = x0 - sx; else if (sx > x1) dx = x1 - sx; if (sy < y0) dy = y0 - sy; else if (sy > y1) dy = y1 - sy;
+    if (dx || dy) { fly = null; V.tx += dx; V.ty += dy; V.anchor = null; V.auto = false; draw(); }
   }
   let zoomAnim = false;
   function zoomAt(f, cx, cy) { const lo = V.sFit ? V.sFit * 0.45 : 0.03, hi = V.sFit ? V.sFit * 14 : 60; V.ts = clamp((V.ts || V.s) * f, lo, hi); if (Math.abs(V.ts - V.s) < 1e-9) return; V.anchor = [cx, cy]; V.auto = false; if (zoomAnim) return; zoomAnim = true; const step = () => { let busy = false; if (V.anchor && V.ts !== undefined) { const d = V.ts / V.s; if (Math.abs(Math.log(d)) < 0.003) { const ff = V.ts / V.s, [ax, ay] = V.anchor; V.tx = ax - (ax - V.tx) * ff; V.ty = ay - (ay - V.ty) * ff; V.s = V.ts; V.anchor = null; } else { const ns = V.s * Math.pow(d, 0.3), ff = ns / V.s, [ax, ay] = V.anchor; V.tx = ax - (ax - V.tx) * ff; V.ty = ay - (ay - V.ty) * ff; V.s = ns; busy = true; } } draw(); if (busy) requestAnimationFrame(step); else zoomAnim = false; }; requestAnimationFrame(step); }
@@ -3133,7 +3206,7 @@ function createMapView(canvas, host) {
       tileLayer = { key, canvas: off };
     }
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(tileLayer.canvas, 0, 0); ctx.restore();
-    if (TL.attribution) { ctx.font = `10px ${tokens().body}`; const tw = ctx.measureText(TL.attribution).width + 10; ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, h - 15, tw, 15); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left'; ctx.fillText(TL.attribution, 5, h - 4); }
+    if (TL.attribution) { const o = host.viewInset ? host.viewInset(w, h) : null, y = h - (o && o.b ? o.b + 2 : 0); ctx.font = `10px ${tokens().body}`; const tw = ctx.measureText(TL.attribution).width + 10; ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, y - 15, tw, 15); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left'; ctx.fillText(TL.attribution, 5, y - 4); }
   }
   function paintTiles(ctx, w, h, TL, dpr) {
     const M0 = TL.merc, sc = V.s;
@@ -3392,13 +3465,13 @@ function createMapView(canvas, host) {
     const wm = (host.getWidthM ? host.getWidthM() : 8) * 2 / tr.mpp; xs0 -= wm; xs1 += wm; ys0 -= wm; ys1 += wm;
     // never closer than the whole-track fit allows times maxZoom (so one corner does not become a wall of pixels)
     const sFit = (() => { const keep = { s: V.s, tx: V.tx, ty: V.ty, auto: V.auto, ts: V.ts }; fit(true); const s = V.s; Object.assign(V, keep); return s; })();
-    const s = Math.min(w / Math.max(1, xs1 - xs0), h / Math.max(1, ys1 - ys0)) * 0.9, sz = Math.min(s, sFit * (maxZoom || 4.5));
+    const I = inset(w, h), s = Math.min(I.w / Math.max(1, xs1 - xs0), I.h / Math.max(1, ys1 - ys0)) * 0.9, sz = Math.min(s, sFit * (maxZoom || 4.5));
     const cx = (xs0 + xs1) / 2, cy = (ys0 + ys1) / 2; V.auto = false;
-    flyTo(sz, w / 2 - sz * cx, h / 2 - sz * cy, 300);
+    flyTo(sz, I.cx - sz * cx, I.cy - sz * cy, 300);
   }
   function fitAnimated() { const keep = { s: V.s, tx: V.tx, ty: V.ty }; fit(true); const to = { s: V.s, tx: V.tx, ty: V.ty }; V.s = keep.s; V.tx = keep.tx; V.ty = keep.ty; flyTo(to.s, to.tx, to.ty, 280); V.auto = true; }
   canvas.addEventListener('pointerdown', () => { fly = null; });
-  return { V, M, fit, fitAnimated, focusWindow, draw, zoomAt, zoomCenter, rotateBy, toS, toI, setTool, setHover, setTouchFree, nearestStation, nearestLineIdx, badgeAt, setup, tokens, lapPos: (P, i) => lapPos(host.getTrack(), P, i) };
+  return { V, M, fit, fitAnimated, focusWindow, keepInView, draw, zoomAt, zoomCenter, rotateBy, toS, toI, setTool, setHover, setTouchFree, nearestStation, nearestLineIdx, badgeAt, setup, tokens, lapPos: (P, i) => lapPos(host.getTrack(), P, i) };
 }
 (() => {
 const $ = (id) => document.getElementById(id);
@@ -3916,7 +3989,7 @@ LAB.open = async function (meta, asCmp) {
   LAB.names = await STORE.names(LAB.sessions.map(s => s.owner));
   LAB.sessions.sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.createdAt || 0) - (b.createdAt || 0));
   const reopen = !!(LAB.current && LAB.current.id === sess.id);
-  LAB.current = sess; LAB.selN = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = reopen && LAB.pickerOpen; LAB.social = null;
+  LAB.current = sess; LAB.selN = 0; LAB.ckInsp = false; LAB.scrubIdx = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = reopen && LAB.pickerOpen; LAB.social = null;
   if (asCmp) { const my = LAB.sessions.filter(s => mySession(s) && s.id !== sess.id).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]; if (my) { LAB.ref = lapKey(my, bestLap(my)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : lapKey(sess, bestLap(sess)); LAB.current = my; } else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; } }
   else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; }
   LAB.loaded = true; LAB.needFit = true; if (APP.route === 'lab') { LAB.map.fit(); LAB.needFit = false; } labRender();
@@ -3932,42 +4005,67 @@ LAB.load = async function (meta) {
 };
 // ask the lab to drop its loaded state (after a session was edited or deleted elsewhere)
 LAB.invalidate = function (sid) { if (!sid || (LAB.current && LAB.current.id === sid) || LAB.sessions.some(s => s.id === sid)) { LAB.current = null; LAB.G = null; LAB.sessions = []; LAB.loaded = false; LAB.dcmp = null; } };
-// a phone: narrow in portrait, or short and wide when held sideways (the Lab then becomes a two-column cockpit)
+// a phone: narrow in portrait, or short and wide when held sideways
 const MQ_LAND = '(max-height:520px) and (orientation:landscape) and (pointer:coarse)';
 const isLand = () => window.matchMedia && window.matchMedia(MQ_LAND).matches;
 const isPhone = () => window.matchMedia && (window.matchMedia('(max-width:700px)').matches || isLand());
 const fsOn = () => document.fullscreenElement === $('hero') || $('hero').classList.contains('fs-fallback');
+// the cockpit: the phone Lab as a logger app — the map over the whole screen, live data at the top, round buttons on the right, a scrub bar
+// along the lap at the bottom. It is on whenever a session is open on a phone held sideways, and in the full-screen map on a phone upright.
+const isCockpit = () => document.body.classList.contains('cockpit');
 function labMapHeight(w) {
   const fs = fsOn();
   const ratio = LAB.G ? LAB.G.H / LAB.G.W : 0.65;
-  if (isLand()) { const box = $('mapBox').clientHeight; return Math.max(120, box || (window.innerHeight - 40 - ($('mapBar').offsetHeight || 34) - 2)); }
+  if (isCockpit()) { const box = $('mapBox').clientHeight; return Math.max(120, box || window.innerHeight); }
   if (fs && isPhone()) return Math.max(220, window.innerHeight - ($('fsHead').offsetHeight || 50) - ($('dataPanel').offsetHeight || 180) - 2);
   if (fs) { const hgt = (id) => { const e = $(id); return e && e.offsetParent !== null ? e.offsetHeight : 0; }; return Math.max(240, window.innerHeight - 28 - hgt('fsHead') - hgt('pickbar') - hgt('mapBar') - hgt('legendData') - hgt('dataPanel') - 24); }
   if (isPhone()) return Math.round(window.innerHeight * 0.5);
   return Math.round(clamp(w * ratio, 340, Math.min(Math.max(360, window.innerHeight - 470), 720)));
 }
-// phone: which panel is shown under the map (sideways: in the right column; the chart then replaces the map on the left)
-LAB.tab = 'corners';
+// the part of the map the cockpit overlays leave free: fit and corner fly-to aim at it (a sheet on the right or at the bottom narrows it)
+function ckInset(w, h) {
+  if (!isCockpit()) return null;
+  const land = isLand(), insp = $('inspector').classList.contains('open'), pick = $('pickbar').classList.contains('open'), side = !!LAB.side;
+  const r = land ? Math.round(w * (pick ? 0.62 : (insp || side ? 0.46 : 0))) : 0;
+  const b = !land && (insp || side || pick) ? Math.round(h * 0.56) : 70;
+  return { l: 0, t: land ? 56 : 112, r: r + 50, b };
+}
+// phone: which panel is shown under the map (in the cockpit: in the side sheet, when it is open)
+LAB.tab = 'corners'; LAB.side = false; LAB.ckInsp = false; LAB.scrubIdx = 0;
 function applyMobTab() {
   const map = { corners: 'cornersPanel', digest: 'digestPanel', chart: 'dataPanel', discuss: 'discussPanel', ai: 'askPanel' };
-  const fs = $('hero').classList.contains('fs-fallback'), land = isLand(), was = $('pg-lab').classList.contains('tab-chart');
-  for (const k in map) { const e = $(map[k]); if (!e) continue; e.classList.toggle('mob-hide', !(k === LAB.tab || (k === 'chart' && fs && !land) || (land && k === 'corners' && LAB.tab === 'chart'))); }
-  for (const b of $('labTabs').querySelectorAll('button')) b.classList.toggle('active', b.dataset.tab === LAB.tab);
+  const fs = $('hero').classList.contains('fs-fallback'), ck = isCockpit();
+  if (ck && LAB.tab === 'chart') LAB.tab = 'corners';
+  for (const k in map) { const e = $(map[k]); if (!e) continue; e.classList.toggle('mob-hide', !(k === LAB.tab || (k === 'chart' && (fs || ck)))); }
+  for (const b of $('labTabs').querySelectorAll('button[data-tab]')) b.classList.toggle('active', b.dataset.tab === LAB.tab);
   for (const k in map) $('pg-lab').classList.toggle('tab-' + k, LAB.tab === k);
-  if (land && was && LAB.tab !== 'chart' && LAB.map && LAB.G) requestAnimationFrame(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); });
+  document.body.classList.toggle('ck-side', ck && !!LAB.side);
+  $('ckList').classList.toggle('active', ck && !!LAB.side && LAB.tab !== 'ai'); $('ckCoach').classList.toggle('active', ck && !!LAB.side && LAB.tab === 'ai');
 }
-// the sideways cockpit hides the app chrome (top bar, tab bar) while a session is open in the Lab
+// the cockpit side sheet (corners / digest / discussion / coach)
+function setSide(on, tab) {
+  LAB.side = !!on; if (tab) LAB.tab = tab; if (LAB.side) $('pickbar').classList.remove('open');
+  applyMobTab(); ckRefit();
+}
+let ckRefitT = null;
+function ckRefit() { if (!LAB.map || !LAB.G) return; clearTimeout(ckRefitT); ckRefitT = setTimeout(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); if (LAB.dcmp) { drawScrub(); drawDataCharts(); } }, 40); }
+// the cockpit on / off: body classes, the hint to turn the phone (upright, when the cockpit is not on), one-finger panning
 function syncLand() {
-  const on = isLand() && APP.route === 'lab' && $('pg-lab').classList.contains('has') && !$('pg-lab').hidden;
-  document.body.classList.toggle('lab-land', on);
+  const has = APP.route === 'lab' && $('pg-lab').classList.contains('has') && !$('pg-lab').hidden;
+  const land = has && isLand(), ck = has && (land || (isPhone() && fsOn())), was = isCockpit();
+  document.body.classList.toggle('lab-land', land); document.body.classList.toggle('cockpit', ck);
+  for (const id of ['ckHud', 'ckBtns', 'ckScrub']) $(id).hidden = !ck;
+  if (!ck) { document.body.classList.remove('ck-side', 'ck-chart', 'ck-tools', 'ck-insp', 'ck-pick'); LAB.side = false; for (const id of ['ckChart', 'ckMore']) $(id).classList.remove('active'); }
+  if (LAB.map) LAB.map.setTouchFree(ck || fsOn());
   const hint = $('landHint'); let seen = false; try { seen = !!localStorage.getItem('hutka.landHint'); } catch (e) {}
-  hint.hidden = !(APP.route === 'lab' && $('pg-lab').classList.contains('has') && isPhone() && !isLand() && !seen);
-  $('landHintText').textContent = t('Turn the phone sideways: the map and the corners side by side, step corner by corner.');
+  hint.hidden = !(has && isPhone() && !ck && !seen);
+  $('landHintText').textContent = t('Turn the phone sideways: the Lab becomes a full-screen cockpit — the satellite photo, the lap line, live numbers and a scrub bar along the lap.');
+  if (ck !== was) { applyMobTab(); if (LAB.map && LAB.G) { LAB.hoverIdx = ck ? clamp(LAB.scrubIdx | 0, 0, LAB.G.track.N - 1) : -1; LAB.map.setHover(LAB.hoverIdx); requestAnimationFrame(() => { LAB.map.fit(true); LAB.map.draw(); if (LAB.dcmp) { renderHud(); renderCkStep(); drawScrub(); drawDataCharts(); renderInspector(); showReadout(); } }); } }
 }
 let vpT = null;
 function onViewportChange() {
   clearTimeout(vpT);
-  vpT = setTimeout(() => { syncLand(); if (APP.route === 'lab' && LAB.map && LAB.G && LAB.dcmp) { applyMobTab(); if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); renderInspector(); renderCornerNav(); } }, 80);
+  vpT = setTimeout(() => { syncLand(); if (APP.route === 'lab' && LAB.map && LAB.G && LAB.dcmp) { applyMobTab(); if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); renderInspector(); renderCornerNav(); renderHud(); drawScrub(); } }, 80);
 }
 if (window.matchMedia) { const mq = window.matchMedia(MQ_LAND); (mq.addEventListener ? mq.addEventListener('change', onViewportChange) : mq.addListener(onViewportChange)); }
 // corner stepping (phone): previous / next corner, the map flies to it
@@ -3981,12 +4079,76 @@ function renderCornerNav() {
   const rows = cornerRows(), i = rows.findIndex(r => r.w.n === LAB.selN);
   $('lmCorner').textContent = i >= 0 ? 'T' + LAB.selN : t('Corner'); $('lmCorner').classList.toggle('active', i >= 0);
   $('inspNavLbl').textContent = i >= 0 ? `T${LAB.selN} · ${i + 1}/${rows.length}` : '';
+  renderCkStep();
 }
 // after the selection changed: redraw everything, and on a phone fly the map to the corner (or back to the whole track)
 function afterSelect(follow) {
-  renderInspector(); renderCornersTable(); renderCornerNav();
   const row = LAB.selN ? cornerRows().find(r => r.w.n === LAB.selN) : null;
+  if (isCockpit() && row) { LAB.scrubIdx = row.w.apex; LAB.hoverIdx = row.w.apex; LAB.map.setHover(row.w.apex); renderHud(); }   // the marker jumps to the apex of the corner
+  renderInspector(); renderCornersTable(); renderCornerNav();
   if (follow && isPhone() && LAB.map && LAB.G) { if (row) LAB.map.focusWindow(row.w.a, row.w.len, 35, 4.5); else LAB.map.fitAnimated(); } else LAB.map.draw();
+  if (isCockpit()) drawScrub();
+}
+// the pointer left the map or a chart: no hover — except in the cockpit, where the marker stays at the scrub position
+function hoverOff() { LAB.hoverIdx = isCockpit() && LAB.G ? clamp(LAB.scrubIdx | 0, 0, LAB.G.track.N - 1) : -1; LAB.map.setHover(LAB.hoverIdx); hoverChanged(); }
+// hover / scrub position changed: the readout (desktop), the HUD and the step label (cockpit), the charts
+function hoverChanged() {
+  if (isCockpit()) { renderHud(); renderCkStep(); }
+  else { showReadout(); const row = activeRow(), key = row ? row.w.n : 0; if (key !== LAB._inspKey) renderInspector(); }
+  scheduleCharts();
+}
+// ----- the cockpit HUD: one row per lap on the screen — colour, lap time, then the speed, time and distance at the scrub position (and Δt) -----
+function renderHud() {
+  if (!isCockpit()) return; const D = LAB.dcmp, G = LAB.G, box = $('ckLaps'); if (!D || !G) { box.innerHTML = ''; box.dataset.key = ''; return; }
+  const i = LAB.hoverIdx >= 0 ? LAB.hoverIdx : clamp(LAB.scrubIdx | 0, 0, G.track.N - 1), ds = G.track.ds, onRole = LAB.mapLap === 'cmp' && D.O ? 'cmp' : 'ref';
+  const rows = [{ role: 'ref', P: D.R, name: D.ref.name + (D.ref.mine || D.ref.avg ? '' : ' · ' + shortSess(D.sess)), c: 'var(--actual)' }];
+  if (D.O) rows.push({ role: 'cmp', P: D.O, name: D.nameOf(D.O), c: 'var(--cmp)' });
+  const key = rows.map(r => r.role + '~' + r.name + '~' + fmtLap(r.P.T)).join('|') + '~' + onRole;
+  if (box.dataset.key !== key) {
+    box.dataset.key = key; box.innerHTML = '';
+    for (const r of rows) {
+      const cell = (cls, html) => { const e = el('span', cls); e.innerHTML = html; e.dataset.role = r.role; if (r.role === onRole) e.classList.add('on'); e.style.setProperty('--c', r.c); e.onclick = () => { if (!D.O) return; LAB.mapLap = r.role === 'cmp' ? 'cmp' : 'you'; labRender(); }; box.appendChild(e); return e; };
+      cell('sw' + (r.role === 'cmp' ? ' dash' : ''), '<i></i>');
+      cell('nm', `<b>${esc(fmtLap(r.P.T))}</b>${esc(r.name)}`);
+      cell('v', `<b data-k="v"></b> ${t('km/h')}`); cell('v', `<b data-k="t"></b> ${t('s')}`); cell('v', `<b data-k="s"></b> ${t('m')}`);
+      cell('v dt', r.role === 'cmp' ? '<b data-k="d"></b>' : '');
+    }
+  }
+  const q = (role, k) => box.querySelector(`[data-role="${role}"] [data-k="${k}"]`);
+  for (const r of rows) { const P = r.P; q(r.role, 'v').textContent = kmh(P.v[i]); q(r.role, 't').textContent = P.t[i].toFixed(2); q(r.role, 's').textContent = (i * ds).toFixed(0); }
+  if (D.O) { const d = D.R.t[i] - D.O.t[i], e = q('cmp', 'd'); e.textContent = sg(d); const dt = e.parentElement; dt.classList.toggle('loss', d >= 0.04); dt.classList.toggle('gain', d <= -0.04); }
+}
+// the step label in the scrub bar: the corner under the marker (or the selected one) and its headline number
+function renderCkStep() {
+  if (!isCockpit()) return; const rows = cornerRows(), r = activeRow(), sel = !!(LAB.selN && r && r.w.n === LAB.selN);
+  $('ckStepT').textContent = r ? 'T' + r.w.n : t('Corners'); $('ckStepBtn').classList.toggle('sel', sel);
+  let tx = '';
+  if (r) { const c = LAB.coach ? LAB.coach.corners.find(x => x.n === r.w.n) : null, res = c ? Math.max(0, r.R.time - c.tTop) : 0; tx = (r.cmp ? 'Δt ' + sg(r.cmp.dt) : (c ? (res > 0.03 ? t('reserve') + ' ' + res.toFixed(2) : t('ok')) : r.R.time.toFixed(2) + ' ' + t('s'))) + ' · ' + kindWord(r.R); }
+  else tx = rows.length ? t('{n} corners · ‹ › to step', { n: rows.length }) : '';
+  $('ckStepX').textContent = tx;
+}
+// the scrub bar: the speed trace of the lap(s), the corner numbers at the apexes, the marker at the scrub position — drag anywhere along it
+function drawScrub() {
+  if (!isCockpit()) return; const D = LAB.dcmp, G = LAB.G, c = $('ckScrubC'), box = $('ckScrub'); if (!D || !G || box.hidden) return;
+  const hCss = c.clientHeight || (box.clientHeight - 2) || 58, { ctx, w, h } = setupCanvas(c, hCss);
+  ctx.clearRect(0, 0, w, h);
+  const tr = G.track, N = tr.N, L = tr.lengthM, pl = 8, pr = 8, pt = 13, pb = 7, X = (s) => pl + (w - pl - pr) * s / L;
+  let vmax = 0, vmin = Infinity; for (let i = 0; i < N; i++) { vmax = Math.max(vmax, D.R.v[i], D.O ? D.O.v[i] : 0); vmin = Math.min(vmin, D.R.v[i], D.O ? D.O.v[i] : Infinity); }
+  const Y = (v) => pt + (h - pt - pb) * (1 - (v - vmin) / Math.max(0.1, vmax - vmin));
+  for (const r of D.rows) { const m = r.R; if (m.kind !== 'brake') continue; const a = ((r.w.a + m.bk) * tr.ds) % L, b = (r.w.a + m.apK) * tr.ds; ctx.fillStyle = 'rgba(255,107,112,.16)'; ctx.fillRect(X(a), pt - 3, Math.max(1, X(Math.min(L, b)) - X(a)), h - pt - pb + 6); }
+  const act = activeRow(); if (act) { const a = act.w.a * tr.ds, b = a + act.w.len * tr.ds; ctx.fillStyle = 'rgba(255,255,255,.1)'; ctx.fillRect(X(a), 0, Math.max(1, X(Math.min(L, b)) - X(a)), h); if (b > L) ctx.fillRect(X(0), 0, X(b - L) - X(0), h); }
+  const line = (P, col, lw, dash) => { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash || []); ctx.beginPath(); for (let i = 0; i <= N; i++) { const y = Y(P.v[i % N]); i ? ctx.lineTo(X(i * tr.ds), y) : ctx.moveTo(X(0), y); } ctx.stroke(); ctx.setLineDash([]); };
+  if (D.O) line(D.O, '#ff7ad9', 1.3, [4, 3]); line(D.R, '#6fb1ff', 1.8);
+  ctx.font = `600 9px ${LAB.map.tokens().mono}`; ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,255,255,.72)'; let lastX = -99; for (const r of D.rows.slice().sort((a, b) => a.R.sApex - b.R.sApex)) { const x = X(r.R.sApex); if (x - lastX < 22) continue; ctx.fillText('T' + r.w.n, x, 9); lastX = x; }
+  const i = LAB.hoverIdx >= 0 ? LAB.hoverIdx : clamp(LAB.scrubIdx | 0, 0, N - 1), x = X(i * tr.ds);
+  ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(x, 2); ctx.lineTo(x, h - 2); ctx.stroke();
+  if (D.O) { ctx.beginPath(); ctx.arc(x, Y(D.O.v[i]), 3.5, 0, Math.PI * 2); ctx.fillStyle = '#ff7ad9'; ctx.fill(); }
+  ctx.beginPath(); ctx.arc(x, Y(D.R.v[i]), 4.5, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#6fb1ff'; ctx.lineWidth = 2; ctx.stroke();
+}
+function scrubTo(clientX) {
+  const G = LAB.G, D = LAB.dcmp; if (!G || !D) return; const r = $('ckScrubC').getBoundingClientRect(), u = clamp((clientX - r.left - 8) / Math.max(1, r.width - 16), 0, 1);
+  const i = Math.min(G.track.N - 1, Math.max(0, Math.round(u * G.track.lengthM / G.track.ds))); if (i === LAB.hoverIdx) return;
+  LAB.scrubIdx = i; LAB.hoverIdx = i; LAB.map.setHover(i); if (!LAB.map.V.auto) LAB.map.keepInView(LAB.mapLap === 'cmp' && D.O ? D.O : D.R, i); hoverChanged();
 }
 function labEnsureMap() {
   if (LAB.map) return;
@@ -3995,8 +4157,27 @@ function labEnsureMap() {
     getTiles: () => { const G = LAB.G; if (!G) return null; const b = G.sat || { dx: 0, dy: 0 }; return SAT.layer(G, LAB.opts.tiles, { dx: b.dx + LAB.satAdj.dx, dy: b.dy + LAB.satAdj.dy }); },
     onSatMove: (dxPx, dyPx) => { if (!LAB.G) return; const mpp = LAB.G.track.mpp; LAB.satAdj.dx += dxPx * mpp; LAB.satAdj.dy -= dyPx * mpp; saveSatAdj(); renderAlignBar(); },
     getOverlay: () => ({ D: LAB.dcmp, role: LAB.mapLap === 'cmp' ? 'cmp' : 'ref', hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor }),
-    onHover: (i) => { LAB.hoverIdx = i; showReadout(); const row = activeRow(), key = row ? row.w.n : 0; if (key !== LAB._inspKey) renderInspector(); scheduleCharts(); },
-    onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
+    viewInset: ckInset,
+    onHover: (i) => { if (i < 0 && isCockpit()) { hoverOff(); return; } LAB.hoverIdx = i; hoverChanged(); },
+    onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); if (isCockpit()) { if (i >= 0) LAB.scrubIdx = i; LAB.ckInsp = !!row && LAB.selN !== row.w.n; } LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
+  // the cockpit: back, the round buttons, the step label and the scrub bar
+  $('ckBack').onclick = () => { if (document.fullscreenElement) { document.exitFullscreen(); return; } if ($('hero').classList.contains('fs-fallback')) { fsFallbackOn(false); return; } if (history.length > 1) history.back(); else go('home'); };
+  $('ckSat').onclick = () => $('tglTiles').click();
+  $('ckCmp').onclick = () => { const pb = $('pickbar'); pb.classList.toggle('open'); if (pb.classList.contains('open') && LAB.side) setSide(false); };
+  $('ckList').onclick = () => setSide(!(LAB.side && LAB.tab !== 'ai'), LAB.tab === 'ai' ? 'corners' : LAB.tab);
+  $('ckCoach').onclick = () => setSide(!(LAB.side && LAB.tab === 'ai'), 'ai');
+  $('ckChart').onclick = () => { const on = document.body.classList.toggle('ck-chart'); $('ckChart').classList.toggle('active', on); if (on) { document.body.classList.remove('ck-tools'); $('ckMore').classList.remove('active'); } requestAnimationFrame(drawDataCharts); };
+  $('ckMore').onclick = () => { const on = document.body.classList.toggle('ck-tools'); $('ckMore').classList.toggle('active', on); if (on) { document.body.classList.remove('ck-chart'); $('ckChart').classList.remove('active'); } };
+  $('labTabsClose').onclick = () => setSide(false);
+  $('ckPrev').onclick = () => stepCorner(-1); $('ckNext').onclick = () => stepCorner(1);
+  $('ckStepBtn').onclick = () => { const r = activeRow(); if (r) { const same = LAB.selN === r.w.n; LAB.ckInsp = !(same && LAB.ckInsp); if (!same) LAB.selN = r.w.n; afterSelect(true); } else $('lmCorner').click(); };
+  { const sc = $('ckScrub'); let on = false;
+    sc.addEventListener('pointerdown', (e) => { if (e.target.closest('.ck-step')) return; on = true; try { sc.setPointerCapture(e.pointerId); } catch (x) {} scrubTo(e.clientX); e.preventDefault(); });
+    sc.addEventListener('pointermove', (e) => { if (on) scrubTo(e.clientX); });
+    const end = () => { on = false; }; sc.addEventListener('pointerup', end); sc.addEventListener('pointercancel', end); }
+  // a sheet opening on the right (the corner inspector, the comparison picker) narrows the free part of the map: the buttons and the scrub bar move with it
+  { const sync = () => { const insp = $('inspector').classList.contains('open'), pick = $('pickbar').classList.contains('open'), b = document.body.classList, ch = b.contains('ck-insp') !== insp || b.contains('ck-pick') !== pick; b.toggle('ck-insp', insp); b.toggle('ck-pick', pick); $('ckCmp').classList.toggle('active', pick); if (pick && LAB.side && isCockpit()) setSide(false); if (ch && isCockpit()) ckRefit(); };
+    const mo = new MutationObserver(sync); mo.observe($('inspector'), { attributes: true, attributeFilter: ['class'] }); mo.observe($('pickbar'), { attributes: true, attributeFilter: ['class'] }); }
   $('lmBack').onclick = () => { if (history.length > 1) history.back(); else go('home'); };
   $('lmPrev').onclick = () => stepCorner(-1); $('lmNext').onclick = () => stepCorner(1); $('inspPrev').onclick = () => stepCorner(-1); $('inspNext').onclick = () => stepCorner(1);
   $('lmCorner').onclick = () => { if (LAB.selN) { LAB.selN = 0; afterSelect(true); return; } const rows = cornerRows(), coach = LAB.coach; let pick = rows[0]; if (coach) { let best = 0; for (const r of rows) { const c = coach.corners.find(x => x.n === r.w.n); const d = c ? r.R.time - c.tTop : 0; if (d > best) { best = d; pick = r; } } } if (pick) { LAB.selN = pick.w.n; afterSelect(true); } };
@@ -4016,19 +4197,19 @@ function labEnsureMap() {
   // full screen: map, charts, readout and the corner inspector on one screen
   const placePickbar = (fs) => { const pb = $('pickbar'), h = $('hero'); if (fs) { if (pb.parentElement !== h) h.insertBefore(pb, h.firstChild); } else if (pb.parentElement === h) { h.parentElement.insertBefore(pb, h); pb.classList.remove('open'); } };
   $('fsCompare').onclick = () => $('pickbar').classList.toggle('open');
-  const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); placePickbar(on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); };
+  const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); placePickbar(on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); syncLand(); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); if (isCockpit()) { renderHud(); renderCkStep(); drawScrub(); } } }, 60); };
   $('lmMap').onclick = () => fsFallbackOn(true);
   $('lmCompare').onclick = () => { $('pickbar').classList.toggle('open'); };
   $('pickClose').onclick = () => $('pickbar').classList.remove('open');
-  for (const b of $('labTabs').querySelectorAll('button')) b.onclick = () => { LAB.tab = b.dataset.tab; applyMobTab(); if (LAB.tab === 'chart') drawDataCharts(); };
+  for (const b of $('labTabs').querySelectorAll('button[data-tab]')) b.onclick = () => { LAB.tab = b.dataset.tab; applyMobTab(); if (LAB.tab === 'chart') drawDataCharts(); };
   const fsOn = () => document.fullscreenElement === $('hero') || $('hero').classList.contains('fs-fallback');
   $('btnFull').onclick = () => { const h = $('hero'); if (fsOn()) { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); return; } if (h.requestFullscreen) h.requestFullscreen().catch(() => fsFallbackOn(true)); else fsFallbackOn(true); };
   $('btnFullExit').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); };
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('hero').classList.contains('fs-fallback')) fsFallbackOn(false); });
-  document.addEventListener('fullscreenchange', () => { const fs = document.fullscreenElement === $('hero'); placePickbar(fs); $('fsHead').hidden = !fs; $('btnFull').classList.toggle('active', fs); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); });
-  window.addEventListener('resize', () => { if (APP.route === 'lab' && LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (LAB.dcmp) renderInspector(); } });
+  document.addEventListener('fullscreenchange', () => { const fs = document.fullscreenElement === $('hero'); placePickbar(fs); $('fsHead').hidden = !fs; $('btnFull').classList.toggle('active', fs); syncLand(); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); if (isCockpit()) { renderHud(); renderCkStep(); drawScrub(); } } }, 60); });
+  window.addEventListener('resize', () => { if (APP.route === 'lab' && LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (LAB.dcmp) { renderInspector(); if (isCockpit()) { renderHud(); drawScrub(); } } } });
   window.addEventListener('keydown', (e) => { if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if (APP.route !== 'lab') return; if (e.key === 'Escape' && LAB.selN) { LAB.selN = 0; afterSelect(true); } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { if (LAB.dcmp) { e.preventDefault(); stepCorner(e.key === 'ArrowRight' ? 1 : -1); } } else if (e.key === 'q' || e.key === 'Q') LAB.map.rotateBy(-Math.PI / 24); else if (e.key === 'e' || e.key === 'E') LAB.map.rotateBy(Math.PI / 24); else if (e.key === 'f' || e.key === 'F') $('btnFull').click(); });
-  for (const c of [$('chDataSpeed'), $('chDataDelta')]) { c.addEventListener('pointermove', (e) => { const G = LAB.G; if (!G || !LAB.dcmp) return; const r = c.getBoundingClientRect(), x = e.clientX - r.left; const s = (x - PAD.l) / (r.width - PAD.l - PAD.r) * G.track.lengthM, i = Math.round(s / G.track.ds), ni = (i >= 0 && i < G.track.N) ? i : -1; if (ni !== LAB.hoverIdx) { LAB.hoverIdx = ni; LAB.map.setHover(ni); showReadout(); const row = activeRow(), key = row ? row.w.n : 0; if (key !== LAB._inspKey) renderInspector(); scheduleCharts(); } }); c.addEventListener('pointerleave', () => { if (LAB.hoverIdx >= 0) { LAB.hoverIdx = -1; LAB.map.setHover(-1); showReadout(); renderInspector(); scheduleCharts(); } }); }
+  for (const c of [$('chDataSpeed'), $('chDataDelta')]) { c.addEventListener('pointermove', (e) => { const G = LAB.G; if (!G || !LAB.dcmp) return; const r = c.getBoundingClientRect(), x = e.clientX - r.left; const s = (x - PAD.l) / (r.width - PAD.l - PAD.r) * G.track.lengthM, i = Math.round(s / G.track.ds), ni = (i >= 0 && i < G.track.N) ? i : -1; if (ni !== LAB.hoverIdx) { LAB.hoverIdx = ni; if (isCockpit() && ni >= 0) LAB.scrubIdx = ni; LAB.map.setHover(ni); hoverChanged(); } }); c.addEventListener('pointerleave', () => { if (LAB.hoverIdx >= 0) { hoverOff(); if (!isCockpit()) renderInspector(); } }); }
   // session switch, reference lap, comparison
   $('sessSel').addEventListener('change', async () => { const id = $('sessSel').value; if (!id || (LAB.current && id === LAB.current.id)) return; const loaded = sessOf(id); if (loaded) { LAB.current = loaded; LAB.ref = lapKey(loaded, bestLap(loaded)); LAB.cmp = 'none'; LAB.selN = 0; LAB.chat = []; LAB.social = null; labRender(); } else { const meta = await STORE.getSessionMeta(id); if (meta) { go('lab~' + id); } } });
   $('refSel').addEventListener('change', () => { LAB.ref = $('refSel').value; if (LAB.cmp === LAB.ref) LAB.cmp = 'none'; LAB.selN = 0; LAB.chat = []; labRender(); });
@@ -4043,8 +4224,8 @@ function labEnsureMap() {
   $('btnEditSess').onclick = () => { const s = LAB.current; if (s) SESSEDIT.open(s, () => { LAB.invalidate(s.id); go('lab~' + s.id); }); };
   $('btnFollowOwner').onclick = async () => { const s = LAB.current; if (!s || mySession(s)) return; if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to follow drivers.')); return; } const b = $('btnFollowOwner'); b.classList.add('busy'); try { await STORE.toggleFollow(s.owner); await renderOwnerRow(); } catch (e) { toast(t('Could not save.')); } b.classList.remove('busy'); };
   $('commentBtn').onclick = postComment; $('commentInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); postComment(); } });
-  $('digest').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); LAB.selN = +a.dataset.n; afterSelect(true); if (!isLand()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
-  $('inspClose').onclick = () => { LAB.selN = 0; LAB.hoverIdx = -1; LAB.map.setHover(-1); afterSelect(true); };
+  $('digest').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); LAB.selN = +a.dataset.n; LAB.ckInsp = true; if (isCockpit() && LAB.side) setSide(false); afterSelect(true); if (!isCockpit()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+  $('inspClose').onclick = () => { LAB.selN = 0; LAB.ckInsp = false; LAB.hoverIdx = -1; LAB.map.setHover(-1); afterSelect(true); };
   $('inspEmpty').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); selectCorner(+a.dataset.n, false); });
   $('askBtn').onclick = askAI; $('askStop').onclick = () => { if (askCtl) askCtl.abort(); };
   $('askInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); askAI(); } });
@@ -4061,7 +4242,7 @@ function renderSatPill() {
   const on = SAT.can(LAB.G) && LAB.opts.tiles && (LAB.aligning || !satPillGone); const p = $('satPill'); p.hidden = !on; if (!on) return;
   const shifted = Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01 || (LAB.G.sat && (Math.abs(LAB.G.sat.dx) > 0.01 || Math.abs(LAB.G.sat.dy) > 0.01));
   if (LAB.aligning) { $('satPillText').textContent = isPhone() ? t('Drag the photo with one finger until the track sits under the line.') : t('Drag the photo until the track sits under the line (or use the arrows above).'); $('satPillBtn').textContent = t('Done'); }
-  else { $('satPillText').textContent = (shifted ? t('Photo shifted by hand. ') : '') + (isPhone() ? t('The photo is a guide: GPS and the image can be a few metres apart.') : t('The satellite photo is a guide: GPS and the image can be a few metres apart, so the line may seem to clip a wall.')); $('satPillBtn').textContent = shifted ? t('Move again') : t('Move the photo'); }
+  else { $('satPillText').textContent = (shifted ? t('Photo shifted by hand. ') : '') + (isCockpit() ? t('The photo can sit a few metres off the GPS line.') : (isPhone() ? t('The photo is a guide: GPS and the image can be a few metres apart.') : t('The satellite photo is a guide: GPS and the image can be a few metres apart, so the line may seem to clip a wall.'))); $('satPillBtn').textContent = shifted ? t('Move again') : (isCockpit() ? t('Move') : t('Move the photo')); }
 }
 $('satPillBtn').onclick = () => setAligning(!LAB.aligning);
 function setAligning(on) { LAB.aligning = !!on && LAB.opts.tiles; $('tglAlign').classList.toggle('active', LAB.aligning); $('alignBar').hidden = !LAB.aligning; $('satNote').hidden = true; renderSatPill(); LAB.map.setTool(LAB.aligning ? 'sat' : 'pan'); if (LAB.aligning) renderAlignBar(); if (LAB.map && LAB.G) { setTimeout(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); }, 30); } }
@@ -4072,11 +4253,11 @@ function renderAlignBar() {
   $('alSave').hidden = !canSave;
 }
 function syncOpts() {
-  const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles); $('tglAlign').hidden = !(sat && LAB.opts.tiles); if (!(sat && LAB.opts.tiles) && LAB.aligning) setAligning(false);
+  const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles); $('ckSat').hidden = !sat; $('ckSat').classList.toggle('active', sat && LAB.opts.tiles); $('tglAlign').hidden = !(sat && LAB.opts.tiles); if (!(sat && LAB.opts.tiles) && LAB.aligning) setAligning(false);
   $('satNote').hidden = true; $('tglAlign').textContent = t('Move imagery'); renderSatPill();
-  if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; LAB.map.draw(); } });
+  if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; $('ckSat').hidden = true; LAB.map.draw(); } });
   $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').hidden = !!(sat && LAB.opts.tiles); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))) || !!(sat && LAB.opts.tiles && !(LAB.G && LAB.G.aerial)); LAB.map.draw(); }
-function selectCorner(n, scroll) { LAB.selN = (LAB.selN === n) ? 0 : n; afterSelect(true); if (scroll && LAB.selN && !isLand()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+function selectCorner(n, scroll) { LAB.selN = (LAB.selN === n) ? 0 : n; LAB.ckInsp = !!LAB.selN; if (isCockpit() && LAB.side && LAB.selN) setSide(false); afterSelect(true); if (scroll && LAB.selN && !isCockpit()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 
 // ----- the start screen: my sessions and what the drivers I follow have published -----
 async function renderLabStart() {
@@ -4165,7 +4346,7 @@ function labRender() {
   STORE.socialAvailable().then(on => { if (LAB.current !== sess) return; $('voteBox').hidden = !(on && STORE.hasDb && sess.owner !== 'local'); if ($('voteBox').hidden) $('lowRated').hidden = true; $('discussPanel').hidden = !on; if (on) { renderSocialBits(); renderDiscussion(); } renderOwnerRow(); });
   $('legendData').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span><span><i style="background:var(--actual)"></i>${t('reference')}</span>${D.O ? `<span><i style="background:var(--cmp)"></i>${t('comparison')}</span>` : ''}<span>${t('number — corner from the S/F line')}</span>`;
   $('mapNote').hidden = true;
-  syncOpts(); renderDigest(); renderCornersTable(); renderInspector(); renderCornerNav(); renderAskState(); showReadout(); drawDataCharts();
+  syncOpts(); renderDigest(); renderCornersTable(); renderInspector(); renderCornerNav(); renderAskState(); showReadout(); drawDataCharts(); renderHud(); drawScrub();
 }
 // linked corners: a loss in one corner that buys a bigger gain in the next (early brake, early throttle) is not a mistake
 function markCombos(D) {
@@ -4362,10 +4543,10 @@ function renderCornersTable() {
 }
 // the data charts follow the mouse: at most one repaint per animation frame
 let chartsReq = false;
-function scheduleCharts() { if (chartsReq) return; chartsReq = true; requestAnimationFrame(() => { chartsReq = false; drawDataCharts(); }); }
+function scheduleCharts() { if (chartsReq) return; chartsReq = true; requestAnimationFrame(() => { chartsReq = false; drawDataCharts(); drawScrub(); }); }
 function renderInspector() {
   const D = LAB.dcmp, body = $('inspBody'), empty = $('inspEmpty'); if (!D) return;
-  const r = activeRow(); $('inspector').classList.toggle('open', !!r); LAB._inspKey = r ? r.w.n : 0;
+  const r = isCockpit() ? (LAB.selN && LAB.ckInsp ? cornerRows().find(x => x.w.n === LAB.selN) || null : null) : activeRow(); $('inspector').classList.toggle('open', !!r); LAB._inspKey = r ? r.w.n : 0;
   if (!r) {
     body.hidden = true; empty.hidden = false;
     const coach = LAB.coach, top = coach ? D.rows.map(x => { const c = coach.corners.find(y => y.n === x.w.n); return c ? { n: x.w.n, d: x.R.time - c.tTop } : null; }).filter(Boolean).filter(x => x.d > 0.03).sort((a, b) => b.d - a.d).slice(0, 3) : [];
@@ -4408,8 +4589,9 @@ const PAD = { l: 44, r: 14, t: 18, b: 22 };
 function setupCanvas(c, hCss) { const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = c.clientWidth || c.parentElement.clientWidth || 600; if (c.width !== Math.round(w * dpr) || c.height !== Math.round(hCss * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(hCss * dpr); c.style.height = hCss + 'px'; } const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, w, h: hCss }; }
 function drawDataCharts() {
   const D = LAB.dcmp, G = LAB.G; if (!D || !G || $('hero').hidden) return;
+  const ck = isCockpit(); if (ck && !$('chDataSpeed').clientWidth) return;
   const tr = G.track, C = LAB.map.tokens(), N = tr.N, L = tr.lengthM, chDS = $('chDataSpeed'), chDD = $('chDataDelta'), X = (s) => PAD.l + (chDS.clientWidth - PAD.l - PAD.r) * s / L;
-  { const { ctx, w, h } = setupCanvas(chDS, isLand() ? clamp(($('dataPanel').clientHeight || 0) - 84 - 36, 110, 240) : 150);
+  { const { ctx, w, h } = setupCanvas(chDS, ck ? clamp(($('mapBox').clientHeight || 300) - 150 - 84 - 14, 80, 150) : 150);
     ctx.fillStyle = C.surface; ctx.fillRect(0, 0, w, h);
     let vmax = 0; for (let i = 0; i < N; i++) vmax = Math.max(vmax, D.R.v[i], D.O ? D.O.v[i] : 0);
     const ymax = Math.ceil((vmax * 3.6 + 6) / 10) * 10, Y = (v) => PAD.t + (h - PAD.t - PAD.b) * (1 - v * 3.6 / ymax);
