@@ -1,0 +1,23 @@
+{
+  "name": "Hutka — karting sessions",
+  "short_name": "Hutka",
+  "description": "Rental karting tracks, Alfano session analysis, hot laps and drivers",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f6f8",
+  "theme_color": "#1b2340",
+  "lang": "en",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "share_target": {
+    "action": "./share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": { "title": "title", "text": "text", "files": [ { "name": "file", "accept": [".alf2", ".csv", ".zip", "application/octet-stream", "application/zip", "text/csv", "text/plain"] } ] }
+  }
+}

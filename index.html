@@ -4,8 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Hutka — rental karting tracks, Alfano session analysis and hot laps">
+<meta name="theme-color" content="#1b2340">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hutka">
 <style>[hidden]{display:none!important}html{color-scheme:light}</style>
 <script src="config.js"></script>
+<script>if ("serviceWorker" in navigator && location.protocol === "https:") addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));</script>
 <script src="supabase.js"></script>
 </head>
 <body>
@@ -97,7 +104,12 @@ p{margin:0}
 .page{padding-block:4px 60px;padding-inline:28px;display:flex;flex-direction:column;gap:18px;max-width:1440px;width:100%}
 .page[hidden]{display:none}
 .topbar-nav{display:none}
-@media (max-width:900px){
+.brand.mobile{display:none;padding:0;flex:none}
+.brand.mobile .mark{width:34px;height:27px}
+.tabbar{display:none}
+.mobile-only{display:none!important}
+.insp-close{display:none}
+@media (max-width:900px) and (min-width:701px){
   .app{grid-template-columns:1fr}
   .side{position:static;height:auto;flex-direction:row;align-items:center;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--line);padding-block:10px;gap:8px}
   .brand{padding:0 6px 0 2px}
@@ -110,6 +122,10 @@ p{margin:0}
   .page{padding-inline:16px}
   .userchip .nm,.userchip .sub{display:none}
 }
+.hero.fs-fallback{position:fixed;inset:0;z-index:60;overflow:auto;background:var(--bg);padding:12px;display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:12px}
+.hero.fs-fallback .fs-head{display:flex}
+.hero.fs-fallback .map-wrap{display:flex;flex-direction:column}
+@media (min-width:1100px){.hero.fs-fallback{grid-template-columns:minmax(0,1fr) 380px}}
 
 /* ---------- primitives ---------- */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;min-width:0}
@@ -440,6 +456,93 @@ textarea{min-height:90px;resize:vertical}
 .tool-rail{display:flex;flex-direction:column;gap:10px}
 .step h4{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:8px;font-weight:600}
 .step h4 .n{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--surface-3);color:var(--fg);font:600 11px/1 var(--mono)}
+/* ---------- phone: app-like shell with a bottom tab bar ---------- */
+@media (max-width:700px){
+  html{-webkit-text-size-adjust:100%}
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .brand.mobile{display:flex}
+  .mobile-only{display:flex!important}
+  .top{padding:8px 12px;gap:10px;top:0}
+  .top .search{height:40px;border-radius:12px;padding:0 12px}
+  .top .search input[type=text]{font-size:16px}
+  .userchip{padding:2px}
+  .userchip .nm,.userchip .sub{display:none}
+  .userchip img{width:34px;height:34px}
+  #btnSignIn{height:36px;padding:0 12px;font-size:13px}
+  .page{padding:2px 12px calc(84px + env(safe-area-inset-bottom,0px));gap:12px}
+  .card{padding:14px;border-radius:14px}
+  .card h2{font-size:16px}
+  .ph h1{font-size:24px}
+  .ph .row .btn{height:38px;font-size:13.5px;padding:0 12px}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));justify-content:space-around;align-items:flex-end}
+  .tabbar a,.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;border:0;background:none;color:var(--muted);text-decoration:none;font:500 10.5px/1 var(--body);cursor:pointer;min-width:0}
+  .tabbar svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .tabbar a.active{color:var(--accent)}
+  .tabbar a.active svg{stroke-width:2.2}
+  .tabbar .up .circ{display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:var(--btn);color:#fff;margin-top:-22px;box-shadow:0 6px 16px rgba(20,30,60,.25);border:3px solid var(--bg)}
+  .tabbar .up .circ svg{stroke:#fff;width:24px;height:24px}
+  .tabbar .up{color:var(--fg)}
+  .home-hero{padding:16px}
+  .home-hero h1{font-size:24px}
+  .home-hero p{font-size:14px}
+  .home-hero .stats .tile{min-width:0;flex:1;padding:10px 6px}
+  .home-hero .stats .tile .v{font-size:16px}
+  .home-hero .stats{flex-wrap:nowrap;gap:6px}
+  .post .ph{padding:10px 12px}
+  .post .pb{padding:0 12px 12px;gap:10px;grid-template-columns:1fr}
+  .post .pv{height:130px}
+  .post .big{font-size:30px}
+  .post .pf{padding:8px 12px;gap:6px}
+  .post .pf .btn.sm{height:34px;padding:0 10px;font-size:13px}
+  .tracks-grid{grid-template-columns:1fr}
+  .cover{height:150px;margin:0 -12px}
+  .cover.nocover{height:0;margin:0}
+  .track-head{margin-top:-30px;padding:0;gap:12px;align-items:center;flex-wrap:nowrap}
+  .cover.nocover + .track-head{margin-top:4px}
+  .logo.lg{width:64px;height:64px;font-size:18px;border-width:3px}
+  .track-head .titles{padding-bottom:0}
+  .track-head h1{font-size:22px;gap:8px}
+  .track-head h1 .btn.sm{height:30px;font-size:12px}
+  .meta-row{font-size:13px;gap:8px 12px}
+  .prof-head{flex-direction:column;align-items:flex-start!important}
+  .prof-head .row{width:100%}
+  .tiles{grid-template-columns:repeat(2,1fr);gap:8px}
+  .layouts{grid-template-columns:1fr}
+  .pickbar{gap:10px}
+  .pickbar .field,.pickbar .field.auto{flex:1 1 100%;max-width:none}
+  .lapline .big{font-size:32px}
+  .map-bar{padding:6px 8px;gap:4px;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .map-bar::-webkit-scrollbar{display:none}
+  .map-bar .btn{flex:none}
+  .charts.under{padding:4px 6px 6px}
+  .hero{gap:10px}
+  .hero .inspector{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom,0px));max-height:50vh;overflow:auto;border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);z-index:25;transform:translateY(115%);transition:transform .25s ease;padding:14px 16px 18px}
+  .hero .inspector.open{transform:none}
+  .hero .inspector .insp-empty{display:none}
+  .insp-close{display:grid;place-items:center;position:absolute;right:10px;top:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);font-size:18px;line-height:1;color:var(--muted);cursor:pointer}
+  .insp-head b{font-size:22px}
+  .digest{font-size:13.5px}
+  .tbl.corners{min-width:0}
+  .grid2{grid-template-columns:1fr}
+  .admin-grid{grid-template-columns:1fr}
+  .modal{padding:0;align-items:end}
+  .modal .box{border-radius:18px 18px 0 0;max-height:94vh;padding:16px;width:100%}
+  .toast{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+  /* data tables become stacked cards */
+  .tbl.resp{display:block}
+  .tbl.resp thead{display:none}
+  .tbl.resp tbody{display:block}
+  .tbl.resp tr{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px;padding:10px 2px;border-bottom:1px solid var(--line)}
+  .tbl.resp tr:hover td{background:none}
+  .tbl.resp td{display:block;border:0;padding:0;white-space:normal;min-width:0;font-size:13.5px}
+  .tbl.resp td::before{content:attr(data-label);display:block;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .tbl.resp td.num{font-size:14px}
+  .tbl.resp td:first-child{grid-column:1 / -1}
+  .tbl.resp td:last-child{grid-column:1 / -1;padding-top:4px}
+  .tbl.resp td:last-child::before,.tbl.resp td.noLbl::before{display:none}
+  .tbl.resp td .row{flex-wrap:wrap}
+}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -483,7 +586,7 @@ textarea{min-height:90px;resize:vertical}
 
 <div class="app">
   <aside class="side">
-    <a class="brand" href="#tracks">
+    <a class="brand" href="#home">
       <svg class="mark" viewBox="0 0 40 32" aria-hidden="true"><path d="M8 2h7L9 30H2z" fill="#e5484d"/><path d="M19 2h7l-6 28h-7z" fill="currentColor"/><path d="M31 2h7l-6 28h-7z" fill="currentColor"/><path d="M11.5 18l17-5-1.2 5.3-17 5z" fill="currentColor"/></svg>
       <b>Hutka</b>
     </a>
@@ -502,11 +605,13 @@ textarea{min-height:90px;resize:vertical}
   </aside>
   <div class="main">
     <header class="top">
+      <a class="brand mobile" href="#home" aria-label="Hutka"><svg class="mark" viewBox="0 0 40 32" aria-hidden="true"><path d="M8 2h7L9 30H2z" fill="#e5484d"/><path d="M19 2h7l-6 28h-7z" fill="currentColor"/><path d="M31 2h7l-6 28h-7z" fill="currentColor"/><path d="M11.5 18l17-5-1.2 5.3-17 5z" fill="currentColor"/></svg></a>
       <div class="search">
         <svg><use href="#i-search"/></svg>
         <input type="text" id="q" placeholder="Search tracks, drivers..." autocomplete="off">
         <div class="search-drop" id="qDrop" hidden></div>
       </div>
+      
       <a class="userchip" href="#profile" id="userChip"><img alt="" id="chipAvatar"><div><div class="nm" id="chipName">—</div><div class="sub" id="chipSub"></div></div></a>
       <button class="btn primary" id="btnSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button>
     </header>
@@ -621,7 +726,7 @@ textarea{min-height:90px;resize:vertical}
           <div class="legend" id="legendData"></div>
           <div class="charts under" id="dataPanel"><div class="hint" id="dataSub" style="margin:8px 0 4px"></div><canvas class="chart" id="chDataSpeed" height="150"></canvas><canvas class="chart" id="chDataDelta" height="84"></canvas></div>
         </div>
-        <div class="inspector" id="inspector"><div class="insp-empty" id="inspEmpty"></div><div id="inspBody" hidden></div></div>
+        <div class="inspector" id="inspector"><button class="insp-close" id="inspClose" type="button" aria-label="Close">×</button><div class="insp-empty" id="inspEmpty"></div><div id="inspBody" hidden></div></div>
       </div>
       <div class="card" id="digestPanel" hidden><h2><svg><use href="#i-clip"/></svg><span data-t="Session digest">Session digest</span><span class="sub" id="digestSub"></span></h2><div class="digest" id="digest"></div><details class="gloss"><summary class="hint" data-t="What the terms mean">What the terms mean</summary><ul id="glossList"></ul></details></div>
       <div class="card" id="askPanel" hidden><h2><svg><use href="#i-lab"/></svg><span data-t="Ask the AI about this session">Ask the AI about this session</span></h2><div class="chat" id="chatLog"></div><div class="chips" id="askChips"></div><div class="askrow"><textarea id="askInput"></textarea><div class="askbtns"><button class="btn primary" id="askBtn" type="button" data-t="Ask">Ask</button><button class="btn" id="askStop" type="button" hidden data-t="Stop">Stop</button></div></div><div class="hint" id="askNote" style="margin-top:6px"></div></div>
@@ -633,13 +738,14 @@ textarea{min-height:90px;resize:vertical}
     <section class="page" id="pg-profile" hidden>
       <div class="ph"><div><h1 data-t="Profile">Profile</h1><div class="sub" id="profSub"></div></div></div>
       <div class="grid2">
-        <div class="card"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><img class="avatar" id="profAvatar" alt="" style="width:72px;height:72px"><div style="min-width:0;flex:1"><div style="font-size:20px;font-weight:800" id="profName">—</div><div class="hint" id="profMeta"></div></div><div class="row"><label class="btn sm filebtn"><span data-t="Change photo">Change photo</span><input type="file" id="profAvatarFile" accept="image/*"></label><button class="btn sm ghost" id="profAvatarClear" type="button" data-t="Remove">Remove</button></div></div>
+        <div class="card"><div class="prof-head" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><img class="avatar" id="profAvatar" alt="" style="width:72px;height:72px"><div style="min-width:0;flex:1"><div style="font-size:20px;font-weight:800" id="profName">—</div><div class="hint" id="profMeta"></div></div><div class="row"><label class="btn sm filebtn"><span data-t="Change photo">Change photo</span><input type="file" id="profAvatarFile" accept="image/*"></label><button class="btn sm ghost" id="profAvatarClear" type="button" data-t="Remove">Remove</button></div></div>
           <div class="form" style="margin-top:18px">
             <div class="field"><label data-t="Racing name">Racing name</label><input type="text" id="profRacing" maxlength="40"></div>
             <div class="field"><label data-t="Country">Country</label><select id="profCountry"></select></div>
             <div class="field wide"><label data-t="Home track">Home track</label><select id="profHome"></select></div>
           </div>
           <div class="row" style="margin-top:12px"><button class="btn primary" id="profSave" type="button" data-t="Save">Save</button><button class="btn ghost" id="profSignOut" type="button" hidden data-t="Sign out">Sign out</button><span class="status" id="profStatus"></span></div>
+          <div class="row mobile-only" style="margin-top:14px;gap:10px;align-items:center"><span class="hint" data-t="Language">Language</span><div class="lang" role="group"><button type="button" id="langEnM">EN</button><button type="button" id="langRuM">RU</button></div><a class="btn sm" href="#admin" id="profAdminLink" hidden><svg><use href="#i-shield"/></svg><span data-t="Admin Panel">Admin Panel</span></a></div>
         </div>
         <div class="card" id="profSocialCard"><h2><svg><use href="#i-users"/></svg><span data-t="Community">Community</span></h2><div class="tiles" id="profSocial"></div><div class="hint" id="profSocialHint" style="margin-top:10px"></div></div>
       </div>
@@ -727,6 +833,14 @@ textarea{min-height:90px;resize:vertical}
   </div>
 </div>
 
+<!-- mobile tab bar -->
+<nav class="tabbar" id="tabbar" aria-label="Main">
+  <a href="#home" data-route="home"><svg><use href="#i-home"/></svg><span data-t="Home">Home</span></a>
+  <a href="#tracks" data-route="tracks"><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></a>
+  <button type="button" id="tabUpload" class="up" aria-label="Upload"><span class="circ"><svg><use href="#i-upload"/></svg></span><span data-t="Upload">Upload</span></button>
+  <a href="#lab" data-route="lab"><svg><use href="#i-lab"/></svg><span data-t="Lab">Lab</span></a>
+  <a href="#profile" data-route="profile"><svg><use href="#i-user"/></svg><span data-t="Profile">Profile</span></a>
+</nav>
 <!-- upload modal -->
 <div class="modal" id="uplModal" hidden>
   <div class="box">
@@ -1937,6 +2051,7 @@ Object.assign(I18N.RU, {
   'Edit session': 'Изменить сессию',
   'Published on the track page': 'Опубликована на странице трека',
   'likes & comments soon': 'лайки и комменты скоро',
+  'Nothing was shared — pick the .alf2 file in the upload window.': 'Ничего не передано — выбери файл .alf2 в окне загрузки.', 'Upload': 'Загрузить', 'Language': 'Язык',
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
@@ -2547,8 +2662,14 @@ function createMapView(canvas, host) {
   function hitPoint(sx, sy) { const O = host.getOverlay ? host.getOverlay() : {}; let best = -1, bd = 10; (O.pts || []).forEach((p, i) => { const [x, y] = toS(p.x, p.y), d = Math.hypot(x - sx, y - sy); if (d < bd) { bd = d; best = i; } }); return best; }
   function nearestSegment(sx, sy) { const O = host.getOverlay ? host.getOverlay() : {}, pts = O.pts || []; let best = -1, bd = Infinity; const n = pts.length; for (let i = 0; i < n; i++) { const a = pts[i], b = pts[(i + 1) % n]; const [ax, ay] = toS(a.x, a.y), [bx, by] = toS(b.x, b.y); const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy || 1; const u = clamp(((sx - ax) * dx + (sy - ay) * dy) / l2, 0, 1); const d = Math.hypot(ax + u * dx - sx, ay + u * dy - sy); if (d < bd) { bd = d; best = i; } } return { i: best, d: bd }; }
   // ----- input -----
+  // touch: one finger scrolls the page, two fingers move and pinch-zoom the map, a tap selects
+  const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches; canvas.style.touchAction = coarse ? 'pan-y' : 'none';
+  M.ptrs = new Map(); M.pinch = null;
   canvas.addEventListener('pointerdown', (e) => {
     const [sx, sy] = getPos(e); canvas.setPointerCapture(e.pointerId);
+    M.ptrs.set(e.pointerId, [sx, sy]);
+    if (M.ptrs.size === 2) { const [a, b] = [...M.ptrs.values()]; M.pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx: (a[0] + b[0]) / 2, my: (a[1] + b[1]) / 2 }; M.panning = null; M.tap = null; canvas.classList.remove('panning'); return; }
+    if (e.pointerType === 'touch') { M.tap = { x: sx, y: sy, t: Date.now() }; return; }
     const panMode = M.tool === 'pan' || e.button === 1 || M.spaceDown;
     if (panMode) { M.panning = { x: sx, y: sy, tx: V.tx, ty: V.ty, sx, sy, moved: false }; canvas.classList.add('panning'); return; }
     if (e.button === 2) return;
@@ -2564,12 +2685,18 @@ function createMapView(canvas, host) {
   });
   canvas.addEventListener('pointermove', (e) => {
     const [sx, sy] = getPos(e);
+    if (M.ptrs.has(e.pointerId)) M.ptrs.set(e.pointerId, [sx, sy]);
+    if (M.pinch) { if (M.ptrs.size < 2) return; const [a, b] = [...M.ptrs.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2; zoomAt(d / M.pinch.d, mx, my); V.tx += mx - M.pinch.mx; V.ty += my - M.pinch.my; M.pinch = { d, mx, my }; V.auto = false; draw(); return; }
+    if (e.pointerType === 'touch' && !M.panning && M.dragIdx < 0 && !M.photoDrag) return;
     if (M.panning) { V.tx = M.panning.tx + sx - M.panning.x; V.ty = M.panning.ty + sy - M.panning.y; if (Math.hypot(sx - M.panning.sx, sy - M.panning.sy) > 4) M.panning.moved = true; V.auto = false; draw(); return; }
     if (M.photoDrag) { const [ix, iy] = toI(sx, sy); if (host.onPhotoMove) host.onPhotoMove(ix - M.photoDrag.ix, iy - M.photoDrag.iy); M.photoDrag = { ix, iy }; draw(); return; }
     if (M.dragIdx >= 0) { const [ix, iy] = toI(sx, sy); if (host.onPointDrag) host.onPointDrag(M.dragIdx, ix, iy); draw(); return; }
     const i = nearestLineIdx(sx, sy); if (i !== M.hoverIdx) { M.hoverIdx = i; if (host.onHover) host.onHover(i); draw(); }
   });
   const endDrag = (e) => {
+    if (e) { M.ptrs.delete(e.pointerId); if (M.ptrs.size < 2) M.pinch = null; }
+    if (e && e.type === 'pointerup' && e.pointerType === 'touch' && M.tap && Date.now() - M.tap.t < 400) { const [sx, sy] = getPos(e); if (Math.hypot(sx - M.tap.x, sy - M.tap.y) < 12 && host.onClick) { const b = badgeAt(sx, sy); const i = b ? b.w.apex : nearestLineIdx(sx, sy); if (host.onHover) host.onHover(i); host.onClick(i, b); } M.tap = null; return; }
+    M.tap = null;
     if (M.photoDrag) { M.photoDrag = null; canvas.classList.remove('panning'); if (host.onPhotoDone) host.onPhotoDone(); }
     if (M.panning) { const moved = M.panning.moved; M.panning = null; canvas.classList.remove('panning'); if (!moved && e && e.type === 'pointerup' && e.button === 0 && host.onClick) { const [sx, sy] = getPos(e); const b = badgeAt(sx, sy); host.onClick(b ? b.w.apex : nearestLineIdx(sx, sy), b); } }
     if (M.dragIdx >= 0) { M.dragIdx = -1; if (host.onPointsEdited) host.onPointsEdited(); }
@@ -2596,6 +2723,10 @@ let toastT = null;
 function toast(msg, ms) { const e = $('toast'); e.textContent = msg; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { e.hidden = true; }, ms || 2600); }
 function setStatus(id, text, cls) { const e = $(id); if (!e) return; e.textContent = text || ''; e.className = 'status' + (cls ? ' ' + cls : ''); }
 function confirmDlg(title, text, yes) { return new Promise((res) => { $('cfTitle').textContent = title; $('cfText').textContent = text || ''; $('cfYes').textContent = yes || t('Confirm'); $('cfModal').hidden = false; const done = (v) => { $('cfModal').hidden = true; $('cfYes').onclick = null; $('cfNo').onclick = null; res(v); }; $('cfYes').onclick = () => done(true); $('cfNo').onclick = () => done(false); }); }
+// files handed over by the service worker after "Share → Hutka" from another app
+async function takeSharedFiles() { const out = []; try { if (!('caches' in window)) return out; const c = await caches.open('hutka-share'); for (const k of await c.keys()) { const r = await c.match(k); if (!r) continue; const b = await r.blob(); const name = decodeURIComponent(k.url.split('/').pop() || 'session.alf2'); out.push(new File([b], name, { type: b.type })); await c.delete(k); } } catch (e) {} return out; }
+// on phones data tables stack into cards: every cell gets its column name as a label
+function respTable(tb) { const ths = Array.from(tb.querySelectorAll('thead th')).map(th => th.textContent.trim()); for (const tr of tb.querySelectorAll('tbody tr')) Array.from(tr.children).forEach((td, i) => { if (ths[i]) td.dataset.label = ths[i]; else td.classList.add('noLbl'); }); tb.classList.add('resp'); return tb; }
 function fillSelect(sel, opts, value) {
   const sig = opts.map(o => o[0] + '\t' + o[1] + '\t' + (o[2] || '')).join('|');
   if (sel._sig !== sig) { sel.innerHTML = ''; let grp = null, grpName = null; for (const [v, tx, g] of opts) { const o = document.createElement('option'); o.value = v; o.textContent = tx; if (g) { if (grpName !== g) { grp = document.createElement('optgroup'); grp.label = g; sel.appendChild(grp); grpName = g; } grp.appendChild(o); } else { grp = null; grpName = null; sel.appendChild(o); } } sel._sig = sig; }
@@ -2640,12 +2771,13 @@ async function route() {
     if (name === 'admin' && !STORE.isAdmin()) name = 'home';
     APP.route = name; APP.a = r.a; APP.b = r.b; APP.c = r.c;
     for (const p of PAGES) $('pg-' + p).hidden = p !== name;
-    for (const a of document.querySelectorAll('.nav a[data-route]')) a.classList.toggle('active', a.dataset.route === name || (name === 'track' || name === 'layout') && a.dataset.route === 'tracks');
+    for (const a of document.querySelectorAll('.nav a[data-route], .tabbar a[data-route]')) a.classList.toggle('active', a.dataset.route === name || (name === 'track' || name === 'layout') && a.dataset.route === 'tracks' || name === 'driver' && a.dataset.route === 'profile');
     window.scrollTo({ top: 0 });
     if (name === 'home') await renderHomePage();
     else if (name === 'tracks') await renderTracksPage();
     else if (name === 'track') await renderTrackPage(r.a);
     else if (name === 'layout') await renderLayoutPage(r.a, r.b);
+    else if (name === 'lab' && r.a === 'share') { await LAB.show(null); history.replaceState(null, '', '#lab'); const files = await takeSharedFiles(); if (files.length) UPLOAD.withFiles(files); else toast(t('Nothing was shared — pick the .alf2 file in the upload window.')); }
     else if (name === 'lab') await LAB.show(r.a, r.b);
     else if (name === 'profile') await renderProfile();
     else if (name === 'driver') await renderDriverPage(r.a);
@@ -2666,11 +2798,12 @@ async function renderShell() {
   $('userChip').hidden = STORE.hasAuth && !STORE.hasIdentity; $('btnSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity);
   $('navAdmin').hidden = !STORE.isAdmin(); $('adminSep').hidden = !STORE.isAdmin();
   $('modeNote').textContent = STORE.hasAuth ? (STORE.hasIdentity ? '' : t('Sign in to upload sessions and keep a library across devices. Browsing is open to everyone.')) : (STORE.hasDb ? (STORE.hasIdentity ? (STORE.canWrite() ? '' : t('Read-only access: ask the owner for Contributor access to publish sessions.')) : t('Sign in to claude.ai to publish sessions and keep a library across devices.')) : t('Offline mode: sessions stay in this browser. Open the shared Hutka link signed in to claude.ai to publish and compare with others.'));
-  $('langEn').classList.toggle('active', I18N.lang === 'en'); $('langRu').classList.toggle('active', I18N.lang === 'ru');
+  $('langEn').classList.toggle('active', I18N.lang === 'en'); $('langRu').classList.toggle('active', I18N.lang === 'ru'); $('langEnM').classList.toggle('active', I18N.lang === 'en'); $('langRuM').classList.toggle('active', I18N.lang === 'ru'); $('profAdminLink').hidden = !STORE.isAdmin();
   $('q').placeholder = t('Search tracks, drivers...'); $('uplName').placeholder = t('Pasha, Al Forsan, stint 1'); $('uplNote').placeholder = t('Sodi RT10 #14, wet'); $('newLayoutName').placeholder = t('New layout name');
 }
-$('langEn').onclick = () => { I18N.setLang('en'); renderShell(); route(); };
-$('langRu').onclick = () => { I18N.setLang('ru'); renderShell(); route(); };
+$('langEn').onclick = $('langEnM').onclick = () => { I18N.setLang('en'); renderShell(); route(); };
+$('langRu').onclick = $('langRuM').onclick = () => { I18N.setLang('ru'); renderShell(); route(); };
+$('tabUpload').onclick = () => UPLOAD.open(APP.route === 'lab' && LAB.tid ? { track: LAB.tid, layout: LAB.lid } : {});
 // sign-in (standalone hosting with Supabase auth)
 const AUTH = {
   open() { $('authStatus').textContent = ''; $('authEmail').value = ''; $('authGoogleBtn').hidden = !(window.HUTKA_CONFIG && window.HUTKA_CONFIG.googleAuth); $('authModal').hidden = false; $('authEmail').focus(); },
@@ -2831,7 +2964,7 @@ async function renderTrackPage(tid) {
   if (mine.length) {
     const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Session')}</th><th>${t('Layout')}</th><th>${t('Date')}</th><th>${t('Best')}</th><th>${t('Visibility')}</th><th></th></tr></thead>`; const body = el('tbody');
     for (const m of mine) { const r = el('tr'); const l = layouts.find(x => x.id === m.layout); r.innerHTML = `<td style="font-weight:600;white-space:normal">${esc(m.label || m.name)}</td><td>${esc(l ? l.name : t('Custom'))}</td><td>${esc(fmtDate(m.date))}</td><td class="num">${fmtMs(m.bestMs)}</td><td>${m.published ? `<span class="pill ok">${t('Published')}</span>` : `<span class="pill off">${t('Private')}</span>`}</td><td></td>`; const acts = el('div', 'row'); const open = el('a', 'btn xs', t('Open')); open.href = '#lab~' + m.id; acts.appendChild(open); if (STORE.canWrite() && m.owner !== 'local') { const pub = el('button', 'btn xs' + (m.published ? '' : ' primary'), m.published ? t('Unpublish') : t('Publish')); pub.type = 'button'; pub.onclick = async () => { try { await STORE.updateSession(m.id, { published: !m.published }); renderTrackPage(tid); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); } }; acts.appendChild(pub); } r.lastElementChild.appendChild(acts); body.appendChild(r); }
-    tb.appendChild(body); wrap.appendChild(tb); mineBox.appendChild(wrap);
+    tb.appendChild(body); respTable(tb); wrap.appendChild(tb); mineBox.appendChild(wrap);
     if (mine.some(m => !m.published)) mineBox.appendChild(el('div', 'hint', t('Private sessions are only in your library. Publish one to put it on this page and in the hot laps.')));
   }
   $('tLayoutsHint').textContent = layouts.length ? '' : (STORE.isAdmin() ? t('No layouts yet — add them in the admin panel.') : t('No layouts listed yet.'));
@@ -2844,7 +2977,7 @@ async function renderTrackPage(tid) {
     const names = await STORE.names(best.map(s => s.owner));
     const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl hot'); tb.innerHTML = `<thead><tr><th>#</th><th>${t('Driver')}</th><th>${t('Lap')}</th><th>${t('Layout')}</th><th>${t('Session')}</th><th>${t('Date')}</th><th></th></tr></thead>`; const body = el('tbody');
     best.forEach((s, i) => { const r = el('tr'); const l = layouts.find(x => x.id === s.layout); r.innerHTML = `<td class="num">${i + 1}</td><td class="drv">${driverLink(s.owner, names)}</td><td class="num">${fmtMs(s.bestMs)}</td><td>${esc(l ? l.name : (s.layout === 'custom' ? t('Custom') : s.layout))}</td><td>${esc(s.label || s.name)}</td><td>${esc(fmtDate(s.date))}</td><td><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a></td>`; body.appendChild(r); });
-    tb.appendChild(body); wrap.appendChild(tb); hot.appendChild(wrap);
+    tb.appendChild(body); respTable(tb); wrap.appendChild(tb); hot.appendChild(wrap);
   }
   // stats tiles
   const tiles = $('tTiles'); tiles.innerHTML = '';
@@ -2938,7 +3071,7 @@ async function lpSessions(tid, lid, l, pubs) {
   const names = await STORE.names(pubs.map(s => s.owner));
   const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Driver')}</th><th>${t('Session')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th></th></tr></thead>`; const body = el('tbody');
   for (const s of pubs.slice().sort((a, b) => a.bestMs - b.bestMs)) { const r = el('tr'); r.innerHTML = `<td class="drv" style="font-weight:600">${driverLink(s.owner, names)}</td><td>${esc(s.label || s.name)}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${s.id}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
-  tb.appendChild(body); wrap.appendChild(tb); box.appendChild(wrap);
+  tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
 }
 const driverLink = (uid, names) => { const n = names && names[uid] ? names[uid].name : t('Driver'); return uid && uid !== 'local' ? `<a href="#driver~${esc(uid)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line-2)">${esc(n)}</a>` : esc(n); };
 // ---------- driver page: public profile with personal bests and published sessions ----------
@@ -2969,7 +3102,7 @@ async function renderSessionsTable(box, pubs, subEl) {
   if (!pubs.length) { box.appendChild(el('div', 'hint', t('No published sessions yet.'))); return; }
   const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Track')}</th><th>${t('Session')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th></th></tr></thead>`; const body = el('tbody');
   for (const s of pubs) { const tr = STORE.getTrack(s.track); const ls = s.track ? await STORE.getLayouts(s.track) : []; const l = ls.find(x => x.id === s.layout); const r = el('tr'); r.innerHTML = `<td style="white-space:normal">${esc(tr ? tr.name : t('Custom'))}${l ? ' · ' + esc(l.name) : ''}</td><td style="white-space:normal">${esc(s.label || s.name)}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${s.id}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
-  tb.appendChild(body); wrap.appendChild(tb); box.appendChild(wrap);
+  tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
 }
 // ---------- the Lab ----------
 // One session is the reference; a comparison (another lap, the session average, or another session on the same layout) is optional.
@@ -3045,9 +3178,9 @@ LAB.load = async function (meta) {
 // ask the lab to drop its loaded state (after a session was edited or deleted elsewhere)
 LAB.invalidate = function (sid) { if (!sid || (LAB.current && LAB.current.id === sid) || LAB.sessions.some(s => s.id === sid)) { LAB.current = null; LAB.G = null; LAB.sessions = []; LAB.loaded = false; LAB.dcmp = null; } };
 function labMapHeight(w) {
-  const fs = document.fullscreenElement === $('hero');
+  const fs = document.fullscreenElement === $('hero') || $('hero').classList.contains('fs-fallback');
   const ratio = LAB.G ? LAB.G.H / LAB.G.W : 0.65;
-  if (fs) return Math.max(280, window.innerHeight - 28 - 62 - 49 - 34 - 262);
+  if (fs) return Math.max(240, window.innerHeight - 28 - 62 - 49 - 34 - 262);
   return Math.round(clamp(w * ratio, 340, Math.min(Math.max(360, window.innerHeight - 470), 720)));
 }
 function labEnsureMap() {
@@ -3062,8 +3195,11 @@ function labEnsureMap() {
   $('optBand').onclick = () => { LAB.opts.band = !LAB.opts.band; syncOpts(); }; $('optTicks').onclick = () => { LAB.opts.ticks = !LAB.opts.ticks; syncOpts(); }; $('optLabels').onclick = () => { LAB.opts.labelsAll = !LAB.opts.labelsAll; syncOpts(); };
   $('tglSat').onclick = () => { LAB.opts.aerial = !LAB.opts.aerial; syncOpts(); };
   // full screen: map, charts, readout and the corner inspector on one screen
-  $('btnFull').onclick = () => { const h = $('hero'); if (document.fullscreenElement) document.exitFullscreen(); else if (h.requestFullscreen) h.requestFullscreen().catch(() => toast(t('Full screen is not available in this browser.'))); };
-  $('btnFullExit').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); };
+  const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); };
+  const fsOn = () => document.fullscreenElement === $('hero') || $('hero').classList.contains('fs-fallback');
+  $('btnFull').onclick = () => { const h = $('hero'); if (fsOn()) { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); return; } if (h.requestFullscreen) h.requestFullscreen().catch(() => fsFallbackOn(true)); else fsFallbackOn(true); };
+  $('btnFullExit').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); };
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('hero').classList.contains('fs-fallback')) fsFallbackOn(false); });
   document.addEventListener('fullscreenchange', () => { const fs = document.fullscreenElement === $('hero'); $('fsHead').hidden = !fs; $('btnFull').classList.toggle('active', fs); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); });
   window.addEventListener('resize', () => { if (APP.route === 'lab' && LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (LAB.dcmp) renderInspector(); } });
   window.addEventListener('keydown', (e) => { if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if (APP.route !== 'lab') return; if (e.key === 'Escape' && LAB.selN) { LAB.selN = 0; renderInspector(); renderCornersTable(); LAB.map.draw(); } else if (e.key === 'q' || e.key === 'Q') LAB.map.rotateBy(-Math.PI / 24); else if (e.key === 'e' || e.key === 'E') LAB.map.rotateBy(Math.PI / 24); else if (e.key === 'f' || e.key === 'F') $('btnFull').click(); });
@@ -3084,6 +3220,7 @@ function labEnsureMap() {
   $('btnFollowOwner').onclick = async () => { const s = LAB.current; if (!s || mySession(s)) return; if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to follow drivers.')); return; } const b = $('btnFollowOwner'); b.classList.add('busy'); try { await STORE.toggleFollow(s.owner); await renderOwnerRow(); } catch (e) { toast(t('Could not save.')); } b.classList.remove('busy'); };
   $('commentBtn').onclick = postComment; $('commentInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); postComment(); } });
   $('digest').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); LAB.selN = +a.dataset.n; renderInspector(); renderCornersTable(); LAB.map.draw(); $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+  $('inspClose').onclick = () => { LAB.selN = 0; LAB.hoverIdx = -1; LAB.map.setHover(-1); renderInspector(); renderCornersTable(); LAB.map.draw(); };
   $('inspEmpty').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); selectCorner(+a.dataset.n, false); });
   $('askBtn').onclick = askAI; $('askStop').onclick = () => { if (askCtl) askCtl.abort(); };
   $('askInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); askAI(); } });
@@ -3343,7 +3480,7 @@ function renderDigest() {
   $('glossList').innerHTML = [['brake', t('Brake — where the deceleration gets stronger than 2.5 m/s²; the number is metres from the start/finish line.')], ['lift', t('Lift — the throttle closes without braking; eased off — a partial lift.')], ['released', t('Released — the brake pedal is let go; earlier usually means the kart rolls and rotates on its own.')], ['apex', t('Apex — the slowest point of the corner; apex speed is the minimum speed.')], ['throttle', t('Throttle — where the full acceleration starts after the apex.')], ['exit', t('Exit — the speed 40 m after the apex: what the whole straight inherits.')], ['reserve', t('Reserve — how much faster the corner would be if driven like the best quarter of all passes in the loaded sessions.')], ['clean', t('Clean lap — no slower than the best by 4 %; the rest are counted as dirty and skipped in averages.')]].map(([k, v]) => `<li>${esc(v)}</li>`).join('');
 }
 function renderCornersTable() {
-  const D = LAB.dcmp, tb = $('cornersTable').querySelector('tbody'); tb.innerHTML = ''; if (!D) return;
+  const D = LAB.dcmp, tb = $('cornersTable').querySelector('tbody'); tb.innerHTML = ''; $('cornersTable').classList.add('resp'); if (!D) return;
   const coachOf = (n) => LAB.coach ? LAB.coach.corners.find(c => c.n === n) : null;
   const short = (m) => `${pedalText(m)} · ${t('apex')} ${kmh(m.vApex)} · ${t('throttle')} ${m.sThr >= 0 ? m.sThr.toFixed(0) + ' ' + t('m') : '—'} · ${t('exit')} ${kmh(m.vExit)} · ${m.time.toFixed(2)} ${t('s')}`;
   for (const r of D.rows) {
@@ -3352,14 +3489,14 @@ function renderCornersTable() {
     const main = r.cmp && Math.abs(r.cmp.dt) >= 0.04 && r.cmp.items[0] ? r.cmp.items[0].t : (f && Math.abs(f.corr) >= 0.35 ? t('what matters here is {f}', { f: f.name }) : '—');
     const cells = [['T' + w.n, ''], [`${w.dir === 'L' ? t('left') : t('right')} · ${kindWord(m)}`, kindCls(m)], [short(m), 'txt'], [r.O ? short(r.O) : '—', 'txt'], [r.cmp ? sg(r.cmp.dt) : '—', (r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm') + ' num'], [c ? (res > 0.03 ? res.toFixed(2) + ' ' + t('s') : t('ok')) : '—', (res > 0.1 ? 'loss' : 'm') + ' num'], [main, 'txt']];
     for (const [tx, cl] of cells) { const td = el('td'); td.textContent = tx; if (cl) td.className = cl; tr.appendChild(td); }
-    tr.onclick = () => selectCorner(w.n, true);
+    tr.onclick = () => selectCorner(w.n, true); const labels = ['#', t('Type'), $('youColHead').textContent, $('cmpColHead').textContent, 'Δt', t('Reserve'), t('Main difference')]; Array.from(tr.children).forEach((td, i) => { td.dataset.label = labels[i] || ''; });
     tr.addEventListener('mouseenter', () => { LAB.hoverIdx = w.apex; LAB.map.setHover(w.apex); renderInspector(); }); tr.addEventListener('mouseleave', () => { LAB.hoverIdx = -1; LAB.map.setHover(-1); renderInspector(); });
     tb.appendChild(tr);
   }
 }
 function renderInspector() {
   const D = LAB.dcmp, body = $('inspBody'), empty = $('inspEmpty'); if (!D) return;
-  const r = activeRow();
+  const r = activeRow(); $('inspector').classList.toggle('open', !!r);
   if (!r) {
     body.hidden = true; empty.hidden = false;
     const coach = LAB.coach, top = coach ? D.rows.map(x => { const c = coach.corners.find(y => y.n === x.w.n); return c ? { n: x.w.n, d: x.R.time - c.tTop } : null; }).filter(Boolean).filter(x => x.d > 0.03).sort((a, b) => b.d - a.d).slice(0, 3) : [];
@@ -3547,6 +3684,7 @@ const UPLOAD = (() => {
   $('uplTrack').addEventListener('change', () => { fillLayouts(); syncPub(); });
   $('uplLayout').addEventListener('change', showLayoutPhoto);
   $('uplFile').addEventListener('change', (e) => onFiles(Array.from(e.target.files || [])));
+  if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) $('uplFile').removeAttribute('accept');
   $('uplDrop').addEventListener('click', () => $('uplFile').click());
   $('uplDrop').addEventListener('dragover', (e) => { e.preventDefault(); $('uplDrop').classList.add('over'); }); $('uplDrop').addEventListener('dragleave', () => $('uplDrop').classList.remove('over'));
   $('uplDrop').addEventListener('drop', (e) => { e.preventDefault(); $('uplDrop').classList.remove('over'); onFiles(Array.from(e.dataTransfer.files || [])); });
@@ -3563,7 +3701,8 @@ const UPLOAD = (() => {
     }
     close(); if (first) { await LAB.open(first, false); go('lab'); }
   };
-  return { open, close };
+  async function withFiles(files) { open({}); await onFiles(files); }
+  return { open, close, withFiles };
 })();
 // ---------- home: the feed of published sessions, where people drive, who is fastest ----------
 function drawPreview(cv, pv, color) {
@@ -3688,7 +3827,7 @@ async function renderMySessionsTable(box, opts) {
     const del = el('button', 'btn xs danger', '×'); del.type = 'button'; del.title = t('Delete'); del.onclick = async () => { if (!(await confirmDlg(t('Delete this session?'), t('The file data is removed from your library and from the track page.'), t('Delete')))) return; try { await STORE.deleteSession(m); LAB.invalidate(m.id); } catch (e) {} renderMySessionsTable(box, opts); }; acts.appendChild(del);
     tr.lastElementChild.appendChild(acts); body.appendChild(tr);
   }
-  tb.appendChild(body); wrap.appendChild(tb); box.appendChild(wrap);
+  tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
 }
 // ---------- session edit: name, track, layout, note, visibility ----------
 const SESSEDIT = (() => {
