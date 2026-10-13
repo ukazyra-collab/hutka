@@ -795,18 +795,25 @@ textarea{min-height:90px;resize:vertical}
             <div class="field"><label data-t="Racing name">Racing name</label><input type="text" id="profRacing" maxlength="40"></div>
             <div class="field"><label data-t="Country">Country</label><select id="profCountry"></select></div>
             <div class="field wide"><label data-t="Home track">Home track</label><select id="profHome"></select></div>
+            <div class="field wide"><label data-t="About you (one or two lines)">About you (one or two lines)</label><input type="text" id="profBio" maxlength="160" placeholder="Rental karting since 2021, Kartdrome regular, chasing 1:14"></div>
+            <div class="field"><label>Instagram</label><input type="text" id="profIg" maxlength="80" placeholder="@name"></div>
+            <div class="field"><label data-t="Contact link (Telegram / WhatsApp)">Contact link (Telegram / WhatsApp)</label><input type="text" id="profContact" maxlength="160" placeholder="https://t.me/name"></div>
+            <div class="field wide"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profCoach" style="width:18px;height:18px"><span data-t="I coach — show “Book a training” on my page (uses the contact link)">I coach — show “Book a training” on my page (uses the contact link)</span></label></div>
+            <div class="field wide"><label data-t="SWS (Sodi World Series) profile link">SWS (Sodi World Series) profile link</label><div class="row"><input type="url" id="profSws" class="grow" placeholder="https://www.sodiwseries.com/en-gb/drivers/…"><button class="btn sm" id="profSwsImport" type="button" data-t="Import SWS results">Import SWS results</button></div><div class="hint" id="profSwsHint"></div></div>
           </div>
           <div class="row" style="margin-top:12px"><button class="btn primary" id="profSave" type="button" data-t="Save">Save</button><button class="btn ghost" id="profSignOut" type="button" hidden data-t="Sign out">Sign out</button><span class="status" id="profStatus"></span></div>
           <div class="row mobile-only" style="margin-top:14px;gap:10px;align-items:center"><span class="hint" data-t="Language">Language</span><div class="lang" role="group"><button type="button" id="langEnM">EN</button><button type="button" id="langRuM">RU</button></div><a class="btn sm" href="#admin" id="profAdminLink" hidden><svg><use href="#i-shield"/></svg><span data-t="Admin Panel">Admin Panel</span></a></div>
         </div>
         <div class="card" id="profSocialCard"><h2><svg><use href="#i-users"/></svg><span data-t="Community">Community</span></h2><div class="tiles" id="profSocial"></div><div class="hint" id="profSocialHint" style="margin-top:10px"></div></div>
       </div>
+      <div class="card" id="profSwsCard" hidden><h2><svg><use href="#i-flag"/></svg><span data-t="SWS results">SWS results</span><span class="sub" id="profSwsSub"></span></h2><div id="profSwsBox"></div></div>
       <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="profSessSub"></span></h2><div class="row" style="margin-bottom:12px"><button class="btn primary" id="profUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload Alfano session">Upload Alfano session</span></button></div><div id="profSessions"></div><div class="hint" id="profSessHint"></div></div>
     </section>
 
     <!-- ========== DRIVER ========== -->
     <section class="page" id="pg-driver" hidden>
-      <div class="card"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><img class="avatar" id="drvAvatar" alt="" style="width:72px;height:72px"><div style="min-width:0;flex:1"><div style="font-size:22px;font-weight:800" id="drvName">—</div><div class="hint" id="drvMeta"></div><div class="hint" id="drvFollowers"></div></div><button class="btn primary" id="drvFollow" type="button" hidden></button></div></div>
+      <div class="card"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><img class="avatar" id="drvAvatar" alt="" style="width:72px;height:72px"><div style="min-width:0;flex:1"><div style="font-size:22px;font-weight:800" id="drvName">—</div><div class="hint" id="drvMeta"></div><div class="hint" id="drvFollowers"></div><div id="drvBio" style="margin-top:6px;font-size:14px"></div><div class="row" id="drvLinks" style="margin-top:8px"></div></div><button class="btn primary" id="drvFollow" type="button" hidden></button></div></div>
+      <div class="card" id="drvSwsCard" hidden><h2><svg><use href="#i-flag"/></svg><span data-t="SWS results">SWS results</span><span class="sub" id="drvSwsSub"></span></h2><div id="drvSwsBox"></div></div>
       <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="Personal bests">Personal bests</span></h2><div id="drvBest"></div></div>
       <div class="card"><h2><svg><use href="#i-clip"/></svg><span data-t="Published sessions">Published sessions</span><span class="sub" id="drvSessSub"></span></h2><div id="drvSessions"></div></div>
     </section>
@@ -913,6 +920,16 @@ textarea{min-height:90px;resize:vertical}
     <div class="row" style="justify-content:flex-end"><button class="btn" id="uplCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="uplGo" type="button" disabled data-t="Analyse">Analyse</button></div>
   </div>
 </div>
+<!-- SWS import modal -->
+<div class="modal" id="swsModal" hidden><div class="box" style="width:min(680px,100%)"><h3 data-t="Import your SWS results">Import your SWS results</h3>
+  <p class="hint" id="swsIntro"></p>
+  <ol class="hint" style="margin:0;padding-left:20px;line-height:1.7" id="swsSteps"></ol>
+  <div class="row" style="margin-top:6px"><a class="btn primary" id="swsBookmarklet" href="#" draggable="true">Hutka ← SWS</a><span class="hint" id="swsDragHint"></span></div>
+  <div class="field"><label data-t="…or paste the results table copied from your SWS page">…or paste the results table copied from your SWS page</label><textarea id="swsPaste" rows="5"></textarea></div>
+  <div class="row"><button class="btn" id="swsParse" type="button" data-t="Read the pasted text">Read the pasted text</button><span class="status" id="swsStatus"></span></div>
+  <div id="swsPreview" class="tblwrap" style="max-height:260px;overflow:auto"></div>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="swsCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="swsSave" type="button" disabled data-t="Save to my profile">Save to my profile</button></div>
+</div></div>
 <!-- credits & plan modal -->
 <div class="modal" id="payModal" hidden><div class="box" style="width:min(720px,100%)"><h3 data-t="Credits and Pro">Credits and Pro</h3><p class="hint" id="payIntro"></p>
   <div class="plans" id="payPlans"></div>
@@ -926,6 +943,7 @@ textarea{min-height:90px;resize:vertical}
     <div class="field"><label data-t="Track">Track</label><select id="seTrack"></select></div>
     <div class="field"><label data-t="Layout">Layout</label><select id="seLayout"></select></div>
     <div class="field wide"><label data-t="Kart / notes">Kart / notes</label><input type="text" id="seNote" maxlength="120"></div>
+    <div class="field wide" id="seSwsField" hidden><label data-t="SWS race this session belongs to">SWS race this session belongs to</label><select id="seSws"></select></div>
     <div class="field wide" id="sePubField"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="sePublish" style="width:18px;height:18px"><span data-t="Published on the track page">Published on the track page</span></label></div>
   </div>
   <div class="status" id="seStatus"></div>
@@ -2348,6 +2366,39 @@ Object.assign(I18N.RU, {
   '{s}. Alfano at 10 Hz is the reference; at {hz} Hz braking, release and throttle points are accurate to about ±{m} m and apex speeds are smoothed. Treat small differences with care.': '{s}. Эталон — Alfano на 10 Гц; при {hz} Гц точки торможения, отпускания и газа точны примерно до ±{m} м, скорости в апексе сглажены. К малым разницам относись осторожно.',
   'Choose session files': 'Выбери файлы сессий',
   'Alfano .alf2 (the reference), AiM / RaceChrono / TrackAddict / Harry\'s LapTimer CSV, VBOX .vbo, GPX. One file per session; several at once are fine.': 'Alfano .alf2 (эталон), CSV из AiM / RaceChrono / TrackAddict / Harry\'s LapTimer, VBOX .vbo, GPX. Один файл — одна сессия; можно несколько сразу.',
+
+  // ----- v20: SWS, contacts, coach -----
+  'Book a training': 'Записаться на тренировку',
+  'Message': 'Написать',
+  'Coach': 'Тренер',
+  'No result rows recognised yet.': 'Строки с результатами пока не распознаны.',
+  'Race': 'Гонка',
+  'Pos.': 'Поз.',
+  'Best lap': 'Лучший круг',
+  '{n} results recognised. Check the columns, then save.': 'Распознано результатов: {n}. Проверь колонки и сохрани.',
+  'SWS does not share results with other sites, so they come from your own browser: open your SWS profile while signed in and run the Hutka button there. It reads the results table on that page and brings it here — nothing else.': 'SWS не отдаёт результаты другим сайтам, поэтому они приходят из твоего браузера: открой свой профиль SWS (войдя в аккаунт) и нажми там кнопку Hutka. Она читает таблицу результатов на той странице и приносит её сюда — больше ничего.',
+  'Drag the blue button to your bookmarks bar (on a phone: add any bookmark, then edit its address to the button\'s link — long-press it to copy).': 'Перетащи синюю кнопку на панель закладок (на телефоне: создай любую закладку и замени её адрес на ссылку кнопки — долгое нажатие, чтобы скопировать).',
+  'Sign in at sodiwseries.com and open your driver page (SWS → Drivers → your name).': 'Войди на sodiwseries.com и открой свою страницу гонщика (SWS → Drivers → твоё имя).',
+  'Click the Hutka bookmark there — you come back here with the results.': 'Нажми там закладку Hutka — вернёшься сюда уже с результатами.',
+  '← drag me to the bookmarks bar': '← перетащи меня на панель закладок',
+  'Results of {name} from SWS.': 'Результаты {name} из SWS.',
+  'Drag this button to the bookmarks bar, then use it on your SWS page.': 'Перетащи эту кнопку на панель закладок и нажми её на своей странице SWS.',
+  'SWS results saved to your profile.': 'Результаты SWS сохранены в профиле.',
+  'imported {d}': 'импорт {d}',
+  'No SWS results imported yet.': 'Результаты SWS ещё не импортированы.',
+  'Paste the link to your SWS driver page; it is shown on your public page. “Import SWS results” brings your race history here.': 'Вставь ссылку на свою страницу гонщика SWS — она показывается на твоей публичной странице. «Импорт результатов SWS» переносит сюда историю гонок.',
+  '— not an SWS race —': '— не гонка SWS —',
+  'About you (one or two lines)': 'О себе (одна-две строки)',
+  'Contact link (Telegram / WhatsApp)': 'Ссылка для связи (Telegram / WhatsApp)',
+  'I coach — show “Book a training” on my page (uses the contact link)': 'Я тренирую — показывать «Записаться на тренировку» на моей странице (по ссылке для связи)',
+  'SWS (Sodi World Series) profile link': 'Ссылка на профиль SWS (Sodi World Series)',
+  'Import SWS results': 'Импорт результатов SWS',
+  'SWS results': 'Результаты SWS',
+  'Import your SWS results': 'Импорт твоих результатов SWS',
+  '…or paste the results table copied from your SWS page': '…или вставь таблицу результатов, скопированную со своей страницы SWS',
+  'Read the pasted text': 'Прочитать вставленный текст',
+  'Save to my profile': 'Сохранить в профиль',
+  'SWS race this session belongs to': 'Гонка SWS, к которой относится сессия',
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
@@ -2606,9 +2657,15 @@ const STORE = (() => {
       async saveSession(sid, meta, chunks) { must(await sb.from('sessions').upsert({ id: sid, owner: meta.owner, track_id: meta.track || '', layout_id: meta.layout || 'custom', published: !!meta.published, best_ms: meta.bestMs, meta, updated_at: new Date().toISOString() })); must(await sb.from('session_data').upsert({ id: sid, enc: meta.enc, data: chunks.join('') })); },
       async updateSession(sid, patch) { const cur = await A.getSessionMeta(sid); if (!cur) throw new Error('missing'); const meta = Object.assign(cur, patch, { updatedAt: Date.now() }); delete meta.id; must(await sb.from('sessions').update({ meta, published: !!meta.published, track_id: meta.track || '', layout_id: meta.layout || 'custom', updated_at: new Date().toISOString() }).eq('id', sid)); },
       deleteSession: async (sid) => must(await sb.from('sessions').delete().eq('id', sid)),
-      async getProfile(id) { const rows = must(await sb.from('profiles').select('*').eq('id', id).limit(1)); if (!rows.length) return null; const r = rows[0]; return { racingName: r.racing_name || '', country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', updatedAt: r.updated_at }; },
-      saveProfile: async (id, body) => must(await sb.from('profiles').upsert({ id, racing_name: body.racingName || '', country: body.country || '', home_track: body.homeTrack || '', avatar: body.avatar || '', updated_at: new Date().toISOString() })),
-      async allProfiles() { return must(await sb.from('profiles').select('*').limit(1000)).map(r => ({ id: r.id, racingName: r.racing_name || '', country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '' })); },
+      async getProfile(id) { const rows = must(await sb.from('profiles').select('*').eq('id', id).limit(1)); if (!rows.length) return null; const r = rows[0]; return { racingName: r.racing_name || '', country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', sws: r.sws_url || '', swsResults: r.sws_results || null, instagram: r.instagram || '', contact: r.contact || '', coach: !!r.coach, bio: r.bio || '', updatedAt: r.updated_at }; },
+      async saveProfile(id, body) {
+        const base = { id, racing_name: body.racingName || '', country: body.country || '', home_track: body.homeTrack || '', avatar: body.avatar || '', updated_at: new Date().toISOString() };
+        const extra = { sws_url: body.sws || '', sws_results: body.swsResults || null, instagram: body.instagram || '', contact: body.contact || '', coach: !!body.coach, bio: body.bio || '' };
+        const r = await sb.from('profiles').upsert(Object.assign({}, base, extra));
+        if (r.error && /column|schema cache|PGRST204|42703/i.test((r.error.message || '') + ' ' + (r.error.code || ''))) { A.profileExtras = false; return must(await sb.from('profiles').upsert(base)); }   // update.sql not run yet
+        return must(r);
+      },
+      async allProfiles() { return must(await sb.from('profiles').select('*').limit(1000)).map(r => ({ id: r.id, racingName: r.racing_name || '', country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', coach: !!r.coach })); },
       async platformNames() { return {}; },
       addClaim: async (body) => must(await sb.from('claims').insert({ track_id: body.track, by: body.by, text: body.text || '' })),
       async listClaims() { return must(await sb.from('claims').select('*').order('created_at', { ascending: false })).map(r => ({ id: String(r.id), track: r.track_id, by: r.by, text: r.text, createdAt: new Date(r.created_at).getTime() })); },
@@ -3090,15 +3147,16 @@ const trackHours = (tr) => { if (!tr.close) return null; if (!tr.open) return { 
 const APP = { route: 'tracks', a: null, b: null, geo: null, hoverTrack: null };
 function parseHash() { const h = (location.hash || '#home').slice(1); const parts = h.includes('~') ? h.split('~') : h.split('-'); return { name: parts[0] || 'home', a: parts[1] || null, b: parts[2] || null, c: parts[3] || null }; }
 function go(hash) { if (location.hash === '#' + hash) route(); else location.hash = hash; }
-const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver', 'ai'];
+const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver', 'ai', 'sws'];
 let routing = false;
 async function route() {
   if (routing) return; routing = true;
   try {
     const r = parseHash(); let name = PAGES.includes(r.name) ? r.name : 'home';
+    if (name === 'sws') { const pre = SWS.decodeHash((location.hash.split('~')[1] || '')); history.replaceState(null, '', '#profile'); name = 'profile'; r.a = null; setTimeout(() => SWS.open(pre || {}), 300); }
     if (name === 'admin' && !STORE.isAdmin()) name = 'home';
     APP.route = name; APP.a = r.a; APP.b = r.b; APP.c = r.c;
-    for (const p of PAGES) $('pg-' + p).hidden = p !== name;
+    for (const p of PAGES) { const pg = $('pg-' + p); if (pg) pg.hidden = p !== name; }
     for (const a of document.querySelectorAll('.nav a[data-route], .tabbar a[data-route]')) a.classList.toggle('active', a.dataset.route === name || (name === 'track' || name === 'layout') && a.dataset.route === 'tracks' || name === 'driver' && a.dataset.route === 'profile');
     window.scrollTo({ top: 0 });
     if (name === 'home') await renderHomePage();
@@ -3410,6 +3468,9 @@ async function renderDriverPage(uid) {
   $('drvName').textContent = nm.name || t('Driver'); $('drvAvatar').src = nm.avatar || GENERIC_AVATAR;
   const home = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null;
   $('drvMeta').textContent = [prof.country ? flag(prof.country) + ' ' + countryName(prof.country) : '', home ? t('Home track: {name}', { name: home.name }) : '', nm.isMe ? t('this is you') : ''].filter(Boolean).join(' · ');
+  $('drvBio').textContent = prof.bio || '';
+  { const links = $('drvLinks'); links.innerHTML = ''; if (prof.instagram) { const a = el('a', 'btn sm', 'Instagram'); a.href = 'https://instagram.com/' + String(prof.instagram).replace(/^@/, ''); a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); } if (prof.coach && prof.contact) { const a = el('a', 'btn sm primary', t('Book a training')); a.href = /^https?:/.test(prof.contact) ? prof.contact : 'https://' + prof.contact; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); } else if (prof.contact) { const a = el('a', 'btn sm', t('Message')); a.href = /^https?:/.test(prof.contact) ? prof.contact : 'https://' + prof.contact; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); } if (prof.sws) { const a = el('a', 'btn sm', 'SWS ↗'); a.href = prof.sws; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); } if (prof.coach) links.appendChild(el('span', 'pill acc', t('Coach'))); }
+  { const card = $('drvSwsCard'); const has = prof.swsResults && prof.swsResults.results && prof.swsResults.results.length; card.hidden = !has; if (has) SWS.renderResults($('drvSwsBox'), prof.swsResults, $('drvSwsSub')); }
   const socOn = await STORE.socialAvailable();
   const fb = $('drvFollow'); fb.hidden = nm.isMe || !STORE.hasDb || !socOn; fb.textContent = t('Follow'); fb.classList.remove('active');
   const paint = (f) => { $('drvFollowers').textContent = `${tn(f.followers, '{n} follower', '{n} followers').replace('{n}', f.followers)} · ${t('{n} following', { n: f.following })}`; fb.textContent = f.iFollow ? t('Following ✓') : t('Follow'); fb.classList.toggle('active', !!f.iFollow); };
@@ -3628,6 +3689,7 @@ function labRender() {
   chip(t('max'), kmh(vmax) + ' ' + t('km/h')); chip(t('min'), kmh(vmin) + ' ' + t('km/h')); chip('S1', s1.toFixed(2)); chip('S2', (s2 - s1).toFixed(2)); chip('S3', (D.R.T - s2).toFixed(2));
   if (D.O) chip(t('comparison'), fmtLap(D.O.T) + ' · ' + sg(D.total));
   if (sess.source && sess.source.app !== 'alfano') chip(t('source'), sourceLabel(sess.source));
+  if (sess.sws) chip('SWS', [sess.sws.race, sess.sws.pos ? 'P' + String(sess.sws.pos).replace(/^P/i, '') : '', sess.sws.best].filter(Boolean).join(' · '));
   if (LAB.coach) { const res = D.rows.reduce((s, r) => { const c = LAB.coach.corners.find(x => x.n === r.w.n); return s + (c ? Math.max(0, r.R.time - c.tTop) : 0); }, 0); chip(t('reserve'), res.toFixed(2) + ' ' + t('s')); }
   $('fsLbl').textContent = $('lapLbl').textContent; $('fsBig').textContent = $('lapBig').textContent; $('fsChips').innerHTML = chips.innerHTML;
   $('dataSub').textContent = `${t('Speed and time delta')} · ${t('{n} corners from the S/F line', { n: D.wins.length })}`;
@@ -4129,7 +4191,7 @@ function postCard(s, names, cnt) {
   if (s.preview && s.preview.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); requestAnimationFrame(() => drawPreview(cv, s.preview)); } else pv.appendChild(svgUse('i-track'));
   const info = el('div'); info.innerHTML = `<div class="lbl">${t('best lap')}</div><div class="big">${fmtMs(s.bestMs)}</div><div class="nm">${esc(s.label || s.name)}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</div>`;
   const chips = el('div', 'chips'); const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
-  chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
+  chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
   info.appendChild(chips); pb.append(pv, info);
   const pf = el('div', 'pf');
   const like = el('button', 'btn sm' + (cnt && cnt.liked ? ' liked' : '')); like.type = 'button'; like.innerHTML = `<span class="heart">♥</span> <b>${cnt ? cnt.likes : 0}</b>`;
@@ -4284,6 +4346,66 @@ $('aiSend').onclick = aiSend; $('aiStop').onclick = () => { if (AI.ctl) AI.ctl.a
 $('aiInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); aiSend(); } });
 $('aiRename').onclick = async () => { if (!AI.cur) return; const v = prompt(t('Chat title'), AI.cur.title || ''); if (v === null) return; await STORE.renameChat(AI.cur.id, v.trim()); AI.cur.title = v.trim(); $('aiTitle').textContent = AI.cur.title; renderChatList(); };
 $('aiDelete').onclick = async () => { if (!AI.cur) return; if (!(await confirmDlg(t('Delete this chat?'), t('The messages are removed; credits are not returned.'), t('Delete')))) return; await STORE.deleteChat(AI.cur.id); AI.chats = AI.chats.filter(c => c.id !== AI.cur.id); AI.cur = null; renderChatList(); startNew(null, true); };
+// ---------- SWS (Sodi World Series): the driver's own results, brought over from their SWS page ----------
+// SWS pages sit behind a captcha for servers, so the data comes from the driver's own browser: a bookmarklet on the SWS
+// profile page (or the table pasted by hand) → Hutka parses the rows → they live in the profile and can be tied to sessions.
+const SWS = (() => {
+  let parsed = null;
+  const siteUrl = () => location.origin + location.pathname;
+  const bookmarklet = () => `javascript:(function(){try{var rows=[];document.querySelectorAll('table tr').forEach(function(tr){var c=[].map.call(tr.querySelectorAll('td,th'),function(x){return x.innerText.trim().replace(/\\s+/g,' ')});if(c.length>2)rows.push(c)});var h=document.querySelector('h1');var d={url:location.href,name:h?h.innerText.trim():'',rows:rows.slice(0,400),t:Date.now()};location.href=${JSON.stringify(siteUrl())}+'#sws~'+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(d)))));}catch(e){alert('Hutka: '+e);}})();`;
+  // rows → results: find the header row, map the columns by their names, keep the rest as-is
+  const COLS = { date: /date|дата|data/i, race: /race|event|session|гонка|course|epreuve/i, track: /track|center|centre|трасса|circuit/i, pos: /^pos|rank|place|position|classement|#/i, best: /best|lap|time|круг|tour|chrono/i, pts: /point|pts|очк/i, cat: /categor|format|type|cup|sprint|endurance/i };
+  function interpret(rows) {
+    rows = rows.map(r => r.map(c => String(c || '').trim())).filter(r => r.some(Boolean));
+    if (!rows.length) return null;
+    const isHead = (r) => r.filter(c => c && !/^\d+([.,:]\d+)*$/.test(c)).length >= Math.max(2, r.length - 1) && r.some(c => Object.values(COLS).some(re => re.test(c)));
+    let hi = rows.findIndex(isHead); const head = hi >= 0 ? rows[hi] : null; const body = rows.filter((r, i) => i !== hi && r.length >= 3 && r.some(c => /\d/.test(c)));
+    const map = {}; if (head) head.forEach((h, i) => { for (const k in COLS) if (map[k] === undefined && COLS[k].test(h)) { map[k] = i; break; } });
+    const pick = (r, k) => map[k] !== undefined ? r[map[k]] : '';
+    const results = body.map(r => ({ date: pick(r, 'date') || (r.find(c => /\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{4}-\d{2}-\d{2}/.test(c)) || ''), race: pick(r, 'race'), track: pick(r, 'track'), pos: pick(r, 'pos') || (r.find(c => /^(P|#)?\d{1,3}(st|nd|rd|th)?$/.test(c)) || ''), best: pick(r, 'best') || (r.find(c => /^\d{1,2}:\d{2}[.,]\d{1,3}$|^\d{2}[.,]\d{3}$/.test(c)) || ''), pts: pick(r, 'pts'), cat: pick(r, 'cat'), raw: r }));
+    return { headers: head || [], results: results.slice(0, 300), importedAt: Date.now() };
+  }
+  function parsePasted(text) { const rows = text.split(/\r?\n/).map(l => l.split(/\t|\s{2,}|\s\|\s|;/).map(c => c.trim())).filter(r => r.length >= 2); return interpret(rows); }
+  function decodeHash(b64) { try { const json = decodeURIComponent(escape(atob(decodeURIComponent(b64)))); const d = JSON.parse(json); return { url: d.url, name: d.name, data: interpret(d.rows || []) }; } catch (e) { return null; } }
+  function preview(res) {
+    const box = $('swsPreview'); box.innerHTML = '';
+    if (!res || !res.results.length) { box.appendChild(el('div', 'hint', t('No result rows recognised yet.'))); $('swsSave').disabled = true; return; }
+    const tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Date')}</th><th>${t('Race')}</th><th>${t('Track')}</th><th>${t('Pos.')}</th><th>${t('Best lap')}</th></tr></thead>`; const body = el('tbody');
+    for (const r of res.results.slice(0, 60)) { const tr = el('tr'); tr.innerHTML = `<td>${esc(r.date)}</td><td style="white-space:normal">${esc(r.race || r.cat || r.raw.slice(0, 3).join(' · '))}</td><td style="white-space:normal">${esc(r.track)}</td><td class="num">${esc(r.pos)}</td><td class="num">${esc(r.best)}</td>`; body.appendChild(tr); }
+    tb.appendChild(body); box.appendChild(tb); $('swsSave').disabled = false;
+    setStatus('swsStatus', t('{n} results recognised. Check the columns, then save.', { n: res.results.length }), 'ok');
+  }
+  function open(pre) {
+    parsed = pre && pre.data ? pre.data : null; $('swsPaste').value = ''; setStatus('swsStatus', '');
+    $('swsIntro').textContent = t('SWS does not share results with other sites, so they come from your own browser: open your SWS profile while signed in and run the Hutka button there. It reads the results table on that page and brings it here — nothing else.');
+    $('swsSteps').innerHTML = [t('Drag the blue button to your bookmarks bar (on a phone: add any bookmark, then edit its address to the button\'s link — long-press it to copy).'), t('Sign in at sodiwseries.com and open your driver page (SWS → Drivers → your name).'), t('Click the Hutka bookmark there — you come back here with the results.')].map(s => `<li>${esc(s)}</li>`).join('');
+    $('swsBookmarklet').href = bookmarklet(); $('swsDragHint').textContent = t('← drag me to the bookmarks bar');
+    preview(parsed); $('swsModal').hidden = false;
+    if (pre && pre.name) setStatus('swsStatus', t('Results of {name} from SWS.', { name: pre.name }) + ' ' + t('{n} results recognised. Check the columns, then save.', { n: parsed ? parsed.results.length : 0 }), parsed && parsed.results.length ? 'ok' : 'warn');
+  }
+  function close() { $('swsModal').hidden = true; }
+  $('swsBookmarklet').addEventListener('click', (e) => { e.preventDefault(); toast(t('Drag this button to the bookmarks bar, then use it on your SWS page.')); });
+  $('swsParse').onclick = () => { parsed = parsePasted($('swsPaste').value); preview(parsed); };
+  $('swsCancel').onclick = close; $('swsModal').addEventListener('click', (e) => { if (e.target === $('swsModal')) close(); });
+  $('swsSave').onclick = async () => {
+    if (!parsed || !parsed.results.length) return; if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); return; }
+    const b = $('swsSave'); b.classList.add('busy');
+    try { const p = Object.assign({}, await STORE.profile(STORE.me.id) || {}); p.swsResults = parsed; await STORE.saveProfile(p); toast(t('SWS results saved to your profile.')); close(); if (APP.route === 'profile') renderProfile(); else go('profile'); }
+    catch (e) { setStatus('swsStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
+    b.classList.remove('busy');
+  };
+  // a results table for the profile and the driver page
+  function renderResults(box, res, subEl) {
+    box.innerHTML = ''; const list = res && res.results ? res.results : [];
+    if (subEl) subEl.textContent = list.length ? `${list.length} · ${t('imported {d}', { d: fmtDate(res.importedAt) })}` : '';
+    if (!list.length) { box.appendChild(el('div', 'hint', t('No SWS results imported yet.'))); return; }
+    const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Date')}</th><th>${t('Race')}</th><th>${t('Track')}</th><th>${t('Pos.')}</th><th>${t('Best lap')}</th><th>${t('Points')}</th></tr></thead>`; const body = el('tbody');
+    for (const r of list.slice(0, 100)) { const tr = el('tr'); tr.innerHTML = `<td>${esc(r.date)}</td><td style="white-space:normal">${esc(r.race || r.cat || r.raw.slice(0, 3).join(' · '))}</td><td style="white-space:normal">${esc(r.track)}</td><td class="num">${esc(r.pos)}</td><td class="num">${esc(r.best)}</td><td class="num">${esc(r.pts)}</td>`; body.appendChild(tr); }
+    tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
+  }
+  const label = (r) => [r.date, r.race || r.cat, r.track, r.pos ? 'P' + String(r.pos).replace(/^P/i, '') : '', r.best].filter(Boolean).join(' · ');
+  return { open, close, decodeHash, renderResults, label, bookmarklet };
+})();
 // ---------- profile ----------
 let pendingAvatar;
 async function renderProfile() {
@@ -4297,9 +4419,12 @@ async function renderProfile() {
   $('profSignOut').hidden = !(STORE.hasAuth && STORE.hasIdentity);
   fillCountries($('profCountry'), true); $('profCountry').value = prof.country || '';
   const trs = STORE.getTracks(); fillSelect($('profHome'), [['', '—']].concat(trs.map(x => [x.id, x.name])), prof.homeTrack || '');
-  $('profRacing').value = prof.racingName || '';
+  $('profRacing').value = prof.racingName || ''; $('profBio').value = prof.bio || ''; $('profIg').value = prof.instagram || ''; $('profContact').value = prof.contact || ''; $('profCoach').checked = !!prof.coach; $('profSws').value = prof.sws || '';
+  $('profSwsHint').textContent = t('Paste the link to your SWS driver page; it is shown on your public page. “Import SWS results” brings your race history here.');
+  $('profSwsImport').onclick = () => SWS.open({});
+  { const card = $('profSwsCard'); card.hidden = !STORE.hasIdentity; if (!card.hidden) SWS.renderResults($('profSwsBox'), prof.swsResults, $('profSwsSub')); }
   $('profSave').onclick = async () => {
-    const body = { racingName: $('profRacing').value.trim().slice(0, 40), country: $('profCountry').value, homeTrack: $('profHome').value, avatar: pendingAvatar === undefined ? (prof.avatar || '') : (pendingAvatar || '') };
+    const body = { racingName: $('profRacing').value.trim().slice(0, 40), country: $('profCountry').value, homeTrack: $('profHome').value, avatar: pendingAvatar === undefined ? (prof.avatar || '') : (pendingAvatar || ''), bio: $('profBio').value.trim().slice(0, 160), instagram: $('profIg').value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@').replace(/\/$/, '').slice(0, 80), contact: $('profContact').value.trim().slice(0, 160), coach: $('profCoach').checked, sws: $('profSws').value.trim().slice(0, 200), swsResults: prof.swsResults || null };
     const b = $('profSave'); b.classList.add('busy'); setStatus('profStatus', t('Saving…'));
     try {
       await STORE.saveProfile(body);
@@ -4351,6 +4476,7 @@ const SESSEDIT = (() => {
     fillSelect($('seTrack'), [['', t('— not in the catalogue (custom) —')]].concat(STORE.getTracks().map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), meta.track || '');
     await fillLayouts(meta.track || '', meta.layout || '');
     $('sePubField').hidden = !(STORE.canWrite() && meta.owner !== 'local'); $('sePublish').checked = !!meta.published;
+    { const prof = STORE.hasIdentity ? (await STORE.profile(STORE.me.id) || {}) : {}; const res = prof.swsResults && prof.swsResults.results || []; $('seSwsField').hidden = !res.length; if (res.length) fillSelect($('seSws'), [['', t('— not an SWS race —')]].concat(res.map((r, i) => [String(i), SWS.label(r)])), meta.sws && meta.sws.i !== undefined ? String(meta.sws.i) : ''); }
     $('sessModal').hidden = false; $('seName').focus();
   }
   function close() { $('sessModal').hidden = true; cur = null; }
@@ -4360,6 +4486,7 @@ const SESSEDIT = (() => {
     if (!cur) return; const tid = $('seTrack').value, tr = tid ? STORE.getTrack(tid) : null;
     const patch = { label: $('seName').value.trim().slice(0, 80), note: $('seNote').value.trim().slice(0, 120), track: tid, trackName: tr ? tr.name : (cur.trackName || ''), layout: tid ? ($('seLayout').value || 'custom') : 'custom' };
     if (!$('sePubField').hidden) patch.published = $('sePublish').checked && !!tid;
+    if (!$('seSwsField').hidden) { const i = $('seSws').value; if (i === '') patch.sws = null; else { const prof = await STORE.profile(STORE.me.id) || {}; const r = (prof.swsResults && prof.swsResults.results || [])[+i]; if (r) patch.sws = { i: +i, date: r.date, race: r.race || r.cat, track: r.track, pos: r.pos, best: r.best }; } }
     const b = $('seSave'); b.classList.add('busy'); setStatus('seStatus', t('Saving…'));
     try { await STORE.updateSession(cur.id, patch); Object.assign(cur, patch); close(); toast(t('Session updated.')); if (done) done(cur); } catch (e) { setStatus('seStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');

@@ -13,6 +13,7 @@
 | `supabase/setup.sql` | schema + админ + seed одним файлом (для нового проекта) |
 | `supabase/social.sql` | лайки, комментарии, подписки — запустить один раз после setup.sql |
 | `supabase/ai.sql` | чаты, сообщения, кредиты — запустить один раз для AI-тренера |
+| `supabase/update.sql` | **всё вместе** (social + ai + поля профиля: SWS, контакты, тренер) — безопасно запускать повторно; достаточно одного этого файла |
 | `supabase/functions/*` | серверные функции: тренер, кошелёк, Stripe |
 | `manifest.webmanifest`, `sw.js`, `icon-*.png` | PWA: установка на телефон, «Поделиться → Hutka» из приложения Alfano (Android) |
 | `supabase/functions/ask/index.ts` | серверная функция «Спросить ИИ» (ключ Anthropic хранится только на сервере) |
