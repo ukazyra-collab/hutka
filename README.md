@@ -10,6 +10,8 @@
 | `config.js` | **единственный файл, который надо заполнить** — адрес и публичный ключ Supabase |
 | `supabase/schema.sql` | таблицы и права доступа (кто что может читать и писать) |
 | `supabase/seed.sql` | 8 трасс ОАЭ с реальными данными и их конфигурации |
+| `supabase/setup.sql` | schema + админ + seed одним файлом (для нового проекта) |
+| `supabase/social.sql` | лайки, комментарии, подписки — запустить один раз после setup.sql |
 | `supabase/functions/ask/index.ts` | серверная функция «Спросить ИИ» (ключ Anthropic хранится только на сервере) |
 
 Схема: статический сайт (Netlify / Cloudflare Pages) + база и логин в Supabase + ИИ через функцию Supabase.
