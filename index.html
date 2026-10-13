@@ -897,7 +897,7 @@ textarea{min-height:90px;resize:vertical}
 <div class="modal" id="uplModal" hidden>
   <div class="box">
     <h3 data-t="Upload Alfano session">Upload Alfano session</h3>
-    <div class="upl-drop" id="uplDrop"><div><b data-t="Choose .alf2 files">Choose .alf2 files</b></div><div class="hint" data-t="Export from the Alfano app; one file per session. Several files at once are fine.">Export from the Alfano app; one file per session. Several files at once are fine.</div><input type="file" id="uplFile" accept=".alf2,.csv,.zip,application/zip" multiple hidden></div>
+    <div class="upl-drop" id="uplDrop"><div><b data-t="Choose session files">Choose session files</b></div><div class="hint" data-t="Alfano .alf2 (the reference), AiM / RaceChrono / TrackAddict / Harry's LapTimer CSV, VBOX .vbo, GPX. One file per session; several at once are fine.">Alfano .alf2 (the reference), AiM / RaceChrono / TrackAddict / Harry's LapTimer CSV, VBOX .vbo, GPX. One file per session; several at once are fine.</div><input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden></div>
     <div class="status" id="uplStatus"></div>
     <div id="uplForm" hidden>
       <div class="form">
@@ -1512,6 +1512,155 @@ const ALF = (() => {
   return { importFile, meanLine, resample, fitSimilarity, registerLoops };
 })();
 
+// ---------- universal import: other loggers and apps besides Alfano (AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX, generic GPS CSV) ----------
+// Every source ends up in the Alfano-shaped session: laps of uniformly sampled points {lat, lon, v, gx, gy} at 10 Hz,
+// plus a precision grade that the Lab shows next to the analysis.
+const IMPORT = (() => {
+  const HZ = 10;
+  const num = (s) => { if (s === undefined || s === null) return NaN; const v = parseFloat(String(s).replace(',', '.')); return isFinite(v) ? v : NaN; };
+  const splitCsvLine = (line, sep) => line.split(sep).map(x => x.trim().replace(/^"|"$/g, ''));
+  const detectSep = (line) => { const c = { ',': (line.match(/,/g) || []).length, ';': (line.match(/;/g) || []).length, '\t': (line.match(/\t/g) || []).length }; return c[';'] > c[','] && c[';'] >= c['\t'] ? ';' : (c['\t'] > c[','] ? '\t' : ','); };
+  const find = (head, res) => { for (const re of res) { const i = head.findIndex(h => re.test(h)); if (i >= 0) return i; } return -1; };
+  // ---- a flat GPS stream {t (s), lat, lon, v (m/s), lap?} out of a CSV from any of the known apps
+  function parseCsv(text, fileName) {
+    const lines = text.split(/\r?\n/);
+    let meta = {}, headIdx = -1, sep = ',';
+    for (let i = 0; i < Math.min(lines.length, 80); i++) {
+      const l = lines[i]; if (!l.trim()) continue;
+      const s = detectSep(l), cells = splitCsvLine(l, s).map(c => c.toLowerCase());
+      if (cells.some(c => /\blat/.test(c)) && cells.some(c => /\blon|lng/.test(c))) { headIdx = i; sep = s; break; }
+      const kv = splitCsvLine(l, s); if (kv.length >= 2 && kv[0]) meta[kv[0].toLowerCase()] = kv.slice(1).join(' ');
+    }
+    if (headIdx < 0) return null;
+    const head = splitCsvLine(lines[headIdx], sep).map(h => h.toLowerCase());
+    const iLat = find(head, [/^lat/, /gps[_ ]?lat/, /latitude/]), iLon = find(head, [/^lon|^lng/, /gps[_ ]?lon/, /longitude/]);
+    const iV = find(head, [/^speed \(m\/s\)/, /gps[_ ]?speed/, /^speed/, /velocity/, /\bspeed\b/]);
+    const iT = find(head, [/^timestamp \(s\)/, /^time \(s\)/, /^timestamp$/, /^time$/, /^elapsed/, /\btime\b/]);
+    const iLap = find(head, [/^lap number/, /^lap$/, /^lap #/, /^lap_/, /^laps?\b/]);
+    const iBearing = find(head, [/bearing/, /heading/, /course/]);
+    // units
+    const vName = iV >= 0 ? head[iV] : ''; let vMul = 1;
+    if (/km\/?h|kph/.test(vName)) vMul = 1 / 3.6; else if (/mph/.test(vName)) vMul = 0.44704; else if (/m\/s/.test(vName)) vMul = 1; else vMul = 0;   // 0 = decide from the values
+    let tMul = 1; const tName = iT >= 0 ? head[iT] : ''; if (/\(ms\)|millis/.test(tName)) tMul = 0.001;
+    const unitsRow = headIdx + 1 < lines.length && /^[^0-9-]*$/.test(splitCsvLine(lines[headIdx + 1], sep)[iLat] || 'x') && !/\d/.test(lines[headIdx + 1].slice(0, 40)) ? headIdx + 1 : -1;
+    const rows = [];
+    for (let i = (unitsRow >= 0 ? unitsRow : headIdx) + 1; i < lines.length; i++) {
+      const l = lines[i]; if (!l || l[0] === '#') continue; const c = splitCsvLine(l, sep); if (c.length < Math.max(iLat, iLon) + 1) continue;
+      const lat = num(c[iLat]), lon = num(c[iLon]); if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) < 0.01 || Math.abs(lat) > 90) continue;
+      let v = iV >= 0 ? num(c[iV]) : NaN, tt = iT >= 0 ? num(c[iT]) * tMul : NaN;
+      if (iT >= 0 && !isFinite(tt) && /:/.test(c[iT] || '')) { const p = String(c[iT]).split(':').map(Number); tt = p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : (p.length === 2 ? p[0] * 60 + p[1] : NaN); }
+      rows.push({ t: tt, lat, lon, v, lap: iLap >= 0 ? num(c[iLap]) : NaN, hdg: iBearing >= 0 ? num(c[iBearing]) : NaN });
+    }
+    if (rows.length < 50) return null;
+    if (vMul === 0) { const vs = rows.map(r => r.v).filter(isFinite); const mx = vs.length ? Math.max(...vs) : 0; vMul = mx > 45 ? 1 / 3.6 : 1; }
+    for (const r of rows) r.v = isFinite(r.v) ? r.v * vMul : NaN;
+    // time: from the column, else from "Sample Rate"/"Frequency" meta, else 10 Hz
+    if (!rows.every(r => isFinite(r.t))) { let hz = 10; for (const k in meta) if (/sample rate|frequency|hz/.test(k)) { const m = /([\d.]+)/.exec(meta[k]); if (m) hz = +m[1]; } rows.forEach((r, i) => r.t = i / hz); }
+    const t0 = rows[0].t; for (const r of rows) r.t -= t0;
+    // speed from position when the file has none
+    if (!rows.some(r => isFinite(r.v))) fillSpeed(rows);
+    const low = text.slice(0, 1500).toLowerCase(), fn = (fileName || '').toLowerCase();
+    let app = 'csv'; if (/racechrono/.test(low) || /racechrono/.test(fn)) app = 'racechrono'; else if (/trackaddict|racerender/.test(low) || /trackaddict/.test(fn)) app = 'trackaddict'; else if (/aim|race ?studio|beacon markers/.test(low)) app = 'aim'; else if (/laptimer|harry/.test(low) || /laptimer/.test(fn)) app = 'harrys'; else if (/garmin|catalyst/.test(low)) app = 'garmin'; else if (/apex pro|apexpro/.test(low)) app = 'apexpro';
+    // AiM: lap boundaries from the beacon markers (seconds from the start)
+    let beacons = null; for (const k in meta) if (/beacon/.test(k)) { const nums = meta[k].split(/[\s,;]+/).map(Number).filter(isFinite); if (nums.length) beacons = nums; }
+    return { rows, app, beacons };
+  }
+  // speed from positions: central difference over ~0.4 s, then a short moving average (phone GPS is jittery)
+  function fillSpeed(rows) {
+    const k = (lat) => [111320 * Math.cos(lat * Math.PI / 180), 110574]; const raw = new Array(rows.length).fill(0);
+    for (let i = 0; i < rows.length; i++) { let a = i, b = i; while (a > 0 && rows[i].t - rows[a].t < 0.2) a--; while (b < rows.length - 1 && rows[b].t - rows[i].t < 0.2) b++; const [kx, ky] = k(rows[i].lat); const d = Math.hypot((rows[b].lon - rows[a].lon) * kx, (rows[b].lat - rows[a].lat) * ky), dt = rows[b].t - rows[a].t; raw[i] = dt > 0 ? Math.min(60, d / dt) : 0; }
+    for (let i = 0; i < rows.length; i++) { let s = 0, n = 0; for (let j = Math.max(0, i - 2); j <= Math.min(rows.length - 1, i + 2); j++) { s += raw[j]; n++; } rows[i].v = s / n; }
+  }
+  // ---- VBOX .vbo
+  function parseVbo(text) {
+    const sec = {}; let cur = ''; for (const raw of text.split(/\r?\n/)) { const l = raw.trim(); if (!l) continue; const m = /^\[(.+)\]$/.exec(l); if (m) { cur = m[1].toLowerCase(); sec[cur] = []; continue; } if (cur) sec[cur].push(l); }
+    const cols = (sec['column names'] || []).join(' ').split(/\s+/).map(c => c.toLowerCase()); if (!cols.length || !sec.data) return null;
+    const iLat = cols.indexOf('lat'), iLon = cols.findIndex(c => c === 'long' || c === 'lon'), iV = cols.findIndex(c => /velocity|speed/.test(c)), iT = cols.indexOf('time'), iHdg = cols.indexOf('heading');
+    if (iLat < 0 || iLon < 0) return null;
+    const rows = [];
+    for (const l of sec.data) { const c = l.split(/\s+/); if (c.length <= Math.max(iLat, iLon)) continue; let lat = num(c[iLat]) / 60, lon = num(c[iLon]) / 60; if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) < 0.01) continue; lon = -lon;  // VBO: minutes, longitude positive west
+      let tt = NaN; if (iT >= 0) { const s = c[iT]; const h = +s.slice(0, 2), mnt = +s.slice(2, 4), ss = +s.slice(4); tt = h * 3600 + mnt * 60 + ss; }
+      rows.push({ t: tt, lat, lon, v: iV >= 0 ? num(c[iV]) / 3.6 : NaN, lap: NaN, hdg: iHdg >= 0 ? num(c[iHdg]) : NaN }); }
+    if (rows.length < 50) return null;
+    if (!rows.every(r => isFinite(r.t))) rows.forEach((r, i) => r.t = i / 10); const t0 = rows[0].t; for (const r of rows) r.t -= t0;
+    if (!rows.some(r => isFinite(r.v))) fillSpeed(rows);
+    return { rows, app: 'vbox', beacons: null };
+  }
+  // ---- GPX
+  function parseGpx(text) {
+    const doc = new DOMParser().parseFromString(text, 'application/xml'); const pts = Array.from(doc.getElementsByTagName('trkpt')); if (pts.length < 50) return null;
+    const rows = []; let t0 = null;
+    for (const p of pts) { const lat = num(p.getAttribute('lat')), lon = num(p.getAttribute('lon')); const te = p.getElementsByTagName('time')[0]; const tt = te ? Date.parse(te.textContent) / 1000 : NaN; if (t0 === null && isFinite(tt)) t0 = tt; const sp = p.getElementsByTagNameNS('*', 'speed')[0]; rows.push({ t: isFinite(tt) ? tt - (t0 || 0) : NaN, lat, lon, v: sp ? num(sp.textContent) : NaN, lap: NaN, hdg: NaN }); }
+    if (!rows.every(r => isFinite(r.t))) rows.forEach((r, i) => r.t = i); if (!rows.some(r => isFinite(r.v))) fillSpeed(rows);
+    return { rows, app: 'gpx', beacons: null };
+  }
+  // ---- laps: from a lap column, from beacon times, or from the loop closing on itself
+  function splitLaps(src) {
+    const rows = src.rows; const out = [];
+    const hasLap = rows.some(r => isFinite(r.lap)) && new Set(rows.map(r => r.lap).filter(isFinite)).size >= 2;
+    if (hasLap) { let cur = null; for (const r of rows) { if (!cur || cur.n !== r.lap) { cur = { n: r.lap, rows: [] }; out.push(cur); } cur.rows.push(r); } return { laps: out.filter(L => L.rows.length > 20), how: 'column' }; }
+    if (src.beacons && src.beacons.length >= 2) { const b = src.beacons.slice().sort((p, q) => p - q); for (let k = 0; k + 1 < b.length; k++) { const seg = rows.filter(r => r.t >= b[k] && r.t < b[k + 1]); if (seg.length > 20) out.push({ n: k + 1, rows: seg }); } if (out.length) return { laps: out, how: 'beacons' }; }
+    // loop closure: an anchor a bit into the recording (past the pit exit), every return to it after ≥250 m closes a lap
+    const kx = 111320 * Math.cos(rows[0].lat * Math.PI / 180), ky = 110574; const xy = rows.map(r => [(r.lon - rows[0].lon) * kx, (r.lat - rows[0].lat) * ky]);
+    const dist = [0]; for (let i = 1; i < xy.length; i++) dist.push(dist[i - 1] + Math.hypot(xy[i][0] - xy[i - 1][0], xy[i][1] - xy[i - 1][1]));
+    const total = dist[dist.length - 1]; if (total < 600) return { laps: [{ n: 1, rows }], how: 'single' };
+    let best = null;
+    for (const frac of [0.12, 0.2, 0.3, 0.4]) {
+      const ai = dist.findIndex(d => d >= total * frac); if (ai < 0) continue; const A = xy[ai]; const cuts = [ai]; let lastD = dist[ai];
+      for (let i = ai + 1; i < xy.length; i++) { if (dist[i] - lastD < 250) continue; if (Math.hypot(xy[i][0] - A[0], xy[i][1] - A[1]) < 10) { cuts.push(i); lastD = dist[i]; } }
+      if (cuts.length >= 3 && (!best || cuts.length > best.length)) best = cuts;
+    }
+    if (!best) return { laps: [{ n: 1, rows }], how: 'single' };
+    for (let k = 0; k + 1 < best.length; k++) out.push({ n: k + 1, rows: rows.slice(best[k], best[k + 1]) });
+    return { laps: out, how: 'loop' };
+  }
+  // ---- uniform 10 Hz samples, longitudinal and lateral g from the motion itself
+  function resample(lapRows) {
+    const t0 = lapRows[0].t, T = lapRows[lapRows.length - 1].t - t0; if (!(T > 5)) return null;
+    const n = Math.max(20, Math.round(T * HZ)), pts = []; let j = 0;
+    for (let i = 0; i < n; i++) {
+      const tt = t0 + i / HZ; while (j + 1 < lapRows.length - 1 && lapRows[j + 1].t <= tt) j++;
+      const a = lapRows[j], b = lapRows[Math.min(lapRows.length - 1, j + 1)], f = b.t > a.t ? Math.min(1, Math.max(0, (tt - a.t) / (b.t - a.t))) : 0;
+      pts.push({ lat: a.lat + (b.lat - a.lat) * f, lon: a.lon + (b.lon - a.lon) * f, v: (isFinite(a.v) ? a.v : 0) + ((isFinite(b.v) ? b.v : 0) - (isFinite(a.v) ? a.v : 0)) * f, gx: 0, gy: 0 });
+    }
+    const kx = 111320 * Math.cos(pts[0].lat * Math.PI / 180), ky = 110574, dt = 1 / HZ;
+    for (let i = 1; i < pts.length - 1; i++) {
+      pts[i].gx = (pts[i + 1].v - pts[i - 1].v) / (2 * dt) / 9.81;
+      const h1 = Math.atan2((pts[i].lat - pts[i - 1].lat) * ky, (pts[i].lon - pts[i - 1].lon) * kx), h2 = Math.atan2((pts[i + 1].lat - pts[i].lat) * ky, (pts[i + 1].lon - pts[i].lon) * kx); let dh = h2 - h1; while (dh > Math.PI) dh -= 2 * Math.PI; while (dh < -Math.PI) dh += 2 * Math.PI;
+      pts[i].gy = Math.abs(pts[i].v * dh / dt) / 9.81;
+    }
+    return { pts, timeMs: Math.round(T * 1000) };
+  }
+  const APP_NAMES = { racechrono: 'RaceChrono', trackaddict: 'TrackAddict', aim: 'AiM', harrys: "Harry's LapTimer", garmin: 'Garmin Catalyst', apexpro: 'Apex Pro', vbox: 'VBOX', gpx: 'GPX', csv: 'GPS CSV' };
+  function grade(hz, app) { const g = hz >= 9 ? 'high' : (hz >= 4 ? 'medium' : 'low'); return { hz: Math.round(hz * 10) / 10, grade: g, app, appName: APP_NAMES[app] || app }; }
+  async function parse(file) {
+    const name = file.name || 'session', text = await file.text(); let src = null;
+    if (/\.vbo$/i.test(name) || /^\[header\]/i.test(text.trim())) src = parseVbo(text);
+    else if (/\.gpx$/i.test(name) || /<gpx/i.test(text.slice(0, 500))) src = parseGpx(text);
+    else src = parseCsv(text, name);
+    if (!src) throw new Error(t('Could not find GPS columns (latitude, longitude, speed) in this file.'));
+    const rows = src.rows; const span = rows[rows.length - 1].t - rows[0].t; const hz = span > 0 ? (rows.length - 1) / span : 10;
+    const { laps: raw, how } = splitLaps(src);
+    const laps = []; for (const L of raw) { const r = resample(L.rows); if (r) laps.push({ n: laps.length + 1, timeMs: r.timeMs, pts: r.pts }); }
+    if (!laps.length) throw new Error(t('No complete laps with GPS in this file.'));
+    const lat0 = laps[0].pts[0].lat, lon0 = laps[0].pts[0].lon, kx = 111320 * Math.cos(lat0 * Math.PI / 180), ky = 110574;
+    for (const L of laps) { L.xy = L.pts.map(p => [(p.lon - lon0) * kx, (p.lat - lat0) * ky]); L.len = 0; for (let i = 1; i < L.xy.length; i++) L.len += Math.hypot(L.xy[i][0] - L.xy[i - 1][0], L.xy[i][1] - L.xy[i - 1][1]); }
+    const bestT = Math.min(...laps.filter(L => L.len > 200).map(L => L.timeMs).concat([Infinity]));
+    for (const L of laps) L.clean = L.timeMs <= bestT * 1.04 && L.len > 200;
+    if (!laps.some(L => L.clean)) laps[0].clean = true;
+    const q = grade(hz, src.app);
+    return { laps, best: laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a).n, name: name.replace(/\.[^.]+$/, ''), source: q, lapsHow: how };
+  }
+  // laps from a logger without a start/finish beacon: start every lap at the layout's S/F when the layout has a GPS line
+  function alignToStart(sess, G) {
+    if (!G || !G.frame || !G.frame.merc || !G.refSess) return false;
+    const ref = G.refSess.laps.find(L => L.clean) || G.refSess.laps[0]; if (!ref || !ref.pts.length) return false;
+    const sf = ref.pts[0], kx = 111320 * Math.cos(sf.lat * Math.PI / 180), ky = 110574;
+    for (const L of sess.laps) { let bi = 0, bd = Infinity; L.pts.forEach((p, i) => { const d = Math.hypot((p.lon - sf.lon) * kx, (p.lat - sf.lat) * ky); if (d < bd) { bd = d; bi = i; } }); if (bd > 25 || bi === 0) continue; L.pts = L.pts.slice(bi).concat(L.pts.slice(0, bi)); if (L.xy) L.xy = L.xy.slice(bi).concat(L.xy.slice(0, bi)); }
+    return true;
+  }
+  return { parse, alignToStart, APP_NAMES };
+})();
 // @@DATA-START
 // Empirical analysis of logged laps (Alfano): a frame that maps GPS metres onto layout pixels, projection of every lap onto the
 // track stations, corner windows cut from the reference lap's own speed trace, per-window metrics (brake / lift / release / apex /
@@ -2184,6 +2333,21 @@ Object.assign(I18N.RU, {
   'What is this chat about?': 'О чём этот чат?',
   'Credits and Pro': 'Кредиты и Pro',
   'Close': 'Закрыть',
+
+  // ----- v19: universal import -----
+  'Could not find GPS columns (latitude, longitude, speed) in this file.': 'В файле не найдены GPS-колонки (широта, долгота, скорость).',
+  'No complete laps with GPS in this file.': 'В файле нет полных кругов с GPS.',
+  'precise': 'точно',
+  'approximate': 'приблизительно',
+  'rough': 'грубо',
+  'Source: {s}': 'Источник: {s}',
+  'braking and throttle points will be approximate; Alfano at 10 Hz is the reference': 'точки торможения и газа будут приблизительными; эталон — Alfano на 10 Гц',
+  'laps were cut where the loop closes (no start/finish beacon in the file)': 'круги нарезаны по замыканию петли (в файле нет маяка старт/финиш)',
+  'source': 'источник',
+  'Data source': 'Источник данных',
+  '{s}. Alfano at 10 Hz is the reference; at {hz} Hz braking, release and throttle points are accurate to about ±{m} m and apex speeds are smoothed. Treat small differences with care.': '{s}. Эталон — Alfano на 10 Гц; при {hz} Гц точки торможения, отпускания и газа точны примерно до ±{m} м, скорости в апексе сглажены. К малым разницам относись осторожно.',
+  'Choose session files': 'Выбери файлы сессий',
+  'Alfano .alf2 (the reference), AiM / RaceChrono / TrackAddict / Harry\'s LapTimer CSV, VBOX .vbo, GPX. One file per session; several at once are fine.': 'Alfano .alf2 (эталон), CSV из AiM / RaceChrono / TrackAddict / Harry\'s LapTimer, VBOX .vbo, GPX. Один файл — одна сессия; можно несколько сразу.',
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
@@ -2359,7 +2523,7 @@ const STORE = (() => {
   function sessionMeta(sess) {
     const clean = sess.laps.filter(L => L.clean), best = sess.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a), avg = clean.length ? clean.reduce((s, L) => s + L.timeMs, 0) / clean.length : best.timeMs;
     let la = 0, lo = 0, n = 0; for (const L of clean.length ? clean : sess.laps) for (let i = 0; i < L.pts.length; i += 5) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
-    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
+    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
   }
 
   // ===== backend: claude.ai artifact (db + user capabilities) =====
@@ -3463,6 +3627,7 @@ function labRender() {
   const N = D.R.N, s1 = D.R.t[Math.floor(N / 3)], s2 = D.R.t[Math.floor(2 * N / 3)];
   chip(t('max'), kmh(vmax) + ' ' + t('km/h')); chip(t('min'), kmh(vmin) + ' ' + t('km/h')); chip('S1', s1.toFixed(2)); chip('S2', (s2 - s1).toFixed(2)); chip('S3', (D.R.T - s2).toFixed(2));
   if (D.O) chip(t('comparison'), fmtLap(D.O.T) + ' · ' + sg(D.total));
+  if (sess.source && sess.source.app !== 'alfano') chip(t('source'), sourceLabel(sess.source));
   if (LAB.coach) { const res = D.rows.reduce((s, r) => { const c = LAB.coach.corners.find(x => x.n === r.w.n); return s + (c ? Math.max(0, r.R.time - c.tTop) : 0); }, 0); chip(t('reserve'), res.toFixed(2) + ' ' + t('s')); }
   $('fsLbl').textContent = $('lapLbl').textContent; $('fsBig').textContent = $('lapBig').textContent; $('fsChips').innerHTML = chips.innerHTML;
   $('dataSub').textContent = `${t('Speed and time delta')} · ${t('{n} corners from the S/F line', { n: D.wins.length })}`;
@@ -3606,6 +3771,7 @@ function renderDigest() {
   const clean = sess.laps.filter(x => x.clean), times = clean.map(x => x.timeMs / 1000), avg = times.reduce((a, b) => a + b, 0) / Math.max(1, times.length);
   const fastest = clean.slice().sort((a, b) => a.timeMs - b.timeMs).slice(0, 5);
   const P = [];
+  if (sess.source && sess.source.app !== 'alfano') P.push(`<p class="hint"><span class="lbl">${t('Data source')}</span><br>${esc(t('{s}. Alfano at 10 Hz is the reference; at {hz} Hz braking, release and throttle points are accurate to about ±{m} m and apex speeds are smoothed. Treat small differences with care.', { s: sourceLabel(sess.source), hz: sess.source.hz, m: sess.source.hz >= 9 ? 2 : (sess.source.hz >= 4 ? 4 : 10) }))}</p>`);
   P.push(`<p><span class="lbl">${t('Session')}</span><br>${esc(shortSess(sess))}: ${t('{n} laps, {c} of them clean (no slower than the best by 4 %)', { n: sess.laps.length, c: clean.length })}. ${t('Best — lap {n}, {t}', { n: bestLap(sess).n, t: fmtMs(bestLap(sess).timeMs) })}. ${t('Average clean lap — {t}', { t: fmtLap(avg) })}. ${t('Five fastest: {list}', { list: fastest.map(x => `${x.n} (${fmtMs(x.timeMs)})`).join(', ') })}.${D.ref.avg ? ' ' + t('The reference now is the average clean lap of this session, {t}: its points are a “typical” pass.', { t: fmtLap(D.R.T) }) : (L !== bestLap(sess) ? ' ' + t('The reference now is lap {n}, {t}.', { n: L.n, t: fmtLap(D.R.T) }) : '')}</p>`);
   if (D.O) {
     const oName = D.nameOf(D.O), rows = D.rows.filter(r => r.cmp), gains = rows.filter(r => r.cmp.dt <= -0.04).sort((a, b) => a.cmp.dt - b.cmp.dt), losses = rows.filter(r => r.cmp.dt >= 0.04).sort((a, b) => b.cmp.dt - a.cmp.dt);
@@ -3847,6 +4013,14 @@ function renderChat(withThinking) {
 }
 
 // ---------- upload modal ----------
+// Alfano first (the reference logger); everything else through the universal importer
+async function readAnyLogger(f) {
+  const name = (f.name || '').toLowerCase();
+  if (/\.(alf2|zip)$/.test(name)) { const d = await ALF.importFile(f); d.source = { app: 'alfano', appName: 'Alfano', hz: 10, grade: 'high' }; return d; }
+  if (/\.csv$/.test(name)) { try { const d = await ALF.importFile(f); d.source = { app: 'alfano', appName: 'Alfano', hz: 10, grade: 'high' }; return d; } catch (e) { /* not an Alfano csv */ } }
+  return IMPORT.parse(f);
+}
+const sourceLabel = (src) => { if (!src || src.app === 'alfano') return ''; const g = src.grade === 'high' ? t('precise') : (src.grade === 'medium' ? t('approximate') : t('rough')); return `${src.appName || src.app} · ${src.hz} Hz · ${g}`; };
 const UPLOAD = (() => {
   let parsed = [], ctx = {};
   function open(o) {
@@ -3857,7 +4031,7 @@ const UPLOAD = (() => {
   async function onFiles(files) {
     if (!files.length) return; setStatus('uplStatus', t('Reading {n} file(s)…', { n: files.length }));
     parsed = [];
-    for (const f of files) { try { const data = await ALF.importFile(f); const meta = DATA.parseAlfName(f.name || ''); parsed.push({ file: f, data, meta }); } catch (e) { setStatus('uplStatus', t('Could not read {f}: {e}', { f: f.name, e: e.message || e }), 'warn'); } }
+    for (const f of files) { try { const data = await readAnyLogger(f); const meta = DATA.parseAlfName(f.name || ''); parsed.push({ file: f, data, meta }); } catch (e) { setStatus('uplStatus', t('Could not read {f}: {e}', { f: f.name, e: e.message || e }), 'warn'); } }
     if (!parsed.length) return;
     const p0 = parsed[0], laps = p0.data.laps, best = laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a);
     let la = 0, lo = 0, n = 0; for (const L of laps) for (let i = 0; i < L.pts.length; i += 10) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
@@ -3868,7 +4042,8 @@ const UPLOAD = (() => {
     await fillLayouts(); syncPub();
     if (ctx.layout) { $('uplLayout').value = ctx.layout; showLayoutPhoto(); }
     $('uplName').value = p0.meta.driver ? `${p0.meta.driver}${p0.meta.date ? ', ' + fmtDate(p0.meta.date) : ''}` : (p0.data.name || '');
-    $('uplDetect').textContent = `${t('{n} laps, best {b}', { n: laps.length, b: fmtMs(best.timeMs) })} · ${near ? t('GPS puts this session at {name} ({d} km)', { name: near.x.name, d: near.d.toFixed(1) }) : t('GPS does not match any track in the catalogue — it will be saved as a custom track.')}${parsed.length > 1 ? ' · ' + t('{n} files: one session each, the same track and layout', { n: parsed.length }) : ''}`;
+    const src = p0.data.source; const srcTx = src && src.app !== 'alfano' ? ' · ' + t('Source: {s}', { s: sourceLabel(src) }) + (src.grade !== 'high' ? ' — ' + t('braking and throttle points will be approximate; Alfano at 10 Hz is the reference') : '') + (p0.data.lapsHow === 'loop' ? ' · ' + t('laps were cut where the loop closes (no start/finish beacon in the file)') : '') : '';
+    $('uplDetect').textContent = `${t('{n} laps, best {b}', { n: laps.length, b: fmtMs(best.timeMs) })} · ${near ? t('GPS puts this session at {name} ({d} km)', { name: near.x.name, d: near.d.toFixed(1) }) : t('GPS does not match any track in the catalogue — it will be saved as a custom track.')}${parsed.length > 1 ? ' · ' + t('{n} files: one session each, the same track and layout', { n: parsed.length }) : ''}${srcTx}`;
     setStatus('uplStatus', '', ''); $('uplForm').hidden = false; $('uplGo').disabled = false;
   }
   async function fillLayouts() { const tid = $('uplTrack').value; const ls = tid ? await STORE.getLayouts(tid) : []; fillSelect($('uplLayout'), ls.map(l => [l.id, l.name + (l.lengthM ? ` · ${l.lengthM} ${t('m')}` : '')]).concat([['custom', t('Custom / not listed')]]), ls.length ? ls[0].id : 'custom'); showLayoutPhoto(); }
@@ -3888,8 +4063,10 @@ const UPLOAD = (() => {
     let first = null;
     for (let k = 0; k < parsed.length; k++) {
       const pub = STORE.canWrite() && !!tid && $('uplPublish').checked;
-      const p = parsed[k], sess = { id: 's' + STORE.uid(), name: p.data.name, label: parsed.length > 1 ? (label ? `${label} · ${k + 1}` : '') : label, driver: p.meta.driver, date: p.meta.date, trackName: tr ? tr.name : p.meta.track, track: tid, layout: tid ? lid : 'custom', note, published: pub, createdAt: Date.now(), laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
+      const p = parsed[k], sess = { id: 's' + STORE.uid(), name: p.data.name, label: parsed.length > 1 ? (label ? `${label} · ${k + 1}` : '') : label, driver: p.meta.driver, date: p.meta.date || fileDate(p.file), trackName: tr ? tr.name : p.meta.track, track: tid, layout: tid ? lid : 'custom', note, published: pub, source: p.data.source || null, createdAt: Date.now(), laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
       for (const L of sess.laps) L._sess = sess;
+      // loggers without a start/finish beacon: start every lap at the layout's S/F so corners line up with everyone else's
+      if (sess.source && sess.source.app !== 'alfano' && tid && lid !== 'custom') { try { const G = await GEOM.build(tid, lid); IMPORT.alignToStart(sess, G); } catch (e) {} }
       try { await STORE.saveSession(sess); if (!first) first = sess; } catch (e) { setStatus('uplStatus', t('Could not save the session: {e}', { e: e && e.message || e }), 'warn'); $('uplGo').disabled = false; return; }
     }
     close(); if (first) { await LAB.open(first, false); go('lab'); }
@@ -3897,6 +4074,7 @@ const UPLOAD = (() => {
   async function withFiles(files) { open({}); await onFiles(files); }
   return { open, close, withFiles };
 })();
+const fileDate = (f) => { try { const d = new Date(f.lastModified || Date.now()); return d.toISOString().slice(0, 16).replace('T', ' '); } catch (e) { return ''; } };
 // ---------- home: the feed of published sessions, where people drive, who is fastest ----------
 function drawPreview(cv, pv, color) {
   if (!cv || !pv || !pv.pts || pv.pts.length < 3) return false;
@@ -3951,7 +4129,7 @@ function postCard(s, names, cnt) {
   if (s.preview && s.preview.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); requestAnimationFrame(() => drawPreview(cv, s.preview)); } else pv.appendChild(svgUse('i-track'));
   const info = el('div'); info.innerHTML = `<div class="lbl">${t('best lap')}</div><div class="big">${fmtMs(s.bestMs)}</div><div class="nm">${esc(s.label || s.name)}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</div>`;
   const chips = el('div', 'chips'); const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
-  chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
+  chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
   info.appendChild(chips); pb.append(pv, info);
   const pf = el('div', 'pf');
   const like = el('button', 'btn sm' + (cnt && cnt.liked ? ' liked' : '')); like.type = 'button'; like.innerHTML = `<span class="heart">♥</span> <b>${cnt ? cnt.likes : 0}</b>`;
