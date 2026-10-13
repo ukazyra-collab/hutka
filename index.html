@@ -517,6 +517,8 @@ textarea{min-height:90px;resize:vertical}
 .insp-nav span{flex:1;min-width:0;text-align:center;font:600 13px var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .insp-nav .btn.sm{height:32px;padding:0 12px;font-size:18px;line-height:1}
 .post .nm .res{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:600;vertical-align:middle}
+.sat-note{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:5px 10px;border-bottom:1px solid var(--line);background:var(--surface);font-size:12px;color:var(--muted)}
+.sat-note[hidden]{display:none}
 .align-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--accent) 8%,var(--surface));font-size:12.5px}
 .align-bar[hidden]{display:none}
 .align-bar .seg .btn.xs{height:28px;padding:0 10px;font-size:14px}
@@ -868,6 +870,7 @@ textarea{min-height:90px;resize:vertical}
             <div class="seg"><button class="btn" id="zoomOut" type="button">−</button><button class="btn" id="zoomIn" type="button">+</button><button class="btn" id="zoomFit" type="button">⌂</button></div>
             <button class="btn" id="btnFull" type="button" title="Full screen"><svg><use href="#i-full"/></svg><span data-t="Full screen">Full screen</span></button>
           </div>
+          <div class="sat-note" id="satNote" hidden><span id="satNoteText"></span> <button class="btn xs" id="satNoteAlign" type="button" data-t="Align">Align</button></div>
           <div class="align-bar" id="alignBar" hidden><span class="hint" id="alignHint"></span><div class="seg"><button class="btn xs" id="alL" type="button" title="0.5 m">←</button><button class="btn xs" id="alU" type="button" title="0.5 m">↑</button><button class="btn xs" id="alD" type="button" title="0.5 m">↓</button><button class="btn xs" id="alR" type="button" title="0.5 m">→</button></div><span class="hint" id="alignOff"></span><button class="btn xs" id="alReset" type="button" data-t="Reset">Reset</button><button class="btn xs primary" id="alSave" type="button" hidden data-t="Save for everyone">Save for everyone</button><button class="btn xs" id="alDone" type="button" data-t="Done">Done</button></div>
           <div style="position:relative" id="mapBox"><canvas id="map"></canvas>
           <div class="map-title" id="map1Title" hidden></div>
@@ -2552,6 +2555,7 @@ Object.assign(I18N.RU, {
   'Corners': 'Повороты',
   'Digest': 'Разбор',
   'Chart': 'График',
+  'Satellite imagery is approximate: GPS and the photo can be a few metres apart.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров.', 'Satellite imagery is approximate: GPS and the photo can be a few metres apart. If the line runs through a wall, move the picture.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров. Если линия идёт сквозь стену — подвиньте картинку.',
   'Align': 'Совместить', 'Save for everyone': 'Сохранить для всех', 'Done': 'Готово', 'Drag the picture until it sits under the line': 'Тяните картинку, пока она не ляжет под линию', 'Drag the picture (or use the arrows, 0.5 m) until it sits under the line': 'Тяните картинку (или стрелками по 0,5 м), пока она не ляжет под линию', '{x} m east, {y} m north': '{x} м на восток, {y} м на север', 'no shift': 'без сдвига', 'Imagery alignment saved for this layout.': 'Совмещение снимка сохранено для этой конфигурации.',
   'Upload a session — every braking point, apex and throttle point, and a comparison with drivers on the same layout.': 'Загрузи сессию — каждая точка торможения, апекса и газа и сравнение с гонщиками на той же конфигурации.',
   'Session type (optional)': 'Тип сессии (необязательно)', 'Result (optional)': 'Результат (необязательно)', 'of': 'из', 'drivers': 'гонщиков', 'Practice': 'Практика', 'Qualifying': 'Квалификация', 'Sprint': 'Спринт', 'Race': 'Гонка', 'Ironman': 'Ironman', 'Endurance': 'Эндуранс', 'Other': 'Другое', '{n} drivers': '{n} гонщиков', 'session': 'сессия',
@@ -3967,7 +3971,7 @@ function labEnsureMap() {
   $('tglSat').onclick = () => { LAB.opts.aerial = !LAB.opts.aerial; syncOpts(); };
   $('tglTiles').onclick = () => { LAB.opts.tiles = !LAB.opts.tiles; SAT.setPref(LAB.opts.tiles); if (!LAB.opts.tiles) setAligning(false); syncOpts(); };
   // moving the picture under the line: for this device, or saved on the layout by whoever may edit the track
-  $('tglAlign').onclick = () => setAligning(!LAB.aligning);
+  $('tglAlign').onclick = () => setAligning(!LAB.aligning); $('satNoteAlign').onclick = () => setAligning(true);
   const nudge = (dx, dy) => { LAB.satAdj.dx += dx; LAB.satAdj.dy += dy; saveSatAdj(); renderAlignBar(); LAB.map.draw(); };
   $('alL').onclick = () => nudge(-0.5, 0); $('alR').onclick = () => nudge(0.5, 0); $('alU').onclick = () => nudge(0, 0.5); $('alD').onclick = () => nudge(0, -0.5);
   $('alReset').onclick = () => { LAB.satAdj = { dx: 0, dy: 0 }; saveSatAdj(); renderAlignBar(); LAB.map.draw(); };
@@ -4012,7 +4016,7 @@ LAB.satAdj = { dx: 0, dy: 0 }; LAB.aligning = false;
 const satKey = () => `hutka.sat.${LAB.tid}~${LAB.lid}`;
 function loadSatAdj() { try { const v = JSON.parse(localStorage.getItem(satKey()) || 'null'); LAB.satAdj = v && typeof v.dx === 'number' ? { dx: v.dx, dy: +v.dy || 0 } : { dx: 0, dy: 0 }; } catch (e) { LAB.satAdj = { dx: 0, dy: 0 }; } }
 function saveSatAdj() { try { if (Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01) localStorage.setItem(satKey(), JSON.stringify({ dx: +LAB.satAdj.dx.toFixed(2), dy: +LAB.satAdj.dy.toFixed(2) })); else localStorage.removeItem(satKey()); } catch (e) {} }
-function setAligning(on) { LAB.aligning = !!on && LAB.opts.tiles; $('tglAlign').classList.toggle('active', LAB.aligning); $('alignBar').hidden = !LAB.aligning; LAB.map.setTool(LAB.aligning ? 'sat' : 'pan'); if (LAB.aligning) renderAlignBar(); if (LAB.map && LAB.G) { setTimeout(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); }, 30); } }
+function setAligning(on) { LAB.aligning = !!on && LAB.opts.tiles; $('tglAlign').classList.toggle('active', LAB.aligning); $('alignBar').hidden = !LAB.aligning; $('satNote').hidden = LAB.aligning || !LAB.opts.tiles || !SAT.can(LAB.G); LAB.map.setTool(LAB.aligning ? 'sat' : 'pan'); if (LAB.aligning) renderAlignBar(); if (LAB.map && LAB.G) { setTimeout(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); }, 30); } }
 function renderAlignBar() {
   const tr = LAB.tid ? STORE.getTrack(LAB.tid) : null, canSave = !!(tr && STORE.canEditTrack(tr) && LAB.lid && LAB.lid !== 'custom' && STORE.getLayout(LAB.tid, LAB.lid));
   $('alignHint').textContent = isPhone() ? t('Drag the picture until it sits under the line') : t('Drag the picture (or use the arrows, 0.5 m) until it sits under the line');
@@ -4021,6 +4025,7 @@ function renderAlignBar() {
 }
 function syncOpts() {
   const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles); $('tglAlign').hidden = !(sat && LAB.opts.tiles); if (!(sat && LAB.opts.tiles) && LAB.aligning) setAligning(false);
+  $('satNote').hidden = !(sat && LAB.opts.tiles) || LAB.aligning; $('satNoteText').textContent = isPhone() ? t('Satellite imagery is approximate: GPS and the photo can be a few metres apart.') : t('Satellite imagery is approximate: GPS and the photo can be a few metres apart. If the line runs through a wall, move the picture.');
   if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; LAB.map.draw(); } });
   $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))); LAB.map.draw(); }
 function selectCorner(n, scroll) { LAB.selN = (LAB.selN === n) ? 0 : n; afterSelect(true); if (scroll && LAB.selN && !isLand()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
