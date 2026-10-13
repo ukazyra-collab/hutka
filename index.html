@@ -521,7 +521,9 @@ textarea{min-height:90px;resize:vertical}
 .insp-nav span{flex:1;min-width:0;text-align:center;font:600 13px var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .insp-nav .btn.sm{height:32px;padding:0 12px;font-size:18px;line-height:1}
 .post .nm .res{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:600;vertical-align:middle}
-.sat-pill{position:absolute;right:10px;bottom:28px;max-width:min(420px,calc(100% - 20px));display:flex;align-items:center;gap:10px;padding:8px 10px 8px 12px;border-radius:10px;background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);box-shadow:0 4px 16px rgba(0,0,0,.12);font-size:12.5px;line-height:1.35;z-index:3}
+.sat-pill{position:absolute;right:10px;bottom:28px;max-width:min(400px,calc(100% - 20px));display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-radius:10px;background:color-mix(in srgb,var(--surface) 72%,transparent);backdrop-filter:blur(6px);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);box-shadow:0 4px 16px rgba(0,0,0,.10);font-size:12px;line-height:1.3;z-index:3;color:var(--fg)}
+.sat-pill .x{flex:none;width:26px;height:26px;border-radius:50%;border:0;background:transparent;color:var(--muted);font-size:18px;line-height:1;cursor:pointer}
+.sat-pill .x:hover{background:var(--surface-3)}
 .sat-pill[hidden]{display:none}
 .sat-pill span{flex:1;min-width:0}
 .sat-pill .btn.xs{flex:none;height:30px;padding:0 12px;font-size:12.5px}
@@ -886,7 +888,7 @@ textarea{min-height:90px;resize:vertical}
           <div style="position:relative" id="mapBox"><canvas id="map"></canvas>
           <div class="map-title" id="map1Title" hidden></div>
           <div class="readout" id="readout" hidden></div>
-          <div class="sat-pill" id="satPill" hidden><span id="satPillText"></span><button class="btn xs primary" id="satPillBtn" type="button"></button></div>
+          <div class="sat-pill" id="satPill" hidden><span id="satPillText"></span><button class="btn xs primary" id="satPillBtn" type="button"></button><button class="x" id="satPillClose" type="button" aria-label="Close">×</button></div>
           <div class="mapnote" id="mapNote" hidden></div></div>
           <div class="legend" id="legendData"></div>
           <div class="charts under" id="dataPanel"><div class="hint" id="dataSub" style="margin:8px 0 4px"></div><canvas class="chart" id="chDataSpeed" height="150"></canvas><canvas class="chart" id="chDataDelta" height="84"></canvas></div>
@@ -4033,8 +4035,10 @@ const satKey = () => `hutka.sat.${LAB.tid}~${LAB.lid}`;
 function loadSatAdj() { try { const v = JSON.parse(localStorage.getItem(satKey()) || 'null'); LAB.satAdj = v && typeof v.dx === 'number' ? { dx: v.dx, dy: +v.dy || 0 } : { dx: 0, dy: 0 }; } catch (e) { LAB.satAdj = { dx: 0, dy: 0 }; } }
 function saveSatAdj() { try { if (Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01) localStorage.setItem(satKey(), JSON.stringify({ dx: +LAB.satAdj.dx.toFixed(2), dy: +LAB.satAdj.dy.toFixed(2) })); else localStorage.removeItem(satKey()); } catch (e) {} }
 // the note on the map: the picture is a guide and may sit a few metres off the GPS line — one button moves it
+let satPillGone = false; try { satPillGone = localStorage.getItem('hutka.satPill') === '1'; } catch (e) {}
+$('satPillClose').onclick = () => { satPillGone = true; try { localStorage.setItem('hutka.satPill', '1'); } catch (e) {} $('satPill').hidden = true; };
 function renderSatPill() {
-  const on = SAT.can(LAB.G) && LAB.opts.tiles; const p = $('satPill'); p.hidden = !on; if (!on) return;
+  const on = SAT.can(LAB.G) && LAB.opts.tiles && (LAB.aligning || !satPillGone); const p = $('satPill'); p.hidden = !on; if (!on) return;
   const shifted = Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01 || (LAB.G.sat && (Math.abs(LAB.G.sat.dx) > 0.01 || Math.abs(LAB.G.sat.dy) > 0.01));
   if (LAB.aligning) { $('satPillText').textContent = isPhone() ? t('Drag the photo with one finger until the track sits under the line.') : t('Drag the photo until the track sits under the line (or use the arrows above).'); $('satPillBtn').textContent = t('Done'); }
   else { $('satPillText').textContent = (shifted ? t('Photo shifted by hand. ') : '') + (isPhone() ? t('The photo is a guide: GPS and the image can be a few metres apart.') : t('The satellite photo is a guide: GPS and the image can be a few metres apart, so the line may seem to clip a wall.')); $('satPillBtn').textContent = shifted ? t('Move again') : t('Move the photo'); }
