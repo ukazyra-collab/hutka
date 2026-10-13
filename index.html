@@ -459,7 +459,7 @@ textarea{min-height:90px;resize:vertical}
     <!-- ========== LAB ========== -->
     <section class="page" id="pg-lab" hidden>
       <div class="ph"><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div><div class="row"><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload Alfano session">Upload Alfano session</span></button></div></div>
-      <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div></div>
+      <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div><button class="btn primary sm" id="labSignIn" style="margin-left:auto;flex:none" hidden data-t="Sign in">Sign in</button></div>
       <div class="empty" id="labEmpty"><svg><use href="#i-lab"/></svg><div class="t" data-t="No session loaded">No session loaded</div><div id="labEmptyText"></div><button class="btn primary" id="labUpload2" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload Alfano session">Upload Alfano session</span></button></div>
       <div class="card" id="pickbar" hidden>
         <div class="pickbar">
@@ -1797,6 +1797,7 @@ Object.assign(I18N.RU, {
   'Smoothing the line…': 'Сглаживаю линию…', 'Placing apexes… {i}/{n}': 'Расставляю апексы… {i}/{n}', 'Optimising the lap… {t}': 'Оптимизирую круг… {t}',
   'average lap': 'средний круг', 'lap {n}': 'круг {n}', 'best': 'лучший', 'dirty': 'грязный', 'eased': 'прикрыл',
   'You are viewing as a guest: sessions stay in this browser and cannot be published. Sign in to claude.ai to keep a library.': 'Ты смотришь как гость: сессии хранятся в этом браузере и их нельзя публиковать. Войди в claude.ai, чтобы вести библиотеку.',
+  'You are viewing as a guest: sessions stay in this browser and cannot be published. Sign in to keep a library on every device and publish to track pages.': 'Ты смотришь как гость: сессии хранятся в этом браузере и их нельзя публиковать. Войди, чтобы вести библиотеку на всех устройствах и публиковать на страницы треков.', 'Could not send the request. Sign in and try again.': 'Не удалось отправить запрос. Войди и попробуй снова.',
   'Offline mode: sessions you upload stay in this browser. Open the shared Hutka link signed in to claude.ai to publish them and compare with other drivers.': 'Офлайн-режим: загруженные сессии хранятся в этом браузере. Открой общую ссылку Hutka, войдя в claude.ai, чтобы публиковать их и сравниваться с другими.',
   'Session not found': 'Сессия не найдена', 'Loading session…': 'Загружаю сессию…', 'Could not load this session.': 'Не удалось загрузить сессию.', 'Custom track': 'Своя трасса', 'No clean laps with GPS in this session.': 'В сессии нет чистых кругов с GPS.',
   'Aerial': 'Спутник', 'Lap traces': 'Следы кругов', 'Computing the model line…': 'Считаю модельную линию…', 'Model lap {t} (grip scaled ×{m} to match the reference lap)': 'Модельный круг {t} (сцепление ×{m}, чтобы совпасть с опорным кругом)',
@@ -2735,7 +2736,7 @@ async function renderTrackPage(tid) {
   for (const [k, icon] of links) { const a = el('a'); a.href = tr[k]; a.target = '_blank'; a.rel = 'noopener'; a.title = k; a.appendChild(svgUse(icon)); soc.appendChild(a); }
   $('tFollow').hidden = !links.length;
   $('tClaimText').textContent = t('{name} is listed from public information. Claim it to keep the details, photos and events accurate.', { name: tr.name });
-  $('tClaimBtn').onclick = async () => { const ok = await confirmDlg(t('Claim this track'), t('Send a request to the Hutka admins to manage this track page?'), t('Send request')); if (!ok) return; try { await STORE.claim(tid, ''); setStatus('tClaimStatus', t('Request sent — the admins will get in touch.'), 'ok'); } catch (e) { setStatus('tClaimStatus', t('Could not send the request. Sign in to claude.ai and try again.'), 'warn'); } };
+  $('tClaimBtn').onclick = async () => { const ok = await confirmDlg(t('Claim this track'), t('Send a request to the Hutka admins to manage this track page?'), t('Send request')); if (!ok) return; try { await STORE.claim(tid, ''); setStatus('tClaimStatus', t('Request sent — the admins will get in touch.'), 'ok'); } catch (e) { setStatus('tClaimStatus', STORE.hasAuth ? t('Could not send the request. Sign in and try again.') : t('Could not send the request. Sign in to claude.ai and try again.'), 'warn'); } };
   setStatus('tClaimStatus', '');
 }
 
@@ -2900,7 +2901,8 @@ function activeRow() { const D = LAB.dcmp; if (!D) return null; const h = LAB.ho
 LAB.show = async function (sid, mode) {
   labEnsureMap();
   $('labGuestNote').hidden = STORE.hasDb && STORE.hasIdentity;
-  $('labGuestText').textContent = STORE.hasDb ? t('You are viewing as a guest: sessions stay in this browser and cannot be published. Sign in to claude.ai to keep a library.') : t('Offline mode: sessions you upload stay in this browser. Open the shared Hutka link signed in to claude.ai to publish them and compare with other drivers.');
+  $('labGuestText').textContent = STORE.hasAuth ? t('You are viewing as a guest: sessions stay in this browser and cannot be published. Sign in to keep a library on every device and publish to track pages.') : (STORE.hasDb ? t('You are viewing as a guest: sessions stay in this browser and cannot be published. Sign in to claude.ai to keep a library.') : t('Offline mode: sessions you upload stay in this browser. Open the shared Hutka link signed in to claude.ai to publish them and compare with other drivers.'));
+  $('labSignIn').hidden = !STORE.hasAuth; $('labSignIn').onclick = () => AUTH.open();
   if (sid && sid !== 'new') {
     const cur = LAB.current;
     if (!(cur && cur.id === sid && mode !== 'cmp')) {
