@@ -395,6 +395,10 @@ textarea{min-height:90px;resize:vertical}
 .fs-head .lapline .big{font-size:30px}
 #hero:fullscreen{background:var(--bg);padding:14px;overflow:auto;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-content:start}
 #hero:fullscreen .fs-head{display:flex}
+/* the session / reference / compare panel rides along into full screen (moved into the hero by the lab) */
+#hero:fullscreen > #pickbar,.hero.fs-fallback > #pickbar{grid-column:1 / -1;margin:0;border-radius:10px;padding:10px 14px}
+#hero:fullscreen > #pickbar .lapline,#hero:fullscreen > #pickbar #ownerRow,.hero.fs-fallback > #pickbar .lapline,.hero.fs-fallback > #pickbar #ownerRow{display:none}
+.fs-head #fsCompare svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 #hero:fullscreen .inspector{max-height:calc(100vh - 28px)}
 #hero:fullscreen .map-wrap{display:flex;flex-direction:column;max-height:calc(100vh - 28px)}
 #hero:fullscreen .map-wrap > div[style]{flex:1;min-height:0}
@@ -517,6 +521,11 @@ textarea{min-height:90px;resize:vertical}
 .insp-nav span{flex:1;min-width:0;text-align:center;font:600 13px var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .insp-nav .btn.sm{height:32px;padding:0 12px;font-size:18px;line-height:1}
 .post .nm .res{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:600;vertical-align:middle}
+.sat-pill{position:absolute;right:10px;bottom:28px;max-width:min(420px,calc(100% - 20px));display:flex;align-items:center;gap:10px;padding:8px 10px 8px 12px;border-radius:10px;background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);box-shadow:0 4px 16px rgba(0,0,0,.12);font-size:12.5px;line-height:1.35;z-index:3}
+.sat-pill[hidden]{display:none}
+.sat-pill span{flex:1;min-width:0}
+.sat-pill .btn.xs{flex:none;height:30px;padding:0 12px;font-size:12.5px}
+@media (max-width:700px){.sat-pill{left:10px;right:10px;bottom:24px;max-width:none;font-size:12px}}
 .sat-note{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:5px 10px;border-bottom:1px solid var(--line);background:var(--surface);font-size:12px;color:var(--muted)}
 .sat-note[hidden]{display:none}
 .align-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--accent) 8%,var(--surface));font-size:12.5px}
@@ -616,6 +625,8 @@ textarea{min-height:90px;resize:vertical}
   .hero.fs-fallback .legend{display:none}
   .hero.fs-fallback .charts.under{padding:2px 4px 4px}
   .hero.fs-fallback .inspector{bottom:0;max-height:55vh}
+  .hero.fs-fallback #pickbar.open{bottom:0;z-index:27}
+  .hero.fs-fallback .fs-head #fsCompare{height:32px;padding:0 10px;font-size:12.5px}
   .hero .inspector .insp-empty{display:none}
   .insp-close{display:grid;place-items:center;position:absolute;right:10px;top:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);font-size:18px;line-height:1;color:var(--muted);cursor:pointer}
   .insp-head b{font-size:22px}
@@ -860,7 +871,7 @@ textarea{min-height:90px;resize:vertical}
       </div>
       <div class="hero" id="hero" hidden>
         <div class="map-wrap" id="mapWrap1">
-          <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
+          <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn mobile-only" id="fsCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
           <div class="map-bar" id="mapBar">
             <div class="seg" id="viewSeg"><button class="btn" id="tglTiles" type="button" hidden data-t="Satellite">Satellite</button><button class="btn" id="tglAlign" type="button" hidden data-t="Align">Align</button><button class="btn" id="tglSat" type="button" data-t="Aerial">Aerial</button></div>
             <button class="btn" id="optBand" type="button" data-t="Track edges">Track edges</button>
@@ -875,6 +886,7 @@ textarea{min-height:90px;resize:vertical}
           <div style="position:relative" id="mapBox"><canvas id="map"></canvas>
           <div class="map-title" id="map1Title" hidden></div>
           <div class="readout" id="readout" hidden></div>
+          <div class="sat-pill" id="satPill" hidden><span id="satPillText"></span><button class="btn xs primary" id="satPillBtn" type="button"></button></div>
           <div class="mapnote" id="mapNote" hidden></div></div>
           <div class="legend" id="legendData"></div>
           <div class="charts under" id="dataPanel"><div class="hint" id="dataSub" style="margin:8px 0 4px"></div><canvas class="chart" id="chDataSpeed" height="150"></canvas><canvas class="chart" id="chDataDelta" height="84"></canvas></div>
@@ -2555,6 +2567,7 @@ Object.assign(I18N.RU, {
   'Corners': 'Повороты',
   'Digest': 'Разбор',
   'Chart': 'График',
+  'Move imagery': 'Подвинуть снимок', 'Move the photo': 'Подвинуть снимок', 'Move again': 'Подвинуть ещё', 'Photo shifted by hand. ': 'Снимок сдвинут вручную. ', 'The photo is a guide: GPS and the image can be a few metres apart.': 'Снимок — ориентир: GPS и фото могут расходиться на несколько метров.', 'The satellite photo is a guide: GPS and the image can be a few metres apart, so the line may seem to clip a wall.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров, поэтому линия может «задевать стену».', 'Drag the photo with one finger until the track sits under the line.': 'Тяни снимок одним пальцем, пока трасса не ляжет под линию.', 'Drag the photo until the track sits under the line (or use the arrows above).': 'Тяни снимок, пока трасса не ляжет под линию (или стрелками выше).',
   'Satellite imagery is approximate: GPS and the photo can be a few metres apart.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров.', 'Satellite imagery is approximate: GPS and the photo can be a few metres apart. If the line runs through a wall, move the picture.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров. Если линия идёт сквозь стену — подвиньте картинку.',
   'Align': 'Совместить', 'Save for everyone': 'Сохранить для всех', 'Done': 'Готово', 'Drag the picture until it sits under the line': 'Тяните картинку, пока она не ляжет под линию', 'Drag the picture (or use the arrows, 0.5 m) until it sits under the line': 'Тяните картинку (или стрелками по 0,5 м), пока она не ляжет под линию', '{x} m east, {y} m north': '{x} м на восток, {y} м на север', 'no shift': 'без сдвига', 'Imagery alignment saved for this layout.': 'Совмещение снимка сохранено для этой конфигурации.',
   'Upload a session — every braking point, apex and throttle point, and a comparison with drivers on the same layout.': 'Загрузи сессию — каждая точка торможения, апекса и газа и сравнение с гонщиками на той же конфигурации.',
@@ -3073,14 +3086,15 @@ function createMapView(canvas, host) {
     if (tr) { x0 = Infinity; y0 = Infinity; x1 = -Infinity; y1 = -Infinity; const pad = (host.getWidthM ? host.getWidthM() : 8) * 2.5 / tr.mpp; for (let i = 0; i < tr.N; i += 2) { const x = tr.cx[i] / tr.mpp, y = tr.cy[i] / tr.mpp; x0 = Math.min(x0, x - pad); x1 = Math.max(x1, x + pad); y0 = Math.min(y0, y - pad); y1 = Math.max(y1, y + pad); } }
     const xs = [], ys = []; for (const [x, y] of [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]) { xs.push(c * x - si * y); ys.push(si * x + c * y); }
     const s = Math.min(w / (Math.max(...xs) - Math.min(...xs)), h / (Math.max(...ys) - Math.min(...ys))) * 0.94, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-    V.s = s; V.ts = s; V.anchor = null; V.tx = w / 2 - s * (c * cx - si * cy); V.ty = h / 2 - s * (si * cx + c * cy); V.auto = true;
+    V.s = s; V.ts = s; V.sFit = s; V.anchor = null; V.tx = w / 2 - s * (c * cx - si * cy); V.ty = h / 2 - s * (si * cx + c * cy); V.auto = true;
   }
   let zoomAnim = false;
-  function zoomAt(f, cx, cy) { V.ts = clamp((V.ts || V.s) * f, 0.03, 60); V.anchor = [cx, cy]; V.auto = false; if (zoomAnim) return; zoomAnim = true; const step = () => { let busy = false; if (V.anchor && V.ts !== undefined) { const d = V.ts / V.s; if (Math.abs(Math.log(d)) < 0.003) { const ff = V.ts / V.s, [ax, ay] = V.anchor; V.tx = ax - (ax - V.tx) * ff; V.ty = ay - (ay - V.ty) * ff; V.s = V.ts; V.anchor = null; } else { const ns = V.s * Math.pow(d, 0.3), ff = ns / V.s, [ax, ay] = V.anchor; V.tx = ax - (ax - V.tx) * ff; V.ty = ay - (ay - V.ty) * ff; V.s = ns; busy = true; } } draw(); if (busy) requestAnimationFrame(step); else zoomAnim = false; }; requestAnimationFrame(step); }
+  function zoomAt(f, cx, cy) { const lo = V.sFit ? V.sFit * 0.45 : 0.03, hi = V.sFit ? V.sFit * 14 : 60; V.ts = clamp((V.ts || V.s) * f, lo, hi); if (Math.abs(V.ts - V.s) < 1e-9) return; V.anchor = [cx, cy]; V.auto = false; if (zoomAnim) return; zoomAnim = true; const step = () => { let busy = false; if (V.anchor && V.ts !== undefined) { const d = V.ts / V.s; if (Math.abs(Math.log(d)) < 0.003) { const ff = V.ts / V.s, [ax, ay] = V.anchor; V.tx = ax - (ax - V.tx) * ff; V.ty = ay - (ay - V.ty) * ff; V.s = V.ts; V.anchor = null; } else { const ns = V.s * Math.pow(d, 0.3), ff = ns / V.s, [ax, ay] = V.anchor; V.tx = ax - (ax - V.tx) * ff; V.ty = ay - (ay - V.ty) * ff; V.s = ns; busy = true; } } draw(); if (busy) requestAnimationFrame(step); else zoomAnim = false; }; requestAnimationFrame(step); }
   function rotateBy(dRot) { const { w, h } = setup(), cx = w / 2, cy = h / 2, [px, py] = toI(cx, cy); V.rot += dRot; const c = Math.cos(V.rot), si = Math.sin(V.rot); V.tx = cx - V.s * (c * px - si * py); V.ty = cy - V.s * (si * px + c * py); V.auto = false; draw(); }
   function zoomCenter(f) { const { w, h } = setup(); zoomAt(f, w / 2, h / 2); }
   // ----- satellite tiles under a Web-Mercator frame (the GPS layouts are built at zoom 19, so tiles line up by construction) -----
-  const tiles = new Map(); let tileFails = 0, zCap = 99;
+  const tiles = new Map(); let tileFails = 0, zCap = 99, tileDrawT = null;
+  const tileDraw = () => { if (tileDrawT) return; tileDrawT = setTimeout(() => { tileDrawT = null; draw(); }, 50); };   // many tiles land together: one repaint for all of them
   // providers answer beyond their real coverage with a flat grey "no data" picture (HTTP 200): spot it and stop asking for that zoom
   function placeholderTile(im) {
     try { const c = document.createElement('canvas'); c.width = c.height = 24; const cx = c.getContext('2d', { willReadFrequently: true }); cx.drawImage(im, 0, 0, 24, 24); const d = cx.getImageData(0, 0, 24, 24).data; let n = 0, sum = 0, sum2 = 0, grey = 0; for (let i = 0; i < d.length; i += 4) { const r = d[i], g = d[i + 1], b = d[i + 2], l = (r + g + b) / 3; sum += l; sum2 += l * l; n++; if (Math.abs(r - g) < 6 && Math.abs(g - b) < 6) grey++; } const mean = sum / n, sd = Math.sqrt(Math.max(0, sum2 / n - mean * mean)); if (grey / n < 0.9 || mean < 170) return false; if (sd < 18) return true;
@@ -3090,11 +3104,11 @@ function createMapView(canvas, host) {
   function tileUrl(TL, z, x, y) { return String(TL.url || 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').replace('{z}', z).replace('{x}', x).replace('{y}', y); }
   function tile(TL, z, x, y) {
     const k = `${z}/${x}/${y}`; let e = tiles.get(k); if (e) return e;
-    if (tiles.size > 600) { let n = 0; for (const kk of tiles.keys()) { tiles.delete(kk); if (++n > 200) break; } }
+    if (tiles.size > 180) { let n = 0; for (const kk of tiles.keys()) { const t0 = tiles.get(kk); if (t0 && t0.img) t0.img.src = ''; tiles.delete(kk); if (++n > 70) break; } }
     e = { img: null, ok: false, err: false }; tiles.set(k, e);
     const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async';
-    im.onload = () => { if (z >= 17 && placeholderTile(im)) { e.err = true; if (z - 1 < zCap) zCap = z - 1; draw(); return; } e.ok = true; e.img = im; draw(); };
-    im.onerror = () => { e.err = true; tileFails++; if (host.onTileError) host.onTileError(tileFails); draw(); };
+    im.onload = () => { if (z >= 17 && placeholderTile(im)) { e.err = true; if (z - 1 < zCap) zCap = z - 1; tileDraw(); return; } e.ok = true; e.img = im; tileDraw(); };
+    im.onerror = () => { e.err = true; tileFails++; if (host.onTileError) host.onTileError(tileFails); tileDraw(); };
     im.src = tileUrl(TL, z, x, y); return e;
   }
   function drawTiles(ctx, w, h, TL) {
@@ -3102,15 +3116,16 @@ function createMapView(canvas, host) {
     // visible frame rectangle (frame px = mercator px at M0.z minus the origin, shifted by the alignment offset)
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
     for (const [px, py] of [[0, 0], [w, 0], [w, h], [0, h]]) { const [x, y] = toI(px, py); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
-    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-    const z = Math.max(12, Math.min(TL.maxZoom || 20, zCap, M0.z + Math.round(Math.log2(Math.max(0.01, sc * dpr)))));
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    // the zoom level follows where the zoom animation is heading, so the tiles for the final scale load once, not per frame
+    const target = V.ts || sc;
+    let z = Math.max(12, Math.min(TL.maxZoom || 20, zCap, M0.z + Math.round(Math.log2(Math.max(0.01, target * dpr)) - 0.3)));
     ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-    const f = Math.pow(2, M0.z - z);   // frame px per tile px at zoom z
     const dx = TL.dx || 0, dy = TL.dy || 0;
-    const ox = M0.x0 - dx, oy = M0.y0 - dy;   // tile → frame: frame = merc/f*... see below
-    const size = 256 * f;
-    const tx0 = Math.floor((x0 + ox) / size), tx1 = Math.floor((x1 + ox) / size), ty0 = Math.floor((y0 + oy) / size), ty1 = Math.floor((y1 + oy) / size);
-    if ((tx1 - tx0 + 1) * (ty1 - ty0 + 1) > 120) return;
+    const ox = M0.x0 - dx, oy = M0.y0 - dy;   // tile → frame: frame px = merc px (at M0.z) − origin + shift
+    let f, size, tx0, tx1, ty0, ty1;
+    // a big screen at a high zoom would need hundreds of tiles: step the zoom down until the count is sane
+    for (;;) { f = Math.pow(2, M0.z - z); size = 256 * f; tx0 = Math.floor((x0 + ox) / size); tx1 = Math.floor((x1 + ox) / size); ty0 = Math.floor((y0 + oy) / size); ty1 = Math.floor((y1 + oy) / size); if ((tx1 - tx0 + 1) * (ty1 - ty0 + 1) <= 160 || z <= 12) break; z--; }
     ctx.save(); ctx.translate(V.tx, V.ty); ctx.rotate(V.rot); ctx.scale(sc, sc); ctx.globalAlpha = TL.alpha === undefined ? 1 : TL.alpha;
     const n = Math.pow(2, z);
     for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
@@ -3118,10 +3133,9 @@ function createMapView(canvas, host) {
       const fx = tx * size - ox, fy = ty * size - oy;
       let e = tile(TL, z, txw, ty), drawn = false;
       if (e.ok) { ctx.drawImage(e.img, fx, fy, size + 0.5, size + 0.5); drawn = true; }
-      else if (z > M0.z - 3) {   // not there yet (or missing at this zoom): the parent tile, scaled
-        for (let up = 1; up <= 3 && !drawn; up++) { const pz = z - up, pf = Math.pow(2, up); const pe = tiles.get(`${pz}/${Math.floor(txw / pf)}/${Math.floor(ty / pf)}`) || (e.err ? tile(TL, pz, Math.floor(txw / pf), Math.floor(ty / pf)) : null); if (pe && pe.ok) { const sx = (txw % pf) * 256 / pf, sy = (ty % pf) * 256 / pf; ctx.drawImage(pe.img, sx, sy, 256 / pf, 256 / pf, fx, fy, size + 0.5, size + 0.5); drawn = true; } }
+      else {   // not there yet (or missing at this zoom): the nearest loaded ancestor, scaled — never a blank flash
+        for (let up = 1; up <= 5 && !drawn; up++) { const pz = z - up, pf = Math.pow(2, up); const pe = tiles.get(`${pz}/${Math.floor(txw / pf)}/${Math.floor(ty / pf)}`) || (e.err && up === 1 ? tile(TL, pz, Math.floor(txw / pf), Math.floor(ty / pf)) : null); if (pe && pe.ok) { const sx = (txw % pf) * 256 / pf, sy = (ty % pf) * 256 / pf; ctx.drawImage(pe.img, sx, sy, 256 / pf, 256 / pf, fx, fy, size + 0.5, size + 0.5); drawn = true; } }
       }
-      if (!drawn) { ctx.fillStyle = 'rgba(40,48,60,0.35)'; ctx.fillRect(fx, fy, size + 0.5, size + 0.5); }
     }
     ctx.restore();
     if (TL.attribution) { ctx.font = `10px ${tokens().body}`; const tw = ctx.measureText(TL.attribution).width + 10; ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, h - 15, tw, 15); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left'; ctx.fillText(TL.attribution, 5, h - 4); }
@@ -3906,7 +3920,7 @@ function labMapHeight(w) {
   const ratio = LAB.G ? LAB.G.H / LAB.G.W : 0.65;
   if (isLand()) { const box = $('mapBox').clientHeight; return Math.max(120, box || (window.innerHeight - 40 - ($('mapBar').offsetHeight || 34) - 2)); }
   if (fs && isPhone()) return Math.max(220, window.innerHeight - ($('fsHead').offsetHeight || 50) - ($('dataPanel').offsetHeight || 180) - 2);
-  if (fs) return Math.max(240, window.innerHeight - 28 - 62 - 49 - 34 - 262);
+  if (fs) { const hgt = (id) => { const e = $(id); return e && e.offsetParent !== null ? e.offsetHeight : 0; }; return Math.max(240, window.innerHeight - 28 - hgt('fsHead') - hgt('pickbar') - hgt('mapBar') - hgt('legendData') - hgt('dataPanel') - 24); }
   if (isPhone()) return Math.round(window.innerHeight * 0.5);
   return Math.round(clamp(w * ratio, 340, Math.min(Math.max(360, window.innerHeight - 470), 720)));
 }
@@ -3978,7 +3992,9 @@ function labEnsureMap() {
   $('alDone').onclick = () => setAligning(false);
   $('alSave').onclick = async () => { const l = STORE.getLayout(LAB.tid, LAB.lid), tr = STORE.getTrack(LAB.tid); if (!l || !tr || !STORE.canEditTrack(tr)) return; const b = $('alSave'); b.classList.add('busy'); try { const base = l.sat || { dx: 0, dy: 0 }; await STORE.saveLayout(LAB.tid, Object.assign({}, l, { sat: { dx: +(base.dx + LAB.satAdj.dx).toFixed(2), dy: +(base.dy + LAB.satAdj.dy).toFixed(2) } })); LAB.satAdj = { dx: 0, dy: 0 }; saveSatAdj(); GEOM.invalidate(); setAligning(false); toast(t('Imagery alignment saved for this layout.')); await LAB.open(LAB.current, false); } catch (e) { toast(t('Could not save: {e}', { e: e && e.message || e })); } b.classList.remove('busy'); };
   // full screen: map, charts, readout and the corner inspector on one screen
-  const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); };
+  const placePickbar = (fs) => { const pb = $('pickbar'), h = $('hero'); if (fs) { if (pb.parentElement !== h) h.insertBefore(pb, h.firstChild); } else if (pb.parentElement === h) { h.parentElement.insertBefore(pb, h); pb.classList.remove('open'); } };
+  $('fsCompare').onclick = () => $('pickbar').classList.toggle('open');
+  const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); placePickbar(on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); };
   $('lmMap').onclick = () => fsFallbackOn(true);
   $('lmCompare').onclick = () => { $('pickbar').classList.toggle('open'); };
   $('pickClose').onclick = () => $('pickbar').classList.remove('open');
@@ -3987,7 +4003,7 @@ function labEnsureMap() {
   $('btnFull').onclick = () => { const h = $('hero'); if (fsOn()) { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); return; } if (h.requestFullscreen) h.requestFullscreen().catch(() => fsFallbackOn(true)); else fsFallbackOn(true); };
   $('btnFullExit').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); };
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('hero').classList.contains('fs-fallback')) fsFallbackOn(false); });
-  document.addEventListener('fullscreenchange', () => { const fs = document.fullscreenElement === $('hero'); $('fsHead').hidden = !fs; $('btnFull').classList.toggle('active', fs); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); });
+  document.addEventListener('fullscreenchange', () => { const fs = document.fullscreenElement === $('hero'); placePickbar(fs); $('fsHead').hidden = !fs; $('btnFull').classList.toggle('active', fs); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); });
   window.addEventListener('resize', () => { if (APP.route === 'lab' && LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (LAB.dcmp) renderInspector(); } });
   window.addEventListener('keydown', (e) => { if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if (APP.route !== 'lab') return; if (e.key === 'Escape' && LAB.selN) { LAB.selN = 0; afterSelect(true); } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { if (LAB.dcmp) { e.preventDefault(); stepCorner(e.key === 'ArrowRight' ? 1 : -1); } } else if (e.key === 'q' || e.key === 'Q') LAB.map.rotateBy(-Math.PI / 24); else if (e.key === 'e' || e.key === 'E') LAB.map.rotateBy(Math.PI / 24); else if (e.key === 'f' || e.key === 'F') $('btnFull').click(); });
   for (const c of [$('chDataSpeed'), $('chDataDelta')]) { c.addEventListener('pointermove', (e) => { const G = LAB.G; if (!G || !LAB.dcmp) return; const r = c.getBoundingClientRect(), x = e.clientX - r.left; const s = (x - PAD.l) / (r.width - PAD.l - PAD.r) * G.track.lengthM, i = Math.round(s / G.track.ds), ni = (i >= 0 && i < G.track.N) ? i : -1; if (ni !== LAB.hoverIdx) { LAB.hoverIdx = ni; LAB.map.setHover(ni); showReadout(); renderInspector(); drawDataCharts(); } }); c.addEventListener('pointerleave', () => { if (LAB.hoverIdx >= 0) { LAB.hoverIdx = -1; LAB.map.setHover(-1); showReadout(); renderInspector(); drawDataCharts(); } }); }
@@ -4016,18 +4032,26 @@ LAB.satAdj = { dx: 0, dy: 0 }; LAB.aligning = false;
 const satKey = () => `hutka.sat.${LAB.tid}~${LAB.lid}`;
 function loadSatAdj() { try { const v = JSON.parse(localStorage.getItem(satKey()) || 'null'); LAB.satAdj = v && typeof v.dx === 'number' ? { dx: v.dx, dy: +v.dy || 0 } : { dx: 0, dy: 0 }; } catch (e) { LAB.satAdj = { dx: 0, dy: 0 }; } }
 function saveSatAdj() { try { if (Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01) localStorage.setItem(satKey(), JSON.stringify({ dx: +LAB.satAdj.dx.toFixed(2), dy: +LAB.satAdj.dy.toFixed(2) })); else localStorage.removeItem(satKey()); } catch (e) {} }
-function setAligning(on) { LAB.aligning = !!on && LAB.opts.tiles; $('tglAlign').classList.toggle('active', LAB.aligning); $('alignBar').hidden = !LAB.aligning; $('satNote').hidden = LAB.aligning || !LAB.opts.tiles || !SAT.can(LAB.G); LAB.map.setTool(LAB.aligning ? 'sat' : 'pan'); if (LAB.aligning) renderAlignBar(); if (LAB.map && LAB.G) { setTimeout(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); }, 30); } }
+// the note on the map: the picture is a guide and may sit a few metres off the GPS line — one button moves it
+function renderSatPill() {
+  const on = SAT.can(LAB.G) && LAB.opts.tiles; const p = $('satPill'); p.hidden = !on; if (!on) return;
+  const shifted = Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01 || (LAB.G.sat && (Math.abs(LAB.G.sat.dx) > 0.01 || Math.abs(LAB.G.sat.dy) > 0.01));
+  if (LAB.aligning) { $('satPillText').textContent = isPhone() ? t('Drag the photo with one finger until the track sits under the line.') : t('Drag the photo until the track sits under the line (or use the arrows above).'); $('satPillBtn').textContent = t('Done'); }
+  else { $('satPillText').textContent = (shifted ? t('Photo shifted by hand. ') : '') + (isPhone() ? t('The photo is a guide: GPS and the image can be a few metres apart.') : t('The satellite photo is a guide: GPS and the image can be a few metres apart, so the line may seem to clip a wall.')); $('satPillBtn').textContent = shifted ? t('Move again') : t('Move the photo'); }
+}
+$('satPillBtn').onclick = () => setAligning(!LAB.aligning);
+function setAligning(on) { LAB.aligning = !!on && LAB.opts.tiles; $('tglAlign').classList.toggle('active', LAB.aligning); $('alignBar').hidden = !LAB.aligning; $('satNote').hidden = true; renderSatPill(); LAB.map.setTool(LAB.aligning ? 'sat' : 'pan'); if (LAB.aligning) renderAlignBar(); if (LAB.map && LAB.G) { setTimeout(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); }, 30); } }
 function renderAlignBar() {
   const tr = LAB.tid ? STORE.getTrack(LAB.tid) : null, canSave = !!(tr && STORE.canEditTrack(tr) && LAB.lid && LAB.lid !== 'custom' && STORE.getLayout(LAB.tid, LAB.lid));
   $('alignHint').textContent = isPhone() ? t('Drag the picture until it sits under the line') : t('Drag the picture (or use the arrows, 0.5 m) until it sits under the line');
-  $('alignOff').textContent = (Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01) ? t('{x} m east, {y} m north', { x: LAB.satAdj.dx.toFixed(1), y: LAB.satAdj.dy.toFixed(1) }) : t('no shift');
+  $('alignOff').textContent = (Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01) ? t('{x} m east, {y} m north', { x: LAB.satAdj.dx.toFixed(1), y: LAB.satAdj.dy.toFixed(1) }) : t('no shift'); renderSatPill();
   $('alSave').hidden = !canSave;
 }
 function syncOpts() {
   const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles); $('tglAlign').hidden = !(sat && LAB.opts.tiles); if (!(sat && LAB.opts.tiles) && LAB.aligning) setAligning(false);
-  $('satNote').hidden = !(sat && LAB.opts.tiles) || LAB.aligning; $('satNoteText').textContent = isPhone() ? t('Satellite imagery is approximate: GPS and the photo can be a few metres apart.') : t('Satellite imagery is approximate: GPS and the photo can be a few metres apart. If the line runs through a wall, move the picture.');
+  $('satNote').hidden = true; $('tglAlign').textContent = t('Move imagery'); renderSatPill();
   if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; LAB.map.draw(); } });
-  $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))); LAB.map.draw(); }
+  $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))) || !!(sat && LAB.opts.tiles && !(LAB.G && LAB.G.aerial)); LAB.map.draw(); }
 function selectCorner(n, scroll) { LAB.selN = (LAB.selN === n) ? 0 : n; afterSelect(true); if (scroll && LAB.selN && !isLand()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 
 // ----- the start screen: my sessions and what the drivers I follow have published -----
