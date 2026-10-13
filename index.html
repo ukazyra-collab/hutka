@@ -3406,9 +3406,9 @@ function createMapView(canvas, host) {
   M.ptrs = new Map(); M.pinch = null; M.touchFree = false;
   function setTouchFree(on) { M.touchFree = !!on; canvas.style.touchAction = M.touchFree ? 'none' : (coarse ? 'pan-y' : 'none'); }
   canvas.addEventListener('pointerdown', (e) => {
-    const [sx, sy] = getPos(e); canvas.setPointerCapture(e.pointerId);
+    const [sx, sy] = getPos(e); try { canvas.setPointerCapture(e.pointerId); } catch (x) {}
     M.ptrs.set(e.pointerId, [sx, sy]);
-    if (M.ptrs.size === 2) { const [a, b] = [...M.ptrs.values()]; M.pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx: (a[0] + b[0]) / 2, my: (a[1] + b[1]) / 2 }; M.panning = null; M.tap = null; canvas.classList.remove('panning'); return; }
+    if (M.ptrs.size === 2) { const [a, b] = [...M.ptrs.values()]; M.pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx: (a[0] + b[0]) / 2, my: (a[1] + b[1]) / 2, ang: Math.atan2(b[1] - a[1], b[0] - a[0]), acc: 0, rotOn: false }; M.panning = null; M.tap = null; canvas.classList.remove('panning'); return; }
     if (e.pointerType === 'touch') { M.tap = { x: sx, y: sy, t: Date.now() }; if (M.tool === 'sat') { const [ix, iy] = toI(sx, sy); M.satDrag = { ix, iy }; return; } if (M.touchFree && M.tool === 'pan') { M.panning = { x: sx, y: sy, tx: V.tx, ty: V.ty, sx, sy, moved: false }; } return; }
     const panMode = M.tool === 'pan' || e.button === 1 || M.spaceDown;
     if (panMode) { M.panning = { x: sx, y: sy, tx: V.tx, ty: V.ty, sx, sy, moved: false }; canvas.classList.add('panning'); return; }
@@ -3427,7 +3427,11 @@ function createMapView(canvas, host) {
   canvas.addEventListener('pointermove', (e) => {
     const [sx, sy] = getPos(e);
     if (M.ptrs.has(e.pointerId)) M.ptrs.set(e.pointerId, [sx, sy]);
-    if (M.pinch) { if (M.ptrs.size < 2) return; const [a, b] = [...M.ptrs.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2; zoomAt(d / M.pinch.d, mx, my); V.tx += mx - M.pinch.mx; V.ty += my - M.pinch.my; M.pinch = { d, mx, my }; V.auto = false; draw(); return; }
+    if (M.pinch) { if (M.ptrs.size < 2) return; const [a, b] = [...M.ptrs.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, ang = Math.atan2(b[1] - a[1], b[0] - a[0]); zoomAt(d / M.pinch.d, mx, my); V.tx += mx - M.pinch.mx; V.ty += my - M.pinch.my;
+      // two fingers twist the map (after a few degrees, so a plain pinch does not wobble): rotate around the point between the fingers
+      let dA = ang - M.pinch.ang; if (dA > Math.PI) dA -= 2 * Math.PI; else if (dA < -Math.PI) dA += 2 * Math.PI; const P = M.pinch; P.acc += dA; if (!P.rotOn && Math.abs(P.acc) > 0.12) P.rotOn = true;
+      if (P.rotOn && dA) { const [px, py] = toI(mx, my); V.rot += dA; const c = Math.cos(V.rot), si = Math.sin(V.rot); V.tx = mx - V.s * (c * px - si * py); V.ty = my - V.s * (si * px + c * py); }
+      Object.assign(P, { d, mx, my, ang }); V.auto = false; draw(); return; }
     if (e.pointerType === 'touch' && !M.panning && M.dragIdx < 0 && !M.photoDrag && !M.satDrag) return;
     if (M.panning) { V.tx = M.panning.tx + sx - M.panning.x; V.ty = M.panning.ty + sy - M.panning.y; if (Math.hypot(sx - M.panning.sx, sy - M.panning.sy) > 4) M.panning.moved = true; V.auto = false; draw(); return; }
     if (M.photoDrag) { const [ix, iy] = toI(sx, sy); if (host.onPhotoMove) host.onPhotoMove(ix - M.photoDrag.ix, iy - M.photoDrag.iy); M.photoDrag = { ix, iy }; draw(); return; }
