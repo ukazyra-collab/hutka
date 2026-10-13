@@ -1,22 +1,38 @@
-// Hutka — the racing AI. One call = one answer: checks the wallet (plan or credits), keeps the chat in the database,
-// streams the Anthropic reply back as SSE, then stores the reply and charges one credit.
-// Deploy as `ask` with "Verify JWT" OFF. Secrets: ANTHROPIC_API_KEY (required), ANTHROPIC_MODEL (optional), FREE_CREDITS (optional, default 10).
+// Hutka — the racing AI. One call = one answer: fair-use checks, keeps the chat in the database, streams the Anthropic reply
+// back as SSE, then stores the reply with its token usage (and, when billing is on, charges one credit).
+// Deploy as `ask` with "Verify JWT" OFF.
+// Secrets: ANTHROPIC_API_KEY (required), ANTHROPIC_MODEL (optional, default claude-sonnet-5-5).
+// Beta / billing: FREE_MODE=1 (default) — nobody is charged, only the fair-use caps apply; FREE_MODE=0 — credits and Pro (Stripe).
+// Caps (all optional): LIMIT_HOUR=15 per driver, LIMIT_DAY=50 per driver, LIMIT_IP_DAY=120 per network address, LIMIT_GLOBAL_DAY=800 for everyone,
+// MAX_TEXT_CHARS=1500, MAX_SYSTEM_CHARS=48000, MAX_OUT_TOKENS=1200. AI_PAUSED=1 switches the coach off without redeploying.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Expose-Headers": "x-chat-id, x-credits, x-plan",
+  "Access-Control-Expose-Headers": "x-chat-id, x-credits, x-plan, x-used-day, x-limit-day",
 };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
-const FREE = Number(Deno.env.get("FREE_CREDITS") || "10");
+const num = (k: string, d: number) => { const v = Number(Deno.env.get(k)); return Number.isFinite(v) && v > 0 ? v : d; };
+const FREE = num("FREE_CREDITS", 10);
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") || "claude-sonnet-5-5";
-const HOURLY_LIMIT = 40;
+const FREE_MODE = (Deno.env.get("FREE_MODE") ?? "1") !== "0";
+const PAUSED = (Deno.env.get("AI_PAUSED") || "0") === "1";
+const LIM = { hour: num("LIMIT_HOUR", 15), day: num("LIMIT_DAY", 50), ip: num("LIMIT_IP_DAY", 120), global: num("LIMIT_GLOBAL_DAY", 800), text: num("MAX_TEXT_CHARS", 1500), system: num("MAX_SYSTEM_CHARS", 48000), out: num("MAX_OUT_TOKENS", 1200) };
+
+// the network address is kept only as a short hash — enough to notice one address opening many accounts, useless for anything else
+async function ipHash(req: Request) {
+  const ip = (req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "").split(",")[0].trim();
+  if (!ip) return "";
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("hutka:" + ip));
+  return Array.from(new Uint8Array(d)).slice(0, 8).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "method" }, 405);
+  if (PAUSED) return json({ error: "paused" }, 503);
   const auth = req.headers.get("Authorization") || "";
   if (!auth.startsWith("Bearer ")) return json({ error: "sign_in" }, 401);
   const url = Deno.env.get("SUPABASE_URL")!;
@@ -29,23 +45,38 @@ Deno.serve(async (req) => {
 
   let body: { chat_id?: number; session_id?: string; track_id?: string; layout_id?: string; title?: string; system?: string; text?: string; lang?: string };
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
-  const text = String(body.text || "").trim().slice(0, 4000);
+  const text = String(body.text || "").trim().slice(0, LIM.text);
   if (!text) return json({ error: "empty" }, 400);
   const key = Deno.env.get("ANTHROPIC_API_KEY");
   if (!key) return json({ error: "not_configured" }, 503);
 
-  // ---- wallet: welcome credits on first use, then plan or credits
-  let { data: wallet } = await db.from("wallets").select("*").eq("user_id", user.id).maybeSingle();
-  if (!wallet) {
-    const { data: w } = await db.from("wallets").insert({ user_id: user.id, credits: FREE }).select("*").single();
-    wallet = w; if (w) await db.from("ledger").insert({ user_id: user.id, delta: FREE, reason: "welcome", ref: "welcome:" + user.id });
+  // ---- fair use: per driver (hour, day), per network address (day), for everyone (day)
+  const hourAgo = new Date(Date.now() - 3600_000).toISOString(), dayAgo = new Date(Date.now() - 86400_000).toISOString();
+  const countQ = (q: PromiseLike<{ count: number | null }>) => Promise.resolve(q).then((r) => r.count || 0);
+  const ip = await ipHash(req);
+  const [usedHour, usedDay, usedGlobal, usedIp] = await Promise.all([
+    countQ(db.from("messages").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("role", "user").gte("created_at", hourAgo)),
+    countQ(db.from("messages").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("role", "user").gte("created_at", dayAgo)),
+    countQ(db.from("messages").select("id", { count: "exact", head: true }).eq("role", "user").gte("created_at", dayAgo)),
+    ip ? countQ(db.from("messages").select("id", { count: "exact", head: true }).eq("role", "user").eq("ip", ip).gte("created_at", dayAgo)) : Promise.resolve(0),
+  ]);
+  if (usedHour >= LIM.hour) return json({ error: "rate_limited", scope: "hour", used: usedHour, limit: LIM.hour }, 429);
+  if (usedDay >= LIM.day) return json({ error: "rate_limited", scope: "day", used: usedDay, limit: LIM.day }, 429);
+  if (ip && usedIp >= LIM.ip) return json({ error: "rate_limited", scope: "ip", used: usedIp, limit: LIM.ip }, 429);
+  if (usedGlobal >= LIM.global) return json({ error: "busy", used: usedGlobal, limit: LIM.global }, 503);
+
+  // ---- wallet (only when billing is on): welcome credits on first use, then plan or credits
+  // deno-lint-ignore no-explicit-any
+  let wallet: any = null, pro = false;
+  if (!FREE_MODE) {
+    const r = await db.from("wallets").select("*").eq("user_id", user.id).maybeSingle(); wallet = r.data;
+    if (!wallet) {
+      const { data: w } = await db.from("wallets").insert({ user_id: user.id, credits: FREE }).select("*").single();
+      wallet = w; if (w) await db.from("ledger").insert({ user_id: user.id, delta: FREE, reason: "welcome", ref: "welcome:" + user.id });
+    }
+    pro = !!(wallet && wallet.plan === "pro" && wallet.plan_until && new Date(wallet.plan_until).getTime() > Date.now());
+    if (!pro && (!wallet || wallet.credits < 1)) return json({ error: "no_credits", credits: wallet ? wallet.credits : 0, plan: wallet ? wallet.plan : "free" }, 402);
   }
-  const pro = wallet && wallet.plan === "pro" && wallet.plan_until && new Date(wallet.plan_until).getTime() > Date.now();
-  if (!pro && (!wallet || wallet.credits < 1)) return json({ error: "no_credits", credits: wallet ? wallet.credits : 0, plan: wallet ? wallet.plan : "free" }, 402);
-  // ---- fair use
-  const since = new Date(Date.now() - 3600_000).toISOString();
-  const { count } = await db.from("messages").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("role", "user").gte("created_at", since);
-  if ((count || 0) >= HOURLY_LIMIT) return json({ error: "rate_limited" }, 429);
 
   // ---- chat
   let chatId = body.chat_id ? Number(body.chat_id) : 0;
@@ -58,27 +89,28 @@ Deno.serve(async (req) => {
     chatId = c.id;
   }
   const { data: hist } = await db.from("messages").select("role,content").eq("chat_id", chatId).order("created_at", { ascending: true }).limit(200);
-  const history = (hist || []).slice(-16).map((m) => ({ role: m.role, content: m.content }));
-  await db.from("messages").insert({ chat_id: chatId, user_id: user.id, role: "user", content: text });
+  const history = (hist || []).slice(-16).map((m) => ({ role: m.role, content: String(m.content || "").slice(0, 6000) }));
+  { const ins = await db.from("messages").insert({ chat_id: chatId, user_id: user.id, role: "user", content: text, ip: ip || null }); if (ins.error) await db.from("messages").insert({ chat_id: chatId, user_id: user.id, role: "user", content: text }); }   // (the ip column arrives with community.sql)
   const messages = [...history, { role: "user", content: text }];
-  const system = String(body.system || "").slice(0, 80000);
+  const system = String(body.system || "").slice(0, LIM.system);
 
+  // the system prompt (rules + the driver's memory + the session breakdown) repeats between questions: cache it
   const upstream = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: 1800, system, messages, stream: true }),
+    body: JSON.stringify({ model: MODEL, max_tokens: LIM.out, system: system ? [{ type: "text", text: system, cache_control: { type: "ephemeral" } }] : undefined, messages, stream: true }),
   });
   if (!upstream.ok || !upstream.body) { const t = await upstream.text(); return json({ error: "upstream", status: upstream.status, detail: t.slice(0, 300) }, 502); }
 
-  // forward the SSE stream; collect the reply and the usage, then store and charge
-  let reply = "", tokIn = 0, tokOut = 0, buf = "";
+  // forward the SSE stream; collect the reply and the usage, then store (and charge when billing is on)
+  let reply = "", tokIn = 0, tokOut = 0, tokCacheR = 0, tokCacheW = 0, buf = "";
   const dec = new TextDecoder();
   const finish = async () => {
     try {
-      const { data: m } = await db.from("messages").insert({ chat_id: chatId, user_id: user.id, role: "assistant", content: reply, tokens_in: tokIn, tokens_out: tokOut, credits: pro ? 0 : 1 }).select("id").single();
+      const { data: m } = await db.from("messages").insert({ chat_id: chatId, user_id: user.id, role: "assistant", content: reply, tokens_in: tokIn + tokCacheR + tokCacheW, tokens_out: tokOut, credits: (FREE_MODE || pro) ? 0 : 1 }).select("id").single();
       await db.from("chats").update({ updated_at: new Date().toISOString() }).eq("id", chatId);
-      if (!pro && m) {
-        await db.from("wallets").update({ credits: Math.max(0, (wallet!.credits || 0) - 1), updated_at: new Date().toISOString() }).eq("user_id", user.id);
+      if (!FREE_MODE && !pro && m) {
+        await db.from("wallets").update({ credits: Math.max(0, (wallet.credits || 0) - 1), updated_at: new Date().toISOString() }).eq("user_id", user.id);
         await db.from("ledger").insert({ user_id: user.id, delta: -1, reason: "ask", ref: "msg:" + m.id });
       }
     } catch (_) { /* best effort */ }
@@ -94,13 +126,14 @@ Deno.serve(async (req) => {
         try {
           const ev = JSON.parse(line.slice(5).trim());
           if (ev.type === "content_block_delta" && ev.delta && ev.delta.text) reply += ev.delta.text;
-          if (ev.type === "message_start" && ev.message && ev.message.usage) tokIn = ev.message.usage.input_tokens || 0;
+          if (ev.type === "message_start" && ev.message && ev.message.usage) { const u = ev.message.usage; tokIn = u.input_tokens || 0; tokCacheR = u.cache_read_input_tokens || 0; tokCacheW = u.cache_creation_input_tokens || 0; }
           if (ev.type === "message_delta" && ev.usage) tokOut = ev.usage.output_tokens || 0;
         } catch (_) { /* partial json */ }
       }
     },
     async flush() { await finish(); },
   });
-  const headers = { ...cors, "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache", "X-Chat-Id": String(chatId), "X-Credits": String(pro ? wallet!.credits : Math.max(0, (wallet!.credits || 0) - 1)), "X-Plan": pro ? "pro" : "free" };
+  const creditsLeft = FREE_MODE ? "" : String(pro ? wallet.credits : Math.max(0, (wallet.credits || 0) - 1));
+  const headers = { ...cors, "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache", "X-Chat-Id": String(chatId), "X-Credits": creditsLeft, "X-Plan": FREE_MODE ? "beta" : (pro ? "pro" : "free"), "X-Used-Day": String(usedDay + 1), "X-Limit-Day": String(LIM.day) };
   return new Response(upstream.body.pipeThrough(out), { headers });
 });

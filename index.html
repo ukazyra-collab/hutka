@@ -74,7 +74,7 @@ p{margin:0}
 .app{display:grid;grid-template-columns:var(--side) minmax(0,1fr);min-height:100%}
 .side{background:var(--surface);border-right:1px solid var(--line);padding-block:18px 18px;padding-inline:14px;position:sticky;top:env(safe-area-inset-top,0px);height:100vh;display:flex;flex-direction:column;gap:6px;min-width:0}
 .brand{display:flex;align-items:center;gap:10px;padding:6px 10px 18px;text-decoration:none;color:var(--fg)}
-.brand .mark{width:30px;height:24px;flex:none}
+.brand .mark{width:34px;height:25px;flex:none;object-fit:contain}
 .brand b{font-size:22px;font-weight:800;letter-spacing:-.02em}
 .nav{display:flex;flex-direction:column;gap:4px}
 .nav a{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:15px;font-weight:500;transition:background .12s,color .12s}
@@ -105,7 +105,7 @@ p{margin:0}
 .page[hidden]{display:none}
 .topbar-nav{display:none}
 .brand.mobile{display:none;padding:0;flex:none}
-.brand.mobile .mark{width:34px;height:27px}
+.brand.mobile .mark{width:36px;height:27px}
 .tabbar{display:none}
 .mobile-only{display:none!important}
 .insp-close{display:none}
@@ -434,10 +434,12 @@ textarea{min-height:90px;resize:vertical}
 .soon{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 8px}
 /* ---------- home feed ---------- */
 .home-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;background:linear-gradient(135deg,var(--accent-soft),var(--surface));border-color:color-mix(in srgb,var(--accent) 30%,var(--line))}
-.home-hero h1{font-size:30px;letter-spacing:-.02em;margin-bottom:6px}
-.home-hero p{color:var(--muted);font-size:15px;line-height:1.55;max-width:60ch}
-.home-hero .stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-.home-hero .stats .tile{min-width:110px}
+.home-hero h1{font-size:28px;letter-spacing:-.02em;margin-bottom:4px}
+.home-hero p{color:var(--muted);font-size:14.5px;line-height:1.5;max-width:52ch}
+.home-hero .stats{display:flex;gap:22px;flex-wrap:wrap;justify-content:flex-end}
+.home-hero .stats .tile{min-width:0;padding:0;background:none;border:0;text-align:right}
+.home-hero .stats .tile .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.home-hero .stats .tile .v{font:600 22px/1.1 var(--mono);letter-spacing:-.02em}
 @media (max-width:900px){.home-hero{grid-template-columns:1fr}.home-hero .stats{justify-content:flex-start}}
 .home-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start;margin-top:16px}
 @media (max-width:1100px){.home-grid{grid-template-columns:1fr}}
@@ -470,7 +472,7 @@ textarea{min-height:90px;resize:vertical}
 .rank img{width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--surface-3)}
 .rank .w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rank .w a{color:inherit;text-decoration:none}
-.rank .w span{display:block;color:var(--muted);font-size:12px}
+.rank .w span{display:block;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis}
 .rank .tm{font-family:var(--mono);font-size:13px}
 /* ---------- AI coach ---------- */
 .ai-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
@@ -514,6 +516,7 @@ textarea{min-height:90px;resize:vertical}
 .insp-nav{align-items:center;gap:8px;margin:-4px 0 2px;padding-right:36px}
 .insp-nav span{flex:1;min-width:0;text-align:center;font:600 13px var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .insp-nav .btn.sm{height:32px;padding:0 12px;font-size:18px;line-height:1}
+.post .nm .res{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:600;vertical-align:middle}
 .votes{display:inline-flex;gap:4px}
 .btn.vote .ic{font-size:14px;line-height:1}
 .btn.vote.on.up{border-color:var(--throttle);color:var(--throttle);background:color-mix(in srgb,var(--throttle) 10%,var(--surface))}
@@ -725,7 +728,7 @@ textarea{min-height:90px;resize:vertical}
 <div class="app">
   <aside class="side">
     <a class="brand" href="#home">
-      <svg class="mark" viewBox="0 0 40 32" aria-hidden="true"><path d="M8 2h7L9 30H2z" fill="#e5484d"/><path d="M19 2h7l-6 28h-7z" fill="currentColor"/><path d="M31 2h7l-6 28h-7z" fill="currentColor"/><path d="M11.5 18l17-5-1.2 5.3-17 5z" fill="currentColor"/></svg>
+      <img class="mark" src="logo.png" alt="" width="110" height="81">
       <b>Hutka</b>
     </a>
     <nav class="nav">
@@ -744,7 +747,7 @@ textarea{min-height:90px;resize:vertical}
   </aside>
   <div class="main">
     <header class="top">
-      <a class="brand mobile" href="#home" aria-label="Hutka"><svg class="mark" viewBox="0 0 40 32" aria-hidden="true"><path d="M8 2h7L9 30H2z" fill="#e5484d"/><path d="M19 2h7l-6 28h-7z" fill="currentColor"/><path d="M31 2h7l-6 28h-7z" fill="currentColor"/><path d="M11.5 18l17-5-1.2 5.3-17 5z" fill="currentColor"/></svg></a>
+      <a class="brand mobile" href="#home" aria-label="Hutka"><img class="mark" src="logo.png" alt="" width="110" height="81"></a>
       <div class="search">
         <svg><use href="#i-search"/></svg>
         <input type="text" id="q" placeholder="Search tracks, drivers..." autocomplete="off">
@@ -765,7 +768,7 @@ textarea{min-height:90px;resize:vertical}
         <div style="min-width:0"><h2 class="hh"><svg><use href="#i-timer"/></svg><span data-t="Latest sessions">Latest sessions</span><span class="sub" id="feedSub"></span></h2><div class="feed" id="homeFeed"></div><div class="hint" id="feedHint" style="margin-top:10px"></div></div>
         <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
           <div class="card"><h2><svg><use href="#i-layouts"/></svg><span data-t="Where people drive">Where people drive</span></h2><div class="list" id="homeActive" style="gap:4px"></div></div>
-          <div class="card"><h2><svg><use href="#i-users"/></svg><span data-t="Fastest this month">Fastest this month</span></h2><div id="homeTop"></div></div>
+          <div class="card"><h2><svg><use href="#i-users"/></svg><span data-t="Active drivers">Active drivers</span><span class="sub" data-t="last 30 days">last 30 days</span></h2><div id="homeTop"></div></div>
           <div class="card" id="homeFollowCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="Drivers you follow">Drivers you follow</span></h2><div class="list" id="homeFollowing" style="gap:4px"></div></div>
         </div>
       </div>
@@ -784,7 +787,7 @@ textarea{min-height:90px;resize:vertical}
         </div>
         <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
           <div class="card"><h2><svg><use href="#i-pin"/></svg><span id="nearTitle" data-t="Tracks near you">Tracks near you</span></h2><div id="nearList" class="list" style="gap:2px"></div><div class="hint" id="nearHint"></div></div>
-          <div class="card"><h2><svg><use href="#i-track"/></svg><span data-t="All tracks">All tracks</span><span class="sub" id="allCount"></span></h2><div id="allList" class="list" style="gap:2px"></div></div>
+          <div class="card"><h2><svg><use href="#i-track"/></svg><span data-t="All tracks">All tracks</span><span class="sub" id="allCount"></span></h2><div class="row" style="margin-bottom:8px;gap:8px"><select id="allCountry" style="max-width:220px"></select><input type="text" id="allSearch" placeholder="Search" style="flex:1;min-width:120px"></div><div id="allList" class="list" style="gap:2px"></div></div>
         </div>
       </div>
     </section>
@@ -817,7 +820,7 @@ textarea{min-height:90px;resize:vertical}
       <div class="banner info" id="lFirst" hidden><svg><use href="#i-info"/></svg><div id="lFirstText"></div></div>
       <div class="card" id="lPhotoCard" hidden><img id="lPhoto" alt="" style="max-width:100%;max-height:520px;border-radius:12px;display:block"></div>
       <div class="hero with-insp" id="lHero">
-        <div class="map-wrap"><div class="map-bar"><div class="seg"><button class="btn" id="lRotL" type="button" title="Rotate">↺</button><button class="btn" id="lRotR" type="button" title="Rotate">↻</button></div><div class="seg"><button class="btn" id="lZoomOut" type="button">−</button><button class="btn" id="lZoomIn" type="button">+</button><button class="btn" id="lZoomFit" type="button">⌂</button></div></div><div style="position:relative"><canvas id="lmap"></canvas><div class="map-title" id="lMapTitle" hidden></div><div class="readout" id="lReadout" hidden></div></div><div class="legend" id="lLegend"></div></div>
+        <div class="map-wrap"><div class="map-bar"><button class="btn" id="lTiles" type="button" hidden data-t="Satellite">Satellite</button><div class="seg"><button class="btn" id="lRotL" type="button" title="Rotate">↺</button><button class="btn" id="lRotR" type="button" title="Rotate">↻</button></div><div class="seg"><button class="btn" id="lZoomOut" type="button">−</button><button class="btn" id="lZoomIn" type="button">+</button><button class="btn" id="lZoomFit" type="button">⌂</button></div></div><div style="position:relative"><canvas id="lmap"></canvas><div class="map-title" id="lMapTitle" hidden></div><div class="readout" id="lReadout" hidden></div></div><div class="legend" id="lLegend"></div></div>
         <div class="inspector" id="lInsp"><div class="insp-empty" id="lInspText"></div></div>
       </div>
       <div class="card" id="lGuideCard"><h2><svg><use href="#i-corner"/></svg><span data-t="Corner guide">Corner guide</span><span class="sub" id="lGuideSub"></span></h2><div id="lGuide" class="guide"></div><div class="hint" id="lGuideHint"></div></div>
@@ -854,7 +857,7 @@ textarea{min-height:90px;resize:vertical}
         <div class="map-wrap" id="mapWrap1">
           <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
           <div class="map-bar" id="mapBar">
-            <div class="seg" id="viewSeg"><button class="btn" id="tglSat" type="button" data-t="Aerial">Aerial</button></div>
+            <div class="seg" id="viewSeg"><button class="btn" id="tglTiles" type="button" hidden data-t="Satellite">Satellite</button><button class="btn" id="tglSat" type="button" data-t="Aerial">Aerial</button></div>
             <button class="btn" id="optBand" type="button" data-t="Track edges">Track edges</button>
             <button class="btn" id="optTicks" type="button" data-t="Markers">Markers</button>
             <button class="btn" id="optLabels" type="button" data-t="Labels">Labels</button>
@@ -884,7 +887,7 @@ textarea{min-height:90px;resize:vertical}
       <div class="banner info" id="aiSoon" hidden><svg><use href="#i-info"/></svg><div id="aiSoonText"></div></div>
       <div class="ai-grid" id="aiGrid">
         <aside class="ai-side" id="aiSide">
-          <div class="card wallet" id="walletCard"><div class="wl"><span class="lbl" data-t="Credits">Credits</span><b id="walletCredits">—</b></div><div class="hint" id="walletNote"></div><div class="row" style="margin-top:10px"><button class="btn primary sm" id="walletBuy" type="button" data-t="Get credits">Get credits</button><button class="btn sm" id="walletManage" type="button" hidden data-t="Manage plan">Manage plan</button></div></div>
+          <div class="card wallet" id="walletCard"><div class="wl"><span class="lbl" id="walletLbl" data-t="Credits">Credits</span><b id="walletCredits">—</b></div><div class="hint" id="walletNote"></div><div class="row" style="margin-top:10px"><button class="btn primary sm" id="walletBuy" type="button" data-t="Get credits">Get credits</button><button class="btn sm" id="walletManage" type="button" hidden data-t="Manage plan">Manage plan</button></div></div>
           <div class="card"><h2><svg><use href="#i-chat"/></svg><span data-t="Chats">Chats</span><span class="sub" id="aiChatsSub"></span></h2><div class="list chatlist" id="aiChats"></div></div>
         </aside>
         <div class="card ai-main" id="aiMain">
@@ -940,6 +943,12 @@ textarea{min-height:90px;resize:vertical}
         <div class="card"><h2><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></h2><div class="list" id="admTracks"></div><div id="admClaimsWrap"><h2 style="margin-top:18px"><svg><use href="#i-flag"/></svg><span data-t="Claim requests">Claim requests</span></h2><div class="list" id="admClaims"></div></div></div>
         <div style="display:flex;flex-direction:column;gap:16px;min-width:0" id="admRight">
           <div class="empty" id="admEmpty"><svg><use href="#i-track"/></svg><div class="t" data-t="Pick a track to edit, or add one">Pick a track to edit, or add one</div></div>
+          <div class="card" id="admImportCard" hidden><h2><svg><use href="#i-globe"/></svg><span data-t="Import tracks from OpenStreetMap">Import tracks from OpenStreetMap</span></h2>
+            <div class="hint" data-t="OpenStreetMap knows most karting tracks in the world (name, position, often the website). Pick a country, tick the tracks worth having, import — they become catalogue pages that drivers find by GPS when they upload.">OpenStreetMap knows most karting tracks in the world (name, position, often the website). Pick a country, tick the tracks worth having, import — they become catalogue pages that drivers find by GPS when they upload.</div>
+            <div class="row" style="margin-top:10px;gap:8px"><select id="osmCountry" style="max-width:260px"></select><button class="btn primary" id="osmFind" type="button" data-t="Find tracks">Find tracks</button><label class="row" style="gap:6px;cursor:pointer"><input type="checkbox" id="osmAll" style="width:16px;height:16px"><span data-t="select all">select all</span></label><span class="status" id="osmStatus"></span></div>
+            <div class="tblwrap" style="margin-top:10px;max-height:420px;overflow:auto" id="osmWrap" hidden><table class="tbl" id="osmTable"><thead><tr><th></th><th data-t="Track">Track</th><th data-t="City">City</th><th data-t="Type">Type</th><th data-t="Website">Website</th><th></th></tr></thead><tbody></tbody></table></div>
+            <div class="row" style="margin-top:10px"><button class="btn primary" id="osmImport" type="button" hidden data-t="Import selected">Import selected</button><span class="status" id="osmImportStatus"></span></div>
+          </div>
           <div class="card" id="admTrackCard" hidden>
             <h2><svg><use href="#i-building"/></svg><span data-t="Track page">Track page</span><span class="sub" id="admTrackId"></span></h2>
             <div class="form">
@@ -997,11 +1006,16 @@ textarea{min-height:90px;resize:vertical}
                   <div class="row"><div class="seg"><button class="btn active" id="toolPan" type="button" data-t="Pan">Pan</button><button class="btn" id="toolCorner" type="button" data-t="Edit corners">Edit corners</button></div></div>
                   <div class="hint" style="margin-top:6px" data-t="Corners are found automatically from the radius threshold. With “Edit corners” on, click the line to add a corner, right-click a number to remove it.">Corners are found automatically from the radius threshold. With “Edit corners” on, click the line to add a corner, right-click a number to remove it.</div>
                   <div class="status" id="geomStatus" style="margin-top:6px"></div></div>
+                <div class="step" id="satStep" hidden><h4><span class="n">3</span><span data-t="Satellite imagery">Satellite imagery</span></h4>
+                  <div class="row"><button class="btn" id="eTiles" type="button" data-t="Satellite">Satellite</button><button class="btn" id="toolSat" type="button" data-t="Align imagery">Align imagery</button></div>
+                  <div class="row" style="margin-top:6px;gap:4px"><div class="seg"><button class="btn" id="satL" type="button" title="0.5 m">←</button><button class="btn" id="satU" type="button" title="0.5 m">↑</button><button class="btn" id="satD" type="button" title="0.5 m">↓</button><button class="btn" id="satR" type="button" title="0.5 m">→</button></div><button class="btn" id="satReset" type="button" data-t="Reset">Reset</button><span class="hint" id="satOff"></span></div>
+                  <div class="hint" style="margin-top:6px" data-t="GPS and imagery can be a few metres apart. With “Align imagery” on, drag the picture under the line (or use the arrows, 0.5 m a step) until the track matches, then save.">GPS and imagery can be a few metres apart. With “Align imagery” on, drag the picture under the line (or use the arrows, 0.5 m a step) until the track matches, then save.</div></div>
                 <div class="row"><button class="btn primary" id="geomSave" type="button" data-t="Save corners">Save corners</button><span class="status" id="geomSaveStatus"></span></div>
               </div>
               <div class="map-wrap"><div class="map-bar"><div class="seg"><button class="btn" id="eRotL" type="button">↺</button><button class="btn" id="eRotR" type="button">↻</button></div><div class="seg"><button class="btn" id="eZoomOut" type="button">−</button><button class="btn" id="eZoomIn" type="button">+</button><button class="btn" id="eZoomFit" type="button">⌂</button></div></div><div style="position:relative"><canvas id="emap"></canvas><div class="readout" id="eReadout" hidden></div></div></div>
             </div>
           </div>
+        <div class="card" id="admAiCard" hidden><h2><svg><use href="#i-spark"/></svg><span data-t="AI coach · usage and cost">AI coach · usage and cost</span></h2><div id="admAiUsage"></div></div>
         </div>
       </div>
     </section>
@@ -1030,6 +1044,8 @@ textarea{min-height:90px;resize:vertical}
         <div class="field wide" id="uplNewTrack" hidden><div class="newtrack"><div class="hint" id="uplNewHint"></div><div class="form" style="margin-top:8px"><div class="field"><label data-t="Track name">Track name</label><input type="text" id="uplNewName" placeholder="Dubai Kartdrome"></div><div class="field"><label data-t="City">City</label><input type="text" id="uplNewCity"></div><div class="field"><label data-t="Country">Country</label><select id="uplNewCountry"></select></div></div></div></div>
         <div class="field"><label data-t="Kart">Kart</label><select id="uplKart"></select></div>
         <div class="field" id="uplKartOtherField" hidden><label data-t="Kart model">Kart model</label><input type="text" id="uplKartOther" placeholder="Sodi RT8, Rotax Max, X30…"></div>
+        <div class="field"><label data-t="Session type (optional)">Session type (optional)</label><select id="uplFormat"></select></div>
+        <div class="field"><label data-t="Result (optional)">Result (optional)</label><div class="row" style="flex-wrap:nowrap;gap:8px;align-items:center"><input type="number" id="uplPos" min="1" max="500" placeholder="P" style="width:76px"><span class="hint" data-t="of">of</span><input type="number" id="uplDrivers" min="1" max="500" placeholder="drivers" style="width:96px"><span class="hint" data-t="drivers">drivers</span></div></div>
         <div class="field wide" id="uplLayoutPhotoField" hidden><img id="uplLayoutPhoto" alt="" style="max-width:100%;max-height:220px;border-radius:10px;display:block"></div>
         <div class="field"><label data-t="Notes">Notes</label><input type="text" id="uplNote" placeholder="#14, wet, new tyres"></div>
         <div class="field" id="uplPubField"><label data-t="Visibility">Visibility</label><label class="row" style="min-height:40px;cursor:pointer;align-items:flex-start;flex-wrap:nowrap;gap:8px;line-height:1.35;padding-top:4px"><input type="checkbox" id="uplPublish" checked style="width:18px;height:18px;flex:none"><span data-t="Publish on the track page (others can compare with it)">Publish on the track page (others can compare with it)</span></label></div>
@@ -1063,6 +1079,8 @@ textarea{min-height:90px;resize:vertical}
     <div class="field"><label data-t="Layout">Layout</label><select id="seLayout"></select></div>
     <div class="field"><label data-t="Kart">Kart</label><select id="seKart"></select></div>
     <div class="field" id="seKartOtherField" hidden><label data-t="Kart model">Kart model</label><input type="text" id="seKartOther" maxlength="40" placeholder="Sodi RT8, Rotax Max…"></div>
+    <div class="field"><label data-t="Session type (optional)">Session type (optional)</label><select id="seFormat"></select></div>
+    <div class="field"><label data-t="Result (optional)">Result (optional)</label><div class="row" style="flex-wrap:nowrap;gap:8px;align-items:center"><input type="number" id="sePos" min="1" max="500" placeholder="P" style="width:76px"><span class="hint" data-t="of">of</span><input type="number" id="seDrivers" min="1" max="500" placeholder="drivers" style="width:96px"><span class="hint" data-t="drivers">drivers</span></div></div>
     <div class="field wide"><label data-t="Notes">Notes</label><input type="text" id="seNote" maxlength="120"></div>
     <div class="field wide"><label data-t="SWS race this session belongs to (optional)">SWS race this session belongs to (optional)</label><select id="seSws"></select><div class="hint" id="seSwsHint"></div></div>
     <div class="field wide" id="sePubField"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="sePublish" style="width:18px;height:18px"><span data-t="Published on the track page">Published on the track page</span></label></div>
@@ -2530,6 +2548,20 @@ Object.assign(I18N.RU, {
   'Corners': 'Повороты',
   'Digest': 'Разбор',
   'Chart': 'График',
+  'Upload a session — every braking point, apex and throttle point, and a comparison with drivers on the same layout.': 'Загрузи сессию — каждая точка торможения, апекса и газа и сравнение с гонщиками на той же конфигурации.',
+  'Session type (optional)': 'Тип сессии (необязательно)', 'Result (optional)': 'Результат (необязательно)', 'of': 'из', 'drivers': 'гонщиков', 'Practice': 'Практика', 'Qualifying': 'Квалификация', 'Sprint': 'Спринт', 'Race': 'Гонка', 'Ironman': 'Ironman', 'Endurance': 'Эндуранс', 'Other': 'Другое', '{n} drivers': '{n} гонщиков', 'session': 'сессия',
+  'All countries': 'Все страны', 'Search': 'Поиск', 'Asking OpenStreetMap… (10–40 s)': 'Спрашиваю OpenStreetMap… (10–40 с)', 'OpenStreetMap did not answer — try again in a minute.': 'OpenStreetMap не ответил — попробуйте через минуту.', '{n} karting venues found in {c}; {h} already in Hutka.': 'Найдено картинговых площадок в {c}: {n}; уже в Hutka: {h}.', 'Nothing tagged as karting in {c} on OpenStreetMap.': 'В OpenStreetMap ничего не помечено как картинг в {c}.', 'indoor': 'крытый', 'in Hutka': 'в Hutka', 'Tick the tracks to import first.': 'Сначала отметьте трассы для импорта.', 'Imported {n} of {m}…': 'Импортировано {n} из {m}…', '{n} tracks imported — open them in the list to add logos, karts and hours.': 'Импортировано трасс: {n} — откройте их в списке, чтобы добавить логотипы, карты и часы работы.',
+  'Import tracks from OpenStreetMap': 'Импорт трасс из OpenStreetMap', 'OpenStreetMap knows most karting tracks in the world (name, position, often the website). Pick a country, tick the tracks worth having, import — they become catalogue pages that drivers find by GPS when they upload.': 'OpenStreetMap знает большинство картинговых трасс мира (название, координаты, часто сайт). Выберите страну, отметьте нужные трассы, импортируйте — они станут страницами каталога, которые гонщики находят по GPS при загрузке.', 'Find tracks': 'Найти трассы', 'select all': 'выбрать все', 'Import selected': 'Импортировать выбранные',
+  'T{a}–T{b}: {net} s for the reference lap': 'T{a}–T{b}: {net} с в пользу эталонного круга', 'T{a}–T{b}: {net} s against the reference lap': 'T{a}–T{b}: {net} с против эталонного круга',
+  'Reserve in this lap ≈ {t} s.': 'Резерв в этом круге ≈ {t} с.', 'This lap is among the best here.': 'Этот круг здесь среди лучших.',
+  'Active drivers': 'Активные гонщики', 'last 30 days': 'за 30 дней', 'Nobody published a session in the last 30 days yet.': 'За последние 30 дней никто ещё не опубликовал сессию.', '{n} lap|{n} laps': '{n} круг|{n} круга|{n} кругов', '{n} track|{n} tracks': '{n} трасса|{n} трассы|{n} трасс',
+  'Satellite': 'Спутник', 'Satellite imagery': 'Спутниковый снимок', 'Align imagery': 'Совместить снимок', 'Reset': 'Сбросить', 'offset {x} m east, {y} m north': 'сдвиг {x} м на восток, {y} м на север', 'Imagery moved — press “Save corners” to keep the alignment.': 'Снимок сдвинут — нажмите «Сохранить повороты», чтобы запомнить совмещение.',
+  'GPS and imagery can be a few metres apart. With “Align imagery” on, drag the picture under the line (or use the arrows, 0.5 m a step) until the track matches, then save.': 'GPS и снимок могут расходиться на несколько метров. Включите «Совместить снимок» и перетащите картинку под линией (или стрелками, шаг 0,5 м), пока трасса не совпадёт, затем сохраните.',
+  // free beta of the coach
+  'Free beta · {u}/{d} questions today': 'Бесплатная бета · {u}/{d} вопросов сегодня', 'Knows your sessions and the fastest published laps on your layouts.': 'Знает твои сессии и быстрейшие опубликованные круги на твоих конфигурациях.',
+  'Daily limit reached ({n} questions) — the coach is back tomorrow.': 'Дневной лимит ({n} вопросов) исчерпан — тренер вернётся завтра.', 'Too many questions from this network today — try again tomorrow.': 'Слишком много вопросов с этой сети за сегодня — попробуй завтра.', 'Limit: {n} questions an hour — take a short break and try again.': 'Лимит: {n} вопросов в час — сделай паузу и попробуй снова.', 'The coach is resting: the community used today\'s questions. Back tomorrow.': 'Тренер отдыхает: сообщество израсходовало вопросы на сегодня. Вернётся завтра.', 'The coach is paused for a moment.': 'Тренер на паузе — ненадолго.',
+  'Usage appears here once the ask function is deployed and community.sql has been run.': 'Статистика появится, когда задеплоена функция ask и выполнен community.sql.', 'Questions · 30 d': 'Вопросов · 30 дн', 'Drivers · 30 d': 'Гонщиков · 30 дн', 'Tokens in / out': 'Токены вход / выход', '≈ cost · 30 d': '≈ расход · 30 дн', 'Day': 'День', 'Questions': 'Вопросов', 'Tokens in': 'Токены вход', 'Tokens out': 'Токены выход', 'Last': 'Последний', 'Prices assumed: ${i} / ${o} per million tokens in / out (set aiPrice in config.js to match your model).': 'Цены для оценки: ${i} / ${o} за миллион токенов вход / выход (aiPrice в config.js — под свою модель).',
+  'Free beta': 'Бесплатная бета', 'Free while we test. {d} questions a day and {h} an hour per driver; the whole community {g}/{gl} today.': 'Бесплатно, пока тестируем. {d} вопросов в день и {h} в час на гонщика; всё сообщество сегодня — {g}/{gl}.', 'Free beta · {u}/{d} questions today · Ctrl+Enter to send': 'Бесплатная бета · {u}/{d} вопросов сегодня · Ctrl+Enter — отправить', 'AI coach · usage and cost': 'AI-тренер · использование и расход',
   '#14, wet, new tyres': '#14, мокро, новая резина',
   'GPS does not match any track in Hutka yet — add it below (name, city), or keep the session private without a track.': 'GPS не совпал ни с одной трассой в Hutka — добавьте её ниже (название, город) или оставьте сессию приватной без трассы.',
   // v23: sideways lab, community tracks, karts, votes
@@ -2719,7 +2751,7 @@ const STORE = (() => {
   function sessionMeta(sess) {
     const clean = sess.laps.filter(L => L.clean), best = sess.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a), avg = clean.length ? clean.reduce((s, L) => s + L.timeMs, 0) / clean.length : best.timeMs;
     let la = 0, lo = 0, n = 0; for (const L of clean.length ? clean : sess.laps) for (let i = 0; i < L.pts.length; i += 5) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
-    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', kart: sess.kart || '', kartClass: sess.kartClass || (sess.kart ? 'rental' : ''), nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
+    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', kart: sess.kart || '', kartClass: sess.kartClass || (sess.kart ? 'rental' : ''), format: sess.format || '', pos: +sess.pos || 0, drivers: +sess.drivers || 0, nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
   }
 
   // ===== backend: claude.ai artifact (db + user capabilities) =====
@@ -2991,12 +3023,14 @@ const STORE = (() => {
   async function ask(o) {
     const r = await fnCall('ask', { chat_id: o.chatId || undefined, session_id: o.sessionId || undefined, track_id: o.trackId || undefined, layout_id: o.layoutId || undefined, title: o.title || undefined, system: o.system || '', text: o.text, lang: I18N.lang }, { signal: o.signal });
     if (!r.ok) throw await errOf(r);
-    const chatId = Number(r.headers.get('x-chat-id')) || o.chatId || null, credits = r.headers.get('x-credits'), plan = r.headers.get('x-plan');
+    const chatId = Number(r.headers.get('x-chat-id')) || o.chatId || null, credits = r.headers.get('x-credits'), plan = r.headers.get('x-plan'), usedDay = r.headers.get('x-used-day'), limitDay = r.headers.get('x-limit-day');
     const reader = r.body.getReader(), dec = new TextDecoder(); let buf = '', text = '';
     while (true) { const { value, done } = await reader.read(); if (done) break; buf += dec.decode(value, { stream: true }); let i; while ((i = buf.indexOf('\n')) >= 0) { const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1); if (!line.startsWith('data:')) continue; try { const ev = JSON.parse(line.slice(5).trim()); if (ev.type === 'content_block_delta' && ev.delta && ev.delta.text) { text += ev.delta.text; if (o.onText) o.onText(text); } if (ev.type === 'error') { const e = new Error(ev.error && ev.error.message || 'error'); e.code = 'error'; e.text = text; throw e; } } catch (e) { if (e.code) throw e; } } }
     walletCache = null;
-    return { text, chatId, credits: credits !== null ? Number(credits) : null, plan };
+    return { text, chatId, credits: credits ? Number(credits) : null, plan, usedDay: usedDay ? Number(usedDay) : null, limitDay: limitDay ? Number(limitDay) : null };
   }
+  // admin: what the coach costs — per day and per driver (the SQL functions return nothing for non-admins)
+  async function aiUsage(days) { if (!aiCfg() || !me.canEdit) return null; try { const [d, u] = await Promise.all([adapter.sb.rpc('ai_usage', { days: days || 30 }), adapter.sb.rpc('ai_usage_by_user', { days: days || 30 })]); if (d.error) return null; return { days: d.data || [], users: (u.data || []) }; } catch (e) { return null; } }
   async function checkout(kind) { const r = await fnCall('stripe-checkout', { kind, return_url: location.origin + location.pathname }); if (!r.ok) throw await errOf(r); return r.json(); }
   async function portal() { const r = await fnCall('stripe-portal', {}); if (!r.ok) throw await errOf(r); return r.json(); }
 
@@ -3009,7 +3043,7 @@ const STORE = (() => {
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid,
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
-    get aiOn() { return !!aiCfg(); }, wallet, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal };
+    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
 // optional model line, and (for the admin editor) the traced control points. Pan, smooth zoom, rotation, hover and click. ----------
@@ -3036,6 +3070,46 @@ function createMapView(canvas, host) {
   function zoomAt(f, cx, cy) { V.ts = clamp((V.ts || V.s) * f, 0.03, 60); V.anchor = [cx, cy]; V.auto = false; if (zoomAnim) return; zoomAnim = true; const step = () => { let busy = false; if (V.anchor && V.ts !== undefined) { const d = V.ts / V.s; if (Math.abs(Math.log(d)) < 0.003) { const ff = V.ts / V.s, [ax, ay] = V.anchor; V.tx = ax - (ax - V.tx) * ff; V.ty = ay - (ay - V.ty) * ff; V.s = V.ts; V.anchor = null; } else { const ns = V.s * Math.pow(d, 0.3), ff = ns / V.s, [ax, ay] = V.anchor; V.tx = ax - (ax - V.tx) * ff; V.ty = ay - (ay - V.ty) * ff; V.s = ns; busy = true; } } draw(); if (busy) requestAnimationFrame(step); else zoomAnim = false; }; requestAnimationFrame(step); }
   function rotateBy(dRot) { const { w, h } = setup(), cx = w / 2, cy = h / 2, [px, py] = toI(cx, cy); V.rot += dRot; const c = Math.cos(V.rot), si = Math.sin(V.rot); V.tx = cx - V.s * (c * px - si * py); V.ty = cy - V.s * (si * px + c * py); V.auto = false; draw(); }
   function zoomCenter(f) { const { w, h } = setup(); zoomAt(f, w / 2, h / 2); }
+  // ----- satellite tiles under a Web-Mercator frame (the GPS layouts are built at zoom 19, so tiles line up by construction) -----
+  const tiles = new Map(); let tileFails = 0;
+  function tileUrl(TL, z, x, y) { return String(TL.url || 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').replace('{z}', z).replace('{x}', x).replace('{y}', y); }
+  function tile(TL, z, x, y) {
+    const k = `${z}/${x}/${y}`; let e = tiles.get(k); if (e) return e;
+    if (tiles.size > 600) { let n = 0; for (const kk of tiles.keys()) { tiles.delete(kk); if (++n > 200) break; } }
+    e = { img: null, ok: false, err: false }; tiles.set(k, e);
+    const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async';
+    im.onload = () => { e.ok = true; e.img = im; draw(); };
+    im.onerror = () => { e.err = true; tileFails++; if (host.onTileError) host.onTileError(tileFails); draw(); };
+    im.src = tileUrl(TL, z, x, y); return e;
+  }
+  function drawTiles(ctx, w, h, TL) {
+    const M0 = TL.merc, sc = V.s; if (!M0) return;
+    // visible frame rectangle (frame px = mercator px at M0.z minus the origin, shifted by the alignment offset)
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const [px, py] of [[0, 0], [w, 0], [w, h], [0, h]]) { const [x, y] = toI(px, py); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    const z = Math.max(12, Math.min(TL.maxZoom || 20, M0.z + Math.round(Math.log2(Math.max(0.01, sc * dpr)))));
+    const f = Math.pow(2, M0.z - z);   // frame px per tile px at zoom z
+    const dx = TL.dx || 0, dy = TL.dy || 0;
+    const ox = M0.x0 - dx, oy = M0.y0 - dy;   // tile → frame: frame = merc/f*... see below
+    const size = 256 * f;
+    const tx0 = Math.floor((x0 + ox) / size), tx1 = Math.floor((x1 + ox) / size), ty0 = Math.floor((y0 + oy) / size), ty1 = Math.floor((y1 + oy) / size);
+    if ((tx1 - tx0 + 1) * (ty1 - ty0 + 1) > 120) return;
+    ctx.save(); ctx.translate(V.tx, V.ty); ctx.rotate(V.rot); ctx.scale(sc, sc); ctx.globalAlpha = TL.alpha === undefined ? 1 : TL.alpha;
+    const n = Math.pow(2, z);
+    for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
+      if (ty < 0 || ty >= n) continue; const txw = ((tx % n) + n) % n;
+      const fx = tx * size - ox, fy = ty * size - oy;
+      let e = tile(TL, z, txw, ty), drawn = false;
+      if (e.ok) { ctx.drawImage(e.img, fx, fy, size + 0.5, size + 0.5); drawn = true; }
+      else if (z > M0.z - 3) {   // not there yet (or missing at this zoom): the parent tile, scaled
+        for (let up = 1; up <= 3 && !drawn; up++) { const pz = z - up, pf = Math.pow(2, up); const pe = tiles.get(`${pz}/${Math.floor(txw / pf)}/${Math.floor(ty / pf)}`) || (e.err ? tile(TL, pz, Math.floor(txw / pf), Math.floor(ty / pf)) : null); if (pe && pe.ok) { const sx = (txw % pf) * 256 / pf, sy = (ty % pf) * 256 / pf; ctx.drawImage(pe.img, sx, sy, 256 / pf, 256 / pf, fx, fy, size + 0.5, size + 0.5); drawn = true; } }
+      }
+      if (!drawn) { ctx.fillStyle = 'rgba(40,48,60,0.35)'; ctx.fillRect(fx, fy, size + 0.5, size + 0.5); }
+    }
+    ctx.restore();
+    if (TL.attribution) { ctx.font = `10px ${tokens().body}`; const tw = ctx.measureText(TL.attribution).width + 10; ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, h - 15, tw, 15); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left'; ctx.fillText(TL.attribution, 5, h - 4); }
+  }
   let drawReq = false;
   function draw() { if (drawReq) return; drawReq = true; requestAnimationFrame(() => { drawReq = false; paint(); if (host.afterDraw) host.afterDraw(); }); }
   function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
@@ -3046,9 +3120,11 @@ function createMapView(canvas, host) {
     const rc = Math.cos(V.rot), rs = Math.sin(V.rot), RN = (nx, ny) => [rc * nx - rs * ny, rs * nx + rc * ny];
     const tr = host.getTrack ? host.getTrack() : null, mpp = tr ? tr.mpp : null, widthM = host.getWidthM ? host.getWidthM() : 8, im = host.getImage ? host.getImage() : null;
     ctx.fillStyle = C.surface2; ctx.fillRect(0, 0, w, h);
-    const photo = !!(im && im.photo);
+    const TL = host.getTiles ? host.getTiles() : null, tilesOn = !!(TL && TL.on && TL.merc);
+    if (tilesOn) drawTiles(ctx, w, h, TL);
+    const photo = !!(im && im.photo) || tilesOn;
     if (im && im.src) { ctx.save(); ctx.translate(V.tx, V.ty); ctx.rotate(V.rot); ctx.scale(sc, sc); ctx.translate(im.x || 0, im.y || 0); ctx.rotate(im.rot || 0); ctx.globalAlpha = im.alpha === undefined ? 1 : im.alpha; ctx.drawImage(im.src, 0, 0, im.w, im.h); ctx.restore(); }
-    else {
+    else if (!tilesOn) {
       const stepPx = mpp ? 10 / mpp : 100, major = 5; let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
       for (const [px, py] of [[0, 0], [w, 0], [w, h], [0, h]]) { const [x, y] = toI(px, py); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
       ctx.save(); ctx.translate(V.tx, V.ty); ctx.rotate(V.rot); ctx.scale(sc, sc); ctx.lineWidth = 1 / sc;
@@ -3208,11 +3284,12 @@ function createMapView(canvas, host) {
     const [sx, sy] = getPos(e); canvas.setPointerCapture(e.pointerId);
     M.ptrs.set(e.pointerId, [sx, sy]);
     if (M.ptrs.size === 2) { const [a, b] = [...M.ptrs.values()]; M.pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx: (a[0] + b[0]) / 2, my: (a[1] + b[1]) / 2 }; M.panning = null; M.tap = null; canvas.classList.remove('panning'); return; }
-    if (e.pointerType === 'touch') { M.tap = { x: sx, y: sy, t: Date.now() }; if (M.touchFree && M.tool === 'pan') { M.panning = { x: sx, y: sy, tx: V.tx, ty: V.ty, sx, sy, moved: false }; } return; }
+    if (e.pointerType === 'touch') { M.tap = { x: sx, y: sy, t: Date.now() }; if (M.tool === 'sat') { const [ix, iy] = toI(sx, sy); M.satDrag = { ix, iy }; return; } if (M.touchFree && M.tool === 'pan') { M.panning = { x: sx, y: sy, tx: V.tx, ty: V.ty, sx, sy, moved: false }; } return; }
     const panMode = M.tool === 'pan' || e.button === 1 || M.spaceDown;
     if (panMode) { M.panning = { x: sx, y: sy, tx: V.tx, ty: V.ty, sx, sy, moved: false }; canvas.classList.add('panning'); return; }
     if (e.button === 2) return;
     if (M.tool === 'photo') { const [ix, iy] = toI(sx, sy); M.photoDrag = { ix, iy }; canvas.classList.add('panning'); return; }
+    if (M.tool === 'sat') { const [ix, iy] = toI(sx, sy); M.satDrag = { ix, iy }; canvas.classList.add('panning'); return; }
     if (M.tool === 'seed') { const [ix, iy] = toI(sx, sy); if (host.onSeed) host.onSeed(ix, iy); return; }
     if (M.tool === 'corner') { if (host.onCorner) host.onCorner(sx, sy, false); return; }
     if (M.tool === 'start') { const tr = host.getTrack ? host.getTrack() : null; if (!tr || !host.onStart) return; let best = 0, bd = Infinity; for (let j = 0; j < tr.N; j++) { const [x, y] = toS(tr.raw[j].x, tr.raw[j].y), d = Math.hypot(x - sx, y - sy); if (d < bd) { bd = d; best = j; } } host.onStart(best / tr.N); return; }
@@ -3226,14 +3303,16 @@ function createMapView(canvas, host) {
     const [sx, sy] = getPos(e);
     if (M.ptrs.has(e.pointerId)) M.ptrs.set(e.pointerId, [sx, sy]);
     if (M.pinch) { if (M.ptrs.size < 2) return; const [a, b] = [...M.ptrs.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2; zoomAt(d / M.pinch.d, mx, my); V.tx += mx - M.pinch.mx; V.ty += my - M.pinch.my; M.pinch = { d, mx, my }; V.auto = false; draw(); return; }
-    if (e.pointerType === 'touch' && !M.panning && M.dragIdx < 0 && !M.photoDrag) return;
+    if (e.pointerType === 'touch' && !M.panning && M.dragIdx < 0 && !M.photoDrag && !M.satDrag) return;
     if (M.panning) { V.tx = M.panning.tx + sx - M.panning.x; V.ty = M.panning.ty + sy - M.panning.y; if (Math.hypot(sx - M.panning.sx, sy - M.panning.sy) > 4) M.panning.moved = true; V.auto = false; draw(); return; }
     if (M.photoDrag) { const [ix, iy] = toI(sx, sy); if (host.onPhotoMove) host.onPhotoMove(ix - M.photoDrag.ix, iy - M.photoDrag.iy); M.photoDrag = { ix, iy }; draw(); return; }
+    if (M.satDrag) { const [ix, iy] = toI(sx, sy); if (host.onSatMove) host.onSatMove(ix - M.satDrag.ix, iy - M.satDrag.iy); M.satDrag = { ix, iy }; draw(); return; }
     if (M.dragIdx >= 0) { const [ix, iy] = toI(sx, sy); if (host.onPointDrag) host.onPointDrag(M.dragIdx, ix, iy); draw(); return; }
     const i = nearestLineIdx(sx, sy); if (i !== M.hoverIdx) { M.hoverIdx = i; if (host.onHover) host.onHover(i); draw(); }
   });
   const endDrag = (e) => {
     if (e) { M.ptrs.delete(e.pointerId); if (M.ptrs.size < 2) M.pinch = null; }
+    if (M.satDrag) { M.satDrag = null; M.tap = null; canvas.classList.remove('panning'); if (host.onSatDone) host.onSatDone(); return; }
     if (e && e.type === 'pointerup' && e.pointerType === 'touch' && M.tap && Date.now() - M.tap.t < 400) { const [sx, sy] = getPos(e); const moved = M.panning && M.panning.moved; M.panning = null; canvas.classList.remove('panning'); if (!moved && Math.hypot(sx - M.tap.x, sy - M.tap.y) < 12 && host.onClick) { const b = badgeAt(sx, sy); const i = b ? b.w.apex : nearestLineIdx(sx, sy); if (host.onHover) host.onHover(i); host.onClick(i, b); } M.tap = null; return; }
     if (e && e.pointerType === 'touch' && M.panning) { M.panning = null; canvas.classList.remove('panning'); M.tap = null; return; }
     M.tap = null;
@@ -3245,7 +3324,7 @@ function createMapView(canvas, host) {
   canvas.addEventListener('pointerleave', () => { if (M.hoverIdx >= 0 && M.dragIdx < 0) { M.hoverIdx = -1; if (host.onHover) host.onHover(-1); draw(); } });
   canvas.addEventListener('wheel', (e) => { e.preventDefault(); const [sx, sy] = getPos(e); if (M.tool === 'photo' && host.onPhotoScale) { const [ix, iy] = toI(sx, sy); host.onPhotoScale(Math.exp(-e.deltaY * 0.0012), ix, iy); draw(); return; } zoomAt(Math.exp(-e.deltaY * 0.0012), sx, sy); }, { passive: false });
   canvas.addEventListener('contextmenu', (e) => { e.preventDefault(); const [sx, sy] = getPos(e); if (M.tool === 'corner') { if (host.onCorner) host.onCorner(sx, sy, true); return; } const hit = hitPoint(sx, sy); if (hit >= 0 && host.onPointDel) { host.onPointDel(hit); M.selIdx = -1; } });
-  function setTool(tl) { M.tool = tl; canvas.className = tl === 'pan' ? '' : (tl === 'trace' ? 'edit' : 'pick'); draw(); }
+  function setTool(tl) { M.tool = tl; canvas.className = tl === 'pan' ? '' : (tl === 'trace' ? 'edit' : 'pick'); canvas.style.touchAction = tl === 'sat' ? 'none' : (M.touchFree ? 'none' : (coarse ? 'pan-y' : 'none')); draw(); }
   function setHover(i) { if (i !== M.hoverIdx) { M.hoverIdx = i; draw(); } }
   // fly to a window of the track (stations a … a+len, with padM metres of context on both sides), keeping the rotation
   let fly = null;
@@ -3313,6 +3392,28 @@ async function imageToDataUrl(file, maxDim, maxChars, png) {
   return out;
 }
 const loadImg = (src) => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+// satellite imagery under a GPS layout: the frame is Web Mercator (zoom 19), so tiles line up by construction; a layout may carry a small alignment offset in metres
+const SAT = {
+  available: null,   // null = not probed yet, false = tiles cannot load here (offline, blocked)
+  cfg() { const c = window.HUTKA_CONFIG || {}; return { url: c.satTiles || '', attribution: c.satAttribution || 'Imagery © Esri, Maxar, Earthstar Geographics', maxZoom: +c.satMaxZoom || 20 }; },
+  can(G) { return !!(G && G.frame && G.frame.merc && G.track && SAT.available !== false); },
+  layer(G, on, sat) { if (!SAT.can(G)) return null; const mpp = G.track.mpp || 1, o = sat || G.sat || { dx: 0, dy: 0 }; return Object.assign({ on: !!on, merc: G.frame.merc, dx: (+o.dx || 0) / mpp, dy: -(+o.dy || 0) / mpp }, SAT.cfg()); },
+  pref() { try { const v = localStorage.getItem('hutka.sat'); return v === null ? true : v === '1'; } catch (e) { return true; } },
+  setPref(on) { try { localStorage.setItem('hutka.sat', on ? '1' : '0'); } catch (e) {} },
+  // one small tile from the middle of the layout tells whether imagery loads at all on this page (the claude.ai artifact sandbox blocks it)
+  probe(G) {
+    if (SAT.available !== null) return Promise.resolve(SAT.available); if (!G || !G.frame || !G.frame.merc) return Promise.resolve(false);
+    const m = G.frame.merc, z = 16, f = Math.pow(2, m.z - z), x = Math.floor((m.x0 + (G.W || 0) / 2) / (256 * f)), y = Math.floor((m.y0 + (G.H || 0) / 2) / (256 * f));
+    const url = String(SAT.cfg().url || 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').replace('{z}', z).replace('{x}', x).replace('{y}', y);
+    return new Promise((res) => { const im = new Image(); im.crossOrigin = 'anonymous'; const done = (ok) => { if (SAT.available === null) SAT.available = ok; res(SAT.available); }; im.onload = () => done(true); im.onerror = () => done(false); setTimeout(() => done(false), 8000); im.src = url; });
+  }
+};
+// session formats (optional): what kind of session it was, and the result if it was a race
+const FORMATS = [['', '—'], ['practice', 'Practice'], ['qualifying', 'Qualifying'], ['sprint', 'Sprint'], ['race', 'Race'], ['ironman', 'Ironman'], ['endurance', 'Endurance'], ['other', 'Other']];
+const formatName = (k) => { const f = FORMATS.find(x => x[0] === k); return f && f[0] ? t(f[1]) : ''; };
+function fillFormats(sel, v) { fillSelect(sel, FORMATS.map(([k, n]) => [k, k ? t(n) : n]), v || ''); }
+// "Ironman · P3 / 50" — from the fields, or from the linked SWS result
+function resultText(m) { if (!m) return ''; if (m.sws && (m.sws.race || m.sws.pos)) return [m.sws.race, m.sws.pos ? 'P' + String(m.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · '); const bits = []; if (m.format) bits.push(formatName(m.format)); if (m.pos) bits.push('P' + m.pos + (m.drivers ? ' / ' + m.drivers : '')); else if (m.drivers) bits.push(t('{n} drivers', { n: m.drivers })); return bits.join(' · '); }
 // kart classes: rental karts are the default world; sport karts (Rotax, X30, KZ…) are compared only with each other
 const kartClassOf = (m) => (m && m.kartClass) || 'rental';
 const kartClassName = (cls) => cls === 'sport' ? t('sport kart') : t('rental kart');
@@ -3438,6 +3539,7 @@ const GEOM = (() => {
       }
       if (!done) { const g = DATA.gpsLayout(refSess.laps, 600, F); if (!g) return null; F.T = g.T; F.merc = g.merc; const tr = KLL.buildTrack(g.pts, g.lengthM, 0, false); if (!(isFinite(tr.mpp) && tr.mpp > 0)) return null; G.track = tr; G.W = g.W; G.H = g.H; G.source = 'gps'; G.lengthM = g.lengthM; G.image = { src: lapsCanvas(laps, g), w: g.W, h: g.H, alpha: 1 }; }
       G.frame = F; DATA.lapPx(refSess, F.T); for (const L of refSess.laps) delete L._proj; refSess._attached = G.rev;
+      G.sat = layout && layout.sat ? { dx: +layout.sat.dx || 0, dy: +layout.sat.dy || 0 } : { dx: 0, dy: 0 };
       if (layout && layout.aerial && F.merc) { const src = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/aerial`); if (src) { try { const im = await loadImg(src); G.aerial = Object.assign({}, layout.aerial, { src: im }); } catch (e) {} } }
     } else { const tr = traceTrack(trace, trace.lengthM); if (!tr) return null; G.track = tr; G.W = trace.w || 1600; G.H = trace.h || 1000; G.source = 'trace'; G.frame = null; const img = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/trace`); if (img) { try { const im = await loadImg(img); G.image = { src: im, w: im.naturalWidth, h: im.naturalHeight, alpha: 1 }; } catch (e) {} } }
     cache.set(key, G); return G;
@@ -3492,10 +3594,11 @@ async function renderTracksPage() {
   const near = $('nearList'); near.innerHTML = '';
   if (home) { $('nearTitle').textContent = t('Tracks near {name}', { name: home.name }); $('nearHint').textContent = ''; for (const x of withD.filter(x => x.d !== null).sort((a, b) => a.d - b.d).slice(0, 4)) near.appendChild(trackRow(x.tr, x.d)); }
   else { $('nearTitle').textContent = t('Tracks near you'); $('nearHint').textContent = t('Set your home track in the profile to see distances.'); }
-  const all = $('allList'); all.innerHTML = ''; $('allCount').textContent = trs.length ? `· ${trs.length}` : '';
+  // the catalogue: by country, with a search box (the list can hold hundreds of tracks once countries are imported)
+  { const ccs = [...new Set(trs.map(tr => tr.country).filter(Boolean))].sort((a, b) => countryName(a).localeCompare(countryName(b))); const cur = $('allCountry').value; fillSelect($('allCountry'), [['', t('All countries') + (trs.length ? ` · ${trs.length}` : '')]].concat(ccs.map(cc => [cc, `${flag(cc)} ${countryName(cc)} · ${trs.filter(tr => tr.country === cc).length}`])), cur || (home && home.country && ccs.includes(home.country) ? home.country : '')); }
   const sorted = home ? withD.sort((a, b) => (a.d === null) - (b.d === null) || (a.d || 0) - (b.d || 0)) : withD.sort((a, b) => (a.tr.country || '').localeCompare(b.tr.country || '') || a.tr.name.localeCompare(b.tr.name));
-  for (const x of sorted) all.appendChild(trackRow(x.tr, x.d));
-  if (!trs.length) all.appendChild(el('div', 'hint', STORE.hasDb ? t('No tracks yet.') : t('Tracks appear here once you are signed in.')));
+  const renderAll = () => { const all = $('allList'); all.innerHTML = ''; const cc = $('allCountry').value, q = $('allSearch').value.trim().toLowerCase(); const list = sorted.filter(x => (!cc || x.tr.country === cc) && (!q || [x.tr.name, x.tr.city].join(' ').toLowerCase().includes(q))); $('allCount').textContent = list.length ? `· ${list.length}` : ''; for (const x of list.slice(0, 400)) all.appendChild(trackRow(x.tr, x.d)); if (!trs.length) all.appendChild(el('div', 'hint', STORE.hasDb ? t('No tracks yet.') : t('Tracks appear here once you are signed in.'))); else if (!list.length) all.appendChild(el('div', 'hint', t('Nothing found'))); };
+  $('allCountry').onchange = renderAll; $('allSearch').oninput = renderAll; $('allSearch').placeholder = t('Search'); renderAll();
 }
 // a generated cover: the layout's shape from a published session on a brand gradient (until the track has a real photo)
 function drawCoverShape(cv, pv, name) {
@@ -3613,10 +3716,11 @@ async function renderLayoutPage(tid, lid) {
   { const src = l.photo ? await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/photo`) : null; $('lPhotoCard').hidden = !src; if (src) $('lPhoto').src = src; }
   if (!LP.map) {
     LP.map = createMapView($('lmap'), { height: (w) => Math.round(clamp(w * 0.72, 380, 760)), getTrack: () => LP.G ? LP.G.track : null, getWidthM: () => LP.G ? LP.G.widthM : 8, getFrameSize: () => LP.G ? [LP.G.W, LP.G.H] : null,
-      getImage: () => LP.G ? LP.G.image : null,
+      getImage: () => LP.G ? LP.G.image : null, getTiles: () => SAT.layer(LP.G, LP.tiles),
       getOverlay: () => ({ D: LP.D, role: 'ref', hiRow: lpActiveRow(), band: true, ticks: true, labelsAll: false, model: null, modelOn: false, showApexes: !LP.D, apexes: LP.G && !LP.D ? GEOM.apexes(LP.G, null) : null, wins: LP.wins }),
       onHover: (i) => { LP.hover = i; lpInspector(); }, onClick: (i, b) => { const row = b || (i >= 0 ? lpCornerAt(i) : null); LP.sel = row ? (LP.sel === row.w.n ? 0 : row.w.n) : 0; lpInspector(); LP.map.draw(); } });
     $('lRotL').onclick = () => LP.map.rotateBy(-Math.PI / 12); $('lRotR').onclick = () => LP.map.rotateBy(Math.PI / 12);
+    LP.tiles = SAT.pref(); $('lTiles').onclick = () => { LP.tiles = !LP.tiles; SAT.setPref(LP.tiles); $('lTiles').classList.toggle('active', LP.tiles); LP.map.draw(); };
     $('lZoomIn').onclick = () => LP.map.zoomCenter(1.3); $('lZoomOut').onclick = () => LP.map.zoomCenter(1 / 1.3); $('lZoomFit').onclick = () => { LP.map.fit(); LP.map.draw(); };
     window.addEventListener('resize', () => { if (APP.route === 'layout' && LP.map) { if (LP.map.V.auto) LP.map.fit(true); LP.map.draw(); } });
   }
@@ -3633,6 +3737,7 @@ async function renderLayoutPage(tid, lid) {
     }
     $('lMapTitle').hidden = !LP.D; if (LP.D) { $('lMapTitle').className = 'map-title ref'; $('lMapTitle').textContent = t('Fastest published lap · {t} · {who}', { t: fmtMs(LP.bestL.timeMs), who: (LP.names[LP.bestL._sess.owner] || {}).name || t('Driver') }); }
   }
+  { const sat = SAT.can(G); $('lTiles').hidden = !sat; $('lTiles').classList.toggle('active', sat && LP.tiles); if (sat && LP.tiles && SAT.available === null) SAT.probe(G).then(ok => { if (!ok) { $('lTiles').hidden = true; LP.map.draw(); } }); }
   LP.map.fit(); LP.map.draw(); lpInspector(); lpGuide(l); lpSessions(tid, lid, l, pubs);
 }
 function lpCornerAt(i) { const D = LP.D; if (!D || i < 0) return null; const N = LP.G.track.N; return D.rows.find(r => ((i - r.w.a) % N + N) % N < r.w.len) || null; }
@@ -3662,7 +3767,7 @@ async function lpSessions(tid, lid, l, pubs) {
   if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); e.appendChild(el('div', 't', t('No sessions yet'))); e.appendChild(el('div', '', t('Upload your session and publish it — it becomes the reference others compare with.'))); const b = el('button', 'btn primary', t('Upload my session')); b.type = 'button'; b.onclick = () => UPLOAD.open({ track: tid, layout: lid }); e.appendChild(b); box.appendChild(e); return; }
   const names = await STORE.names(pubs.map(s => s.owner)), counts = await STORE.socialCounts(pubs.map(s => s.id)), low = (s) => STORE.lowRated(counts[s.id]);
   const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Driver')}</th><th>${t('Session')}</th><th>${t('Kart')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th></th></tr></thead>`; const body = el('tbody');
-  for (const s of pubs.slice().sort((a, b) => low(a) - low(b) || (kartClassOf(a) === 'sport') - (kartClassOf(b) === 'sport') || a.bestMs - b.bestMs)) { const r = el('tr'); if (low(s)) r.style.opacity = '.6'; r.innerHTML = `<td class="drv" style="font-weight:600">${driverLink(s.owner, names)}</td><td>${esc(s.label || s.name)}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}${low(s) ? ` <span class="soon">${t('rated not helpful')}</span>` : ''}${counts[s.id] && (counts[s.id].likes || counts[s.id].down) ? ` <span class="hint">👍 ${counts[s.id].likes} 👎 ${counts[s.id].down}</span>` : ''}</td><td>${esc(kartLabel(s))}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${s.id}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
+  for (const s of pubs.slice().sort((a, b) => low(a) - low(b) || (kartClassOf(a) === 'sport') - (kartClassOf(b) === 'sport') || a.bestMs - b.bestMs)) { const r = el('tr'); if (low(s)) r.style.opacity = '.6'; r.innerHTML = `<td class="drv" style="font-weight:600">${driverLink(s.owner, names)}</td><td>${esc(s.label || s.name)}${resultText(s) ? ` <span class="pill">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}${low(s) ? ` <span class="soon">${t('rated not helpful')}</span>` : ''}${counts[s.id] && (counts[s.id].likes || counts[s.id].down) ? ` <span class="hint">👍 ${counts[s.id].likes} 👎 ${counts[s.id].down}</span>` : ''}</td><td>${esc(kartLabel(s))}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${s.id}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
   tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
 }
 const driverLink = (uid, names) => { const n = names && names[uid] ? names[uid].name : t('Driver'); return uid && uid !== 'local' ? `<a href="#driver~${esc(uid)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line-2)">${esc(n)}</a>` : esc(n); };
@@ -3703,7 +3808,7 @@ async function renderSessionsTable(box, pubs, subEl) {
 // One session is the reference; a comparison (another lap, the session average, or another session on the same layout) is optional.
 const LAB = {
   tid: '', lid: '', G: null, sessions: [], ref: null, cmp: 'none', mapLap: 'you', selN: 0, hoverIdx: -1, chat: [], dcmp: null, coach: null, map: null, loaded: false, social: null, pickerOpen: false,
-  opts: { band: false, ticks: true, labelsAll: false, aerial: true }
+  opts: { band: false, ticks: true, labelsAll: false, aerial: true, tiles: SAT.pref() }
 };
 const lapKey = (sess, L) => sess.id + '|' + L.n;
 const isAvgKey = (k) => String(k || '').startsWith('avg:');
@@ -3835,6 +3940,7 @@ function labEnsureMap() {
   if (LAB.map) return;
   LAB.map = createMapView($('map'), { height: labMapHeight, getTrack: () => LAB.G ? LAB.G.track : null, getWidthM: () => LAB.G ? LAB.G.widthM : 8, getFrameSize: () => LAB.G ? [LAB.G.W, LAB.G.H] : null,
     getImage: () => { if (!LAB.G) return null; const im = LAB.G.image; return im && LAB.G.source !== 'gps' ? im : (LAB.opts.aerial ? im : null); },
+    getTiles: () => SAT.layer(LAB.G, LAB.opts.tiles),
     getOverlay: () => ({ D: LAB.dcmp, role: LAB.mapLap === 'cmp' ? 'cmp' : 'ref', hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor }),
     onHover: (i) => { LAB.hoverIdx = i; showReadout(); renderInspector(); drawDataCharts(); },
     onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
@@ -3846,6 +3952,7 @@ function labEnsureMap() {
   $('zoomIn').onclick = () => LAB.map.zoomCenter(1.3); $('zoomOut').onclick = () => LAB.map.zoomCenter(1 / 1.3); $('zoomFit').onclick = () => { LAB.map.fit(); LAB.map.draw(); };
   $('optBand').onclick = () => { LAB.opts.band = !LAB.opts.band; syncOpts(); }; $('optTicks').onclick = () => { LAB.opts.ticks = !LAB.opts.ticks; syncOpts(); }; $('optLabels').onclick = () => { LAB.opts.labelsAll = !LAB.opts.labelsAll; syncOpts(); };
   $('tglSat').onclick = () => { LAB.opts.aerial = !LAB.opts.aerial; syncOpts(); };
+  $('tglTiles').onclick = () => { LAB.opts.tiles = !LAB.opts.tiles; SAT.setPref(LAB.opts.tiles); syncOpts(); };
   // full screen: map, charts, readout and the corner inspector on one screen
   const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); };
   $('lmMap').onclick = () => fsFallbackOn(true);
@@ -3880,7 +3987,10 @@ function labEnsureMap() {
   $('askBtn').onclick = askAI; $('askStop').onclick = () => { if (askCtl) askCtl.abort(); };
   $('askInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); askAI(); } });
 }
-function syncOpts() { $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))); LAB.map.draw(); }
+function syncOpts() {
+  const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles);
+  if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; LAB.map.draw(); } });
+  $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))); LAB.map.draw(); }
 function selectCorner(n, scroll) { LAB.selN = (LAB.selN === n) ? 0 : n; afterSelect(true); if (scroll && LAB.selN && !isLand()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 
 // ----- the start screen: my sessions and what the drivers I follow have published -----
@@ -3957,6 +4067,7 @@ function labRender() {
   if (D.O) chip(t('comparison'), fmtLap(D.O.T) + ' · ' + sg(D.total));
   if (sess.source && sess.source.app !== 'alfano') chip(t('source'), sourceLabel(sess.source));
   if (sess.kart || sess.kartClass === 'sport') chip(t('kart'), kartLabel(sess));
+  if (!sess.sws && resultText(sess)) chip(t('session'), resultText(sess));
   if (sess.sws) chip('SWS', [sess.sws.race, sess.sws.pos ? 'P' + String(sess.sws.pos).replace(/^P/i, '') : '', sess.sws.best].filter(Boolean).join(' · '));
   if (LAB.coach) { const res = D.rows.reduce((s, r) => { const c = LAB.coach.corners.find(x => x.n === r.w.n); return s + (c ? Math.max(0, r.R.time - c.tTop) : 0); }, 0); chip(t('reserve'), res.toFixed(2) + ' ' + t('s')); }
   $('fsLbl').textContent = $('lapLbl').textContent; $('fsBig').textContent = $('lapBig').textContent; $('fsChips').innerHTML = chips.innerHTML;
@@ -4124,7 +4235,7 @@ function renderDigest() {
     const linked = (r) => { const c = r.combo || r.comboPrev; if (!c) return ''; const on = c.n; return c.net <= -0.04 && r.cmp.dt >= 0.04 ? ' — ' + t('linked with {t}, net gain', { t: tref(on) }) : (c.net >= 0.04 && r.cmp.dt <= -0.04 ? ' — ' + t('linked with {t}, net loss', { t: tref(on) }) : ''); };
     if (gains.length) tx += ' ' + t('The gain comes in {list}.', { list: gains.slice(0, 4).map(r => `${tref(r.w.n)} (${(-r.cmp.dt).toFixed(2)} ${t('s')} — ${esc(reason(r))}${linked(r)})`).join(', ') });
     if (losses.length) tx += ' ' + t('It loses in {list}.', { list: losses.slice(0, 4).map(r => `${tref(r.w.n)} (${r.cmp.dt.toFixed(2)} ${t('s')} — ${esc(reason(r))}${linked(r)})`).join(', ') }); else tx += ' ' + t('It loses nowhere noticeably.');
-    const pairs = rows.filter(r => r.combo).sort((p, q) => Math.abs(q.combo.net) - Math.abs(p.combo.net)).slice(0, 3).map(r => r.combo.net <= -0.04 ? t('T{a}–T{b}: {net} s in your favour', { a: r.w.n, b: r.combo.n, net: (-r.combo.net).toFixed(2) }) : (r.combo.net >= 0.04 ? t('T{a}–T{b}: {net} s against you', { a: r.w.n, b: r.combo.n, net: r.combo.net.toFixed(2) }) : t('T{a}–T{b}: even', { a: r.w.n, b: r.combo.n })));
+    const pairs = rows.filter(r => r.combo).sort((p, q) => Math.abs(q.combo.net) - Math.abs(p.combo.net)).slice(0, 3).map(r => r.combo.net <= -0.04 ? (D.ref.mine ? t('T{a}–T{b}: {net} s in your favour', { a: r.w.n, b: r.combo.n, net: (-r.combo.net).toFixed(2) }) : t('T{a}–T{b}: {net} s for the reference lap', { a: r.w.n, b: r.combo.n, net: (-r.combo.net).toFixed(2) })) : (r.combo.net >= 0.04 ? (D.ref.mine ? t('T{a}–T{b}: {net} s against you', { a: r.w.n, b: r.combo.n, net: r.combo.net.toFixed(2) }) : t('T{a}–T{b}: {net} s against the reference lap', { a: r.w.n, b: r.combo.n, net: r.combo.net.toFixed(2) })) : t('T{a}–T{b}: even', { a: r.w.n, b: r.combo.n })));
     if (pairs.length) tx += ' ' + t('Linked corners (an earlier brake that buys the next corner, or the opposite) are judged as pairs: {list}.', { list: pairs.join('; ') });
     P.push(tx + '</p>');
   }
@@ -4191,7 +4302,7 @@ function renderInspector() {
   html += row(t('lateral'), `${R.gmax.toFixed(2)} g`, O ? `${O.gmax.toFixed(2)} g` : '');
   html += row(t('time'), `${R.time.toFixed(2)} ${t('s')}`, O ? `${O.time.toFixed(2)} ${t('s')}` : '') + '</table>';
   if (O) { const pl = plainCorner(r, oName, refLabel); html += `<div class="insp-text"><div class="lbl">${t('In plain words')}</div>${esc(pl.what)}${pl.advice ? `<br><b>${esc(pl.advice)}</b>` : ''}</div>`; }
-  if (coach) { const res = R.time - coach.tTop; html += `<div class="insp-text"><div class="lbl">${t('Coach · best passes through this corner')}</div>${esc(DATA.coachText(coach))}${res > 0.03 ? ` <b>${t('Your reserve here ≈ {t} s.', { t: res.toFixed(2) })}</b>` : ' ' + t('You are among the best here.')}</div>`; }
+  if (coach) { const res = R.time - coach.tTop; html += `<div class="insp-text"><div class="lbl">${t('Coach · best passes through this corner')}</div>${esc(DATA.coachText(coach))}${res > 0.03 ? ` <b>${D.ref.mine ? t('Your reserve here ≈ {t} s.', { t: res.toFixed(2) }) : t('Reserve in this lap ≈ {t} s.', { t: res.toFixed(2) })}</b>` : ' ' + (D.ref.mine ? t('You are among the best here.') : t('This lap is among the best here.'))}</div>`; }
   html += `<canvas class="chart" id="inspChart" height="130"></canvas>`;
   body.innerHTML = html;
   drawDataMini($('inspChart'), r, D);
@@ -4284,7 +4395,7 @@ function renderAskState() {
   if (STORE.aiOn) {
     // hosted: the coach with memory; the thread is a chat tied to this session
     if (needSignIn) { note.textContent = t('Sign in to ask the coach about your session.'); input.disabled = true; btn.disabled = true; }
-    else { input.disabled = false; btn.disabled = false; STORE.wallet(false).then(w => { if (w.off) { note.innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('The AI coach is being connected.'))}`; input.disabled = true; btn.disabled = true; } else { note.innerHTML = (w.plan === 'pro' ? esc(t('Pro — unlimited questions.')) : esc(t('{n} credits left · one per answer', { n: w.credits }))) + (LAB.chatId ? ` · <a href="#ai~${LAB.chatId}">${esc(t('open this chat in the AI coach'))}</a>` : ` · <a href="#ai~new~${esc(LAB.current ? LAB.current.id : '')}">${esc(t('open in the AI coach'))}</a>`); } }); }
+    else { input.disabled = false; btn.disabled = false; STORE.wallet(false).then(w => { if (w.off) { note.innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('The AI coach is being connected.'))}`; input.disabled = true; btn.disabled = true; } else { note.innerHTML = (w.free ? esc(t('Free beta · {u}/{d} questions today', { u: w.used_day || 0, d: w.limit_day })) : (w.plan === 'pro' ? esc(t('Pro — unlimited questions.')) : esc(t('{n} credits left · one per answer', { n: w.credits })))) + (LAB.chatId ? ` · <a href="#ai~${LAB.chatId}">${esc(t('open this chat in the AI coach'))}</a>` : ` · <a href="#ai~new~${esc(LAB.current ? LAB.current.id : '')}">${esc(t('open in the AI coach'))}</a>`); } }); }
     input.placeholder = t('Ask the coach about this session… (Ctrl+Enter to send)');
     const chips = $('askChips'); chips.innerHTML = '';
     for (const q of [t('What is the main thing to fix in this session?'), t('Where do I lose the most and why?'), t('Which three corners would give the most time?'), t('Compare me with the fastest published lap here')]) { const c = el('span', 'chip q', q); c.onclick = () => { $('askInput').value = q; askAI(); }; chips.appendChild(c); }
@@ -4338,7 +4449,7 @@ async function askCoachInline() {
     const code = e && e.code; if (e && e.text) LAB.chat.push({ role: 'assistant', content: e.text }); else LAB.chat.pop();
     if (code === 'no_credits') { toast(t('No credits left — get a pack or Pro.')); if (typeof openPay === 'function') { await renderWallet(true); openPay(); } }
     else if (code === 'sign_in') AUTH.open();
-    else if (code === 'rate_limited') toast(t('Too many questions in an hour — take a break and try again.'));
+    else if (aiLimitText(e)) toast(aiLimitText(e));
     else if (code === 'not_configured') toast(t('The AI coach is not connected yet.'));
     else if (!(e && e.name === 'AbortError')) toast(t('No answer ({code}). Try again.', { code: code || (e && e.message) || 'error' }));
   }
@@ -4383,7 +4494,7 @@ const UPLOAD = (() => {
     { const city = GEO.nearestCity(c.lat, c.lon); $('uplNewName').value = p0.meta.track ? p0.meta.track.replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase()) : ''; $('uplNewCity').value = city && city.km < 80 ? city.name : ''; fillCountries($('uplNewCountry'), true); $('uplNewCountry').value = city && city.km < 400 ? city.cc : ''; $('uplNewHint').textContent = t('Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.'); }
     await fillLayouts(); syncPub(); syncNew();
     if (ctx.layout) { $('uplLayout').value = ctx.layout; showLayoutPhoto(); }
-    fillKarts();
+    fillKarts(); fillFormats($('uplFormat'), ''); $('uplPos').value = ''; $('uplDrivers').value = '';
     $('uplName').value = p0.meta.driver ? `${p0.meta.driver}${p0.meta.date ? ', ' + fmtDate(p0.meta.date) : ''}` : (p0.data.name || '');
     const src = p0.data.source; const srcTx = src && src.app !== 'alfano' ? ' · ' + t('Source: {s}', { s: sourceLabel(src) }) + (src.grade !== 'high' ? ' — ' + t('braking and throttle points will be approximate; Alfano at 10 Hz is the reference') : '') + (p0.data.lapsHow === 'loop' ? ' · ' + t('laps were cut where the loop closes (no start/finish beacon in the file)') : '') : '';
     $('uplDetect').textContent = `${t('{n} laps, best {b}', { n: laps.length, b: fmtMs(best.timeMs) })} · ${near ? t('GPS puts this session at {name} ({d} km)', { name: near.x.name, d: near.d.toFixed(1) }) : (canAdd ? t('GPS does not match any track in Hutka yet — add it below (name, city), or keep the session private without a track.') : t('GPS does not match any track in the catalogue — it will be saved as a custom track.'))}${parsed.length > 1 ? ' · ' + t('{n} files: one session each, the same track and layout', { n: parsed.length }) : ''}${srcTx}`;
@@ -4429,7 +4540,7 @@ const UPLOAD = (() => {
     let first = null;
     for (let k = 0; k < parsed.length; k++) {
       const pub = STORE.canWrite() && !!tid && $('uplPublish').checked;
-      const p = parsed[k], sess = { id: 's' + STORE.uid(), name: p.data.name, label: parsed.length > 1 ? (label ? `${label} · ${k + 1}` : '') : label, driver: p.meta.driver, date: p.meta.date || fileDate(p.file), trackName: tr ? tr.name : p.meta.track, track: tid, layout: tid ? lid : 'custom', note, kart: kart.name, kartClass: kart.cls, published: pub, source: p.data.source || null, createdAt: Date.now(), laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
+      const p = parsed[k], sess = { id: 's' + STORE.uid(), name: p.data.name, label: parsed.length > 1 ? (label ? `${label} · ${k + 1}` : '') : label, driver: p.meta.driver, date: p.meta.date || fileDate(p.file), trackName: tr ? tr.name : p.meta.track, track: tid, layout: tid ? lid : 'custom', note, kart: kart.name, kartClass: kart.cls, format: $('uplFormat').value || '', pos: +$('uplPos').value || 0, drivers: +$('uplDrivers').value || 0, published: pub, source: p.data.source || null, createdAt: Date.now(), laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
       for (const L of sess.laps) L._sess = sess;
       // loggers without a start/finish beacon: start every lap at the layout's S/F so corners line up with everyone else's
       if (sess.source && sess.source.app !== 'alfano' && tid && lid !== 'custom') { try { const G = await GEOM.build(tid, lid); IMPORT.alignToStart(sess, G); } catch (e) {} }
@@ -4457,7 +4568,7 @@ function drawPreview(cv, pv, color) {
   return true;
 }
 async function renderHomePage() {
-  $('homeSub').textContent = t('Upload your session from Alfano, AiM, RaceChrono or any GPS logger: Hutka finds every braking point, apex and throttle point, tells you in plain words where the lap is lost and lets you compare with anyone who published a session on the same layout and the same kart class.');
+  $('homeSub').textContent = t('Upload a session — every braking point, apex and throttle point, and a comparison with drivers on the same layout.');
   $('homeUpload').onclick = () => UPLOAD.open({});
   $('homeSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity); $('homeSignIn').onclick = () => AUTH.open();
   const feed = $('homeFeed'); feed.innerHTML = '';
@@ -4480,11 +4591,12 @@ async function renderHomePage() {
     if (!rows.length) box.appendChild(el('div', 'hint', t('Nothing yet — the first published session opens the board.')));
     for (const r of rows) { const tr = STORE.getTrack(r.track); const ls = await STORE.getLayouts(r.track); const l = ls.find(x => x.id === r.layout); const a = el('a', 'item'); a.href = r.layout && r.layout !== 'custom' ? `#layout~${r.track}~${r.layout}` : `#track~${r.track}`; a.append(el('span', 'name', `${tr ? tr.name : r.track}${l ? ' · ' + l.name : ''}`), el('span', 'meta', `${tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n)} · ${t('best')} ${fmtMs(r.best)}`)); box.appendChild(a); }
   }
-  // fastest this month: best lap per driver per layout, newest 30 days
-  { const box = $('homeTop'); box.innerHTML = ''; const cut = Date.now() - 30 * 86400000; const best = new Map(); for (const s of pubs) { if ((s.createdAt || 0) < cut || STORE.lowRated(counts[s.id])) continue; const k = s.owner + '|' + s.track + '|' + s.layout + '|' + kartClassOf(s); const cur = best.get(k); if (!cur || s.bestMs < cur.bestMs) best.set(k, s); }
-    const rows = [...best.values()].sort((a, b) => a.bestMs - b.bestMs).slice(0, 8);
-    if (!rows.length) box.appendChild(el('div', 'hint', t('No published laps in the last 30 days.')));
-    rows.forEach((s, i) => { const tr = STORE.getTrack(s.track); const d = el('div', 'rank'); const im = new Image(); im.src = (names[s.owner] && names[s.owner].avatar) || GENERIC_AVATAR; im.alt = ''; const w = el('div', 'w'); w.innerHTML = `<a href="#driver~${esc(s.owner)}">${esc((names[s.owner] || {}).name || t('Driver'))}</a><span>${esc(tr ? tr.name : (s.trackName || t('Custom')))}${s.layout && s.layout !== 'custom' ? ' · ' + esc(layoutName(s.track, s.layout)) : ''}${s.kart || kartClassOf(s) === 'sport' ? ' · ' + esc(kartLabel(s)) : ''}</span>`; d.append(el('span', 'n', String(i + 1)), im, w, el('span', 'tm', fmtMs(s.bestMs))); box.appendChild(d); });
+  // active drivers: who published in the last 30 days, how much, and where they drove last (tracks differ, so no cross-track times)
+  { const box = $('homeTop'); box.innerHTML = ''; const cut = Date.now() - 30 * 86400000; const by = new Map();
+    for (const s of pubs) { if ((s.createdAt || 0) < cut) continue; const o = by.get(s.owner) || { owner: s.owner, n: 0, laps: 0, last: null, tracks: new Set() }; o.n++; o.laps += s.nLaps || 0; if (s.track) o.tracks.add(s.track); if (!o.last || (s.createdAt || 0) > (o.last.createdAt || 0)) o.last = s; by.set(s.owner, o); }
+    const rows = [...by.values()].sort((a, b) => b.n - a.n || (b.last.createdAt || 0) - (a.last.createdAt || 0)).slice(0, 8);
+    if (!rows.length) box.appendChild(el('div', 'hint', t('Nobody published a session in the last 30 days yet.')));
+    rows.forEach((o, i) => { const s = o.last, tr = STORE.getTrack(s.track); const d = el('div', 'rank'); const im = new Image(); im.src = (names[o.owner] && names[o.owner].avatar) || GENERIC_AVATAR; im.alt = ''; const w = el('div', 'w'); w.innerHTML = `<a href="#driver~${esc(o.owner)}">${esc((names[o.owner] || {}).name || t('Driver'))}</a>${names[o.owner] && names[o.owner].country ? ' ' + flag(names[o.owner].country) : ''}<span>${esc(tn(o.n, '{n} session', '{n} sessions').replace('{n}', o.n))} · ${esc(tn(o.laps, '{n} lap', '{n} laps').replace('{n}', o.laps))}${o.tracks.size > 1 ? ' · ' + esc(tn(o.tracks.size, '{n} track', '{n} tracks').replace('{n}', o.tracks.size)) : ''} · ${esc(tr ? tr.name : (s.trackName || t('Custom')))}</span>`; const tm = el('a', 'tm', fmtDate(s.date)); tm.href = '#lab~' + s.id; tm.style.cssText = 'font-size:12px;color:var(--muted);text-decoration:none'; d.append(el('span', 'n', String(i + 1)), im, w, tm); box.appendChild(d); });
   }
   // the drivers I follow
   { const card = $('homeFollowCard'), box = $('homeFollowing'); box.innerHTML = ''; if (!STORE.hasIdentity || !STORE.hasDb || !STORE.socialOn) { card.hidden = true; } else { const ids = await STORE.followingIds(); card.hidden = !ids.length; if (ids.length) { const nm = await STORE.names(ids); for (const id of ids.slice(0, 12)) { const a = el('a', 'item'); a.href = '#driver~' + id; const im = new Image(); im.src = (nm[id] && nm[id].avatar) || GENERIC_AVATAR; im.alt = ''; im.style.cssText = 'width:28px;height:28px;border-radius:50%;object-fit:cover'; a.append(im, el('span', 'name', (nm[id] || {}).name || t('Driver'))); box.appendChild(a); } } } }
@@ -4497,7 +4609,7 @@ function postCard(s, names, cnt) {
   ph.append(im, who);
   const pb = el('div', 'pb'); const pv = el('div', 'pv');
   if (s.preview && s.preview.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); requestAnimationFrame(() => drawPreview(cv, s.preview)); } else pv.appendChild(svgUse('i-track'));
-  const info = el('div'); info.innerHTML = `<div class="lbl">${t('best lap')}</div><div class="big">${fmtMs(s.bestMs)}</div><div class="nm">${esc(s.label || s.name)}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</div>`;
+  const info = el('div'); info.innerHTML = `<div class="lbl">${t('best lap')}</div><div class="big">${fmtMs(s.bestMs)}</div><div class="nm">${esc(s.label || s.name)}${resultText(s) ? ` <span class="res">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</div>`;
   const chips = el('div', 'chips'); const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
   chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`); if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
   info.appendChild(chips); pb.append(pv, info);
@@ -4523,7 +4635,7 @@ async function aiSystem(sessionMeta) {
   const home = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null;
   parts.push(`DRIVER: ${prof.racingName || me.name || 'driver'}${prof.country ? ', ' + countryName(prof.country) : ''}${home ? ', home track ' + home.name : ''}.`);
   const mine = (await STORE.mySessions()).slice(0, 40);
-  if (mine.length) { const lines = []; for (const m of mine) { const tr = STORE.getTrack(m.track); const ls = m.track ? await STORE.getLayouts(m.track) : []; const l = ls.find(x => x.id === m.layout); lines.push(`- [${m.id}] ${m.label || m.name} — ${tr ? tr.name : (m.trackName || 'custom track')}${l ? ' · ' + l.name : ''} · ${fmtDate(m.date)} · best ${fmtMs(m.bestMs)} · avg clean ${fmtMs(m.avgMs)} · ${m.nLaps} laps (${m.cleanLaps} clean)${m.kart || m.kartClass === 'sport' ? ' · kart: ' + kartLabel(m) : ''}${m.published ? ' · published' : ''}${m.note ? ' · ' + m.note : ''}`); } parts.push('THE DRIVER\'S SESSIONS (newest first):\n' + lines.join('\n')); }
+  if (mine.length) { const lines = []; for (const m of mine) { const tr = STORE.getTrack(m.track); const ls = m.track ? await STORE.getLayouts(m.track) : []; const l = ls.find(x => x.id === m.layout); lines.push(`- [${m.id}] ${m.label || m.name} — ${tr ? tr.name : (m.trackName || 'custom track')}${l ? ' · ' + l.name : ''} · ${fmtDate(m.date)} · best ${fmtMs(m.bestMs)} · avg clean ${fmtMs(m.avgMs)} · ${m.nLaps} laps (${m.cleanLaps} clean)${m.kart || m.kartClass === 'sport' ? ' · kart: ' + kartLabel(m) : ''}${resultText(m) ? ' · ' + resultText(m) : ''}${m.published ? ' · published' : ''}${m.note ? ' · ' + m.note : ''}`); } parts.push('THE DRIVER\'S SESSIONS (newest first):\n' + lines.join('\n')); }
   else parts.push('THE DRIVER\'S SESSIONS: none uploaded yet.');
   // fast published laps on the layouts the driver has driven
   const keys = new Set(mine.filter(m => m.track).map(m => m.track + '~' + (m.layout || 'custom'))); if (sessionMeta && sessionMeta.track) keys.add(sessionMeta.track + '~' + (sessionMeta.layout || 'custom'));
@@ -4537,7 +4649,7 @@ async function aiSystem(sessionMeta) {
   return parts.join('\n\n').slice(0, 70000);
 }
 async function renderAIPage(a, b) {
-  $('aiSub').textContent = t('Knows your sessions and the fastest published laps on your layouts. Every answer costs one credit; Pro has no limit.');
+  $('aiSub').textContent = t('Knows your sessions and the fastest published laps on your layouts.');
   const on = STORE.aiOn;
   $('aiSoon').hidden = on && STORE.hasIdentity; $('aiGrid').hidden = !(on && STORE.hasIdentity);
   if (!on) { $('aiSoonText').innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('The AI coach is being connected. Meanwhile the Lab analysis works without it.'))}`; return; }
@@ -4551,10 +4663,30 @@ async function renderAIPage(a, b) {
   else if (AI.chats.length && !window.matchMedia('(max-width:900px)').matches) await openChat(AI.chats[0]);
   else { $('aiGrid').classList.remove('chat-open'); await startNew(null, true); }
 }
+// fair-use replies from the ask function, in words
+function aiLimitText(e) {
+  const code = e && e.code, d = (e && e.data) || {};
+  if (code === 'rate_limited') return d.scope === 'day' ? t('Daily limit reached ({n} questions) — the coach is back tomorrow.', { n: d.limit || '' }) : (d.scope === 'ip' ? t('Too many questions from this network today — try again tomorrow.') : t('Limit: {n} questions an hour — take a short break and try again.', { n: d.limit || '' }));
+  if (code === 'busy') return t('The coach is resting: the community used today\'s questions. Back tomorrow.');
+  if (code === 'paused') return t('The coach is paused for a moment.');
+  return '';
+}
+// admin: what the coach costs (token prices from config.js aiPrice {in, out} in $ per million, else Sonnet list prices)
+async function renderAiUsage(box) {
+  if (!box) return; box.innerHTML = ''; const u = await STORE.aiUsage(30); if (!u) { box.appendChild(el('div', 'hint', t('Usage appears here once the ask function is deployed and community.sql has been run.'))); return; }
+  const price = Object.assign({ in: 3, out: 15 }, (window.HUTKA_CONFIG || {}).aiPrice || {}); const cost = (r) => (r.tokens_in * price.in + r.tokens_out * price.out) / 1e6;
+  const tot = u.days.reduce((a, r) => ({ q: a.q + +r.questions, i: a.i + +r.tokens_in, o: a.o + +r.tokens_out }), { q: 0, i: 0, o: 0 });
+  const tiles = el('div', 'tiles'); for (const [k, v] of [[t('Questions · 30 d'), tot.q], [t('Drivers · 30 d'), u.users.length], [t('Tokens in / out'), `${(tot.i / 1000).toFixed(0)}k / ${(tot.o / 1000).toFixed(0)}k`], [t('≈ cost · 30 d'), '$' + ((tot.i * price.in + tot.o * price.out) / 1e6).toFixed(2)]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${esc(String(v))}</div>`; tiles.appendChild(d); } box.appendChild(tiles);
+  if (u.days.length) { const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Day')}</th><th>${t('Questions')}</th><th>${t('Drivers')}</th><th>${t('Tokens in')}</th><th>${t('Tokens out')}</th><th>≈ $</th></tr></thead>`; const body = el('tbody'); for (const r of u.days.slice(0, 14)) { const tr = el('tr'); tr.innerHTML = `<td>${esc(r.day)}</td><td class="num">${r.questions}</td><td class="num">${r.drivers}</td><td class="num">${(+r.tokens_in).toLocaleString('en-US')}</td><td class="num">${(+r.tokens_out).toLocaleString('en-US')}</td><td class="num">${cost(r).toFixed(2)}</td>`; body.appendChild(tr); } tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap); }
+  if (u.users.length) { const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Driver')}</th><th>${t('Questions')}</th><th>${t('Tokens in')}</th><th>${t('Tokens out')}</th><th>≈ $</th><th>${t('Last')}</th></tr></thead>`; const body = el('tbody'); for (const r of u.users.slice(0, 30)) { const tr = el('tr'); tr.innerHTML = `<td><a href="#driver~${esc(r.user_id)}">${esc(r.racing_name || r.user_id.slice(0, 8))}</a></td><td class="num">${r.questions}</td><td class="num">${(+r.tokens_in).toLocaleString('en-US')}</td><td class="num">${(+r.tokens_out).toLocaleString('en-US')}</td><td class="num">${cost(r).toFixed(2)}</td><td>${esc(fmtDate(r.last_at))}</td>`; body.appendChild(tr); } tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap); }
+  box.appendChild(el('div', 'hint', t('Prices assumed: ${i} / ${o} per million tokens in / out (set aiPrice in config.js to match your model).', { i: price.in, o: price.out })));
+}
 async function renderWallet(fresh) {
   const w = await STORE.wallet(fresh); AI.wallet = w;
   const note = $('walletNote'), cr = $('walletCredits');
   if (w.off) { cr.textContent = '—'; note.innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('Credits and the AI coach are being connected.'))}`; $('walletBuy').hidden = true; $('walletManage').hidden = true; return; }
+  $('walletLbl').textContent = w.free ? t('Free beta') : t('Credits');
+  if (w.free) { cr.textContent = `${w.used_day}/${w.limit_day}`; note.textContent = w.paused ? t('The coach is paused for a moment.') : t('Free while we test. {d} questions a day and {h} an hour per driver; the whole community {g}/{gl} today.', { d: w.limit_day, h: w.limit_hour, g: w.global_day, gl: w.global_limit }); $('walletBuy').hidden = true; $('walletManage').hidden = true; return; }
   const pro = w.plan === 'pro';
   cr.textContent = pro ? 'Pro' : String(w.credits);
   note.textContent = pro ? t('Pro until {d}: unlimited questions.', { d: w.plan_until ? fmtDate(w.plan_until) : '—' }) : (w.credits > 0 ? t('One credit per answer. You started with {n} free.', { n: w.free_credits || 10 }) : t('No credits left — get a pack or Pro to keep asking.'));
@@ -4607,13 +4739,13 @@ function renderAiLog(loading) {
 }
 function renderAiNote() {
   const w = AI.wallet || {}, n = $('aiNote');
-  if (w.off) n.textContent = ''; else if (w.plan === 'pro') n.textContent = t('Pro — unlimited questions. Ctrl+Enter to send.'); else n.textContent = w.credits > 0 ? t('{n} credits left · one per answer · Ctrl+Enter to send', { n: w.credits }) : t('No credits left.');
-  $('aiSend').disabled = AI.busy || (w.off === true) || (w.plan !== 'pro' && !(w.credits > 0));
+  if (w.off) n.textContent = ''; else if (w.free) n.textContent = w.paused ? t('The coach is paused for a moment.') : t('Free beta · {u}/{d} questions today · Ctrl+Enter to send', { u: w.used_day || 0, d: w.limit_day }); else if (w.plan === 'pro') n.textContent = t('Pro — unlimited questions. Ctrl+Enter to send.'); else n.textContent = w.credits > 0 ? t('{n} credits left · one per answer · Ctrl+Enter to send', { n: w.credits }) : t('No credits left.');
+  $('aiSend').disabled = AI.busy || (w.off === true) || (w.free ? (w.paused || w.used_day >= w.limit_day) : (w.plan !== 'pro' && !(w.credits > 0)));
   $('aiInput').placeholder = t('Ask the coach… (Ctrl+Enter to send)');
 }
 async function aiSend() {
   const text = $('aiInput').value.trim(); if (!text || AI.busy) return;
-  const w = AI.wallet || {}; if (!w.off && w.plan !== 'pro' && !(w.credits > 0)) { openPay(); return; }
+  const w = AI.wallet || {}; if (!w.off && !w.free && w.plan !== 'pro' && !(w.credits > 0)) { openPay(); return; }
   const sessionId = AI.cur ? AI.cur.session_id : AI.newCtx; const meta = sessionId ? await STORE.getSessionMeta(sessionId) : null;
   AI.msgs.push({ role: 'user', content: text }); $('aiInput').value = ''; AI.busy = true; $('aiNewBox').hidden = true;
   const bubble = renderAiLog(); renderAiNote(); $('aiStop').hidden = false; AI.ctl = new AbortController();
@@ -4622,12 +4754,12 @@ async function aiSend() {
     const r = await STORE.ask({ chatId: AI.cur ? AI.cur.id : null, sessionId: meta ? meta.id : null, trackId: meta ? meta.track : null, layoutId: meta ? meta.layout : null, title: AI.cur ? null : (meta ? `${meta.label || meta.name} · ${text.slice(0, 40)}` : text.slice(0, 60)), system, text, signal: AI.ctl.signal, onText: (tx) => { bubble.classList.remove('thinking'); bubble.innerHTML = mdLite(tx); $('aiLog').scrollTop = $('aiLog').scrollHeight; } });
     AI.msgs.push({ role: 'assistant', content: r.text });
     if (!AI.cur) { AI.chats = await STORE.chats(); AI.cur = AI.chats.find(c => c.id === r.chatId) || AI.chats[0] || null; if (AI.cur) { $('aiTitle').textContent = AI.cur.title; const tr = AI.cur.track_id ? STORE.getTrack(AI.cur.track_id) : null; $('aiCtx').innerHTML = AI.cur.session_id ? `${t('About session')} <a href="#lab~${esc(AI.cur.session_id)}">${esc(tr ? tr.name : t('open in the Lab'))}</a>` : t('General chat'); $('aiRename').hidden = false; $('aiDelete').hidden = false; history.replaceState(null, '', '#ai~' + AI.cur.id); } renderChatList(); }
-    if (r.credits !== null && AI.wallet && !AI.wallet.off) { AI.wallet.credits = r.credits; AI.wallet.plan = r.plan || AI.wallet.plan; $('walletCredits').textContent = AI.wallet.plan === 'pro' ? 'Pro' : String(r.credits); }
+    if (AI.wallet && !AI.wallet.off) { if (AI.wallet.free) { if (r.usedDay !== null) { AI.wallet.used_day = r.usedDay; AI.wallet.used_hour = (AI.wallet.used_hour || 0) + 1; $('walletCredits').textContent = `${r.usedDay}/${r.limitDay || AI.wallet.limit_day}`; } } else if (r.credits !== null) { AI.wallet.credits = r.credits; AI.wallet.plan = r.plan || AI.wallet.plan; $('walletCredits').textContent = AI.wallet.plan === 'pro' ? 'Pro' : String(r.credits); } }
   } catch (e) {
     const code = e && e.code; if (e && e.text) AI.msgs.push({ role: 'assistant', content: e.text }); else AI.msgs.pop();
     if (code === 'no_credits') { toast(t('No credits left — get a pack or Pro.')); await renderWallet(true); openPay(); }
     else if (code === 'sign_in') AUTH.open();
-    else if (code === 'rate_limited') toast(t('Too many questions in an hour — take a break and try again.'));
+    else if (aiLimitText(e)) toast(aiLimitText(e));
     else if (code === 'not_configured') toast(t('The AI coach is not connected yet.'));
     else if (code !== 'cancelled' && !(e && e.name === 'AbortError')) toast(t('No answer ({code}). Try again.', { code: code || (e && e.message) || 'error' }));
   }
@@ -4782,7 +4914,7 @@ const SESSEDIT = (() => {
     cur = meta; done = onSaved || null; setStatus('seStatus', '');
     $('seName').value = meta.label || meta.name || ''; $('seNote').value = meta.note || '';
     fillSelect($('seTrack'), [['', t('— not in the catalogue (custom) —')]].concat(STORE.getTracks().map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), meta.track || '');
-    await fillLayouts(meta.track || '', meta.layout || ''); fillKarts(meta);
+    await fillLayouts(meta.track || '', meta.layout || ''); fillKarts(meta); fillFormats($('seFormat'), meta.format || ''); $('sePos').value = meta.pos || ''; $('seDrivers').value = meta.drivers || '';
     $('sePubField').hidden = !(STORE.canWrite() && meta.owner !== 'local'); $('sePublish').checked = !!meta.published;
     { const prof = STORE.hasIdentity ? (await STORE.profile(STORE.me.id) || {}) : {}; const res = prof.swsResults && prof.swsResults.results || []; fillSelect($('seSws'), [['', t('— not an SWS race —')]].concat(res.map((r, i) => [String(i), SWS.label(r)])), meta.sws && meta.sws.i !== undefined ? String(meta.sws.i) : ''); $('seSws').disabled = !res.length; const h = $('seSwsHint'); h.innerHTML = ''; if (!res.length) { h.appendChild(document.createTextNode(t('No SWS results imported yet. ') )); const a = el('a', 'tref', t('Import results from your SWS page')); a.href = '#'; a.onclick = (e) => { e.preventDefault(); SESSEDIT.close(); SWS.open({}); }; h.appendChild(a); } }
     $('sessModal').hidden = false; $('seName').focus();
@@ -4802,7 +4934,7 @@ const SESSEDIT = (() => {
   $('seSave').onclick = async () => {
     if (!cur) return; const tid = $('seTrack').value, tr = tid ? STORE.getTrack(tid) : null;
     const kv = $('seKart').value || 'rental|', kart = { cls: kv.split('|')[0] || 'rental', name: kv.split('|')[1] || $('seKartOther').value.trim().slice(0, 40) };
-    const patch = { label: $('seName').value.trim().slice(0, 80), note: $('seNote').value.trim().slice(0, 120), track: tid, trackName: tr ? tr.name : (cur.trackName || ''), layout: tid ? ($('seLayout').value || 'custom') : 'custom', kart: kart.name, kartClass: kart.cls };
+    const patch = { label: $('seName').value.trim().slice(0, 80), note: $('seNote').value.trim().slice(0, 120), track: tid, trackName: tr ? tr.name : (cur.trackName || ''), layout: tid ? ($('seLayout').value || 'custom') : 'custom', kart: kart.name, kartClass: kart.cls, format: $('seFormat').value || '', pos: +$('sePos').value || 0, drivers: +$('seDrivers').value || 0 };
     if (tr && kart.name && STORE.canEditTrack(tr) && !(tr.karts || []).some(k => k.name.toLowerCase() === kart.name.toLowerCase())) { try { await STORE.saveTrack(Object.assign({}, tr, { karts: (tr.karts || []).concat([{ name: kart.name, cls: kart.cls }]) })); } catch (e) {} }
     if (!$('sePubField').hidden) patch.published = $('sePublish').checked && !!tid;
     if (!$('seSws').disabled) { const i = $('seSws').value; if (i === '') patch.sws = null; else { const prof = await STORE.profile(STORE.me.id) || {}; const r = (prof.swsResults && prof.swsResults.results || [])[+i]; if (r) patch.sws = { i: +i, date: r.date, race: r.race || r.cat, track: r.track, pos: r.pos, best: r.best }; } }
@@ -4822,6 +4954,8 @@ const ADMIN = (() => {
     $('admAddTrack').hidden = !admin; $('admClaimsWrap').hidden = !admin; $('aDelete').hidden = !admin;
     fillCountries($('aCountry'), true);
     await renderTrackList(); if (admin) await renderClaims();
+    $('admAiCard').hidden = !(admin && STORE.aiOn); if (admin && STORE.aiOn) renderAiUsage($('admAiUsage'));
+    $('admImportCard').hidden = !admin; if (admin && !$('osmCountry').options.length) { fillCountries($('osmCountry'), false); $('osmCountry').value = 'AE'; }
     if (tid && STORE.getTrack(tid)) { A.tid = tid; A.lid = lid || null; await renderTrackForm(); await renderLayouts(); if (lid) await renderLayoutEditor(); else $('admLayoutCard').hidden = true; }
     else { A.tid = null; A.lid = null; $('admEmpty').hidden = false; $('admTrackCard').hidden = true; $('admLayoutsCard').hidden = true; $('admLayoutCard').hidden = true; }
   }
@@ -4870,8 +5004,8 @@ const ADMIN = (() => {
     setStatus('lyStatus', ''); setStatus('geomStatus', ''); setStatus('geomSaveStatus', '');
     pendingPhoto = undefined; const photo = l.photo ? await STORE.getMedia(`tracks/${A.tid}/layouts/${A.lid}/media/photo`) : null; $('lyPhotoPrev').hidden = !photo; if (photo) $('lyPhotoPrev').src = photo;
     A.G = null; try { A.G = await GEOM.build(A.tid, A.lid); } catch (e) { A.G = null; }
-    A.E = { widthM: l.widthM || 8, cornerR: l.cornerR || 110, add: (l.cornersAdd || []).slice(), del: (l.cornersDel || []).slice() };
-    ensureMap(); setTool('pan'); A.map.fit(); A.map.draw(); hint();
+    A.E = { widthM: l.widthM || 8, cornerR: l.cornerR || 110, add: (l.cornersAdd || []).slice(), del: (l.cornersDel || []).slice(), sat: { dx: l.sat ? +l.sat.dx || 0 : 0, dy: l.sat ? +l.sat.dy || 0 : 0 } };
+    ensureMap(); setTool('pan'); A.tilesOn = SAT.pref(); satUi(); A.map.fit(); A.map.draw(); hint();
   }
   function hint() { const G = A.G; $('geomSrc').textContent = G ? t('From GPS: the reference session defines the line and the S/F. {n} m, {c} corners.', { n: G.lengthM, c: GEOM.apexes(G, null).length }) : t('Nothing yet: the track line appears after the first published session on this layout (or pick a reference session above).'); }
   function curApexes() { const G = A.G; if (!G) return null; G.corners = { R: A.E.cornerR, add: A.E.add, del: A.E.del }; return GEOM.apexes(G, null); }
@@ -4879,13 +5013,20 @@ const ADMIN = (() => {
     if (A.map) return;
     A.map = createMapView($('emap'), { height: (w) => Math.round(clamp(w * 0.72, 380, 760)), getTrack: () => A.G ? A.G.track : null, getWidthM: () => A.E ? A.E.widthM : 8, getFrameSize: () => A.G ? [A.G.W, A.G.H] : [1600, 1000], getImage: () => A.G ? A.G.image : null,
       getOverlay: () => ({ band: true, ticks: true, showApexes: true, apexes: curApexes(), pts: null, closed: false }),
+      getTiles: () => A.E ? SAT.layer(A.G, A.tilesOn, A.E.sat) : null,
+      onSatMove: (dxPx, dyPx) => { if (!A.E || !A.G) return; const mpp = A.G.track.mpp; A.E.sat.dx += dxPx * mpp; A.E.sat.dy -= dyPx * mpp; satUi(); },
       onHover: (i) => { const tr = A.G ? A.G.track : null; const e = $('eReadout'); if (i < 0 || !tr) { e.hidden = true; return; } e.textContent = `${(i * tr.ds).toFixed(0)} ${t('m')}`; e.hidden = false; },
       onCorner: (sx, sy, remove) => cornerEdit(sx, sy, remove) });
     $('eRotL').onclick = () => A.map.rotateBy(-Math.PI / 12); $('eRotR').onclick = () => A.map.rotateBy(Math.PI / 12); $('eZoomIn').onclick = () => A.map.zoomCenter(1.3); $('eZoomOut').onclick = () => A.map.zoomCenter(1 / 1.3); $('eZoomFit').onclick = () => { A.map.fit(); A.map.draw(); };
     window.addEventListener('resize', () => { if (APP.route === 'admin' && A.map && !$('admLayoutCard').hidden) { if (A.map.V.auto) A.map.fit(true); A.map.draw(); } });
   }
-  function setTool(tl) { A.tool = tl; $('toolPan').classList.toggle('active', tl === 'pan'); $('toolCorner').classList.toggle('active', tl === 'corner'); A.map.setTool(tl); }
-  $('toolPan').onclick = () => setTool('pan'); $('toolCorner').onclick = () => setTool('corner');
+  function setTool(tl) { A.tool = tl; $('toolPan').classList.toggle('active', tl === 'pan'); $('toolCorner').classList.toggle('active', tl === 'corner'); $('toolSat').classList.toggle('active', tl === 'sat'); A.map.setTool(tl); }
+  $('toolPan').onclick = () => setTool('pan'); $('toolCorner').onclick = () => setTool('corner'); $('toolSat').onclick = () => { if (!A.tilesOn) { A.tilesOn = true; } setTool(A.tool === 'sat' ? 'pan' : 'sat'); satUi(); };
+  // satellite imagery under the line: on/off and the alignment offset (metres east / north)
+  function satUi() { const can = SAT.can(A.G); $('satStep').hidden = !can; if (!can) return; $('eTiles').classList.toggle('active', !!A.tilesOn); const o = A.E ? A.E.sat : { dx: 0, dy: 0 }; $('satOff').textContent = t('offset {x} m east, {y} m north', { x: o.dx.toFixed(1), y: o.dy.toFixed(1) }); if (A.tilesOn && SAT.available === null) SAT.probe(A.G).then(ok => { if (!ok) $('satStep').hidden = true; satUi(); }); A.map.draw(); }
+  $('eTiles').onclick = () => { A.tilesOn = !A.tilesOn; SAT.setPref(A.tilesOn); if (!A.tilesOn && A.tool === 'sat') setTool('pan'); satUi(); };
+  const nudge = (dx, dy) => { if (!A.E) return; A.E.sat.dx += dx; A.E.sat.dy += dy; satUi(); setStatus('geomStatus', t('Imagery moved — press “Save corners” to keep the alignment.')); };
+  $('satL').onclick = () => nudge(-0.5, 0); $('satR').onclick = () => nudge(0.5, 0); $('satU').onclick = () => nudge(0, 0.5); $('satD').onclick = () => nudge(0, -0.5); $('satReset').onclick = () => { if (A.E) { A.E.sat = { dx: 0, dy: 0 }; satUi(); } };
   function cornerEdit(sx, sy, remove) {
     const tr = A.G ? A.G.track : null; if (!tr) return; const i = A.map.nearestStation(sx, sy, 40); if (i < 0) return;
     const N = tr.N, ds = tr.ds, u = i / N, ap = curApexes() || [];
@@ -4902,7 +5043,7 @@ const ADMIN = (() => {
   $('lySave').onclick = async () => {
     const l = Object.assign({}, STORE.getLayout(A.tid, A.lid)); if (!l.id) return;
     l.name = $('lyName').value.trim() || l.name; l.lengthM = +$('lyLen').value || null; l.corners = +$('lyCorners').value || null; l.direction = $('lyDir').value; l.note = $('lyNote').value.trim(); l.refSession = $('lyRef').value || ''; l.cornerR = clamp(+$('lyR').value || 110, 30, 300); l.widthM = clamp(+$('lyWidth').value || 8, 2, 30);
-    if (pendingPhoto !== undefined) l.photo = !!pendingPhoto;
+    if (pendingPhoto !== undefined) l.photo = !!pendingPhoto; if (A.E && A.E.sat) l.sat = { dx: +A.E.sat.dx.toFixed(2), dy: +A.E.sat.dy.toFixed(2) };
     const b = $('lySave'); b.classList.add('busy');
     try { if (pendingPhoto !== undefined) { await STORE.setMedia(`tracks/${A.tid}/layouts/${A.lid}/media/photo`, pendingPhoto); pendingPhoto = undefined; } await STORE.saveLayout(A.tid, l); GEOM.invalidate(); setStatus('lyStatus', t('Saved'), 'ok'); $('admLayoutName').textContent = l.name; renderLayouts(); } catch (e) { setStatus('lyStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');
@@ -4910,11 +5051,45 @@ const ADMIN = (() => {
   $('lyDelete').onclick = async () => { if (!(await confirmDlg(t('Delete this layout?'), t('Sessions already uploaded on it keep their data but lose the layout link.'), t('Delete')))) return; await STORE.deleteLayout(A.tid, A.lid); GEOM.invalidate(); go('admin~' + A.tid); };
   $('geomSave').onclick = async () => {
     const l = Object.assign({}, STORE.getLayout(A.tid, A.lid)); if (!l.id) return; const E = A.E;
-    l.widthM = E.widthM; l.cornerR = clamp(+$('lyR').value || E.cornerR || 110, 30, 300); l.cornersAdd = E.add.map(x => +x.toFixed(5)); l.cornersDel = E.del.map(x => +x.toFixed(5));
+    l.widthM = E.widthM; l.cornerR = clamp(+$('lyR').value || E.cornerR || 110, 30, 300); l.cornersAdd = E.add.map(x => +x.toFixed(5)); l.cornersDel = E.del.map(x => +x.toFixed(5)); l.sat = { dx: +E.sat.dx.toFixed(2), dy: +E.sat.dy.toFixed(2) };
     const b = $('geomSave'); b.classList.add('busy');
     try { await STORE.saveLayout(A.tid, l); GEOM.invalidate(); setStatus('geomSaveStatus', t('Corners saved'), 'ok'); A.G = null; try { A.G = await GEOM.build(A.tid, A.lid); } catch (e) {} A.map.draw(); hint(); }
     catch (e) { setStatus('geomSaveStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');
+  };
+  // ----- import from OpenStreetMap: every named karting venue of a country (sport=karting), picked by hand -----
+  const OSM = { rows: [] };
+  const osmTag = (tg, ...keys) => { for (const k of keys) if (tg[k]) return String(tg[k]).trim(); return ''; };
+  async function osmFind() {
+    const cc = $('osmCountry').value; if (!cc) return; const b = $('osmFind'); b.classList.add('busy'); setStatus('osmStatus', t('Asking OpenStreetMap… (10–40 s)')); $('osmWrap').hidden = true; $('osmImport').hidden = true; OSM.rows = [];
+    const q = `[out:json][timeout:90];area["ISO3166-1"="${cc}"][admin_level=2]->.a;nwr["sport"="karting"](area.a);out center tags;`;
+    let data = null;
+    for (const ep of [(window.HUTKA_CONFIG || {}).overpassUrl || 'https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter']) {
+      try { const r = await fetch(ep, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); if (r.ok) { data = await r.json(); break; } } catch (e) { /* next mirror */ }
+    }
+    b.classList.remove('busy');
+    if (!data || !Array.isArray(data.elements)) { setStatus('osmStatus', t('OpenStreetMap did not answer — try again in a minute.'), 'warn'); return; }
+    // one row per venue: named elements, merged when the same name sits within 400 m (a track way + a venue node)
+    const raw = data.elements.map(e => { const tg = e.tags || {}; const lat = e.lat !== undefined ? e.lat : (e.center ? e.center.lat : null), lon = e.lon !== undefined ? e.lon : (e.center ? e.center.lon : null); const name = osmTag(tg, 'name:en', 'name', 'official_name'); if (!name || lat === null) return null;
+      const indoor = tg.indoor === 'yes' || tg.covered === 'yes' || tg.building === 'yes' || /indoor|крыт/i.test(name) || tg.leisure === 'sports_centre' && tg.building;
+      return { name, lat, lon, city: osmTag(tg, 'addr:city', 'addr:town', 'addr:village', 'addr:suburb'), website: (w => w ? (/^https?:/i.test(w) ? w : 'https://' + w) : '')(osmTag(tg, 'website', 'contact:website', 'url')), phone: osmTag(tg, 'phone', 'contact:phone'), indoor: !!indoor, tags: Object.keys(tg).length, osm: `${e.type[0]}${e.id}` }; }).filter(Boolean);
+    const rows = []; for (const r of raw.sort((a, b) => b.tags - a.tags)) { const dup = rows.find(x => GEO.distKm(x, r) < 0.4 && (x.name.toLowerCase() === r.name.toLowerCase() || GEO.distKm(x, r) < 0.12)); if (dup) { if (!dup.website && r.website) dup.website = r.website; if (!dup.city && r.city) dup.city = r.city; continue; } rows.push(r); }
+    for (const r of rows) { const near = STORE.getTracks().find(tr => isFinite(tr.lat) && GEO.distKm(tr, r) < 0.3); r.have = near ? near.id : ''; if (!r.city) { const c = GEO.nearestCity(r.lat, r.lon); if (c && c.km < 40) r.city = c.name; } }
+    rows.sort((a, b) => (!!a.have - !!b.have) || a.name.localeCompare(b.name)); OSM.rows = rows;
+    setStatus('osmStatus', rows.length ? t('{n} karting venues found in {c}; {h} already in Hutka.', { n: rows.length, c: countryName(cc), h: rows.filter(r => r.have).length }) : t('Nothing tagged as karting in {c} on OpenStreetMap.', { c: countryName(cc) }), rows.length ? 'ok' : 'warn');
+    const body = $('osmTable').querySelector('tbody'); body.innerHTML = '';
+    rows.forEach((r, i) => { const tr = el('tr'); tr.innerHTML = `<td><input type="checkbox" data-i="${i}" ${r.have ? 'disabled' : ''} style="width:16px;height:16px"></td><td style="white-space:normal;font-weight:600">${esc(r.name)}</td><td>${esc(r.city)}</td><td>${r.indoor ? esc(t('indoor')) : ''}</td><td>${r.website ? `<a href="${esc(r.website)}" target="_blank" rel="noopener">${esc(r.website.replace(/^https?:\/\//, '').slice(0, 30))}</a>` : ''}</td><td>${r.have ? `<a class="btn xs" href="#track~${esc(r.have)}">${esc(t('in Hutka'))}</a>` : `<a class="btn xs" href="https://www.openstreetmap.org/${r.osm[0] === 'n' ? 'node' : (r.osm[0] === 'w' ? 'way' : 'relation')}/${r.osm.slice(1)}" target="_blank" rel="noopener">OSM</a>`}</td>`; body.appendChild(tr); });
+    $('osmWrap').hidden = !rows.length; $('osmImport').hidden = !rows.some(r => !r.have); $('osmAll').checked = false;
+  }
+  $('osmFind').onclick = osmFind;
+  $('osmAll').onchange = () => { for (const cb of $('osmTable').querySelectorAll('input[type=checkbox]:not(:disabled)')) cb.checked = $('osmAll').checked; };
+  $('osmImport').onclick = async () => {
+    const cc = $('osmCountry').value, picked = [...$('osmTable').querySelectorAll('input[type=checkbox]:checked:not(:disabled)')].map(cb => OSM.rows[+cb.dataset.i]).filter(Boolean);
+    if (!picked.length) { setStatus('osmImportStatus', t('Tick the tracks to import first.'), 'warn'); return; }
+    const b = $('osmImport'); b.classList.add('busy'); let n = 0;
+    for (const r of picked) { try { const id = await STORE.saveTrack({ name: r.name, city: r.city, country: cc, lat: +r.lat.toFixed(5), lon: +r.lon.toFixed(5), website: r.website, phone: r.phone, indoor: r.indoor, osm: r.osm, source: 'osm' }); r.have = id; n++; setStatus('osmImportStatus', t('Imported {n} of {m}…', { n, m: picked.length })); } catch (e) { setStatus('osmImportStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); break; } }
+    b.classList.remove('busy'); setStatus('osmImportStatus', t('{n} tracks imported — open them in the list to add logos, karts and hours.', { n }), 'ok'); await renderTrackList(); if (APP.geo) APP.geo.draw();
+    for (const cb of $('osmTable').querySelectorAll('input[type=checkbox]')) { const r = OSM.rows[+cb.dataset.i]; if (r && r.have) { cb.checked = false; cb.disabled = true; cb.closest('tr').lastElementChild.innerHTML = `<a class="btn xs" href="#track~${esc(r.have)}">${esc(t('in Hutka'))}</a>`; } }
   };
   return { show, addTrack };
 })();
@@ -4925,7 +5100,7 @@ const ADMIN = (() => {
   $('q').placeholder = t('Search tracks, drivers...');
   try { await STORE.init(); } catch (e) {}
   renderShell(); I18N.applyStatic();
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
 })();
