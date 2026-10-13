@@ -659,7 +659,7 @@ html.native .top{padding-top:max(8px,env(safe-area-inset-top,0px))}
    live data at the top left, round buttons on the right, the lap scrub bar at the bottom; corners, digest, coach and the comparison open as sheets ---------- */
 .ck-hud,.ck-btns,.ck-scrub{display:none}
 @media (max-height:520px) and (orientation:landscape) and (pointer:coarse){ .toast{bottom:12px} }
-body.cockpit{overflow:hidden}
+body.cockpit{overflow:hidden;--sl:max(8px,env(safe-area-inset-left,0px));--sr:max(8px,env(safe-area-inset-right,0px));--st:max(8px,env(safe-area-inset-top,0px));--sb:max(8px,env(safe-area-inset-bottom,0px))}
 body.cockpit .top,body.cockpit .tabbar,body.cockpit #labMob,body.cockpit .land-hint{display:none!important}
 body.cockpit .page{padding:0;gap:0;max-width:none}
 body.cockpit #pg-lab.has{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
@@ -670,23 +670,23 @@ body.cockpit #hero .map-wrap{flex:1;min-height:0;display:flex;flex-direction:col
 body.cockpit #mapBox{flex:1;min-height:0;overflow:hidden}
 body.cockpit .legend,body.cockpit .map-title,body.cockpit .readout,body.cockpit .mapnote{display:none!important}
 /* the toolbar (markers, labels, rotate, zoom, imagery) is a strip above the scrub bar, shown by the ⋯ button */
-body.cockpit #hero .map-bar{display:none;position:absolute;left:8px;right:56px;bottom:76px;z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);backdrop-filter:blur(10px);padding:5px 6px;gap:4px;overflow-x:auto;justify-content:flex-start;flex-wrap:nowrap;scrollbar-width:none}
+body.cockpit #hero .map-bar{display:none;position:absolute;left:var(--sl);right:calc(var(--sr) + 48px);bottom:calc(var(--sb) + 68px);z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);backdrop-filter:blur(10px);padding:5px 6px;gap:4px;overflow-x:auto;justify-content:flex-start;flex-wrap:nowrap;scrollbar-width:none}
 body.cockpit.ck-tools #hero .map-bar{display:flex}
 body.cockpit #hero .map-bar .btn{height:30px;padding:0 9px;font-size:12px;background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.16);flex:none}
 body.cockpit #hero .map-bar .seg{border-color:rgba(255,255,255,.16)}
 body.cockpit #hero .map-bar .btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 body.cockpit #hero .map-bar #btnFull,body.cockpit #hero .map-bar #tglTiles{display:none}
-body.cockpit .align-bar{position:absolute;left:8px;right:56px;top:70px;z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);color:#fff;backdrop-filter:blur(10px);font-size:12px}
+body.cockpit .align-bar{position:absolute;left:var(--sl);right:calc(var(--sr) + 48px);top:calc(var(--st) + 62px);z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);color:#fff;backdrop-filter:blur(10px);font-size:12px}
 body.cockpit .align-bar .hint{color:rgba(255,255,255,.8)}
 body.cockpit .align-bar .btn.xs{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.18)}
 body.cockpit .align-bar .btn.xs.primary{background:var(--accent);border-color:var(--accent)}
-body.cockpit .sat-pill{left:8px;right:56px;bottom:76px;max-width:none;font-size:11px;padding:4px 4px 4px 10px}
+body.cockpit .sat-pill{left:var(--sl);right:calc(var(--sr) + 48px);bottom:calc(var(--sb) + 68px);max-width:none;font-size:11px;padding:4px 4px 4px 10px}
 body.cockpit .sat-pill .btn.xs{height:26px;padding:0 9px;font-size:11.5px}
 body.cockpit #hero .charts.under{display:none}
-body.cockpit.ck-chart #hero .charts.under{display:block;position:absolute;left:8px;right:56px;bottom:76px;z-index:5;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(10px);padding:2px 6px 4px;max-height:calc(100% - 150px);overflow:hidden}
+body.cockpit.ck-chart #hero .charts.under{display:block;position:absolute;left:var(--sl);right:calc(var(--sr) + 48px);bottom:calc(var(--sb) + 68px);z-index:5;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(10px);padding:2px 6px 4px;max-height:calc(100% - 150px);overflow:hidden}
 body.cockpit.ck-chart #dataSub{display:none}
 /* the HUD: lap rows — colour, lap time, then the speed, time and distance at the scrub position (and Δt against the comparison) */
-body.cockpit .ck-hud{display:flex;position:absolute;left:8px;top:8px;align-items:flex-start;gap:8px;z-index:4;max-width:calc(100% - 64px)}
+body.cockpit .ck-hud{display:flex;position:absolute;left:var(--sl);top:var(--st);align-items:flex-start;gap:8px;z-index:4;max-width:calc(100% - var(--sl) - var(--sr) - 48px)}
 .ck-rb{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(10,14,24,.7);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;font:600 22px/1 var(--body);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25);padding:0;flex:none;-webkit-tap-highlight-color:transparent}
 .ck-rb svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .ck-rb.active{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -704,13 +704,13 @@ body.cockpit .ck-hud{display:flex;position:absolute;left:8px;top:8px;align-items
 .ck-panel .v.dt.loss b{color:#ff8a8a}.ck-panel .v.dt.gain b{color:#5fe08f}
 .ck-panel > span.on.v,.ck-panel > span.on.nm{opacity:1}
 /* upright: the back button alone in the corner, the data panel on a line of its own under it */
-body.cockpit:not(.lab-land) .ck-hud{display:block;left:8px;right:8px;max-width:none}
+body.cockpit:not(.lab-land) .ck-hud{display:block;left:var(--sl);right:var(--sr);max-width:none}
 body.cockpit:not(.lab-land) .ck-hud #ckBack{position:absolute;left:0;top:0}
 body.cockpit:not(.lab-land) .ck-hud .ck-panel{margin-top:48px;max-width:calc(100% - 48px)}
 /* round buttons on the right: satellite, compare, corners, chart, coach, more */
-body.cockpit .ck-btns{display:flex;position:absolute;right:8px;top:8px;flex-direction:column;gap:6px;z-index:6;transition:right .25s ease}
+body.cockpit .ck-btns{display:flex;position:absolute;right:var(--sr);top:var(--st);flex-direction:column;gap:6px;z-index:6;transition:right .25s ease}
 /* the scrub bar: previous / corner / next on the left, then the speed trace of the lap with the position marker — drag anywhere along it */
-body.cockpit .ck-scrub{display:flex;position:absolute;left:8px;right:8px;bottom:8px;height:60px;align-items:stretch;z-index:4;border-radius:14px;background:rgba(10,14,24,.7);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 18px rgba(0,0,0,.28);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+body.cockpit .ck-scrub{display:flex;position:absolute;left:var(--sl);right:var(--sr);bottom:var(--sb);height:60px;align-items:stretch;z-index:4;border-radius:14px;background:rgba(10,14,24,.7);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 18px rgba(0,0,0,.28);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
 .ck-step{display:flex;align-items:center;flex:none;border-right:1px solid rgba(255,255,255,.12);padding:0 2px;touch-action:manipulation}
 .ck-step button{background:none;border:0;color:#fff;height:100%;padding:0 10px;font:600 22px/1 var(--body);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .ck-step .ck-ct{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 4px;width:136px;gap:2px}
@@ -752,6 +752,9 @@ body.cockpit.lab-land.ck-side .ck-btns,body.cockpit.lab-land.ck-insp .ck-btns{ri
 body.cockpit.lab-land.ck-pick .ck-btns{right:calc(62% + 8px)}
 body.cockpit.lab-land.ck-side .ck-scrub,body.cockpit.lab-land.ck-insp .ck-scrub{right:calc(46% + 8px)}
 body.cockpit.lab-land.ck-pick .ck-scrub{right:calc(62% + 8px)}
+/* sheets on the right keep clear of the notch / home indicator */
+body.cockpit.lab-land.ck-side #labTabs,body.cockpit.lab-land.ck-side #cornersPanel,body.cockpit.lab-land.ck-side #digestPanel,body.cockpit.lab-land.ck-side #discussPanel,body.cockpit.lab-land.ck-side #askPanel,body.cockpit.lab-land .hero .inspector,body.cockpit.lab-land #pickbar.open{padding-right:calc(10px + env(safe-area-inset-right,0px))}
+body.cockpit.lab-land.ck-side #cornersPanel,body.cockpit.lab-land.ck-side #digestPanel,body.cockpit.lab-land.ck-side #discussPanel,body.cockpit.lab-land.ck-side #askPanel,body.cockpit.lab-land .hero .inspector,body.cockpit.lab-land #pickbar.open{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 body.cockpit.lab-land.ck-side .ck-hud,body.cockpit.lab-land.ck-insp .ck-hud{max-width:calc(54% - 64px)}
 body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero .map-bar,body.cockpit.lab-land.ck-side #hero .charts.under,body.cockpit.lab-land.ck-insp #hero .charts.under,body.cockpit.lab-land.ck-side .sat-pill,body.cockpit.lab-land.ck-insp .sat-pill,body.cockpit.lab-land.ck-side .align-bar,body.cockpit.lab-land.ck-insp .align-bar{right:calc(46% + 56px)}
 </style>
