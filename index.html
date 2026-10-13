@@ -256,6 +256,8 @@ textarea{min-height:90px;resize:vertical}
 @media (max-width:700px){.track-head{margin-top:-36px;gap:12px}.logo.lg{width:84px;height:84px;font-size:20px}.track-head h1{font-size:24px}}
 .cover-x{position:relative;height:300px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,var(--surface-3),var(--surface-2));border:1px solid var(--line)}
 .cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover canvas{width:100%;height:100%;display:block}
+.cover.gen{background:linear-gradient(135deg,#1b2340,#2f3b6b)}
 .cover .fade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,var(--bg) 100%)}
 .track-head{display:flex;gap:22px;align-items:flex-end;margin-top:-64px;padding:0 24px;position:relative;flex-wrap:wrap}
 .track-head .titles{flex:1;min-width:0;padding-bottom:6px}
@@ -681,7 +683,7 @@ textarea{min-height:90px;resize:vertical}
 
     <!-- ========== TRACK ========== -->
     <section class="page" id="pg-track" hidden>
-      <div class="cover" id="tCover"><img alt="" id="tCoverImg" hidden><div class="fade"></div></div>
+      <div class="cover" id="tCover"><img alt="" id="tCoverImg" hidden><canvas id="tCoverGen" hidden></canvas><div class="fade"></div></div>
       <div class="track-head">
         <div class="logo lg" id="tLogo"></div>
         <div class="titles">
@@ -3310,6 +3312,15 @@ async function renderTracksPage() {
   for (const x of sorted) all.appendChild(trackRow(x.tr, x.d));
   if (!trs.length) all.appendChild(el('div', 'hint', STORE.hasDb ? t('No tracks yet.') : t('Tracks appear here once you are signed in.')));
 }
+// a generated cover: the layout's shape from a published session on a brand gradient (until the track has a real photo)
+function drawCoverShape(cv, pv, name) {
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1)), w = cv.clientWidth || 900, h = cv.clientHeight || 300; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#1b2340'); g.addColorStop(1, '#30406f'); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  const pad = 26, sw = (w * 0.55 - 2 * pad) / Math.max(pv.w || 1, 0.05), sh = (h - 2 * pad) / Math.max(pv.h || 1, 0.05), s = Math.min(sw, sh), ox = w - pad - (pv.w || 1) * s, oy = (h - (pv.h || 1) * s) / 2;
+  const path = () => { ctx.beginPath(); pv.pts.forEach((p, i) => { const x = ox + p[0] * s, y = h - (oy + p[1] * s); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath(); };
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; path(); ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 22; ctx.stroke(); path(); ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 4; ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `600 12px ${getComputedStyle(document.documentElement).getPropertyValue('--mono') || 'monospace'}`; ctx.fillText('GPS · ' + (name || ''), pad, h - pad / 2);
+}
 function trackRow(tr, d) {
   const a = el('a', 'track-row'); a.href = '#track~' + tr.id; a.dataset.id = tr.id;
   const lg = el('div', 'logo'); logoInto(lg, tr);
@@ -3337,7 +3348,10 @@ async function renderTrackPage(tid) {
   if (tr.website) add('i-globe', `<a href="${esc(tr.website)}" target="_blank" rel="noopener">${t('Website')}</a>`);
   if (open) add('i-clock', open.open === false && open.opens ? t('Opens at {t}', { t: open.opens }) : t('Closes at {t}', { t: open.closes }));
   const cover = await STORE.getMedia(`tracks/${tid}/media/cover`);
-  $('tCoverImg').hidden = !cover; if (cover) $('tCoverImg').src = cover; $('tCover').classList.toggle('nocover', !cover);
+  $('tCoverImg').hidden = !cover; if (cover) $('tCoverImg').src = cover;
+  const pubsEarly = cover ? [] : await STORE.sessionsFor(tid); const shape = pubsEarly.map(s => s.preview).find(p => p && p.pts);
+  $('tCover').classList.toggle('nocover', !cover && !shape); $('tCover').classList.toggle('gen', !cover && !!shape); $('tCoverGen').hidden = !(!cover && shape);
+  if (!cover && shape) requestAnimationFrame(() => drawCoverShape($('tCoverGen'), shape, tr.name));
   logoInto($('tLogo'), tr);
   $('tBook').hidden = !tr.booking; if (tr.booking) { $('tBookBtn').href = tr.booking; $('tBookSub').textContent = t('Reserve your spot at {name} through their official booking site.', { name: tr.name }); }
   $('tVideo').hidden = !tr.video; if (tr.video) { $('tVideoBtn').href = tr.video; $('tVideoSub').textContent = t("Experience {name} from a driver's perspective", { name: tr.name }); }
