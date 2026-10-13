@@ -135,7 +135,7 @@ p{margin:0}
 .crows{display:flex;flex-direction:column;gap:6px}
 .crow{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:4px 10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-align:left;font:inherit;color:var(--fg);cursor:pointer}
 .crow.sel{border-color:var(--accent);background:var(--accent-soft)}
-.crow b{font-size:16px;font-weight:800}
+.crow b{font-size:16px;font-weight:800;grid-column:1;grid-row:1 / span 2;align-self:center}
 .crow .k{font-size:12.5px;color:var(--muted);white-space:normal;line-height:1.35;grid-column:2}
 .crow .ty{font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;grid-column:2}
 .crow .ty.b{color:var(--brake)}.crow .ty.y{color:var(--lift)}.crow .ty.g{color:var(--throttle)}
@@ -506,8 +506,24 @@ textarea{min-height:90px;resize:vertical}
 .tool-rail{display:flex;flex-direction:column;gap:10px}
 .step h4{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:8px;font-weight:600}
 .step h4 .n{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--surface-3);color:var(--fg);font:600 11px/1 var(--mono)}
-/* ---------- phone: app-like shell with a bottom tab bar ---------- */
-@media (max-width:700px){
+.land-only{display:none!important}
+.land-hint{align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:13px;color:var(--muted)}
+.land-hint svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.land-hint span{flex:1;min-width:0}
+.land-hint[hidden]{display:none!important}
+.insp-nav{align-items:center;gap:8px;margin:-4px 0 2px;padding-right:36px}
+.insp-nav span{flex:1;min-width:0;text-align:center;font:600 13px var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.insp-nav .btn.sm{height:32px;padding:0 12px;font-size:18px;line-height:1}
+.votes{display:inline-flex;gap:4px}
+.btn.vote .ic{font-size:14px;line-height:1}
+.btn.vote.on.up{border-color:var(--throttle);color:var(--throttle);background:color-mix(in srgb,var(--throttle) 10%,var(--surface))}
+.btn.vote.on.down{border-color:var(--brake);color:var(--brake);background:color-mix(in srgb,var(--brake) 10%,var(--surface))}
+.post.low{opacity:.72}
+.post.low .pv{filter:grayscale(1)}
+.karts{display:flex;flex-wrap:wrap;gap:6px}
+.karts .chip b{font-weight:600}
+/* ---------- phone: app-like shell with a bottom tab bar (portrait, and a phone held sideways) ---------- */
+@media (max-width:700px), (max-height:520px) and (orientation:landscape) and (pointer:coarse){
   html{-webkit-text-size-adjust:100%}
   .app{grid-template-columns:1fr}
   .side{display:none}
@@ -616,6 +632,53 @@ textarea{min-height:90px;resize:vertical}
   .tbl.resp td:last-child::before,.tbl.resp td.noLbl::before{display:none}
   .tbl.resp td .row{flex-wrap:wrap}
 }
+/* ---------- phone held sideways: the Lab becomes a cockpit — map on the left, corners on the right ---------- */
+@media (max-height:520px) and (orientation:landscape) and (pointer:coarse){
+  body.lab-land{overflow:hidden}
+  body.lab-land .top,body.lab-land .tabbar{display:none!important}
+  body.lab-land .page{padding:0;gap:0;max-width:none}
+  #pg-lab.has{display:grid;grid-template-columns:minmax(0,1fr) 46%;grid-template-rows:40px auto minmax(0,1fr);height:100vh;height:100dvh;overflow:hidden;padding:0;gap:0}
+  #pg-lab.has .ph,#pg-lab.has #labGuestNote,#pg-lab.has #landHint,#pg-lab.has #labStart{display:none!important}
+  #pg-lab.has #labMob{grid-column:1 / -1;grid-row:1;position:static;margin:0;padding:0 8px;height:40px;gap:6px;border-bottom:1px solid var(--line)}
+  #pg-lab.has #labMob .lm-t{flex-direction:row;align-items:baseline;gap:8px}
+  #pg-lab.has #labMob .lm-t b{font-size:17px}
+  #pg-lab.has #labMob .lm-t .lbl{max-width:28vw}
+  #pg-lab.has #labMob .btn.sm{height:30px;padding:0 9px;font-size:12.5px}
+  #pg-lab.has #lmBack{padding:0 10px;font-size:20px;line-height:1}
+  #pg-lab.has .land-only{display:flex!important}
+  #pg-lab.has #lmStep .btn{height:30px;padding:0 10px;font-size:15px;line-height:1}
+  #pg-lab.has #lmStep #lmCorner{font-weight:700;min-width:52px;font-size:13px}
+  #pg-lab.has #hero{grid-column:1;grid-row:2 / 4;min-height:0;display:flex;flex-direction:column;align-items:stretch;gap:0;border-right:1px solid var(--line)}
+  #pg-lab.has .map-wrap{border:0;border-radius:0;flex:1;min-height:0;display:flex;flex-direction:column;width:100%}
+  #pg-lab.has #mapBox{flex:1;min-height:0;overflow:hidden}
+  #pg-lab.has .map-bar{padding:3px 6px;gap:3px;flex:none}
+  #pg-lab.has .map-bar .btn{height:28px;padding:0 8px;font-size:12px}
+  #pg-lab.has .map-bar #btnFull{display:none}
+  #pg-lab.has .legend,#pg-lab.has .map-title{display:none}
+  #pg-lab.has .readout{font-size:11px}
+  #pg-lab.has.tab-chart #mapBox,#pg-lab.has.tab-chart .map-bar{display:none}
+  #pg-lab.has.tab-chart .charts.under{flex:1;min-height:0;overflow:auto;border-top:0}
+  #pg-lab.has #labTabs{grid-column:2;grid-row:2;padding:4px 6px 2px;gap:4px;margin:0}
+  #pg-lab.has #labTabs button{padding:5px 10px;font-size:12px}
+  #pg-lab.has #cornersPanel,#pg-lab.has #digestPanel,#pg-lab.has #discussPanel,#pg-lab.has #askPanel{grid-column:2;grid-row:3;min-height:0;overflow:auto;border:0;border-radius:0;padding:4px 8px 12px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  #pg-lab.has #cornersPanel h2{display:none}
+  #pg-lab.has #digestPanel h2,#pg-lab.has #discussPanel h2,#pg-lab.has #askPanel h2{font-size:13px;margin-bottom:6px}
+  #pg-lab.has .crow{padding:7px 8px;border-radius:10px;gap:2px 8px}
+  #pg-lab.has .crow b{font-size:14px}
+  #pg-lab.has .crow .k{font-size:11.5px}
+  #pg-lab.has .digest{font-size:13px}
+  #pg-lab.has .hero .inspector{left:auto;right:0;top:40px;bottom:0;width:46%;max-height:none;border-radius:0;border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.15);transform:translateX(110%);padding:10px 12px 14px;overscroll-behavior:contain}
+  #pg-lab.has .hero .inspector.open{transform:none}
+  #pg-lab.has .insp-head b{font-size:18px}
+  #pg-lab.has #pickbar.open{left:auto;right:0;top:40px;bottom:0;width:62%;max-height:none;border-radius:0;border-left:1px solid var(--line)}
+  #pg-lab.has .hero.fs-fallback{border:0}
+  #pg-lab.has .hero.fs-fallback .charts.under{display:none!important}
+  #pg-lab.has .hero.fs-fallback .inspector{top:0;width:46%}
+  #pg-lab.has .hero.fs-fallback .fs-head{padding:0 10px;height:40px;flex:none}
+  #pg-lab.has .hero.fs-fallback .fs-head .lapline .big{font-size:18px}
+  #pg-lab.has .hero.fs-fallback .fs-head .btn{height:30px;font-size:12.5px;padding:0 10px}
+  .toast{bottom:12px}
+}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -654,6 +717,7 @@ textarea{min-height:90px;resize:vertical}
     <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></symbol>
     <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></symbol>
+    <symbol id="i-rotate" viewBox="0 0 24 24"><rect x="3" y="7" width="14" height="10" rx="2"/><path d="M20 10v4M17 20l-2-2 2-2M15 18h3a2 2 0 002-2"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
   </defs>
 </svg>
@@ -694,7 +758,7 @@ textarea{min-height:90px;resize:vertical}
     <!-- ========== HOME ========== -->
     <section class="page" id="pg-home" hidden>
       <div class="home-hero card">
-        <div class="t"><h1 data-t="See where the time is">See where the time is</h1><p id="homeSub"></p><div class="row" style="margin-top:14px"><button class="btn primary" id="homeUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload Alfano session">Upload Alfano session</span></button><a class="btn" href="#tracks"><svg><use href="#i-track"/></svg><span data-t="Browse tracks">Browse tracks</span></a><button class="btn" id="homeSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button></div></div>
+        <div class="t"><h1 data-t="See where the time is">See where the time is</h1><p id="homeSub"></p><div class="row" style="margin-top:14px"><button class="btn primary" id="homeUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#tracks"><svg><use href="#i-track"/></svg><span data-t="Browse tracks">Browse tracks</span></a><button class="btn" id="homeSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button></div></div>
         <div class="stats" id="homeStats"></div>
       </div>
       <div class="home-grid">
@@ -740,6 +804,7 @@ textarea{min-height:90px;resize:vertical}
       <div class="card" id="tDescCard" hidden><p id="tDesc" style="max-width:80ch;line-height:1.6"></p></div>
       <div class="card"><h2><svg><use href="#i-layouts"/></svg><span data-t="Layouts">Layouts</span></h2><div class="layouts" id="tLayouts"></div><div class="hint" id="tLayoutsHint"></div></div>
       <div class="card" id="tMineCard" hidden><h2><svg><use href="#i-user"/></svg><span data-t="Your sessions on this track">Your sessions on this track</span><span class="sub" id="tMineSub"></span></h2><div id="tMine"></div></div>
+      <div class="card" id="tKartsCard" hidden><h2><svg><use href="#i-speed"/></svg><span data-t="Karts people drive here">Karts people drive here</span></h2><div class="karts" id="tKarts"></div></div>
       <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="Hot laps">Hot laps</span><span class="sub" id="tHotSub"></span></h2><div id="tHot"></div></div>
       <div class="card"><div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:center" id="tStatsWrap"><img class="thumb" id="tAerial" alt="" hidden style="width:240px;height:240px;object-fit:cover"><div class="tiles" id="tTiles"></div></div></div>
       <div class="follow" id="tFollow"><span id="tFollowLbl"></span><div class="socials" id="tSocials"></div></div>
@@ -761,14 +826,15 @@ textarea{min-height:90px;resize:vertical}
 
     <!-- ========== LAB ========== -->
     <section class="page" id="pg-lab" hidden>
-      <div class="ph"><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div><div class="row"><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload Alfano session">Upload Alfano session</span></button></div></div>
+      <div class="ph"><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div><div class="row"><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
       <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div><button class="btn primary sm" id="labSignIn" style="margin-left:auto;flex:none" hidden data-t="Sign in">Sign in</button></div>
       <div id="labStart" hidden>
         <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="labMineSub"></span></h2><div id="labMine"></div><div class="hint" id="labMineHint"></div></div>
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
-        <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><button class="btn primary" id="labUpload2" type="button" style="margin-top:10px"><svg><use href="#i-upload"/></svg><span data-t="Upload Alfano session">Upload Alfano session</span></button></div>
+        <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><button class="btn primary" id="labUpload2" type="button" style="margin-top:10px"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div>
       </div>
-      <div class="lab-mob mobile-only" id="labMob" hidden><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><button class="btn sm" id="lmCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
+      <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner">›</button></div><button class="btn sm" id="lmCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
+      <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close">×</button></div>
       <div class="card" id="pickbar" hidden>
         <button class="insp-close mobile-only" id="pickClose" type="button" aria-label="Close">×</button>
         <div class="pickbar">
@@ -777,7 +843,7 @@ textarea{min-height:90px;resize:vertical}
           <div class="field auto"><label data-t="Compare">Compare</label><div class="row" style="flex-wrap:nowrap"><div class="seg"><button class="btn" id="qcNone" type="button" data-t="Off">Off</button><button class="btn" id="qcBestAvg" type="button" data-t="Best vs average">Best vs average</button><button class="btn" id="qcLap" type="button" data-t="Another lap">Another lap</button><button class="btn" id="qcOther" type="button" data-t="Another session…">Another session…</button></div></div></div>
           <div class="field" id="cmpField" hidden><label id="cmpLbl"></label><select id="cmpSel"></select></div>
           <div class="field auto" id="lapSegField" hidden><label data-t="Show on map">Show on map</label><div class="seg" id="lapSeg"><button class="btn active" id="lapYou" type="button">Reference</button><button class="btn" id="lapCmp" type="button">Comparison</button></div></div>
-          <div class="field auto"><label data-t="This session">This session</label><div class="row" style="flex-wrap:nowrap"><button class="btn" id="btnLike" type="button" title="Like"><span class="heart">♥</span> <b id="likeN">0</b></button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button></div></div>
+          <div class="field auto"><label data-t="This session">This session</label><div class="row" style="flex-wrap:nowrap"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button></div></div>
         </div>
         <div class="cmp-picker" id="cmpPicker" hidden><div class="hint" id="cmpPickerHint"></div><div class="list" id="cmpList"></div></div>
         <div class="lapline" style="margin-top:14px"><span class="lbl" id="lapLbl"></span><span class="big" id="lapBig">—</span><div class="chips" id="lapChips"></div></div>
@@ -787,7 +853,7 @@ textarea{min-height:90px;resize:vertical}
       <div class="hero" id="hero" hidden>
         <div class="map-wrap" id="mapWrap1">
           <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
-          <div class="map-bar">
+          <div class="map-bar" id="mapBar">
             <div class="seg" id="viewSeg"><button class="btn" id="tglSat" type="button" data-t="Aerial">Aerial</button></div>
             <button class="btn" id="optBand" type="button" data-t="Track edges">Track edges</button>
             <button class="btn" id="optTicks" type="button" data-t="Markers">Markers</button>
@@ -796,14 +862,14 @@ textarea{min-height:90px;resize:vertical}
             <div class="seg"><button class="btn" id="zoomOut" type="button">−</button><button class="btn" id="zoomIn" type="button">+</button><button class="btn" id="zoomFit" type="button">⌂</button></div>
             <button class="btn" id="btnFull" type="button" title="Full screen"><svg><use href="#i-full"/></svg><span data-t="Full screen">Full screen</span></button>
           </div>
-          <div style="position:relative"><canvas id="map"></canvas>
+          <div style="position:relative" id="mapBox"><canvas id="map"></canvas>
           <div class="map-title" id="map1Title" hidden></div>
           <div class="readout" id="readout" hidden></div>
           <div class="mapnote" id="mapNote" hidden></div></div>
           <div class="legend" id="legendData"></div>
           <div class="charts under" id="dataPanel"><div class="hint" id="dataSub" style="margin:8px 0 4px"></div><canvas class="chart" id="chDataSpeed" height="150"></canvas><canvas class="chart" id="chDataDelta" height="84"></canvas></div>
         </div>
-        <div class="inspector" id="inspector"><button class="insp-close" id="inspClose" type="button" aria-label="Close">×</button><div class="insp-empty" id="inspEmpty"></div><div id="inspBody" hidden></div></div>
+        <div class="inspector" id="inspector"><button class="insp-close" id="inspClose" type="button" aria-label="Close">×</button><div class="insp-nav mobile-only" id="inspNav"><button class="btn sm" id="inspPrev" type="button" aria-label="Previous corner">‹</button><span id="inspNavLbl"></span><button class="btn sm" id="inspNext" type="button" aria-label="Next corner">›</button></div><div class="insp-empty" id="inspEmpty"></div><div id="inspBody" hidden></div></div>
       </div>
       <div class="lab-tabs mobile-only" id="labTabs" hidden><button type="button" class="active" data-tab="corners" data-t="Corners">Corners</button><button type="button" data-tab="digest" data-t="Digest">Digest</button><button type="button" data-tab="chart" data-t="Chart">Chart</button><button type="button" data-tab="discuss" data-t="Discussion">Discussion</button><button type="button" data-tab="ai" data-t="Coach">Coach</button></div>
       <div class="card" id="digestPanel" hidden><h2><svg><use href="#i-clip"/></svg><span data-t="Session digest">Session digest</span><span class="sub" id="digestSub"></span></h2><div class="digest" id="digest"></div><details class="gloss"><summary class="hint" data-t="What the terms mean">What the terms mean</summary><ul id="glossList"></ul></details></div>
@@ -856,7 +922,7 @@ textarea{min-height:90px;resize:vertical}
         <div class="card" id="profSocialCard"><h2><svg><use href="#i-users"/></svg><span data-t="Community">Community</span></h2><div class="tiles" id="profSocial"></div><div class="hint" id="profSocialHint" style="margin-top:10px"></div></div>
       </div>
       <div class="card" id="profSwsCard" hidden><h2><svg><use href="#i-flag"/></svg><span data-t="SWS results">SWS results</span><span class="sub" id="profSwsSub"></span></h2><div id="profSwsBox"></div></div>
-      <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="profSessSub"></span></h2><div class="row" style="margin-bottom:12px"><button class="btn primary" id="profUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload Alfano session">Upload Alfano session</span></button></div><div id="profSessions"></div><div class="hint" id="profSessHint"></div></div>
+      <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="profSessSub"></span></h2><div class="row" style="margin-bottom:12px"><button class="btn primary" id="profUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div><div id="profSessions"></div><div class="hint" id="profSessHint"></div></div>
     </section>
 
     <!-- ========== DRIVER ========== -->
@@ -871,7 +937,7 @@ textarea{min-height:90px;resize:vertical}
     <section class="page" id="pg-admin" hidden>
       <div class="ph"><div><h1 data-t="Admin Panel">Admin Panel</h1><div class="sub" id="admSub"></div></div><div class="row"><button class="btn primary" id="admAddTrack" type="button"><svg><use href="#i-plus"/></svg><span data-t="Add track">Add track</span></button></div></div>
       <div class="admin-grid">
-        <div class="card"><h2><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></h2><div class="list" id="admTracks"></div><h2 style="margin-top:18px"><svg><use href="#i-flag"/></svg><span data-t="Claim requests">Claim requests</span></h2><div class="list" id="admClaims"></div></div>
+        <div class="card"><h2><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></h2><div class="list" id="admTracks"></div><div id="admClaimsWrap"><h2 style="margin-top:18px"><svg><use href="#i-flag"/></svg><span data-t="Claim requests">Claim requests</span></h2><div class="list" id="admClaims"></div></div></div>
         <div style="display:flex;flex-direction:column;gap:16px;min-width:0" id="admRight">
           <div class="empty" id="admEmpty"><svg><use href="#i-track"/></svg><div class="t" data-t="Pick a track to edit, or add one">Pick a track to edit, or add one</div></div>
           <div class="card" id="admTrackCard" hidden>
@@ -899,6 +965,7 @@ textarea{min-height:90px;resize:vertical}
               <div class="field"><label>Facebook</label><input type="url" id="aFb" placeholder="https://facebook.com/..."></div>
               <div class="field"><label>TikTok</label><input type="url" id="aTt" placeholder="https://tiktok.com/..."></div>
               <div class="field wide"><label data-t="Description">Description</label><textarea id="aDesc"></textarea></div>
+              <div class="field wide"><label data-t="Karts — one per line (add “sport” after a sport kart)">Karts — one per line (add “sport” after a sport kart)</label><textarea id="aKarts" placeholder="Sodi RT8&#10;Sodi RT10&#10;Rotax Max · sport"></textarea></div>
               <div class="field"><label data-t="Logo">Logo</label><div class="row"><div class="logo" id="aLogoPrev"></div><label class="btn sm filebtn"><span data-t="Upload image">Upload image</span><input type="file" id="aLogoFile" accept="image/*"></label><button class="btn sm ghost" id="aLogoClear" type="button" data-t="Remove">Remove</button></div></div>
               <div class="field"><label data-t="Cover photo">Cover photo</label><div class="row"><img class="thumb" id="aCoverPrev" alt="" style="width:160px;height:72px;object-fit:cover" hidden><label class="btn sm filebtn"><span data-t="Upload image">Upload image</span><input type="file" id="aCoverFile" accept="image/*"></label><button class="btn sm ghost" id="aCoverClear" type="button" data-t="Remove">Remove</button></div></div>
             </div>
@@ -952,17 +1019,20 @@ textarea{min-height:90px;resize:vertical}
 <!-- upload modal -->
 <div class="modal" id="uplModal" hidden>
   <div class="box">
-    <h3 data-t="Upload Alfano session">Upload Alfano session</h3>
-    <div class="upl-drop" id="uplDrop"><div><b data-t="Choose session files">Choose session files</b></div><div class="hint" data-t="Alfano .alf2 (the reference), AiM / RaceChrono / TrackAddict / Harry's LapTimer CSV, VBOX .vbo, GPX. One file per session; several at once are fine.">Alfano .alf2 (the reference), AiM / RaceChrono / TrackAddict / Harry's LapTimer CSV, VBOX .vbo, GPX. One file per session; several at once are fine.</div><input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden></div>
+    <h3 data-t="Upload session">Upload session</h3>
+    <div class="upl-drop" id="uplDrop"><div><b data-t="Choose session files">Choose session files</b></div><div class="hint" data-t="Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.">Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.</div><input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden></div>
     <div class="status" id="uplStatus"></div>
     <div id="uplForm" hidden>
       <div class="form">
         <div class="field wide"><label data-t="Session name">Session name</label><input type="text" id="uplName" placeholder="Pasha, Al Forsan, stint 1"></div>
         <div class="field"><label data-t="Track">Track</label><select id="uplTrack"></select></div>
         <div class="field"><label data-t="Layout — pick the one you drove">Layout — pick the one you drove</label><select id="uplLayout"></select></div>
+        <div class="field wide" id="uplNewTrack" hidden><div class="newtrack"><div class="hint" id="uplNewHint"></div><div class="form" style="margin-top:8px"><div class="field"><label data-t="Track name">Track name</label><input type="text" id="uplNewName" placeholder="Dubai Kartdrome"></div><div class="field"><label data-t="City">City</label><input type="text" id="uplNewCity"></div><div class="field"><label data-t="Country">Country</label><select id="uplNewCountry"></select></div></div></div></div>
+        <div class="field"><label data-t="Kart">Kart</label><select id="uplKart"></select></div>
+        <div class="field" id="uplKartOtherField" hidden><label data-t="Kart model">Kart model</label><input type="text" id="uplKartOther" placeholder="Sodi RT8, Rotax Max, X30…"></div>
         <div class="field wide" id="uplLayoutPhotoField" hidden><img id="uplLayoutPhoto" alt="" style="max-width:100%;max-height:220px;border-radius:10px;display:block"></div>
-        <div class="field"><label data-t="Kart / notes">Kart / notes</label><input type="text" id="uplNote" placeholder="Sodi RT10 #14, wet"></div>
-        <div class="field" id="uplPubField"><label data-t="Visibility">Visibility</label><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="uplPublish" checked style="width:18px;height:18px"><span data-t="Publish on the track page (others can compare with it)">Publish on the track page (others can compare with it)</span></label></div>
+        <div class="field"><label data-t="Notes">Notes</label><input type="text" id="uplNote" placeholder="#14, wet, new tyres"></div>
+        <div class="field" id="uplPubField"><label data-t="Visibility">Visibility</label><label class="row" style="min-height:40px;cursor:pointer;align-items:flex-start;flex-wrap:nowrap;gap:8px;line-height:1.35;padding-top:4px"><input type="checkbox" id="uplPublish" checked style="width:18px;height:18px;flex:none"><span data-t="Publish on the track page (others can compare with it)">Publish on the track page (others can compare with it)</span></label></div>
       </div>
       <div class="hint" id="uplDetect" style="margin-top:8px"></div>
     </div>
@@ -991,7 +1061,9 @@ textarea{min-height:90px;resize:vertical}
     <div class="field wide"><label data-t="Session name">Session name</label><input type="text" id="seName" maxlength="80"></div>
     <div class="field"><label data-t="Track">Track</label><select id="seTrack"></select></div>
     <div class="field"><label data-t="Layout">Layout</label><select id="seLayout"></select></div>
-    <div class="field wide"><label data-t="Kart / notes">Kart / notes</label><input type="text" id="seNote" maxlength="120"></div>
+    <div class="field"><label data-t="Kart">Kart</label><select id="seKart"></select></div>
+    <div class="field" id="seKartOtherField" hidden><label data-t="Kart model">Kart model</label><input type="text" id="seKartOther" maxlength="40" placeholder="Sodi RT8, Rotax Max…"></div>
+    <div class="field wide"><label data-t="Notes">Notes</label><input type="text" id="seNote" maxlength="120"></div>
     <div class="field wide"><label data-t="SWS race this session belongs to (optional)">SWS race this session belongs to (optional)</label><select id="seSws"></select><div class="hint" id="seSwsHint"></div></div>
     <div class="field wide" id="sePubField"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="sePublish" style="width:18px;height:18px"><span data-t="Published on the track page">Published on the track page</span></label></div>
   </div>
@@ -2118,7 +2190,7 @@ Object.assign(I18N.RU, {
   'Subscribe': 'Подписаться', 'Edit track': 'Редактировать', 'Book a session': 'Забронировать заезд', 'Book now': 'Забронировать', 'Take a virtual lap': 'Виртуальный круг', 'Watch the onboard': 'Смотреть онборд', 'Layouts': 'Лейауты', 'Hot laps': 'Лучшие круги', 'Is this your track?': 'Это ваша трасса?',
   // layout page
   'Layout not found': 'Лейаут не найден', 'clockwise': 'по часовой', 'counter-clockwise': 'против часовой', 'no sessions yet': 'сессий пока нет',
-  'Nobody has published a session on this layout yet. Be the first: upload your Alfano file and it will appear here for others to compare with.': 'На этом лейауте ещё никто не опубликовал сессию. Будь первым: загрузи файл Alfano, и он появится здесь — другие смогут сравниться с ним.',
+  'Nobody has published a session on this layout yet. Be the first: upload your session and it will appear here for others to compare with.': 'На этой конфигурации ещё никто не опубликовал сессию. Будь первым: загрузи свою сессию, и она появится здесь для сравнения.',
   'Nobody has published a session on this layout yet, so there is no track line to show. The first uploaded session defines it — be the first.': 'На этом лейауте ещё никто не опубликовал сессию, поэтому линии трассы пока нет. Её задаст первая загруженная сессия — будь первым.',
   'brake': 'тормоз', 'brake released': 'отпустил тормоз', 'throttle': 'газ', 'number — corner from the S/F line': 'номер — поворот от линии старт/финиш',
   'Fastest published lap · {t} · {who}': 'Лучший опубликованный круг · {t} · {who}',
@@ -2128,7 +2200,7 @@ Object.assign(I18N.RU, {
   'left': 'левый', 'right': 'правый', 'apex {s} m from S/F': 'апекс {s} м от S/F', 'Fastest published lap': 'Лучший опубликованный круг', 'Best passes · {n} laps': 'Лучшие проезды · {n} кругов',
   'The guide needs at least 4 clean laps.': 'Для гида нужно минимум 4 чистых круга.', 'The corner guide is built from everything drivers publish on this layout: the best quarter of all passes through each corner. Nothing here yet.': 'Гид по поворотам собирается из всего, что гонщики публикуют на этом лейауте: лучшая четверть всех проездов каждого поворота. Пока пусто.',
   'built from {n} clean laps of {m}': 'собран из {n} чистых кругов · {m}', 'Ranges are the middle half of the best passes. Hover a card to see the corner on the map.': 'Диапазоны — средняя половина лучших проездов. Наведи на карточку, чтобы увидеть поворот на карте.',
-  'braking corner': 'тормозной', 'lift corner': 'со сбросом', 'flat-out corner': 'на полном газу', 'No sessions yet': 'Сессий пока нет', 'Upload your Alfano session and publish it — it becomes the reference others compare with.': 'Загрузи свою сессию Alfano и опубликуй — она станет эталоном, с которым сравниваются другие.',
+  'braking corner': 'тормозной', 'lift corner': 'со сбросом', 'flat-out corner': 'на полном газу', 'No sessions yet': 'Сессий пока нет', 'Upload your session and publish it — it becomes the reference others compare with.': 'Загрузи свою сессию и опубликуй её — она станет эталоном, с которым сравниваются другие.',
   'Upload my session': 'Загрузить мою сессию', 'Laps': 'Кругов', 'Best': 'Лучший', 'Avg clean': 'Средний чистый', 'Compare with mine': 'Сравнить с моей',
   'Model lap {t} · {n} corners · numbers are from the model, not from drivers': 'Модельный круг {t} · {n} поворотов · цифры из модели, не от гонщиков', 'The model could not run on this line.': 'Модель не смогла посчитать эту линию.',
   '{n} session|{n} sessions': '{n} сессия|{n} сессии|{n} сессий', '{m} driver|{m} drivers': '{m} гонщик|{m} гонщика|{m} гонщиков',
@@ -2142,7 +2214,7 @@ Object.assign(I18N.RU, {
   'Session not found': 'Сессия не найдена', 'Loading session…': 'Загружаю сессию…', 'Could not load this session.': 'Не удалось загрузить сессию.', 'Custom track': 'Своя трасса', 'No clean laps with GPS in this session.': 'В сессии нет чистых кругов с GPS.',
   'Aerial': 'Спутник', 'Lap traces': 'Следы кругов', 'Computing the model line…': 'Считаю модельную линию…', 'Model lap {t} (grip scaled ×{m} to match the reference lap)': 'Модельный круг {t} (сцепление ×{m}, чтобы совпасть с опорным кругом)',
   'Upload an Alfano .alf2 export, pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and a comparison with any other lap or driver.': 'Загрузи выгрузку Alfano (.alf2), выбери трассу и лейаут — и Лаборатория покажет, где время: точки тормоза, апекса и газа в каждом повороте, выжимку простым языком и сравнение с любым другим кругом или гонщиком.',
-  'custom layout': 'свой лейаут', 'Alfano session analysis': 'Разбор сессий Alfano', 'Could not project this lap onto the track line.': 'Не удалось спроецировать круг на линию трассы.',
+  'custom layout': 'свой лейаут', 'Session analysis': 'Разбор сессий', 'Could not project this lap onto the track line.': 'Не удалось спроецировать круг на линию трассы.',
   'Average of all other clean laps': 'Средний из всех других чистых кругов', 'published': 'опубликовано', 'average clean lap': 'средний чистый круг',
   'Reference · {s}': 'Опорный · {s}', 'Reference — a lap or the session average': 'Опорный — круг или средний круг сессии', 'Compare with · {s}': 'Сравнить с · {s}', 'Compare with · all other clean laps': 'Сравнить с · все другие чистые круги', 'Compare with — a lap or the session average': 'Сравнить с — круг или средний круг сессии',
   'Average lap': 'Средний круг', 'No corners found on this line.': 'На этой линии не найдено поворотов.', 'Reference': 'Опорный', 'Comparison': 'Сравнение', 'points of this lap': 'точки этого круга',
@@ -2196,7 +2268,7 @@ Object.assign(I18N.RU, {
   'Session digest': 'Выжимка по сессии', 'What the terms mean': 'Что значат термины', 'Ask the AI about this session': 'Спросить ИИ об этой сессии', 'Ask': 'Спросить', 'Stop': 'Стоп', 'Corner by corner': 'По поворотам', 'click a row to pin it on the map': 'клик по строке закрепит поворот на карте', 'Type': 'Тип', 'Reserve': 'Резерв', 'Main difference': 'Главное отличие', 'Speed and time delta': 'Скорость и дельта времени',
   // profile
   'Hutka admin': 'Админ Hutka', 'Guest — this library lives in this browser only': 'Гость — библиотека живёт только в этом браузере', 'Sign in to claude.ai and open the shared Hutka link to get an account that works on every device.': 'Войди в claude.ai и открой общую ссылку Hutka — аккаунт будет работать на всех устройствах.',
-  'Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.': 'Опубликованные сессии видны на странице трассы, с ними могут сравниваться другие. Приватные — только твои.', 'No sessions yet. Upload an Alfano .alf2 export to start.': 'Сессий пока нет. Загрузи выгрузку Alfano (.alf2), чтобы начать.',
+  'Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.': 'Опубликованные сессии видны на странице трассы, с ними могут сравниваться другие. Приватные — только твои.', 'No sessions yet. Upload a session to start.': 'Сессий пока нет. Загрузи сессию, чтобы начать.',
   'Published': 'Опубликована', 'Private': 'Приватная', 'custom': 'свой', 'Rename': 'Переименовать', 'Delete': 'Удалить', 'Delete this session?': 'Удалить сессию?', 'The file data is removed from your library and from the track page.': 'Данные файла удалятся из библиотеки и со страницы трассы.',
     'Racing name': 'Гоночное имя', 'Country': 'Страна', 'Home track': 'Домашняя трасса', 'Save': 'Сохранить', 'My sessions': 'Мои сессии', 'Track': 'Трасса', 'Visibility': 'Видимость',
   // admin
@@ -2231,7 +2303,7 @@ Object.assign(I18N.RU, {
   'Sign in to like sessions.': 'Войди, чтобы ставить лайки.',
   'Could not save the like.': 'Не удалось сохранить лайк.',
   'Follow a driver on their page and their new published sessions appear here.': 'Подпишись на гонщика на его странице — его новые опубликованные сессии появятся здесь.',
-  'Upload an Alfano .alf2 export, pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.': 'Загрузи экспорт Alfano (.alf2), выбери трек и конфигурацию — и лаборатория покажет, где время: точки торможения, апекса и газа в каждом повороте, разбор простыми словами и, когда нужно, сравнение с любым другим кругом, средним кругом сессии или другим гонщиком на этой же конфигурации.',
+  'Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.': 'Загрузи сессию (Alfano .alf2 — эталон; AiM, RaceChrono, TrackAddict, VBOX и GPX тоже работают), выбери трассу и лейаут — и Лаборатория покажет, где время: точки тормоза, апекса и газа в каждом повороте, выжимку простым языком и, когда нужно, сравнение с любым другим кругом, средним по сессии или другим гонщиком на той же конфигурации.',
   'Published on this layout': 'Опубликованные на этой конфигурации',
   'Compare with — this session': 'Сравнить с — эта сессия',
   'Assign a track first (Edit).': 'Сначала укажи трек (Edit).',
@@ -2265,12 +2337,12 @@ Object.assign(I18N.RU, {
   'Δt appears once a comparison is on (Best vs average, another lap or another session).': 'Δt появится, когда включено сравнение («Лучший vs средний», другой круг или другая сессия).',
   'coming soon': 'скоро',
   'The racing AI — a separate chat that knows your sessions and the fastest published laps on your layouts — is being prepared. The analysis above does not need it.': 'Гоночный ИИ — отдельный чат, который знает твои сессии и самые быстрые опубликованные круги на твоих конфигурациях — готовится. Разбору выше он не нужен.',
-  'Upload the Alfano export of your rental-karting session: Hutka finds every braking point, apex and throttle point, tells you in plain words where the lap is lost and lets you compare with anyone who published a session on the same layout.': 'Загрузи экспорт Alfano своей сессии на прокатном картинге: Hutka найдёт каждую точку торможения, апекса и газа, простыми словами скажет, где теряется круг, и сравнит с любым, кто опубликовал сессию на той же конфигурации.',
+  'Upload your session from Alfano, AiM, RaceChrono or any GPS logger: Hutka finds every braking point, apex and throttle point, tells you in plain words where the lap is lost and lets you compare with anyone who published a session on the same layout and the same kart class.': 'Загрузи сессию с Alfano, AiM, RaceChrono или любого GPS-логгера: Hutka найдёт каждую точку торможения, апекса и газа, простыми словами скажет, где теряется круг, и сравнит с любым, кто опубликовал сессию на той же конфигурации и том же классе картов.',
   'Sessions': 'Сессии',
   '{n} published': 'опубликовано: {n}',
   'No sessions published yet': 'Опубликованных сессий пока нет',
   'Sign in to see the feed': 'Войди, чтобы видеть ленту',
-  'Be the first: upload your Alfano session and publish it on the track page.': 'Будь первым: загрузи сессию Alfano и опубликуй её на странице трека.',
+  'Be the first: upload your session and publish it on the track page.': 'Будь первым: загрузи сессию и опубликуй её на странице трека.',
   'The shared library needs a connection. Browse tracks meanwhile.': 'Общей библиотеке нужно подключение. Пока посмотри треки.',
   'Sessions appear here when drivers publish them. Open one to see the corner-by-corner breakdown, or compare it with your own.': 'Сессии появляются здесь, когда гонщики их публикуют. Открой любую — увидишь разбор по поворотам, или сравни со своей.',
   'Nothing yet — the first published session opens the board.': 'Пока пусто — первая опубликованная сессия откроет таблицу.',
@@ -2458,16 +2530,30 @@ Object.assign(I18N.RU, {
   'Corners': 'Повороты',
   'Digest': 'Разбор',
   'Chart': 'График',
+  '#14, wet, new tyres': '#14, мокро, новая резина',
+  'GPS does not match any track in Hutka yet — add it below (name, city), or keep the session private without a track.': 'GPS не совпал ни с одной трассой в Hutka — добавьте её ниже (название, город) или оставьте сессию приватной без трассы.',
+  // v23: sideways lab, community tracks, karts, votes
+  'sport kart': 'спортивный карт', 'rental kart': 'прокатный карт', 'sport': 'спорт', 'kart': 'карт', 'Kart': 'Карт', 'Kart model': 'Модель карта', 'Notes': 'Заметки',
+  'Helpful': 'Полезно', 'Not helpful — irrelevant or misleading': 'Не полезно — нерелевантная или вводит в заблуждение', 'Sign in to rate sessions.': 'Войдите, чтобы оценивать сессии.', 'Could not save the vote.': 'Не удалось сохранить оценку.', 'rated not helpful': 'оценили как неполезную', 'votes & comments soon': 'оценки и комментарии скоро',
+  'My tracks': 'Мои трассы', 'added by {who}': 'добавил {who}', 'a driver': 'гонщик', 'The tracks you added: their page, layouts and corners. Admins can edit everything.': 'Трассы, которые добавили вы: страница, лейауты и повороты. Админы могут править всё.',
+  'Turn the phone sideways: the map and the corners side by side, step corner by corner.': 'Поверните телефон горизонтально: карта и повороты рядом, листайте от поворота к повороту.', 'Corner': 'Поворот',
+  'Showing every kart class — a sport kart and a rental kart are not comparable corner by corner.': 'Показаны все классы картов — спортивный и прокатный карт по поворотам не сравнить.', '{n} session(s) on another kart class are hidden (a sport kart and a rental kart are not comparable).': 'Скрыто сессий на другом классе картов: {n} (спортивный и прокатный карт не сравнить).', 'Hide them': 'Скрыть', 'Show anyway': 'Всё равно показать',
+  'Add a new track…': 'Добавить новую трассу…', '— no track (private, custom) —': '— без трассы (приватно, своя) —', 'Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.': 'Трассы ещё нет в Hutka? Назовите её — страница трассы создастся вместе с этой сессией, потом её можно править, а другие гонщики найдут её по GPS.', 'Other rental kart…': 'Другой прокатный карт…', 'Rental kart (model below)': 'Прокатный карт (модель ниже)', 'Sport kart (Rotax, X30, KZ…)': 'Спортивный карт (Rotax, X30, KZ…)', 'Give the new track a name.': 'Дайте новой трассе название.', 'Main': 'Основной', 'Could not create the track: {e}': 'Не удалось создать трассу: {e}', 'Track name': 'Название трассы',
+  'Upload session': 'Загрузить сессию', 'Karts people drive here': 'Карты, на которых здесь ездят', 'Karts — one per line (add “sport” after a sport kart)': 'Карты — по одному в строке (после спортивного допишите «sport»)', "Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.": 'Alfano .alf2 (эталон), AiM, RaceChrono, TrackAddict, Harry\'s LapTimer, VBOX, GPX — один файл на сессию; можно несколько сразу.',
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
   const mX = (lon) => (lon + 180) / 360;
   const mY = (lat) => { const s = Math.sin(Math.max(-85, Math.min(85, lat)) * PI / 180); return 0.5 - Math.log((1 + s) / (1 - s)) / (4 * PI); };
-  const CITIES = [
+  const CITY_LL = [
     ['Dubai', 25.2048, 55.2708, 1], ['Abu Dhabi', 24.4539, 54.3773, 1], ['Sharjah', 25.3463, 55.4209, 2], ['Ajman', 25.4052, 55.5136, 3], ['Al Ain', 24.2075, 55.7447, 2], ['Ras Al Khaimah', 25.7895, 55.9432, 2], ['Fujairah', 25.1288, 56.3265, 2], ['Umm Al Quwain', 25.5647, 55.5552, 3], ['Al Dhaid', 25.2866, 55.8816, 3], ['Hatta', 24.8003, 56.1160, 3], ['Khasab', 26.1799, 56.2477, 3], ['Muscat', 23.5880, 58.3829, 1], ['Sohar', 24.3643, 56.7466, 2], ['Doha', 25.2854, 51.5310, 1], ['Manama', 26.2285, 50.5860, 1], ['Riyadh', 24.7136, 46.6753, 1], ['Jeddah', 21.4858, 39.1925, 2], ['Kuwait City', 29.3759, 47.9774, 1], ['Tehran', 35.6892, 51.3890, 1], ['Bandar Abbas', 27.1832, 56.2666, 2],
     ['Minsk', 53.9006, 27.5590, 1], ['Vilnius', 54.6872, 25.2797, 1], ['Warsaw', 52.2297, 21.0122, 1], ['Riga', 56.9496, 24.1052, 1], ['Kyiv', 50.4501, 30.5234, 1], ['Moscow', 55.7558, 37.6173, 1], ['Saint Petersburg', 59.9343, 30.3351, 2], ['Berlin', 52.5200, 13.4050, 1], ['Prague', 50.0755, 14.4378, 1], ['Vienna', 48.2082, 16.3738, 1], ['Budapest', 47.4979, 19.0402, 2], ['Rome', 41.9028, 12.4964, 1], ['Milan', 45.4642, 9.1900, 2], ['Paris', 48.8566, 2.3522, 1], ['London', 51.5074, -0.1278, 1], ['Madrid', 40.4168, -3.7038, 1], ['Barcelona', 41.3851, 2.1734, 2], ['Lisbon', 38.7223, -9.1393, 2], ['Amsterdam', 52.3676, 4.9041, 2], ['Istanbul', 41.0082, 28.9784, 1], ['Cairo', 30.0444, 31.2357, 1], ['Tbilisi', 41.7151, 44.8271, 2], ['Baku', 40.4093, 49.8671, 2], ['Almaty', 43.2220, 76.8512, 2], ['Tashkent', 41.2995, 69.2401, 2], ['Delhi', 28.6139, 77.2090, 1], ['Mumbai', 19.0760, 72.8777, 1], ['Bangkok', 13.7563, 100.5018, 1], ['Singapore', 1.3521, 103.8198, 1], ['Kuala Lumpur', 3.1390, 101.6869, 2], ['Tokyo', 35.6762, 139.6503, 1], ['Shanghai', 31.2304, 121.4737, 1], ['Sydney', -33.8688, 151.2093, 1], ['New York', 40.7128, -74.0060, 1], ['Los Angeles', 34.0522, -118.2437, 1], ['Miami', 25.7617, -80.1918, 2], ['Toronto', 43.6532, -79.3832, 2], ['Mexico City', 19.4326, -99.1332, 1], ['São Paulo', -23.5505, -46.6333, 1], ['Buenos Aires', -34.6037, -58.3816, 1], ['Johannesburg', -26.2041, 28.0473, 1], ['Nairobi', -1.2921, 36.8219, 2], ['Lagos', 6.5244, 3.3792, 1]
-  ].map(c => ({ name: c[0], x: mX(c[2]), y: mY(c[1]), rank: c[3] }));
+  ];
+  const CITIES = CITY_LL.map(c => ({ name: c[0], x: mX(c[2]), y: mY(c[1]), rank: c[3] }));
+  const CITY_CC = { 'Dubai': 'AE', 'Abu Dhabi': 'AE', 'Sharjah': 'AE', 'Ajman': 'AE', 'Al Ain': 'AE', 'Ras Al Khaimah': 'AE', 'Fujairah': 'AE', 'Umm Al Quwain': 'AE', 'Al Dhaid': 'AE', 'Hatta': 'AE', 'Khasab': 'OM', 'Muscat': 'OM', 'Sohar': 'OM', 'Doha': 'QA', 'Manama': 'BH', 'Riyadh': 'SA', 'Jeddah': 'SA', 'Kuwait City': 'KW', 'Tehran': 'IR', 'Bandar Abbas': 'IR', 'Minsk': 'BY', 'Vilnius': 'LT', 'Warsaw': 'PL', 'Riga': 'LV', 'Kyiv': 'UA', 'Moscow': 'RU', 'Saint Petersburg': 'RU', 'Berlin': 'DE', 'Prague': 'CZ', 'Vienna': 'AT', 'Budapest': 'HU', 'Rome': 'IT', 'Milan': 'IT', 'Paris': 'FR', 'London': 'GB', 'Madrid': 'ES', 'Barcelona': 'ES', 'Lisbon': 'PT', 'Amsterdam': 'NL', 'Istanbul': 'TR', 'Cairo': 'EG', 'Tbilisi': 'GE', 'Baku': 'AZ', 'Almaty': 'KZ', 'Tashkent': 'UZ', 'Delhi': 'IN', 'Mumbai': 'IN', 'Bangkok': 'TH', 'Singapore': 'SG', 'Kuala Lumpur': 'MY', 'Tokyo': 'JP', 'Shanghai': 'CN', 'Sydney': 'AU', 'New York': 'US', 'Los Angeles': 'US', 'Miami': 'US', 'Toronto': 'CA', 'Mexico City': 'MX', 'São Paulo': 'BR', 'Buenos Aires': 'AR', 'Johannesburg': 'ZA', 'Nairobi': 'KE', 'Lagos': 'NG' };
+  // the nearest known city to a point: a first guess for a new track's city and country (the driver can correct it)
+  function nearestCity(lat, lon) { let best = null; for (const c of CITY_LL) { const d = distKm({ lat, lon }, { lat: c[1], lon: c[2] }); if (!best || d < best.km) best = { name: c[0], cc: CITY_CC[c[0]] || '', km: d }; } return best; }
   let land = null, borders = null, loading = null;
   function decode(buf) {
     const b = new Uint8Array(buf); let p = 0;
@@ -2575,7 +2661,7 @@ const GEO = (() => {
   }
   const initials = (name) => String(name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
   const distKm = (a, b) => { const R = 6371, dLat = (b.lat - a.lat) * PI / 180, dLon = (b.lon - a.lon) * PI / 180, s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * PI / 180) * Math.cos(b.lat * PI / 180) * Math.sin(dLon / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(s)); };
-  return { load, GeoMap, initials, distKm, ready: () => !!land };
+  return { load, GeoMap, initials, distKm, nearestCity, ready: () => !!land };
 })();
 // ---------- data layer ----------
 // One STORE API over three backends: the claude.ai artifact runtime (db + user capabilities), a Supabase project (standalone
@@ -2633,7 +2719,7 @@ const STORE = (() => {
   function sessionMeta(sess) {
     const clean = sess.laps.filter(L => L.clean), best = sess.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a), avg = clean.length ? clean.reduce((s, L) => s + L.timeMs, 0) / clean.length : best.timeMs;
     let la = 0, lo = 0, n = 0; for (const L of clean.length ? clean : sess.laps) for (let i = 0; i < L.pts.length; i += 5) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
-    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
+    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', kart: sess.kart || '', kartClass: sess.kartClass || (sess.kart ? 'rental' : ''), nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
   }
 
   // ===== backend: claude.ai artifact (db + user capabilities) =====
@@ -2666,8 +2752,8 @@ const STORE = (() => {
       async listClaims() { return docs(await db.collection('claims').get()); },
       deleteClaim: (id) => db.doc('claims/' + id).delete(),
       // social: likes, comments, follows
-      async likesFor(sid) { return docs(await db.collection('likes').where('session', '==', sid).get()).map(r => ({ user: r.user, createdAt: r.createdAt })); },
-      like: (sid, uid) => db.doc(`likes/${sid}__${uid}`).set({ session: sid, user: uid, createdAt: Date.now() }),
+      async likesFor(sid) { return docs(await db.collection('likes').where('session', '==', sid).get()).map(r => ({ user: r.user, createdAt: r.createdAt, vote: r.vote === -1 ? -1 : 1 })); },
+      like: (sid, uid, vote) => db.doc(`likes/${sid}__${uid}`).set({ session: sid, user: uid, vote: vote === -1 ? -1 : 1, createdAt: Date.now() }),
       unlike: (sid, uid) => db.doc(`likes/${sid}__${uid}`).delete(),
       async commentsFor(sid) { return docs(await db.collection('comments').where('session', '==', sid).get()).map(r => ({ id: r.id, user: r.user, text: r.text || '', createdAt: r.createdAt || 0 })); },
       addComment: (sid, uid, text) => db.collection('comments').add({ session: sid, user: uid, text, createdAt: Date.now() }),
@@ -2678,7 +2764,7 @@ const STORE = (() => {
       unfollow: (a, b) => db.doc(`follows/${a}__${b}`).delete(),
       async sessionsByOwners(ids) { const out = []; for (const id of ids.slice(0, 30)) { try { out.push(...docs(await db.collection('sessions').where('owner', '==', id).where('published', '==', true).limit(50).get())); } catch (e) {} } return out; },
       async recentPublished(n) { return docs(await db.collection('sessions').where('published', '==', true).limit(Math.max(n, 100)).get()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, n); },
-      async socialCounts(ids, me) { const out = {}; for (const id of ids) { out[id] = { likes: 0, comments: 0, liked: false }; try { const ls = docs(await db.collection('likes').where('session', '==', id).get()); out[id].likes = ls.length; out[id].liked = !!(me && ls.some(x => x.user === me)); } catch (e) {} try { out[id].comments = (await db.collection('comments').where('session', '==', id).get()).docs.length; } catch (e) {} } return out; }
+      async socialCounts(ids, me) { const out = {}; for (const id of ids) { out[id] = { likes: 0, down: 0, comments: 0, liked: false, mine: 0 }; try { const ls = docs(await db.collection('likes').where('session', '==', id).get()); for (const x of ls) { if (x.vote === -1) out[id].down++; else out[id].likes++; if (me && x.user === me) out[id].mine = x.vote === -1 ? -1 : 1; } out[id].liked = out[id].mine === 1; } catch (e) {} try { out[id].comments = (await db.collection('comments').where('session', '==', id).get()).docs.length; } catch (e) {} } return out; }
     };
   }
 
@@ -2687,6 +2773,7 @@ const STORE = (() => {
     const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
     const must = (r) => { if (r.error) { const e = new Error(r.error.message || 'db error'); e.code = r.error.code; throw e; } return r.data; };
     const row2doc = (r) => Object.assign({ id: r.id }, r.data || {});
+    const noCol = (err) => /column|schema cache|PGRST204|42703/i.test((err.message || '') + ' ' + (err.code || ''));   // a column the SQL update has not added yet
     let session = null;
     const A = {
       kind: 'supabase', sb,
@@ -2701,10 +2788,10 @@ const STORE = (() => {
         return { id: u.id, name, avatarUrl: (u.user_metadata && u.user_metadata.avatar_url) || '', color: '#2f6bf0', canEdit: admin, isOwner: admin, canWrite: true, email: u.email || '' };
       },
       async subscribeTracks(fn) { const rows = must(await sb.from('tracks').select('id,data')); fn(rows.map(row2doc)); },
-      saveTrack: async (id, body) => must(await sb.from('tracks').upsert({ id, data: body, updated_at: new Date().toISOString() })),
+      async saveTrack(id, body) { const row = { id, data: body, updated_at: new Date().toISOString() }; if (body.createdBy && A.communityCols !== false) { const r = await sb.from('tracks').upsert(Object.assign({ created_by: body.createdBy }, row)); if (!(r.error && noCol(r.error))) return must(r); A.communityCols = false; } return must(await sb.from('tracks').upsert(row)); },
       deleteTrack: async (id) => must(await sb.from('tracks').delete().eq('id', id)),
       async listLayouts(tid) { return must(await sb.from('layouts').select('id,data').eq('track_id', tid)).map(row2doc); },
-      saveLayout: async (tid, id, body) => must(await sb.from('layouts').upsert({ track_id: tid, id, data: body, updated_at: new Date().toISOString() })),
+      async saveLayout(tid, id, body) { const row = { track_id: tid, id, data: body, updated_at: new Date().toISOString() }; if (body.createdBy && A.communityCols !== false) { const r = await sb.from('layouts').upsert(Object.assign({ created_by: body.createdBy }, row)); if (!(r.error && noCol(r.error))) return must(r); A.communityCols = false; } return must(await sb.from('layouts').upsert(row)); },
       deleteLayout: async (tid, id) => must(await sb.from('layouts').delete().eq('track_id', tid).eq('id', id)),
       async getMedia(path) { const rows = must(await sb.from('media').select('data').eq('path', path).limit(1)); return rows.length ? rows[0].data : null; },
       async setMedia(path, dataUrl) { if (dataUrl) must(await sb.from('media').upsert({ path, data: dataUrl, updated_at: new Date().toISOString() })); else must(await sb.from('media').delete().eq('path', path)); },
@@ -2730,8 +2817,8 @@ const STORE = (() => {
       async listClaims() { return must(await sb.from('claims').select('*').order('created_at', { ascending: false })).map(r => ({ id: String(r.id), track: r.track_id, by: r.by, text: r.text, createdAt: new Date(r.created_at).getTime() })); },
       deleteClaim: async (id) => must(await sb.from('claims').delete().eq('id', +id)),
       // social: likes, comments, follows
-      async likesFor(sid) { return must(await sb.from('likes').select('user_id,created_at').eq('session_id', sid)).map(r => ({ user: r.user_id, createdAt: Date.parse(r.created_at) || 0 })); },
-      like: async (sid, uid) => must(await sb.from('likes').upsert({ session_id: sid, user_id: uid })),
+      async likesFor(sid) { let r = await sb.from('likes').select('user_id,created_at,vote').eq('session_id', sid); if (r.error && noCol(r.error)) { A.votes = false; r = await sb.from('likes').select('user_id,created_at').eq('session_id', sid); } return must(r).map(r => ({ user: r.user_id, createdAt: Date.parse(r.created_at) || 0, vote: r.vote === -1 ? -1 : 1 })); },
+      async like(sid, uid, vote) { if (A.votes !== false) { const r = await sb.from('likes').upsert({ session_id: sid, user_id: uid, vote: vote === -1 ? -1 : 1 }); if (!(r.error && noCol(r.error))) return must(r); A.votes = false; } return must(await sb.from('likes').upsert({ session_id: sid, user_id: uid })); },
       unlike: async (sid, uid) => must(await sb.from('likes').delete().eq('session_id', sid).eq('user_id', uid)),
       async commentsFor(sid) { return must(await sb.from('comments').select('id,user_id,text,created_at').eq('session_id', sid).order('created_at', { ascending: true }).limit(500)).map(r => ({ id: String(r.id), user: r.user_id, text: r.text || '', createdAt: Date.parse(r.created_at) || 0 })); },
       addComment: async (sid, uid, text) => must(await sb.from('comments').insert({ session_id: sid, user_id: uid, text })),
@@ -2742,7 +2829,7 @@ const STORE = (() => {
       unfollow: async (a, b) => must(await sb.from('follows').delete().eq('follower', a).eq('followee', b)),
       async sessionsByOwners(ids) { if (!ids.length) return []; return must(await sb.from('sessions').select('id,meta').in('owner', ids.slice(0, 100)).eq('published', true).order('updated_at', { ascending: false }).limit(60)).map(r => Object.assign({ id: r.id }, r.meta)); },
       async recentPublished(n) { return must(await sb.from('sessions').select('id,meta').eq('published', true).order('created_at', { ascending: false }).limit(n)).map(r => Object.assign({ id: r.id }, r.meta)); },
-      async socialCounts(ids, me) { const out = {}; for (const id of ids) out[id] = { likes: 0, comments: 0, liked: false }; if (!ids.length) return out; try { for (const r of must(await sb.from('likes').select('session_id,user_id').in('session_id', ids).limit(5000))) { const o = out[r.session_id]; if (o) { o.likes++; if (me && r.user_id === me) o.liked = true; } } } catch (e) {} try { for (const r of must(await sb.from('comments').select('session_id').in('session_id', ids).limit(5000))) { const o = out[r.session_id]; if (o) o.comments++; } } catch (e) {} return out; },
+      async socialCounts(ids, me) { const out = {}; for (const id of ids) out[id] = { likes: 0, down: 0, comments: 0, liked: false, mine: 0 }; if (!ids.length) return out; try { let r = await sb.from('likes').select('session_id,user_id,vote').in('session_id', ids).limit(5000); if (r.error && noCol(r.error)) { A.votes = false; r = await sb.from('likes').select('session_id,user_id').in('session_id', ids).limit(5000); } for (const x of must(r)) { const o = out[x.session_id]; if (o) { const v = x.vote === -1 ? -1 : 1; if (v === -1) o.down++; else o.likes++; if (me && x.user_id === me) { o.mine = v; o.liked = v === 1; } } } } catch (e) {} try { for (const r of must(await sb.from('comments').select('session_id').in('session_id', ids).limit(5000))) { const o = out[r.session_id]; if (o) o.comments++; } } catch (e) {} return out; },
       // auth
       signInEmail: async (email) => must(await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname } })),
       signInGoogle: async () => must(await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } })),
@@ -2778,7 +2865,7 @@ const STORE = (() => {
   const getTracks = () => Array.from(tracks.values()).sort(sortTracks);
   const getTrack = (tid) => tracks.get(tid) || null;
   async function saveTrack(tr) {
-    const id = tr.id || ('t' + uid()); const body = Object.assign({}, tr); delete body.id; body.updatedAt = Date.now(); if (!body.createdAt) body.createdAt = Date.now();
+    const id = tr.id || ('t' + uid()); const body = Object.assign({}, tr); delete body.id; body.updatedAt = Date.now(); if (!body.createdAt) body.createdAt = Date.now(); if (!body.createdBy && me.id && !tracks.has(id)) body.createdBy = me.id;
     if (adapter) await adapter.saveTrack(id, body); tracks.set(id, Object.assign({ id }, body)); notify('tracks'); return id;
   }
   async function deleteTrack(tid) { if (adapter) { const ls = await getLayouts(tid, true); await adapter.deleteTrack(tid, ls.map(l => l.id)); } tracks.delete(tid); layouts.delete(tid); notify('tracks'); }
@@ -2789,7 +2876,7 @@ const STORE = (() => {
   }
   const getLayout = (tid, lid) => (layouts.get(tid) || []).find(l => l.id === lid) || null;
   async function saveLayout(tid, l) {
-    const id = l.id || ('l' + uid()); const body = Object.assign({}, l); delete body.id; body.updatedAt = Date.now(); if (!body.createdAt) body.createdAt = Date.now();
+    const id = l.id || ('l' + uid()); const body = Object.assign({}, l); delete body.id; body.updatedAt = Date.now(); if (!body.createdAt) body.createdAt = Date.now(); if (!body.createdBy && me.id && !getLayout(tid, id)) body.createdBy = me.id;
     if (adapter) await adapter.saveLayout(tid, id, body);
     const list = (layouts.get(tid) || []).filter(x => x.id !== id); list.push(Object.assign({ id }, body)); list.sort(sortLayouts); layouts.set(tid, list); notify('layouts'); return id;
   }
@@ -2852,14 +2939,21 @@ const STORE = (() => {
   // ----- social -----
   const social = new Map(), followCache = new Map();
   let socialOn = null;
+  // community tracks need community.sql (the created_by column); until then only admins add tracks
+  let communityOn = null;
+  async function communityAvailable() { if (communityOn !== null) return communityOn; if (!adapter) return (communityOn = false); if (adapter.kind !== 'supabase') return (communityOn = true); try { const r = await adapter.sb.from('tracks').select('created_by').limit(1); communityOn = !r.error; } catch (e) { communityOn = false; } return communityOn; }
   async function socialAvailable() { if (socialOn !== null) return socialOn; if (!adapter) return (socialOn = false); try { await adapter.likesFor('__probe__'); socialOn = true; } catch (e) { socialOn = false; } return socialOn; }
   async function sessionSocial(sid, fresh) {
     if (!fresh && social.has(sid)) return social.get(sid);
-    const out = { likes: 0, liked: false, likers: [], comments: [] };
-    if (adapter && sid) { try { const ls = await adapter.likesFor(sid); out.likes = ls.length; out.likers = ls.map(x => x.user); out.liked = !!(me.id && ls.some(x => x.user === me.id)); } catch (e) {} try { out.comments = (await adapter.commentsFor(sid)).sort((a, b) => a.createdAt - b.createdAt); } catch (e) {} }
+    const out = { likes: 0, down: 0, mine: 0, liked: false, likers: [], comments: [] };
+    if (adapter && sid) { try { const ls = await adapter.likesFor(sid); for (const x of ls) { if (x.vote === -1) out.down++; else { out.likes++; out.likers.push(x.user); } if (me.id && x.user === me.id) out.mine = x.vote === -1 ? -1 : 1; } out.liked = out.mine === 1; } catch (e) {} try { out.comments = (await adapter.commentsFor(sid)).sort((a, b) => a.createdAt - b.createdAt); } catch (e) {} }
     social.set(sid, out); return out;
   }
-  async function toggleLike(sid) { if (!adapter || !me.id) throw new Error('sign in'); const cur = await sessionSocial(sid); if (cur.liked) await adapter.unlike(sid, me.id); else await adapter.like(sid, me.id); social.delete(sid); return sessionSocial(sid, true); }
+  // helpful (+1) / not helpful (−1): the same vote again removes it
+  async function vote(sid, v) { if (!adapter || !me.id) throw new Error('sign in'); v = v === -1 ? -1 : 1; const cur = await sessionSocial(sid); if (cur.mine === v) await adapter.unlike(sid, me.id); else await adapter.like(sid, me.id, v); social.delete(sid); return sessionSocial(sid, true); }
+  const toggleLike = (sid) => vote(sid, 1);
+  // a session several drivers marked as not helpful sinks in the lists and gets a label
+  const lowRated = (c) => !!c && (c.down || 0) >= 3 && (c.down || 0) > (c.likes || 0);
   async function addComment(sid, text) { if (!adapter || !me.id) throw new Error('sign in'); text = String(text || '').trim().slice(0, 1000); if (!text) return; await adapter.addComment(sid, me.id, text); social.delete(sid); return sessionSocial(sid, true); }
   async function deleteComment(sid, id) { if (!adapter) return; await adapter.deleteComment(id); social.delete(sid); return sessionSocial(sid, true); }
   async function followInfo(uid, fresh) {
@@ -2872,7 +2966,7 @@ const STORE = (() => {
   async function followingIds() { if (!adapter || !me.id) return []; try { return await adapter.followingOf(me.id); } catch (e) { return []; } }
   async function feed() { const ids = await followingIds(); if (!ids.length) return []; try { return (await adapter.sessionsByOwners(ids)).sort(byDate).slice(0, 30); } catch (e) { return []; } }
   async function recentPublished(n) { if (!adapter) return []; try { return (await adapter.recentPublished(n || 30)).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); } catch (e) { return []; } }
-  async function socialCounts(ids) { if (!adapter || !ids.length) { const o = {}; for (const id of ids) o[id] = { likes: 0, comments: 0, liked: false }; return o; } try { return await adapter.socialCounts(ids, me.id); } catch (e) { const o = {}; for (const id of ids) o[id] = { likes: 0, comments: 0, liked: false }; return o; } }
+  async function socialCounts(ids) { const empty = () => { const o = {}; for (const id of ids) o[id] = { likes: 0, down: 0, comments: 0, liked: false, mine: 0 }; return o; }; if (!adapter || !ids.length) return empty(); try { return await adapter.socialCounts(ids, me.id); } catch (e) { return empty(); } }
   async function refreshProfile() { if (adapter && me.id) { try { const p = await adapter.getProfile(me.id); profiles.set(me.id, p); return p; } catch (e) {} } return profiles.get(me.id) || null; }
 
   // ----- the racing AI (standalone hosting): chats live in the project, answers and billing go through the edge functions -----
@@ -2910,11 +3004,11 @@ const STORE = (() => {
   async function claims() { if (!adapter) return []; try { return (await adapter.listClaims()).sort((a, b) => b.createdAt - a.createdAt); } catch (e) { return []; } }
   async function deleteClaim(id) { if (adapter) await adapter.deleteClaim(id); }
 
-  return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
+  return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid,
-    sessionSocial, toggleLike, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, get socialOn() { return socialOn === true; },
+    sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
@@ -3153,7 +3247,27 @@ function createMapView(canvas, host) {
   canvas.addEventListener('contextmenu', (e) => { e.preventDefault(); const [sx, sy] = getPos(e); if (M.tool === 'corner') { if (host.onCorner) host.onCorner(sx, sy, true); return; } const hit = hitPoint(sx, sy); if (hit >= 0 && host.onPointDel) { host.onPointDel(hit); M.selIdx = -1; } });
   function setTool(tl) { M.tool = tl; canvas.className = tl === 'pan' ? '' : (tl === 'trace' ? 'edit' : 'pick'); draw(); }
   function setHover(i) { if (i !== M.hoverIdx) { M.hoverIdx = i; draw(); } }
-  return { V, M, fit, draw, zoomAt, zoomCenter, rotateBy, toS, toI, setTool, setHover, setTouchFree, nearestStation, nearestLineIdx, badgeAt, setup, tokens, lapPos: (P, i) => lapPos(host.getTrack(), P, i) };
+  // fly to a window of the track (stations a … a+len, with padM metres of context on both sides), keeping the rotation
+  let fly = null;
+  function flyTo(s, tx, ty, ms) {
+    const from = { s: V.s, tx: V.tx, ty: V.ty }, t0 = performance.now(); fly = { id: t0 };
+    const step = (now) => { if (!fly || fly.id !== t0) return; const u = Math.min(1, (now - t0) / (ms || 280)), k = 1 - Math.pow(1 - u, 3); V.s = from.s + (s - from.s) * k; V.tx = from.tx + (tx - from.tx) * k; V.ty = from.ty + (ty - from.ty) * k; V.ts = V.s; V.anchor = null; draw(); if (u < 1) requestAnimationFrame(step); else fly = null; };
+    requestAnimationFrame(step);
+  }
+  function focusWindow(a, len, padM, maxZoom) {
+    const tr = host.getTrack ? host.getTrack() : null; if (!tr) return; const { w, h } = setup(); const c = Math.cos(V.rot), si = Math.sin(V.rot);
+    const pad = Math.round((padM === undefined ? 30 : padM) / tr.ds), n = Math.min(tr.N, len + 2 * pad); let xs0 = Infinity, ys0 = Infinity, xs1 = -Infinity, ys1 = -Infinity;
+    for (let k = 0; k < n; k++) { const i = (((a - pad + k) % tr.N) + tr.N) % tr.N, x = tr.cx[i] / tr.mpp, y = tr.cy[i] / tr.mpp, rx = c * x - si * y, ry = si * x + c * y; xs0 = Math.min(xs0, rx); xs1 = Math.max(xs1, rx); ys0 = Math.min(ys0, ry); ys1 = Math.max(ys1, ry); }
+    const wm = (host.getWidthM ? host.getWidthM() : 8) * 2 / tr.mpp; xs0 -= wm; xs1 += wm; ys0 -= wm; ys1 += wm;
+    // never closer than the whole-track fit allows times maxZoom (so one corner does not become a wall of pixels)
+    const sFit = (() => { const keep = { s: V.s, tx: V.tx, ty: V.ty, auto: V.auto, ts: V.ts }; fit(true); const s = V.s; Object.assign(V, keep); return s; })();
+    const s = Math.min(w / Math.max(1, xs1 - xs0), h / Math.max(1, ys1 - ys0)) * 0.9, sz = Math.min(s, sFit * (maxZoom || 4.5));
+    const cx = (xs0 + xs1) / 2, cy = (ys0 + ys1) / 2; V.auto = false;
+    flyTo(sz, w / 2 - sz * cx, h / 2 - sz * cy, 300);
+  }
+  function fitAnimated() { const keep = { s: V.s, tx: V.tx, ty: V.ty }; fit(true); const to = { s: V.s, tx: V.tx, ty: V.ty }; V.s = keep.s; V.tx = keep.tx; V.ty = keep.ty; flyTo(to.s, to.tx, to.ty, 280); V.auto = true; }
+  canvas.addEventListener('pointerdown', () => { fly = null; });
+  return { V, M, fit, fitAnimated, focusWindow, draw, zoomAt, zoomCenter, rotateBy, toS, toI, setTool, setHover, setTouchFree, nearestStation, nearestLineIdx, badgeAt, setup, tokens, lapPos: (P, i) => lapPos(host.getTrack(), P, i) };
 }
 (() => {
 const $ = (id) => document.getElementById(id);
@@ -3199,6 +3313,16 @@ async function imageToDataUrl(file, maxDim, maxChars, png) {
   return out;
 }
 const loadImg = (src) => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+// kart classes: rental karts are the default world; sport karts (Rotax, X30, KZ…) are compared only with each other
+const kartClassOf = (m) => (m && m.kartClass) || 'rental';
+const kartClassName = (cls) => cls === 'sport' ? t('sport kart') : t('rental kart');
+const kartLabel = (m) => { if (!m) return ''; const cls = kartClassOf(m); return m.kart ? (cls === 'sport' ? `${m.kart} · ${t('sport')}` : m.kart) : kartClassName(cls); };
+// helpful / not helpful votes on a session: two small buttons that work the same everywhere
+function voteButtons(sid, cnt, onChange) {
+  const wrap = el('span', 'votes'); const mk = (v, cls) => { const b = el('button', 'btn sm vote ' + cls + (cnt && cnt.mine === v ? ' on' : '')); b.type = 'button'; b.innerHTML = `<span class="ic">${v === 1 ? '👍' : '👎'}</span> <b>${v === 1 ? (cnt ? cnt.likes : 0) : (cnt ? cnt.down : 0)}</b>`; b.title = v === 1 ? t('Helpful') : t('Not helpful — irrelevant or misleading');
+    b.onclick = async () => { if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to rate sessions.')); return; } for (const x of wrap.children) x.disabled = true; try { const r = await STORE.vote(sid, v); wrap.replaceWith(voteButtons(sid, r, onChange)); if (onChange) onChange(r); } catch (e) { toast(t('Could not save the vote.')); for (const x of wrap.children) x.disabled = false; } }; return b; };
+  wrap.append(mk(1, 'up'), mk(-1, 'down')); return wrap;
+}
 // opening hours are judged in the track's own time zone (by country), not the viewer's
 const TZ_BY_COUNTRY = { AE: 'Asia/Dubai', OM: 'Asia/Muscat', QA: 'Asia/Qatar', BH: 'Asia/Bahrain', KW: 'Asia/Kuwait', SA: 'Asia/Riyadh', BY: 'Europe/Minsk', RU: 'Europe/Moscow', UA: 'Europe/Kyiv', KZ: 'Asia/Almaty', GE: 'Asia/Tbilisi', AM: 'Asia/Yerevan', TR: 'Europe/Istanbul', EG: 'Africa/Cairo', PL: 'Europe/Warsaw', LT: 'Europe/Vilnius', LV: 'Europe/Riga', EE: 'Europe/Tallinn', DE: 'Europe/Berlin', FR: 'Europe/Paris', IT: 'Europe/Rome', ES: 'Europe/Madrid', PT: 'Europe/Lisbon', NL: 'Europe/Amsterdam', BE: 'Europe/Brussels', AT: 'Europe/Vienna', CH: 'Europe/Zurich', CZ: 'Europe/Prague', GB: 'Europe/London', IE: 'Europe/Dublin', SE: 'Europe/Stockholm', NO: 'Europe/Oslo', FI: 'Europe/Helsinki', DK: 'Europe/Copenhagen', GR: 'Europe/Athens', CY: 'Asia/Nicosia', IL: 'Asia/Jerusalem', IN: 'Asia/Kolkata', TH: 'Asia/Bangkok', SG: 'Asia/Singapore', MY: 'Asia/Kuala_Lumpur', ID: 'Asia/Jakarta', JP: 'Asia/Tokyo', KR: 'Asia/Seoul', CN: 'Asia/Shanghai', AU: 'Australia/Sydney', NZ: 'Pacific/Auckland', ZA: 'Africa/Johannesburg', BR: 'America/Sao_Paulo', AR: 'America/Argentina/Buenos_Aires', MX: 'America/Mexico_City', CA: 'America/Toronto', US: 'America/New_York' };
 const minutesNowIn = (tz) => { const now = new Date(); if (tz) { try { const parts = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now); const h = +parts.find(p => p.type === 'hour').value, m = +parts.find(p => p.type === 'minute').value; return (h % 24) * 60 + m; } catch (e) { } } return now.getHours() * 60 + now.getMinutes(); };
@@ -3215,9 +3339,10 @@ async function route() {
   try {
     const r = parseHash(); let name = PAGES.includes(r.name) ? r.name : 'home';
     if (name === 'sws') { const pre = SWS.decodeHash((location.hash.split('~')[1] || '')); history.replaceState(null, '', '#profile'); name = 'profile'; r.a = null; setTimeout(() => SWS.open(pre || {}), 300); }
-    if (name === 'admin' && !STORE.isAdmin()) name = 'home';
+    if (name === 'admin' && !STORE.isAdmin() && !(r.a && STORE.canEditTrack(STORE.getTrack(r.a)))) name = STORE.getTracks().some(tr => STORE.canEditTrack(tr)) ? 'admin' : 'home';
     APP.route = name; APP.a = r.a; APP.b = r.b; APP.c = r.c;
     for (const p of PAGES) { const pg = $('pg-' + p); if (pg) pg.hidden = p !== name; }
+    if (typeof syncLand === 'function') syncLand();
     for (const a of document.querySelectorAll('.nav a[data-route], .tabbar a[data-route]')) a.classList.toggle('active', a.dataset.route === name || (name === 'track' || name === 'layout') && a.dataset.route === 'tracks' || name === 'driver' && a.dataset.route === 'profile');
     window.scrollTo({ top: 0 });
     if (name === 'home') await renderHomePage();
@@ -3244,10 +3369,11 @@ async function renderShell() {
   $('chipName').textContent = (prof && prof.racingName) || (STORE.hasIdentity ? (me.name || t('You')) : t('Guest'));
   $('chipSub').textContent = STORE.hasIdentity ? (me.canEdit ? t('admin') : t('driver')) : (STORE.hasAuth ? t('not signed in') : t('local library only'));
   $('userChip').hidden = STORE.hasAuth && !STORE.hasIdentity; $('btnSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity);
-  $('navAdmin').hidden = !STORE.isAdmin(); $('adminSep').hidden = !STORE.isAdmin(); $('navAI').hidden = !STORE.hasAuth; $('tabAI').hidden = !STORE.hasAuth;
+  const canAdm = STORE.isAdmin() || STORE.getTracks().some(tr => STORE.canEditTrack(tr));
+  $('navAdmin').hidden = !canAdm; $('adminSep').hidden = !canAdm; { const lbl = STORE.isAdmin() ? t('Admin Panel') : t('My tracks'); for (const id of ['navAdmin', 'profAdminLink']) { const sp = $(id).querySelector('span'); if (sp) sp.textContent = lbl; } $('pg-admin').querySelector('h1').textContent = lbl; } $('navAI').hidden = !STORE.hasAuth; $('tabAI').hidden = !STORE.hasAuth;
   $('modeNote').textContent = STORE.hasAuth ? (STORE.hasIdentity ? '' : t('Sign in to upload sessions and keep a library across devices. Browsing is open to everyone.')) : (STORE.hasDb ? (STORE.hasIdentity ? (STORE.canWrite() ? '' : t('Read-only access: ask the owner for Contributor access to publish sessions.')) : t('Sign in to claude.ai to publish sessions and keep a library across devices.')) : t('Offline mode: sessions stay in this browser. Open the shared Hutka link signed in to claude.ai to publish and compare with others.'));
-  $('langEn').classList.toggle('active', I18N.lang === 'en'); $('langRu').classList.toggle('active', I18N.lang === 'ru'); $('langEnM').classList.toggle('active', I18N.lang === 'en'); $('langRuM').classList.toggle('active', I18N.lang === 'ru'); $('profAdminLink').hidden = !STORE.isAdmin();
-  $('q').placeholder = t('Search tracks, drivers...'); $('uplName').placeholder = t('Pasha, Al Forsan, stint 1'); $('uplNote').placeholder = t('Sodi RT10 #14, wet'); $('newLayoutName').placeholder = t('New layout name');
+  $('langEn').classList.toggle('active', I18N.lang === 'en'); $('langRu').classList.toggle('active', I18N.lang === 'ru'); $('langEnM').classList.toggle('active', I18N.lang === 'en'); $('langRuM').classList.toggle('active', I18N.lang === 'ru'); $('profAdminLink').hidden = !canAdm;
+  $('q').placeholder = t('Search tracks, drivers...'); $('uplName').placeholder = t('Pasha, Al Forsan, stint 1'); $('uplNote').placeholder = t('#14, wet, new tyres'); $('newLayoutName').placeholder = t('New layout name');
 }
 $('langEn').onclick = $('langEnM').onclick = () => { I18N.setLang('en'); renderShell(); route(); };
 $('langRu').onclick = $('langRuM').onclick = () => { I18N.setLang('ru'); renderShell(); route(); };
@@ -3399,13 +3525,14 @@ async function renderTrackPage(tid) {
   const open = trackHours(tr);
   $('tName').textContent = tr.name;
   $('tOpen').hidden = !(open && open.open !== null); if (open && open.open !== null) { $('tOpen').textContent = open.open ? t('Open') : t('Closed'); $('tOpen').className = 'pill ' + (open.open ? 'ok' : 'off'); }
-  $('tEdit').hidden = !STORE.isAdmin(); $('tEdit').onclick = () => go('admin~' + tid);
+  $('tEdit').hidden = !STORE.canEditTrack(tr); $('tEdit').onclick = () => go('admin~' + tid);
   const meta = $('tMeta'); meta.innerHTML = '';
   const add = (icon, html) => { const s = el('span'); s.appendChild(svgUse(icon)); const b = el('span'); b.innerHTML = html; s.appendChild(b); meta.appendChild(s); };
   add('i-pin', esc([tr.city, tr.country ? countryName(tr.country) : ''].filter(Boolean).join(', ')) + (tr.address ? ' · ' + esc(tr.address) : ''));
   if (tr.phone) add('i-phone', esc(tr.phone));
   if (tr.website) add('i-globe', `<a href="${esc(tr.website)}" target="_blank" rel="noopener">${t('Website')}</a>`);
   if (open) add('i-clock', open.open === false && open.opens ? t('Opens at {t}', { t: open.opens }) : t('Closes at {t}', { t: open.closes }));
+  if (tr.community && tr.createdBy) { const nm = await STORE.names([tr.createdBy]); add('i-users', t('added by {who}', { who: `<a href="#driver~${esc(tr.createdBy)}">${esc((nm[tr.createdBy] || {}).name || t('a driver'))}</a>` })); }
   const cover = await STORE.getMedia(`tracks/${tid}/media/cover`);
   $('tCoverImg').hidden = !cover; if (cover) $('tCoverImg').src = cover;
   const pubsEarly = cover ? [] : await STORE.sessionsFor(tid); const shape = pubsEarly.map(s => s.preview).find(p => p && p.pts);
@@ -3430,15 +3557,20 @@ async function renderTrackPage(tid) {
   $('tLayoutsHint').textContent = layouts.length ? '' : (STORE.isAdmin() ? t('No layouts yet — add them in the admin panel.') : t('No layouts listed yet.'));
   // hot laps: the best lap of every published session
   const hot = $('tHot'); hot.innerHTML = '';
-  const best = pubs.slice().sort((a, b) => a.bestMs - b.bestMs).slice(0, 10);
+  const counts = await STORE.socialCounts(pubs.map(s => s.id)); const low = (s) => STORE.lowRated(counts[s.id]);
+  const best = pubs.filter(s => !low(s)).sort((a, b) => (kartClassOf(a) === 'sport') - (kartClassOf(b) === 'sport') || a.bestMs - b.bestMs).slice(0, 10);
   $('tHotSub').textContent = pubs.length ? t('{n} published sessions', { n: pubs.length }) : '';
   if (!best.length) hot.appendChild(el('div', 'hint', t('No hot laps posted yet — open a layout to add yours.')));
   else {
     const names = await STORE.names(best.map(s => s.owner));
-    const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl hot'); tb.innerHTML = `<thead><tr><th>#</th><th>${t('Driver')}</th><th>${t('Lap')}</th><th>${t('Layout')}</th><th>${t('Session')}</th><th>${t('Date')}</th><th></th></tr></thead>`; const body = el('tbody');
-    best.forEach((s, i) => { const r = el('tr'); const l = layouts.find(x => x.id === s.layout); r.innerHTML = `<td class="num">${i + 1}</td><td class="drv">${driverLink(s.owner, names)}</td><td class="num">${fmtMs(s.bestMs)}</td><td>${esc(l ? l.name : (s.layout === 'custom' ? t('Custom') : s.layout))}</td><td>${esc(s.label || s.name)}</td><td>${esc(fmtDate(s.date))}</td><td><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a></td>`; body.appendChild(r); });
+    const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl hot'); tb.innerHTML = `<thead><tr><th>#</th><th>${t('Driver')}</th><th>${t('Lap')}</th><th>${t('Layout')}</th><th>${t('Kart')}</th><th>${t('Session')}</th><th>${t('Date')}</th><th></th></tr></thead>`; const body = el('tbody');
+    best.forEach((s, i) => { const r = el('tr'); const l = layouts.find(x => x.id === s.layout); r.innerHTML = `<td class="num">${i + 1}</td><td class="drv">${driverLink(s.owner, names)}</td><td class="num">${fmtMs(s.bestMs)}</td><td>${esc(l ? l.name : (s.layout === 'custom' ? t('Custom') : s.layout))}</td><td>${esc(kartLabel(s))}</td><td>${esc(s.label || s.name)}</td><td>${esc(fmtDate(s.date))}</td><td><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a></td>`; body.appendChild(r); });
     tb.appendChild(body); respTable(tb); wrap.appendChild(tb); hot.appendChild(wrap);
   }
+  // the karts people drive here: the track's own list plus whatever drivers reported with their sessions
+  { const box = $('tKarts'); box.innerHTML = ''; const seen = new Map(); for (const k of (Array.isArray(tr.karts) ? tr.karts : [])) if (k && k.name) seen.set(k.name.toLowerCase(), { name: k.name, cls: k.cls || 'rental', n: 0 }); for (const s of pubs) { if (!s.kart) continue; const key = s.kart.toLowerCase(); const o = seen.get(key) || { name: s.kart, cls: kartClassOf(s), n: 0 }; o.n++; seen.set(key, o); }
+    const list = [...seen.values()].sort((a, b) => (a.cls === 'sport') - (b.cls === 'sport') || b.n - a.n); $('tKartsCard').hidden = !list.length;
+    for (const k of list) { const c = el('span', 'chip'); c.innerHTML = `${esc(k.name)}${k.cls === 'sport' ? ' · ' + esc(t('sport')) : ''}${k.n ? ` <b>${k.n}</b>` : ''}`; box.appendChild(c); } }
   // stats tiles
   const tiles = $('tTiles'); tiles.innerHTML = '';
   const tile = (icon, k, v) => { const d = el('div', 'tile'); const kk = el('div', 'k'); kk.appendChild(svgUse(icon)); kk.appendChild(document.createTextNode(k)); d.appendChild(kk); d.appendChild(el('div', 'v', v)); tiles.appendChild(d); };
@@ -3468,7 +3600,7 @@ async function renderLayoutPage(tid, lid) {
   if (!l) { $('lName').textContent = t('Layout not found'); return; }
   $('lCrumb').innerHTML = `<a href="#tracks">${t('Tracks')}</a> › <a href="#track~${tid}">${esc(tr.name)}</a>`;
   $('lName').textContent = `${tr.name} · ${l.name}`;
-  $('lEdit').hidden = !STORE.isAdmin(); $('lEdit').onclick = () => go(`admin~${tid}~${lid}`);
+  $('lEdit').hidden = !STORE.canEditTrack(tr); $('lEdit').onclick = () => go(`admin~${tid}~${lid}`);
   $('lUpload').onclick = () => UPLOAD.open({ track: tid, layout: lid });
   const pubs = await STORE.sessionsFor(tid, lid); LP.sessions = pubs;
   $('lSub').textContent = [l.lengthM ? `${l.lengthM} ${t('m')}` : '', l.corners ? t('{n} corners', { n: l.corners }) : '', l.direction ? (l.direction === 'cw' ? t('clockwise') : t('counter-clockwise')) : '', pubs.length ? t('{n} published sessions', { n: pubs.length }) : t('no sessions yet')].filter(Boolean).join(' · ');
@@ -3477,7 +3609,7 @@ async function renderLayoutPage(tid, lid) {
   let G = null; try { G = await GEOM.build(tid, lid); } catch (e) { G = null; }
   LP.G = G;
   $('lFirst').hidden = !!pubs.length;
-  $('lFirstText').innerHTML = G ? t('Nobody has published a session on this layout yet. Be the first: upload your Alfano file and it will appear here for others to compare with.') : t('Nobody has published a session on this layout yet, so there is no track line to show. The first uploaded session defines it — be the first.');
+  $('lFirstText').innerHTML = G ? t('Nobody has published a session on this layout yet. Be the first: upload your session and it will appear here for others to compare with.') : t('Nobody has published a session on this layout yet, so there is no track line to show. The first uploaded session defines it — be the first.');
   { const src = l.photo ? await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/photo`) : null; $('lPhotoCard').hidden = !src; if (src) $('lPhoto').src = src; }
   if (!LP.map) {
     LP.map = createMapView($('lmap'), { height: (w) => Math.round(clamp(w * 0.72, 380, 760)), getTrack: () => LP.G ? LP.G.track : null, getWidthM: () => LP.G ? LP.G.widthM : 8, getFrameSize: () => LP.G ? [LP.G.W, LP.G.H] : null,
@@ -3527,10 +3659,10 @@ function lpGuide(l) {
 }
 async function lpSessions(tid, lid, l, pubs) {
   const box = $('lSessions'); box.innerHTML = ''; $('lSessSub').textContent = pubs.length ? String(pubs.length) : '';
-  if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); e.appendChild(el('div', 't', t('No sessions yet'))); e.appendChild(el('div', '', t('Upload your Alfano session and publish it — it becomes the reference others compare with.'))); const b = el('button', 'btn primary', t('Upload my session')); b.type = 'button'; b.onclick = () => UPLOAD.open({ track: tid, layout: lid }); e.appendChild(b); box.appendChild(e); return; }
-  const names = await STORE.names(pubs.map(s => s.owner));
-  const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Driver')}</th><th>${t('Session')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th></th></tr></thead>`; const body = el('tbody');
-  for (const s of pubs.slice().sort((a, b) => a.bestMs - b.bestMs)) { const r = el('tr'); r.innerHTML = `<td class="drv" style="font-weight:600">${driverLink(s.owner, names)}</td><td>${esc(s.label || s.name)}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${s.id}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
+  if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); e.appendChild(el('div', 't', t('No sessions yet'))); e.appendChild(el('div', '', t('Upload your session and publish it — it becomes the reference others compare with.'))); const b = el('button', 'btn primary', t('Upload my session')); b.type = 'button'; b.onclick = () => UPLOAD.open({ track: tid, layout: lid }); e.appendChild(b); box.appendChild(e); return; }
+  const names = await STORE.names(pubs.map(s => s.owner)), counts = await STORE.socialCounts(pubs.map(s => s.id)), low = (s) => STORE.lowRated(counts[s.id]);
+  const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Driver')}</th><th>${t('Session')}</th><th>${t('Kart')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th></th></tr></thead>`; const body = el('tbody');
+  for (const s of pubs.slice().sort((a, b) => low(a) - low(b) || (kartClassOf(a) === 'sport') - (kartClassOf(b) === 'sport') || a.bestMs - b.bestMs)) { const r = el('tr'); if (low(s)) r.style.opacity = '.6'; r.innerHTML = `<td class="drv" style="font-weight:600">${driverLink(s.owner, names)}</td><td>${esc(s.label || s.name)}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}${low(s) ? ` <span class="soon">${t('rated not helpful')}</span>` : ''}${counts[s.id] && (counts[s.id].likes || counts[s.id].down) ? ` <span class="hint">👍 ${counts[s.id].likes} 👎 ${counts[s.id].down}</span>` : ''}</td><td>${esc(kartLabel(s))}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${s.id}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
   tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
 }
 const driverLink = (uid, names) => { const n = names && names[uid] ? names[uid].name : t('Driver'); return uid && uid !== 'local' ? `<a href="#driver~${esc(uid)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line-2)">${esc(n)}</a>` : esc(n); };
@@ -3611,20 +3743,23 @@ LAB.show = async function (sid, mode) {
 // open a session as the reference (or as the comparison against my latest session on the same layout)
 LAB.open = async function (meta, asCmp) {
   labEnsureMap(); setStatus('labStatus', t('Loading session…'));
+  if (!(LAB.current && LAB.current.id === meta.id)) LAB.allKarts = false;
   let sess; try { sess = await STORE.loadSession(meta); } catch (e) { setStatus('labStatus', t('Could not load this session.'), 'warn'); return; }
   LAB.tid = meta.track || ''; LAB.lid = meta.layout || 'custom'; LAB.trackName = (STORE.getTrack(LAB.tid) || {}).name || meta.trackName || t('Custom track');
   let G = null; try { G = await GEOM.build(LAB.tid, LAB.lid, sess); } catch (e) { G = null; }
   if (!G) { setStatus('labStatus', t('No clean laps with GPS in this session.'), 'warn'); return; }
   LAB.G = G; LAB.sessions = [];
   const add = (s) => { if (LAB.sessions.some(x => x.id === s.id)) return false; const r = GEOM.attach(s, G); if (r.ok) LAB.sessions.push(s); return !!r.ok; };
-  add(sess); if (G.refSess) add(G.refSess);
+  const cls = kartClassOf(sess), sameKart = (m) => LAB.allKarts || kartClassOf(m) === cls;
+  add(sess); LAB.otherKarts = 0; if (G.refSess) { if (sameKart(G.refSess)) add(G.refSess); else if (G.refSess.published) LAB.otherKarts++; }   // the layout's reference lap is only a comparison when the kart class matches
   // the coach ("reserve", best passes) learns from every lap on this layout: my other sessions and the published ones
-  const mine = (await STORE.mySessions()).filter(m => m.id !== sess.id && (STORE.hasDb ? (m.track === LAB.tid && m.layout === LAB.lid) : true));
+  const mine = (await STORE.mySessions()).filter(m => m.id !== sess.id && sameKart(m) && (STORE.hasDb ? (m.track === LAB.tid && m.layout === LAB.lid) : true));
   for (const m of mine.slice(0, 12)) { try { add(await STORE.loadSession(m)); } catch (e) {} }
-  if (LAB.tid) { const pubs = (await STORE.sessionsFor(LAB.tid, LAB.lid)).filter(m => !LAB.sessions.some(x => x.id === m.id)); for (const m of pubs.slice(-10)) { try { add(await STORE.loadSession(m)); } catch (e) {} } }
+  if (LAB.tid) { const all = (await STORE.sessionsFor(LAB.tid, LAB.lid)).filter(m => !LAB.sessions.some(x => x.id === m.id) && !(G.refSess && m.id === G.refSess.id)); const pubs = all.filter(sameKart); LAB.otherKarts += all.length - pubs.length; for (const m of pubs.slice(-10)) { try { add(await STORE.loadSession(m)); } catch (e) {} } }
   LAB.names = await STORE.names(LAB.sessions.map(s => s.owner));
   LAB.sessions.sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.createdAt || 0) - (b.createdAt || 0));
-  LAB.current = sess; LAB.selN = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = false; LAB.social = null;
+  const reopen = !!(LAB.current && LAB.current.id === sess.id);
+  LAB.current = sess; LAB.selN = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = reopen && LAB.pickerOpen; LAB.social = null;
   if (asCmp) { const my = LAB.sessions.filter(s => mySession(s) && s.id !== sess.id).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]; if (my) { LAB.ref = lapKey(my, bestLap(my)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : lapKey(sess, bestLap(sess)); LAB.current = my; } else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; } }
   else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; }
   LAB.loaded = true; LAB.needFit = true; if (APP.route === 'lab') { LAB.map.fit(); LAB.needFit = false; } labRender();
@@ -3640,22 +3775,61 @@ LAB.load = async function (meta) {
 };
 // ask the lab to drop its loaded state (after a session was edited or deleted elsewhere)
 LAB.invalidate = function (sid) { if (!sid || (LAB.current && LAB.current.id === sid) || LAB.sessions.some(s => s.id === sid)) { LAB.current = null; LAB.G = null; LAB.sessions = []; LAB.loaded = false; LAB.dcmp = null; } };
-const isPhone = () => window.matchMedia && window.matchMedia('(max-width:700px)').matches;
+// a phone: narrow in portrait, or short and wide when held sideways (the Lab then becomes a two-column cockpit)
+const MQ_LAND = '(max-height:520px) and (orientation:landscape) and (pointer:coarse)';
+const isLand = () => window.matchMedia && window.matchMedia(MQ_LAND).matches;
+const isPhone = () => window.matchMedia && (window.matchMedia('(max-width:700px)').matches || isLand());
+const fsOn = () => document.fullscreenElement === $('hero') || $('hero').classList.contains('fs-fallback');
 function labMapHeight(w) {
-  const fs = document.fullscreenElement === $('hero') || $('hero').classList.contains('fs-fallback');
+  const fs = fsOn();
   const ratio = LAB.G ? LAB.G.H / LAB.G.W : 0.65;
+  if (isLand()) { const box = $('mapBox').clientHeight; return Math.max(120, box || (window.innerHeight - 40 - ($('mapBar').offsetHeight || 34) - 2)); }
   if (fs && isPhone()) return Math.max(220, window.innerHeight - ($('fsHead').offsetHeight || 50) - ($('dataPanel').offsetHeight || 180) - 2);
   if (fs) return Math.max(240, window.innerHeight - 28 - 62 - 49 - 34 - 262);
   if (isPhone()) return Math.round(window.innerHeight * 0.5);
   return Math.round(clamp(w * ratio, 340, Math.min(Math.max(360, window.innerHeight - 470), 720)));
 }
-// phone: which panel is shown under the map
+// phone: which panel is shown under the map (sideways: in the right column; the chart then replaces the map on the left)
 LAB.tab = 'corners';
 function applyMobTab() {
   const map = { corners: 'cornersPanel', digest: 'digestPanel', chart: 'dataPanel', discuss: 'discussPanel', ai: 'askPanel' };
-  const fs = $('hero').classList.contains('fs-fallback');
-  for (const k in map) { const e = $(map[k]); if (!e) continue; e.classList.toggle('mob-hide', !(k === LAB.tab || (k === 'chart' && fs))); }
+  const fs = $('hero').classList.contains('fs-fallback'), land = isLand(), was = $('pg-lab').classList.contains('tab-chart');
+  for (const k in map) { const e = $(map[k]); if (!e) continue; e.classList.toggle('mob-hide', !(k === LAB.tab || (k === 'chart' && fs && !land) || (land && k === 'corners' && LAB.tab === 'chart'))); }
   for (const b of $('labTabs').querySelectorAll('button')) b.classList.toggle('active', b.dataset.tab === LAB.tab);
+  for (const k in map) $('pg-lab').classList.toggle('tab-' + k, LAB.tab === k);
+  if (land && was && LAB.tab !== 'chart' && LAB.map && LAB.G) requestAnimationFrame(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); });
+}
+// the sideways cockpit hides the app chrome (top bar, tab bar) while a session is open in the Lab
+function syncLand() {
+  const on = isLand() && APP.route === 'lab' && $('pg-lab').classList.contains('has') && !$('pg-lab').hidden;
+  document.body.classList.toggle('lab-land', on);
+  const hint = $('landHint'); let seen = false; try { seen = !!localStorage.getItem('hutka.landHint'); } catch (e) {}
+  hint.hidden = !(APP.route === 'lab' && $('pg-lab').classList.contains('has') && isPhone() && !isLand() && !seen);
+  $('landHintText').textContent = t('Turn the phone sideways: the map and the corners side by side, step corner by corner.');
+}
+let vpT = null;
+function onViewportChange() {
+  clearTimeout(vpT);
+  vpT = setTimeout(() => { syncLand(); if (APP.route === 'lab' && LAB.map && LAB.G && LAB.dcmp) { applyMobTab(); if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); renderInspector(); renderCornerNav(); } }, 80);
+}
+if (window.matchMedia) { const mq = window.matchMedia(MQ_LAND); (mq.addEventListener ? mq.addEventListener('change', onViewportChange) : mq.addListener(onViewportChange)); }
+// corner stepping (phone): previous / next corner, the map flies to it
+function cornerRows() { return LAB.dcmp ? LAB.dcmp.rows : []; }
+function stepCorner(dir) {
+  const rows = cornerRows(); if (!rows.length) return;
+  const i = rows.findIndex(r => r.w.n === LAB.selN); const j = i < 0 ? (dir > 0 ? 0 : rows.length - 1) : (i + dir + rows.length) % rows.length;
+  LAB.selN = rows[j].w.n; afterSelect(true);
+}
+function renderCornerNav() {
+  const rows = cornerRows(), i = rows.findIndex(r => r.w.n === LAB.selN);
+  $('lmCorner').textContent = i >= 0 ? 'T' + LAB.selN : t('Corner'); $('lmCorner').classList.toggle('active', i >= 0);
+  $('inspNavLbl').textContent = i >= 0 ? `T${LAB.selN} · ${i + 1}/${rows.length}` : '';
+}
+// after the selection changed: redraw everything, and on a phone fly the map to the corner (or back to the whole track)
+function afterSelect(follow) {
+  renderInspector(); renderCornersTable(); renderCornerNav();
+  const row = LAB.selN ? cornerRows().find(r => r.w.n === LAB.selN) : null;
+  if (follow && isPhone() && LAB.map && LAB.G) { if (row) LAB.map.focusWindow(row.w.a, row.w.len, 35, 4.5); else LAB.map.fitAnimated(); } else LAB.map.draw();
 }
 function labEnsureMap() {
   if (LAB.map) return;
@@ -3663,7 +3837,11 @@ function labEnsureMap() {
     getImage: () => { if (!LAB.G) return null; const im = LAB.G.image; return im && LAB.G.source !== 'gps' ? im : (LAB.opts.aerial ? im : null); },
     getOverlay: () => ({ D: LAB.dcmp, role: LAB.mapLap === 'cmp' ? 'cmp' : 'ref', hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor }),
     onHover: (i) => { LAB.hoverIdx = i; showReadout(); renderInspector(); drawDataCharts(); },
-    onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; renderInspector(); renderCornersTable(); LAB.map.draw(); } });
+    onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
+  $('lmBack').onclick = () => { if (history.length > 1) history.back(); else go('home'); };
+  $('lmPrev').onclick = () => stepCorner(-1); $('lmNext').onclick = () => stepCorner(1); $('inspPrev').onclick = () => stepCorner(-1); $('inspNext').onclick = () => stepCorner(1);
+  $('lmCorner').onclick = () => { if (LAB.selN) { LAB.selN = 0; afterSelect(true); return; } const rows = cornerRows(), coach = LAB.coach; let pick = rows[0]; if (coach) { let best = 0; for (const r of rows) { const c = coach.corners.find(x => x.n === r.w.n); const d = c ? r.R.time - c.tTop : 0; if (d > best) { best = d; pick = r; } } } if (pick) { LAB.selN = pick.w.n; afterSelect(true); } };
+  $('landHintClose').onclick = () => { try { localStorage.setItem('hutka.landHint', '1'); } catch (e) {} $('landHint').hidden = true; };
   $('rotL').onclick = () => LAB.map.rotateBy(-Math.PI / 12); $('rotR').onclick = () => LAB.map.rotateBy(Math.PI / 12);
   $('zoomIn').onclick = () => LAB.map.zoomCenter(1.3); $('zoomOut').onclick = () => LAB.map.zoomCenter(1 / 1.3); $('zoomFit').onclick = () => { LAB.map.fit(); LAB.map.draw(); };
   $('optBand').onclick = () => { LAB.opts.band = !LAB.opts.band; syncOpts(); }; $('optTicks').onclick = () => { LAB.opts.ticks = !LAB.opts.ticks; syncOpts(); }; $('optLabels').onclick = () => { LAB.opts.labelsAll = !LAB.opts.labelsAll; syncOpts(); };
@@ -3680,7 +3858,7 @@ function labEnsureMap() {
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('hero').classList.contains('fs-fallback')) fsFallbackOn(false); });
   document.addEventListener('fullscreenchange', () => { const fs = document.fullscreenElement === $('hero'); $('fsHead').hidden = !fs; $('btnFull').classList.toggle('active', fs); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); });
   window.addEventListener('resize', () => { if (APP.route === 'lab' && LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (LAB.dcmp) renderInspector(); } });
-  window.addEventListener('keydown', (e) => { if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if (APP.route !== 'lab') return; if (e.key === 'Escape' && LAB.selN) { LAB.selN = 0; renderInspector(); renderCornersTable(); LAB.map.draw(); } else if (e.key === 'q' || e.key === 'Q') LAB.map.rotateBy(-Math.PI / 24); else if (e.key === 'e' || e.key === 'E') LAB.map.rotateBy(Math.PI / 24); else if (e.key === 'f' || e.key === 'F') $('btnFull').click(); });
+  window.addEventListener('keydown', (e) => { if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if (APP.route !== 'lab') return; if (e.key === 'Escape' && LAB.selN) { LAB.selN = 0; afterSelect(true); } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { if (LAB.dcmp) { e.preventDefault(); stepCorner(e.key === 'ArrowRight' ? 1 : -1); } } else if (e.key === 'q' || e.key === 'Q') LAB.map.rotateBy(-Math.PI / 24); else if (e.key === 'e' || e.key === 'E') LAB.map.rotateBy(Math.PI / 24); else if (e.key === 'f' || e.key === 'F') $('btnFull').click(); });
   for (const c of [$('chDataSpeed'), $('chDataDelta')]) { c.addEventListener('pointermove', (e) => { const G = LAB.G; if (!G || !LAB.dcmp) return; const r = c.getBoundingClientRect(), x = e.clientX - r.left; const s = (x - PAD.l) / (r.width - PAD.l - PAD.r) * G.track.lengthM, i = Math.round(s / G.track.ds), ni = (i >= 0 && i < G.track.N) ? i : -1; if (ni !== LAB.hoverIdx) { LAB.hoverIdx = ni; LAB.map.setHover(ni); showReadout(); renderInspector(); drawDataCharts(); } }); c.addEventListener('pointerleave', () => { if (LAB.hoverIdx >= 0) { LAB.hoverIdx = -1; LAB.map.setHover(-1); showReadout(); renderInspector(); drawDataCharts(); } }); }
   // session switch, reference lap, comparison
   $('sessSel').addEventListener('change', async () => { const id = $('sessSel').value; if (!id || (LAB.current && id === LAB.current.id)) return; const loaded = sessOf(id); if (loaded) { LAB.current = loaded; LAB.ref = lapKey(loaded, bestLap(loaded)); LAB.cmp = 'none'; LAB.selN = 0; LAB.chat = []; LAB.social = null; labRender(); } else { const meta = await STORE.getSessionMeta(id); if (meta) { go('lab~' + id); } } });
@@ -3694,17 +3872,16 @@ function labEnsureMap() {
   $('labUpload').onclick = () => UPLOAD.open({ track: LAB.tid, layout: LAB.lid }); $('labUpload2').onclick = () => UPLOAD.open({});
   $('btnPublish').onclick = labTogglePublish;
   $('btnEditSess').onclick = () => { const s = LAB.current; if (s) SESSEDIT.open(s, () => { LAB.invalidate(s.id); go('lab~' + s.id); }); };
-  $('btnLike').onclick = async () => { const s = LAB.current; if (!s) return; if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to like sessions.')); return; } const b = $('btnLike'); b.disabled = true; try { LAB.social = await STORE.toggleLike(s.id); renderSocialBits(); } catch (e) { toast(t('Could not save the like.')); } b.disabled = false; };
   $('btnFollowOwner').onclick = async () => { const s = LAB.current; if (!s || mySession(s)) return; if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to follow drivers.')); return; } const b = $('btnFollowOwner'); b.classList.add('busy'); try { await STORE.toggleFollow(s.owner); await renderOwnerRow(); } catch (e) { toast(t('Could not save.')); } b.classList.remove('busy'); };
   $('commentBtn').onclick = postComment; $('commentInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); postComment(); } });
-  $('digest').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); LAB.selN = +a.dataset.n; renderInspector(); renderCornersTable(); LAB.map.draw(); $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
-  $('inspClose').onclick = () => { LAB.selN = 0; LAB.hoverIdx = -1; LAB.map.setHover(-1); renderInspector(); renderCornersTable(); LAB.map.draw(); };
+  $('digest').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); LAB.selN = +a.dataset.n; afterSelect(true); if (!isLand()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+  $('inspClose').onclick = () => { LAB.selN = 0; LAB.hoverIdx = -1; LAB.map.setHover(-1); afterSelect(true); };
   $('inspEmpty').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); selectCorner(+a.dataset.n, false); });
   $('askBtn').onclick = askAI; $('askStop').onclick = () => { if (askCtl) askCtl.abort(); };
   $('askInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); askAI(); } });
 }
 function syncOpts() { $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))); LAB.map.draw(); }
-function selectCorner(n, scroll) { LAB.selN = (LAB.selN === n) ? 0 : n; renderInspector(); renderCornersTable(); LAB.map.draw(); if (scroll && LAB.selN) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+function selectCorner(n, scroll) { LAB.selN = (LAB.selN === n) ? 0 : n; afterSelect(true); if (scroll && LAB.selN && !isLand()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 
 // ----- the start screen: my sessions and what the drivers I follow have published -----
 async function renderLabStart() {
@@ -3723,9 +3900,9 @@ async function renderLabStart() {
 function labRender() {
   const G = LAB.G, has = !!(G && LAB.sessions.length && allLaps().length && LAB.current);
   $('labStart').hidden = has; for (const id of ['pickbar', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open'); }
-  $('labEmptyText').textContent = t('Upload an Alfano .alf2 export, pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.');
-  $('labSub').textContent = has ? `${LAB.trackName}${G.layout ? ' · ' + G.layout.name : (LAB.lid === 'custom' ? ' · ' + t('custom layout') : '')}` : t('Alfano session analysis');
-  $('hero').classList.toggle('with-insp', has); $('pg-lab').classList.toggle('has', has);
+  $('labEmptyText').textContent = t('Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.');
+  $('labSub').textContent = has ? `${LAB.trackName}${G.layout ? ' · ' + G.layout.name : (LAB.lid === 'custom' ? ' · ' + t('custom layout') : '')}` : t('Session analysis');
+  $('hero').classList.toggle('with-insp', has); $('pg-lab').classList.toggle('has', has); syncLand();
   LAB.dcmp = null; LAB.coach = null;
   if (!has) return;
   if (LAB.map.V.auto || LAB.needFit) { LAB.map.fit(true); LAB.needFit = false; }   // the map is only measurable once the hero is visible
@@ -3779,6 +3956,7 @@ function labRender() {
   chip(t('max'), kmh(vmax) + ' ' + t('km/h')); chip(t('min'), kmh(vmin) + ' ' + t('km/h')); chip('S1', s1.toFixed(2)); chip('S2', (s2 - s1).toFixed(2)); chip('S3', (D.R.T - s2).toFixed(2));
   if (D.O) chip(t('comparison'), fmtLap(D.O.T) + ' · ' + sg(D.total));
   if (sess.source && sess.source.app !== 'alfano') chip(t('source'), sourceLabel(sess.source));
+  if (sess.kart || sess.kartClass === 'sport') chip(t('kart'), kartLabel(sess));
   if (sess.sws) chip('SWS', [sess.sws.race, sess.sws.pos ? 'P' + String(sess.sws.pos).replace(/^P/i, '') : '', sess.sws.best].filter(Boolean).join(' · '));
   if (LAB.coach) { const res = D.rows.reduce((s, r) => { const c = LAB.coach.corners.find(x => x.n === r.w.n); return s + (c ? Math.max(0, r.R.time - c.tTop) : 0); }, 0); chip(t('reserve'), res.toFixed(2) + ' ' + t('s')); }
   $('fsLbl').textContent = $('lapLbl').textContent; $('fsBig').textContent = $('lapBig').textContent; $('fsChips').innerHTML = chips.innerHTML;
@@ -3788,10 +3966,10 @@ function labRender() {
   const pb = $('btnPublish'); pb.hidden = !(STORE.canWrite() && mySession(sess) && sess.owner !== 'local');
   if (!pb.hidden) { pb.textContent = sess.published ? t('Unpublish') : t('Publish to track page'); pb.classList.toggle('active', !!sess.published); pb.disabled = !sess.track; pb.title = sess.track ? '' : t('Assign a track first (Edit).'); }
   $('btnEditSess').hidden = !mySession(sess);
-  STORE.socialAvailable().then(on => { if (LAB.current !== sess) return; $('btnLike').hidden = !(on && STORE.hasDb && sess.owner !== 'local'); $('discussPanel').hidden = !on; if (on) { renderSocialBits(); renderDiscussion(); } renderOwnerRow(); });
+  STORE.socialAvailable().then(on => { if (LAB.current !== sess) return; $('voteBox').hidden = !(on && STORE.hasDb && sess.owner !== 'local'); if ($('voteBox').hidden) $('lowRated').hidden = true; $('discussPanel').hidden = !on; if (on) { renderSocialBits(); renderDiscussion(); } renderOwnerRow(); });
   $('legendData').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span><span><i style="background:var(--actual)"></i>${t('reference')}</span>${D.O ? `<span><i style="background:var(--cmp)"></i>${t('comparison')}</span>` : ''}<span>${t('number — corner from the S/F line')}</span>`;
   $('mapNote').hidden = true;
-  syncOpts(); renderDigest(); renderCornersTable(); renderInspector(); renderAskState(); showReadout(); drawDataCharts();
+  syncOpts(); renderDigest(); renderCornersTable(); renderInspector(); renderCornerNav(); renderAskState(); showReadout(); drawDataCharts();
 }
 // linked corners: a loss in one corner that buys a bigger gain in the next (early brake, early throttle) is not a mistake
 function markCombos(D) {
@@ -3816,8 +3994,10 @@ function renderCmpPicker() {
   const push = (meta, loaded, same, mine) => rows.push({ meta, loaded, same, mine });
   for (const sx of LAB.sessions) if (sx !== sess) push(sx, true, true, mySession(sx));
   (async () => {
-    const mine = await STORE.mySessions(); for (const m of mine) if (m.id !== sess.id && !sessOf(m.id)) push(m, false, m.track === LAB.tid && m.layout === LAB.lid, true);
-    if (LAB.tid) { const pubs = await STORE.sessionsFor(LAB.tid, LAB.lid); for (const m of pubs) if (m.id !== sess.id && !sessOf(m.id) && !rows.some(r => r.meta.id === m.id)) push(m, false, true, false); }
+    const cls = kartClassOf(sess), sameKart = (m) => LAB.allKarts || kartClassOf(m) === cls; let hidden = 0;
+    const mine = await STORE.mySessions(); for (const m of mine) if (m.id !== sess.id && !sessOf(m.id)) { if (sameKart(m)) push(m, false, m.track === LAB.tid && m.layout === LAB.lid, true); else hidden++; }
+    if (LAB.tid) { const pubs = await STORE.sessionsFor(LAB.tid, LAB.lid); for (const m of pubs) if (m.id !== sess.id && !sessOf(m.id) && !rows.some(r => r.meta.id === m.id)) { if (sameKart(m)) push(m, false, true, false); else hidden++; } }
+    if (hidden || LAB.allKarts) { const h = $('cmpPickerHint'); h.textContent = (LAB.allKarts ? t('Showing every kart class — a sport kart and a rental kart are not comparable corner by corner.') : t('{n} session(s) on another kart class are hidden (a sport kart and a rental kart are not comparable).', { n: hidden })) + ' '; const a = el('a', 'tref', LAB.allKarts ? t('Hide them') : t('Show anyway')); a.href = '#'; a.onclick = async (e) => { e.preventDefault(); LAB.allKarts = !LAB.allKarts; LAB.pickerOpen = true; await LAB.open(LAB.current, false); }; h.appendChild(a); }
     const names = await STORE.names(rows.map(r => r.meta.owner));
     rows.sort((a, b) => (b.same - a.same) || (b.mine - a.mine) || (b.meta.date || '').localeCompare(a.meta.date || ''));
     list.innerHTML = '';
@@ -3827,7 +4007,7 @@ function renderCmpPicker() {
       const tr = STORE.getTrack(m.track); const who = el('span', 'who', r.mine ? t('You') : ((names[m.owner] || {}).name || t('Driver')));
       const nm = el('span', 'nm', `${m.label || m.name} · ${fmtDate(m.date)}${!r.same ? ` · ${tr ? tr.name : (m.trackName || t('Custom'))}` : ''}`);
       const pill = el('span', 'pill ' + (r.same ? 'ok' : 'off'), r.same ? t('same layout') : t('other layout'));
-      b.append(who, nm, el('span', 'tm', fmtMs(m.bestMs)), pill);
+      b.append(who, nm, el('span', 'tm', fmtMs(m.bestMs)), pill); if (m.kart || kartClassOf(m) !== kartClassOf(sess)) b.appendChild(el('span', 'pill ' + (kartClassOf(m) === kartClassOf(sess) ? '' : 'off'), kartLabel(m)));
       b.onclick = async () => { b.classList.add('busy'); try { const s = r.loaded ? m : await LAB.load(m); LAB.cmp = sessAvg(s) ? 'avg:' + s.id : lapKey(s, bestLap(s)); LAB.pickerOpen = false; LAB.chat = []; LAB.selN = 0; labRender(); } catch (e) { toast(t('Could not load that session: {e}', { e: e && e.message || e })); b.classList.remove('busy'); } };
       list.appendChild(b);
     }
@@ -3837,7 +4017,7 @@ async function renderSocialBits() {
   const s = LAB.current; if (!s) return;
   if (!LAB.social || LAB.social.sid !== s.id) { try { LAB.social = Object.assign({ sid: s.id }, await STORE.sessionSocial(s.id)); } catch (e) { LAB.social = { sid: s.id, likes: 0, liked: false, comments: [] }; } }
   if (LAB.current !== s) return;
-  $('likeN').textContent = String(LAB.social.likes || 0); $('btnLike').classList.toggle('liked', !!LAB.social.liked); $('btnLike').title = LAB.social.liked ? t('You like this session') : t('Like');
+  const box = $('voteBox'); box.innerHTML = ''; box.appendChild(voteButtons(s.id, LAB.social, (r) => { LAB.social = Object.assign({ sid: s.id }, r); $('lowRated').hidden = !STORE.lowRated(r); })); $('lowRated').hidden = !STORE.lowRated(LAB.social);
 }
 async function renderOwnerRow() {
   const s = LAB.current, row = $('ownerRow'); if (!s || mySession(s) || !STORE.hasDb) { row.hidden = true; return; }
@@ -3982,6 +4162,7 @@ function renderCornersTable() {
     const main = r.cmp && Math.abs(r.cmp.dt) >= 0.04 && r.cmp.items[0] ? r.cmp.items[0].t : (c && c.infl && c.infl[0] && Math.abs(c.infl[0].corr) >= 0.35 ? t('what matters here is {f}', { f: c.infl[0].name }) : '');
     b.innerHTML = `<b>T${w.n}</b><span class="ty ${kindCls(m)}">${esc((w.dir === 'L' ? t('left') : t('right')) + ' · ' + kindWord(m))}</span><span class="d ${r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm'}">${r.cmp ? sg(r.cmp.dt) : m.time.toFixed(2) + ' ' + t('s')}</span><span class="r ${res > 0.1 ? 'hot' : ''}">${c ? (res > 0.03 ? t('reserve') + ' ' + res.toFixed(2) : t('ok')) : ''}</span><span class="k">${esc(short(m))}${main ? ' — ' + esc(main) : ''}</span>`;
     b.onclick = () => selectCorner(w.n, false); mob.appendChild(b); }
+  if (isLand() && LAB.selN) { const s = mob.querySelector('.crow.sel'); if (s && s.scrollIntoView) s.scrollIntoView({ block: 'nearest' }); }
 }
 function renderInspector() {
   const D = LAB.dcmp, body = $('inspBody'), empty = $('inspEmpty'); if (!D) return;
@@ -4029,7 +4210,7 @@ function setupCanvas(c, hCss) { const dpr = Math.max(1, Math.min(3, window.devic
 function drawDataCharts() {
   const D = LAB.dcmp, G = LAB.G; if (!D || !G || $('hero').hidden) return;
   const tr = G.track, C = LAB.map.tokens(), N = tr.N, L = tr.lengthM, chDS = $('chDataSpeed'), chDD = $('chDataDelta'), X = (s) => PAD.l + (chDS.clientWidth - PAD.l - PAD.r) * s / L;
-  { const { ctx, w, h } = setupCanvas(chDS, 150);
+  { const { ctx, w, h } = setupCanvas(chDS, isLand() ? clamp(($('dataPanel').clientHeight || 0) - 84 - 36, 110, 240) : 150);
     ctx.fillStyle = C.surface; ctx.fillRect(0, 0, w, h);
     let vmax = 0; for (let i = 0; i < N; i++) vmax = Math.max(vmax, D.R.v[i], D.O ? D.O.v[i] : 0);
     const ymax = Math.ceil((vmax * 3.6 + 6) / 10) * 10, Y = (v) => PAD.t + (h - PAD.t - PAD.b) * (1 - v * 3.6 / ymax);
@@ -4122,7 +4303,7 @@ function aiContext() {
   const sess = D.sess, coach = LAB.coach, clean = sess.laps.filter(x => x.clean), avg = clean.reduce((s, x) => s + x.timeMs, 0) / Math.max(1, clean.length) / 1000;
   const M = (m) => m ? { pedal: pedalText(m), entry_kmh: +kmh(m.vEntry), released_m: m.sRel >= 0 ? Math.round(m.sRel) : null, apex_kmh: +kmh(m.vApex), apex_m: Math.round(m.sApex), throttle_m: m.sThr >= 0 ? Math.round(m.sThr) : null, exit_kmh: +kmh(m.vExit), lateral_g: +m.gmax.toFixed(2), time_s: +m.time.toFixed(2) } : null;
   const corners = D.rows.map(r => { const c = coach && coach.corners.find(x => x.n === r.w.n); return { corner: 'T' + r.w.n, direction: r.w.dir === 'L' ? 'left' : 'right', radius_m: Math.round(r.w.Rmin), apex_from_sf_m: Math.round(r.R.sApex), reference: M(r.R), comparison: M(r.O), delta_s: r.cmp ? +r.cmp.dt.toFixed(2) : null, delta_text: r.cmp ? r.cmp.text : null, coach: c ? { best_passes: DATA.coachText(c), reserve_s: +Math.max(0, r.R.time - c.tTop).toFixed(2), time_spread_s: c.tStd !== undefined ? +c.tStd.toFixed(2) : null } : null }; });
-  return JSON.stringify({ track: LAB.trackName, layout: LAB.G.layout ? LAB.G.layout.name : LAB.lid, session: { name: shortSess(sess), driver: sess.driver, date: sess.date, laps: sess.laps.length, clean: clean.length, best_lap: bestLap(sess).n, best_time: fmtMs(bestLap(sess).timeMs), avg_clean: fmtLap(avg), is_viewer_own: !!D.ref.mine }, reference_lap: { what: D.ref.name, time: fmtLap(D.R.T) }, comparison: D.O ? { who: D.nameOf(D.O), time: fmtLap(D.O.T), delta_s: +D.total.toFixed(2) } : null, digest: $('digest').innerText, corners });
+  return JSON.stringify({ track: LAB.trackName, layout: LAB.G.layout ? LAB.G.layout.name : LAB.lid, session: { name: shortSess(sess), driver: sess.driver, date: sess.date, kart: kartLabel(sess), kart_class: kartClassOf(sess), laps: sess.laps.length, clean: clean.length, best_lap: bestLap(sess).n, best_time: fmtMs(bestLap(sess).timeMs), avg_clean: fmtLap(avg), is_viewer_own: !!D.ref.mine }, reference_lap: { what: D.ref.name, time: fmtLap(D.R.T) }, comparison: D.O ? { who: D.nameOf(D.O), time: fmtLap(D.O.T), delta_s: +D.total.toFixed(2) } : null, digest: $('digest').innerText, corners });
 }
 const AI_RULES = () => `You are a rental-karting coach (Sodi RT10, Honda GX390, up to ~80 km/h) and an Alfano telemetry analyst. Below is a JSON breakdown of one session on a track: corners T1…Tn are numbered from the start/finish line; for each one you get what the driver did on the reference lap and on the comparison lap: points in metres from S/F, speeds in km/h, corner time, plus "coach" — statistics of the best passes through that corner across all loaded laps and the reserve. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, briefly and concretely, in plain language without jargon, referring to corner numbers and the numbers in the data. If asked about something not in the data (video, a line more precise than ±1 m, kart condition), say so plainly. Never invent numbers. Plain text, no tables or headings; lists only when short.`;
 async function askAI() {
@@ -4195,19 +4376,35 @@ const UPLOAD = (() => {
     let la = 0, lo = 0, n = 0; for (const L of laps) for (let i = 0; i < L.pts.length; i += 10) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
     const c = { lat: la / n, lon: lo / n };
     const trs = STORE.getTracks().filter(x => isFinite(x.lat) && isFinite(x.lon)).map(x => ({ x, d: GEO.distKm(c, x) })).sort((a, b) => a.d - b.d);
-    const near = trs.length && trs[0].d < 3 ? trs[0] : null;
-    fillSelect($('uplTrack'), [['', t('— not in the catalogue (custom) —')]].concat(STORE.getTracks().map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), ctx.track || (near ? near.x.id : ''));
-    await fillLayouts(); syncPub();
+    const near = trs.length && trs[0].d < 3 ? trs[0] : null; center = c;
+    const canAdd = STORE.canWrite() && (STORE.isAdmin() || await STORE.communityAvailable());
+    fillSelect($('uplTrack'), (canAdd ? [['__new__', '+ ' + t('Add a new track…')]] : []).concat([['', t('— no track (private, custom) —')]], STORE.getTracks().map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), ctx.track || (near ? near.x.id : (canAdd ? '__new__' : '')));
+    // a new track: name from the file where the logger wrote one, city and country from the nearest known city
+    { const city = GEO.nearestCity(c.lat, c.lon); $('uplNewName').value = p0.meta.track ? p0.meta.track.replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase()) : ''; $('uplNewCity').value = city && city.km < 80 ? city.name : ''; fillCountries($('uplNewCountry'), true); $('uplNewCountry').value = city && city.km < 400 ? city.cc : ''; $('uplNewHint').textContent = t('Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.'); }
+    await fillLayouts(); syncPub(); syncNew();
     if (ctx.layout) { $('uplLayout').value = ctx.layout; showLayoutPhoto(); }
+    fillKarts();
     $('uplName').value = p0.meta.driver ? `${p0.meta.driver}${p0.meta.date ? ', ' + fmtDate(p0.meta.date) : ''}` : (p0.data.name || '');
     const src = p0.data.source; const srcTx = src && src.app !== 'alfano' ? ' · ' + t('Source: {s}', { s: sourceLabel(src) }) + (src.grade !== 'high' ? ' — ' + t('braking and throttle points will be approximate; Alfano at 10 Hz is the reference') : '') + (p0.data.lapsHow === 'loop' ? ' · ' + t('laps were cut where the loop closes (no start/finish beacon in the file)') : '') : '';
-    $('uplDetect').textContent = `${t('{n} laps, best {b}', { n: laps.length, b: fmtMs(best.timeMs) })} · ${near ? t('GPS puts this session at {name} ({d} km)', { name: near.x.name, d: near.d.toFixed(1) }) : t('GPS does not match any track in the catalogue — it will be saved as a custom track.')}${parsed.length > 1 ? ' · ' + t('{n} files: one session each, the same track and layout', { n: parsed.length }) : ''}${srcTx}`;
+    $('uplDetect').textContent = `${t('{n} laps, best {b}', { n: laps.length, b: fmtMs(best.timeMs) })} · ${near ? t('GPS puts this session at {name} ({d} km)', { name: near.x.name, d: near.d.toFixed(1) }) : (canAdd ? t('GPS does not match any track in Hutka yet — add it below (name, city), or keep the session private without a track.') : t('GPS does not match any track in the catalogue — it will be saved as a custom track.'))}${parsed.length > 1 ? ' · ' + t('{n} files: one session each, the same track and layout', { n: parsed.length }) : ''}${srcTx}`;
     setStatus('uplStatus', '', ''); $('uplForm').hidden = false; $('uplGo').disabled = false;
   }
-  async function fillLayouts() { const tid = $('uplTrack').value; const ls = tid ? await STORE.getLayouts(tid) : []; fillSelect($('uplLayout'), ls.map(l => [l.id, l.name + (l.lengthM ? ` · ${l.lengthM} ${t('m')}` : '')]).concat([['custom', t('Custom / not listed')]]), ls.length ? ls[0].id : 'custom'); showLayoutPhoto(); }
-  async function showLayoutPhoto() { const tid = $('uplTrack').value, lid = $('uplLayout').value, l = tid ? STORE.getLayout(tid, lid) : null; let src = null; if (l && l.photo) src = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/photo`); if ($('uplLayout').value !== lid) return; $('uplLayoutPhotoField').hidden = !src; if (src) $('uplLayoutPhoto').src = src; }
+  let center = null;
+  function syncNew() { const nw = $('uplTrack').value === '__new__'; $('uplNewTrack').hidden = !nw; $('uplLayout').parentElement.hidden = nw; if (nw) $('uplPublish').checked = true; }
+  // the kart: the track's own list first, then any other rental kart or a sport kart (named by hand)
+  function fillKarts() {
+    const tid = $('uplTrack').value, tr = tid && tid !== '__new__' ? STORE.getTrack(tid) : null, list = (tr && Array.isArray(tr.karts) ? tr.karts : []).filter(k => k && k.name);
+    const opts = list.map(k => [`${k.cls || 'rental'}|${k.name}`, `${k.name}${k.cls === 'sport' ? ' · ' + t('sport') : ''}`]);
+    opts.push(['rental|', list.length ? t('Other rental kart…') : t('Rental kart (model below)')], ['sport|', t('Sport kart (Rotax, X30, KZ…)')]);
+    const cur = $('uplKart').value; fillSelect($('uplKart'), opts, opts.some(o => o[0] === cur) ? cur : (opts[0][0])); syncKart();
+  }
+  function syncKart() { const v = $('uplKart').value || 'rental|'; const custom = /\|$/.test(v); $('uplKartOtherField').hidden = !custom; $('uplKartOther').placeholder = v.startsWith('sport') ? 'Rotax Max, X30, KZ2…' : 'Sodi RT8, Birel N35…'; }
+  const kartPick = () => { const v = $('uplKart').value || 'rental|', cls = v.split('|')[0] || 'rental', nm = v.split('|')[1] || $('uplKartOther').value.trim(); return { cls, name: nm }; };
+  $('uplKart').addEventListener('change', syncKart);
+  async function fillLayouts() { const tid = $('uplTrack').value; const ls = tid && tid !== '__new__' ? await STORE.getLayouts(tid) : []; fillSelect($('uplLayout'), ls.map(l => [l.id, l.name + (l.lengthM ? ` · ${l.lengthM} ${t('m')}` : '')]).concat([['custom', t('Custom / not listed')]]), ls.length ? ls[0].id : 'custom'); showLayoutPhoto(); }
+  async function showLayoutPhoto() { const tid = $('uplTrack').value, lid = $('uplLayout').value, l = tid && tid !== '__new__' ? STORE.getLayout(tid, lid) : null; let src = null; if (l && l.photo) src = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/photo`); if ($('uplLayout').value !== lid) return; $('uplLayoutPhotoField').hidden = !src; if (src) $('uplLayoutPhoto').src = src; }
   function syncPub() { const can = STORE.canWrite() && !!$('uplTrack').value; $('uplPubField').hidden = !can; }
-  $('uplTrack').addEventListener('change', () => { fillLayouts(); syncPub(); });
+  $('uplTrack').addEventListener('change', () => { fillLayouts(); syncPub(); syncNew(); fillKarts(); });
   $('uplLayout').addEventListener('change', showLayoutPhoto);
   $('uplFile').addEventListener('change', (e) => onFiles(Array.from(e.target.files || [])));
   if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) $('uplFile').removeAttribute('accept');
@@ -4217,15 +4414,28 @@ const UPLOAD = (() => {
   $('uplCancel').onclick = close; $('uplModal').addEventListener('click', (e) => { if (e.target === $('uplModal')) close(); });
   $('uplGo').onclick = async () => {
     if (!parsed.length) return; $('uplGo').disabled = true; setStatus('uplStatus', t('Saving…'));
-    const tid = $('uplTrack').value, lid = $('uplLayout').value || 'custom', label = $('uplName').value.trim(), note = $('uplNote').value.trim(), tr = tid ? STORE.getTrack(tid) : null;
+    let tid = $('uplTrack').value, lid = $('uplLayout').value || 'custom'; const label = $('uplName').value.trim(), note = $('uplNote').value.trim(), kart = kartPick();
+    // a track that is not in Hutka yet: its page and a first layout are created together with the session
+    if (tid === '__new__') {
+      const name = $('uplNewName').value.trim(); if (!name) { setStatus('uplStatus', t('Give the new track a name.'), 'warn'); $('uplGo').disabled = false; return; }
+      try {
+        tid = await STORE.saveTrack({ name, city: $('uplNewCity').value.trim(), country: $('uplNewCountry').value || '', lat: center ? +center.lat.toFixed(5) : null, lon: center ? +center.lon.toFixed(5) : null, karts: kart.name ? [{ name: kart.name, cls: kart.cls }] : [], community: true });
+        lid = await STORE.saveLayout(tid, { name: t('Main'), order: 0, cornerR: 110, widthM: 8 });
+      } catch (e) { setStatus('uplStatus', t('Could not create the track: {e}', { e: e && e.message || e }), 'warn'); $('uplGo').disabled = false; return; }
+    }
+    const tr = tid ? STORE.getTrack(tid) : null;
+    // a kart this track did not list yet is remembered on the track page (for the next driver's picker)
+    if (tr && kart.name && STORE.canEditTrack(tr) && !(tr.karts || []).some(k => k.name.toLowerCase() === kart.name.toLowerCase())) { try { await STORE.saveTrack(Object.assign({}, tr, { karts: (tr.karts || []).concat([{ name: kart.name, cls: kart.cls }]) })); } catch (e) {} }
     let first = null;
     for (let k = 0; k < parsed.length; k++) {
       const pub = STORE.canWrite() && !!tid && $('uplPublish').checked;
-      const p = parsed[k], sess = { id: 's' + STORE.uid(), name: p.data.name, label: parsed.length > 1 ? (label ? `${label} · ${k + 1}` : '') : label, driver: p.meta.driver, date: p.meta.date || fileDate(p.file), trackName: tr ? tr.name : p.meta.track, track: tid, layout: tid ? lid : 'custom', note, published: pub, source: p.data.source || null, createdAt: Date.now(), laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
+      const p = parsed[k], sess = { id: 's' + STORE.uid(), name: p.data.name, label: parsed.length > 1 ? (label ? `${label} · ${k + 1}` : '') : label, driver: p.meta.driver, date: p.meta.date || fileDate(p.file), trackName: tr ? tr.name : p.meta.track, track: tid, layout: tid ? lid : 'custom', note, kart: kart.name, kartClass: kart.cls, published: pub, source: p.data.source || null, createdAt: Date.now(), laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
       for (const L of sess.laps) L._sess = sess;
       // loggers without a start/finish beacon: start every lap at the layout's S/F so corners line up with everyone else's
       if (sess.source && sess.source.app !== 'alfano' && tid && lid !== 'custom') { try { const G = await GEOM.build(tid, lid); IMPORT.alignToStart(sess, G); } catch (e) {} }
       try { await STORE.saveSession(sess); if (!first) first = sess; } catch (e) { setStatus('uplStatus', t('Could not save the session: {e}', { e: e && e.message || e }), 'warn'); $('uplGo').disabled = false; return; }
+      // the first session on a brand-new layout defines its track line for everyone who comes after
+      if (k === 0 && tr && tr.community && lid !== 'custom') { const l = STORE.getLayout(tid, lid); if (l && !l.refSession && STORE.canEditTrack(tr)) { try { await STORE.saveLayout(tid, Object.assign({}, l, { refSession: sess.id })); GEOM.invalidate(); } catch (e) {} } }
     }
     close(); if (first) { await LAB.open(first, false); go('lab'); }
   };
@@ -4247,7 +4457,7 @@ function drawPreview(cv, pv, color) {
   return true;
 }
 async function renderHomePage() {
-  $('homeSub').textContent = t('Upload the Alfano export of your rental-karting session: Hutka finds every braking point, apex and throttle point, tells you in plain words where the lap is lost and lets you compare with anyone who published a session on the same layout.');
+  $('homeSub').textContent = t('Upload your session from Alfano, AiM, RaceChrono or any GPS logger: Hutka finds every braking point, apex and throttle point, tells you in plain words where the lap is lost and lets you compare with anyone who published a session on the same layout and the same kart class.');
   $('homeUpload').onclick = () => UPLOAD.open({});
   $('homeSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity); $('homeSignIn').onclick = () => AUTH.open();
   const feed = $('homeFeed'); feed.innerHTML = '';
@@ -4259,8 +4469,10 @@ async function renderHomePage() {
   // hero stats
   { const st = $('homeStats'); st.innerHTML = ''; const drivers = new Set(pubs.map(s => s.owner)).size, laps = pubs.reduce((a, s) => a + (s.nLaps || 0), 0); for (const [k, v] of [[t('Tracks'), STORE.getTracks().length], [t('Sessions'), pubs.length], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${v}</div>`; st.appendChild(d); } }
   feed.innerHTML = ''; $('feedSub').textContent = pubs.length ? t('{n} published', { n: pubs.length }) : '';
-  if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); e.appendChild(el('div', 't', STORE.hasDb ? t('No sessions published yet') : t('Sign in to see the feed'))); e.appendChild(el('div', '', STORE.hasDb ? t('Be the first: upload your Alfano session and publish it on the track page.') : t('The shared library needs a connection. Browse tracks meanwhile.'))); feed.appendChild(e); }
-  for (const s of pubs) feed.appendChild(postCard(s, names, counts[s.id]));
+  if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); e.appendChild(el('div', 't', STORE.hasDb ? t('No sessions published yet') : t('Sign in to see the feed'))); e.appendChild(el('div', '', STORE.hasDb ? t('Be the first: upload your session and publish it on the track page.') : t('The shared library needs a connection. Browse tracks meanwhile.'))); feed.appendChild(e); }
+  // sessions several drivers marked as not helpful sink to the bottom of the feed
+  const order = pubs.slice().sort((a, b) => (STORE.lowRated(counts[a.id]) - STORE.lowRated(counts[b.id])) || (b.createdAt || 0) - (a.createdAt || 0));
+  for (const s of order) feed.appendChild(postCard(s, names, counts[s.id]));
   $('feedHint').textContent = pubs.length ? t('Sessions appear here when drivers publish them. Open one to see the corner-by-corner breakdown, or compare it with your own.') : '';
   // where people drive: layouts by number of sessions in the last 60 days
   { const box = $('homeActive'); box.innerHTML = ''; const by = new Map(); const cut = Date.now() - 60 * 86400000; for (const s of pubs) { if (!s.track) continue; const k = s.track + '~' + (s.layout || 'custom'); const o = by.get(k) || { track: s.track, layout: s.layout, n: 0, recent: 0, best: Infinity }; o.n++; if ((s.createdAt || 0) > cut) o.recent++; o.best = Math.min(o.best, s.bestMs || Infinity); by.set(k, o); }
@@ -4269,17 +4481,17 @@ async function renderHomePage() {
     for (const r of rows) { const tr = STORE.getTrack(r.track); const ls = await STORE.getLayouts(r.track); const l = ls.find(x => x.id === r.layout); const a = el('a', 'item'); a.href = r.layout && r.layout !== 'custom' ? `#layout~${r.track}~${r.layout}` : `#track~${r.track}`; a.append(el('span', 'name', `${tr ? tr.name : r.track}${l ? ' · ' + l.name : ''}`), el('span', 'meta', `${tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n)} · ${t('best')} ${fmtMs(r.best)}`)); box.appendChild(a); }
   }
   // fastest this month: best lap per driver per layout, newest 30 days
-  { const box = $('homeTop'); box.innerHTML = ''; const cut = Date.now() - 30 * 86400000; const best = new Map(); for (const s of pubs) { if ((s.createdAt || 0) < cut) continue; const k = s.owner + '|' + s.track + '|' + s.layout; const cur = best.get(k); if (!cur || s.bestMs < cur.bestMs) best.set(k, s); }
+  { const box = $('homeTop'); box.innerHTML = ''; const cut = Date.now() - 30 * 86400000; const best = new Map(); for (const s of pubs) { if ((s.createdAt || 0) < cut || STORE.lowRated(counts[s.id])) continue; const k = s.owner + '|' + s.track + '|' + s.layout + '|' + kartClassOf(s); const cur = best.get(k); if (!cur || s.bestMs < cur.bestMs) best.set(k, s); }
     const rows = [...best.values()].sort((a, b) => a.bestMs - b.bestMs).slice(0, 8);
     if (!rows.length) box.appendChild(el('div', 'hint', t('No published laps in the last 30 days.')));
-    rows.forEach((s, i) => { const tr = STORE.getTrack(s.track); const d = el('div', 'rank'); const im = new Image(); im.src = (names[s.owner] && names[s.owner].avatar) || GENERIC_AVATAR; im.alt = ''; const w = el('div', 'w'); w.innerHTML = `<a href="#driver~${esc(s.owner)}">${esc((names[s.owner] || {}).name || t('Driver'))}</a><span>${esc(tr ? tr.name : (s.trackName || t('Custom')))}${s.layout && s.layout !== 'custom' ? ' · ' + esc(layoutName(s.track, s.layout)) : ''}</span>`; d.append(el('span', 'n', String(i + 1)), im, w, el('span', 'tm', fmtMs(s.bestMs))); box.appendChild(d); });
+    rows.forEach((s, i) => { const tr = STORE.getTrack(s.track); const d = el('div', 'rank'); const im = new Image(); im.src = (names[s.owner] && names[s.owner].avatar) || GENERIC_AVATAR; im.alt = ''; const w = el('div', 'w'); w.innerHTML = `<a href="#driver~${esc(s.owner)}">${esc((names[s.owner] || {}).name || t('Driver'))}</a><span>${esc(tr ? tr.name : (s.trackName || t('Custom')))}${s.layout && s.layout !== 'custom' ? ' · ' + esc(layoutName(s.track, s.layout)) : ''}${s.kart || kartClassOf(s) === 'sport' ? ' · ' + esc(kartLabel(s)) : ''}</span>`; d.append(el('span', 'n', String(i + 1)), im, w, el('span', 'tm', fmtMs(s.bestMs))); box.appendChild(d); });
   }
   // the drivers I follow
   { const card = $('homeFollowCard'), box = $('homeFollowing'); box.innerHTML = ''; if (!STORE.hasIdentity || !STORE.hasDb || !STORE.socialOn) { card.hidden = true; } else { const ids = await STORE.followingIds(); card.hidden = !ids.length; if (ids.length) { const nm = await STORE.names(ids); for (const id of ids.slice(0, 12)) { const a = el('a', 'item'); a.href = '#driver~' + id; const im = new Image(); im.src = (nm[id] && nm[id].avatar) || GENERIC_AVATAR; im.alt = ''; im.style.cssText = 'width:28px;height:28px;border-radius:50%;object-fit:cover'; a.append(im, el('span', 'name', (nm[id] || {}).name || t('Driver'))); box.appendChild(a); } } } }
 }
 function postCard(s, names, cnt) {
   const tr = STORE.getTrack(s.track), nm = names[s.owner] || {}, mine = s.owner === STORE.me.id;
-  const d = el('div', 'post');
+  const d = el('div', 'post' + (STORE.lowRated(cnt) ? ' low' : ''));
   const ph = el('div', 'ph'); const im = new Image(); im.src = nm.avatar || GENERIC_AVATAR; im.alt = '';
   const who = el('div', 'who'); who.innerHTML = `<b><a href="#driver~${esc(s.owner)}">${esc(nm.name || t('Driver'))}</a>${nm.country ? ' ' + flag(nm.country) : ''}</b><span>${tr ? `<a href="#track~${esc(tr.id)}">${esc(tr.name)}</a>` : esc(s.trackName || t('Custom track'))}${s.layout && s.layout !== 'custom' ? ` · <a href="#layout~${esc(s.track)}~${esc(s.layout)}">${esc(layoutName(s.track, s.layout))}</a>` : ''} · ${esc(fmtDate(s.date))}</span>`;
   ph.append(im, who);
@@ -4287,14 +4499,14 @@ function postCard(s, names, cnt) {
   if (s.preview && s.preview.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); requestAnimationFrame(() => drawPreview(cv, s.preview)); } else pv.appendChild(svgUse('i-track'));
   const info = el('div'); info.innerHTML = `<div class="lbl">${t('best lap')}</div><div class="big">${fmtMs(s.bestMs)}</div><div class="nm">${esc(s.label || s.name)}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</div>`;
   const chips = el('div', 'chips'); const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
-  chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
+  chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`); if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
   info.appendChild(chips); pb.append(pv, info);
   const pf = el('div', 'pf');
-  const like = el('button', 'btn sm' + (cnt && cnt.liked ? ' liked' : '')); like.type = 'button'; like.innerHTML = `<span class="heart">♥</span> <b>${cnt ? cnt.likes : 0}</b>`;
-  like.onclick = async () => { if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to like sessions.')); return; } like.disabled = true; try { const r = await STORE.toggleLike(s.id); like.classList.toggle('liked', r.liked); like.querySelector('b').textContent = r.likes; } catch (e) { toast(t('Could not save the like.')); } like.disabled = false; };
+  const like = voteButtons(s.id, cnt, (r) => { d.classList.toggle('low', STORE.lowRated(r)); lowTag.hidden = !STORE.lowRated(r); });
+  const lowTag = el('span', 'soon', t('rated not helpful')); lowTag.hidden = !STORE.lowRated(cnt); if (STORE.socialOn) ph.appendChild(lowTag);
   const cm = el('a', 'btn sm'); cm.href = '#lab~' + s.id; cm.innerHTML = `<svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2"><use href="#i-chat"/></svg> ${cnt ? cnt.comments : 0}`;
   const open = el('a', 'btn sm primary', t('Open analysis')); open.href = '#lab~' + s.id;
-  if (STORE.socialOn) pf.append(like, cm); else { const soon = el('span', 'soon', t('likes & comments soon')); pf.appendChild(soon); } pf.appendChild(el('span', 'sp'));
+  if (STORE.socialOn) pf.append(like, cm); else { const soon = el('span', 'soon', t('votes & comments soon')); pf.appendChild(soon); } pf.appendChild(el('span', 'sp'));
   if (!mine && s.track) { const c = el('a', 'btn sm', t('Compare with mine')); c.href = `#lab~${s.id}~cmp`; pf.appendChild(c); }
   pf.appendChild(open);
   d.append(ph, pb, pf); return d;
@@ -4303,7 +4515,7 @@ function layoutName(tid, lid) { const l = STORE.getLayout(tid, lid); return l ? 
 $('homeUpload').onclick = () => UPLOAD.open({});
 // ---------- AI coach: chats with memory of the driver's sessions; credits and the Pro plan ----------
 const AI = { chats: [], cur: null, msgs: [], wallet: null, busy: false, ctl: null, newCtx: '' };
-const AI_RULES_V2 = () => `You are Hutka's racing coach: an analyst of rental-karting telemetry (Alfano and similar loggers; Sodi RT10-class karts, ~80 km/h). Everything you say must come from the data below: the driver's own sessions, the corner-by-corner breakdown of the session this chat is about (if any), and the fastest published laps of other drivers on the same layouts. Corners T1…Tn are numbered from the start/finish line; points are metres from S/F, speeds in km/h. Compare the driver with the fast published laps when the layout matches; say which corners and what exactly (brake point, apex speed, throttle point, exit speed). If a question needs data that is not here (another session, video, kart setup, a line more precise than ±1 m), say so and tell the driver what to upload or publish. Never invent numbers or corners. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, short and concrete, plain language, no headings or tables; short lists are fine. Address the driver as "you".`;
+const AI_RULES_V2 = () => `You are Hutka's racing coach: an analyst of karting telemetry (Alfano and similar loggers). Most sessions are rental karts (Sodi RT8/RT10-class, ~70–80 km/h); a session may name a sport kart (Rotax, X30, KZ…) — a different world with far higher speeds and later brake points: never compare times across kart classes and fit the advice to the class named. Everything you say must come from the data below: the driver's own sessions, the corner-by-corner breakdown of the session this chat is about (if any), and the fastest published laps of other drivers on the same layouts. Corners T1…Tn are numbered from the start/finish line; points are metres from S/F, speeds in km/h. Compare the driver with the fast published laps when the layout matches; say which corners and what exactly (brake point, apex speed, throttle point, exit speed). If a question needs data that is not here (another session, video, kart setup, a line more precise than ±1 m), say so and tell the driver what to upload or publish. Never invent numbers or corners. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, short and concrete, plain language, no headings or tables; short lists are fine. Address the driver as "you".`;
 // the memory: profile, the session library, fast laps on the driver's layouts, and the open session in detail
 async function aiSystem(sessionMeta) {
   const parts = [AI_RULES_V2()];
@@ -4311,7 +4523,7 @@ async function aiSystem(sessionMeta) {
   const home = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null;
   parts.push(`DRIVER: ${prof.racingName || me.name || 'driver'}${prof.country ? ', ' + countryName(prof.country) : ''}${home ? ', home track ' + home.name : ''}.`);
   const mine = (await STORE.mySessions()).slice(0, 40);
-  if (mine.length) { const lines = []; for (const m of mine) { const tr = STORE.getTrack(m.track); const ls = m.track ? await STORE.getLayouts(m.track) : []; const l = ls.find(x => x.id === m.layout); lines.push(`- [${m.id}] ${m.label || m.name} — ${tr ? tr.name : (m.trackName || 'custom track')}${l ? ' · ' + l.name : ''} · ${fmtDate(m.date)} · best ${fmtMs(m.bestMs)} · avg clean ${fmtMs(m.avgMs)} · ${m.nLaps} laps (${m.cleanLaps} clean)${m.published ? ' · published' : ''}${m.note ? ' · ' + m.note : ''}`); } parts.push('THE DRIVER\'S SESSIONS (newest first):\n' + lines.join('\n')); }
+  if (mine.length) { const lines = []; for (const m of mine) { const tr = STORE.getTrack(m.track); const ls = m.track ? await STORE.getLayouts(m.track) : []; const l = ls.find(x => x.id === m.layout); lines.push(`- [${m.id}] ${m.label || m.name} — ${tr ? tr.name : (m.trackName || 'custom track')}${l ? ' · ' + l.name : ''} · ${fmtDate(m.date)} · best ${fmtMs(m.bestMs)} · avg clean ${fmtMs(m.avgMs)} · ${m.nLaps} laps (${m.cleanLaps} clean)${m.kart || m.kartClass === 'sport' ? ' · kart: ' + kartLabel(m) : ''}${m.published ? ' · published' : ''}${m.note ? ' · ' + m.note : ''}`); } parts.push('THE DRIVER\'S SESSIONS (newest first):\n' + lines.join('\n')); }
   else parts.push('THE DRIVER\'S SESSIONS: none uploaded yet.');
   // fast published laps on the layouts the driver has driven
   const keys = new Set(mine.filter(m => m.track).map(m => m.track + '~' + (m.layout || 'custom'))); if (sessionMeta && sessionMeta.track) keys.add(sessionMeta.track + '~' + (sessionMeta.layout || 'custom'));
@@ -4546,7 +4758,7 @@ async function renderProfile() {
 async function renderMySessionsTable(box, opts) {
   opts = opts || {}; const list = await STORE.mySessions(); box.innerHTML = '';
   if (opts.sub) opts.sub.textContent = list.length ? String(list.length) : '';
-  if (opts.hint) opts.hint.textContent = list.length ? (opts.compact ? t('Open a session to analyse it; Edit changes its name, track and layout.') : t('Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.')) : t('No sessions yet. Upload an Alfano .alf2 export to start.');
+  if (opts.hint) opts.hint.textContent = list.length ? (opts.compact ? t('Open a session to analyse it; Edit changes its name, track and layout.') : t('Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.')) : t('No sessions yet. Upload a session to start.');
   if (!list.length) return;
   const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Session')}</th><th>${t('Track')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th>${t('Visibility')}</th><th></th></tr></thead>`; const body = el('tbody');
   for (const m of list) {
@@ -4570,17 +4782,28 @@ const SESSEDIT = (() => {
     cur = meta; done = onSaved || null; setStatus('seStatus', '');
     $('seName').value = meta.label || meta.name || ''; $('seNote').value = meta.note || '';
     fillSelect($('seTrack'), [['', t('— not in the catalogue (custom) —')]].concat(STORE.getTracks().map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), meta.track || '');
-    await fillLayouts(meta.track || '', meta.layout || '');
+    await fillLayouts(meta.track || '', meta.layout || ''); fillKarts(meta);
     $('sePubField').hidden = !(STORE.canWrite() && meta.owner !== 'local'); $('sePublish').checked = !!meta.published;
     { const prof = STORE.hasIdentity ? (await STORE.profile(STORE.me.id) || {}) : {}; const res = prof.swsResults && prof.swsResults.results || []; fillSelect($('seSws'), [['', t('— not an SWS race —')]].concat(res.map((r, i) => [String(i), SWS.label(r)])), meta.sws && meta.sws.i !== undefined ? String(meta.sws.i) : ''); $('seSws').disabled = !res.length; const h = $('seSwsHint'); h.innerHTML = ''; if (!res.length) { h.appendChild(document.createTextNode(t('No SWS results imported yet. ') )); const a = el('a', 'tref', t('Import results from your SWS page')); a.href = '#'; a.onclick = (e) => { e.preventDefault(); SESSEDIT.close(); SWS.open({}); }; h.appendChild(a); } }
     $('sessModal').hidden = false; $('seName').focus();
   }
   function close() { $('sessModal').hidden = true; cur = null; }
-  $('seTrack').addEventListener('change', () => fillLayouts($('seTrack').value, ''));
+  // the kart: the track's list, or a rental / sport kart named by hand
+  function fillKarts(meta) {
+    const tid = $('seTrack').value, tr = tid ? STORE.getTrack(tid) : null, list = (tr && Array.isArray(tr.karts) ? tr.karts : []).filter(k => k && k.name);
+    const opts = list.map(k => [`${k.cls || 'rental'}|${k.name}`, `${k.name}${k.cls === 'sport' ? ' · ' + t('sport') : ''}`]).concat([['rental|', list.length ? t('Other rental kart…') : t('Rental kart (model below)')], ['sport|', t('Sport kart (Rotax, X30, KZ…)')]]);
+    const m = meta || cur || {}, cls = m.kartClass || 'rental', key = `${cls}|${m.kart || ''}`; const listed = opts.some(o => o[0] === key);
+    fillSelect($('seKart'), opts, listed ? key : `${cls}|`); $('seKartOther').value = listed ? '' : (m.kart || ''); syncKart();
+  }
+  function syncKart() { const v = $('seKart').value || 'rental|'; $('seKartOtherField').hidden = !/\|$/.test(v); }
+  $('seKart').addEventListener('change', syncKart);
+  $('seTrack').addEventListener('change', () => { fillLayouts($('seTrack').value, ''); fillKarts(); });
   $('seCancel').onclick = close; $('sessModal').addEventListener('click', (e) => { if (e.target === $('sessModal')) close(); });
   $('seSave').onclick = async () => {
     if (!cur) return; const tid = $('seTrack').value, tr = tid ? STORE.getTrack(tid) : null;
-    const patch = { label: $('seName').value.trim().slice(0, 80), note: $('seNote').value.trim().slice(0, 120), track: tid, trackName: tr ? tr.name : (cur.trackName || ''), layout: tid ? ($('seLayout').value || 'custom') : 'custom' };
+    const kv = $('seKart').value || 'rental|', kart = { cls: kv.split('|')[0] || 'rental', name: kv.split('|')[1] || $('seKartOther').value.trim().slice(0, 40) };
+    const patch = { label: $('seName').value.trim().slice(0, 80), note: $('seNote').value.trim().slice(0, 120), track: tid, trackName: tr ? tr.name : (cur.trackName || ''), layout: tid ? ($('seLayout').value || 'custom') : 'custom', kart: kart.name, kartClass: kart.cls };
+    if (tr && kart.name && STORE.canEditTrack(tr) && !(tr.karts || []).some(k => k.name.toLowerCase() === kart.name.toLowerCase())) { try { await STORE.saveTrack(Object.assign({}, tr, { karts: (tr.karts || []).concat([{ name: kart.name, cls: kart.cls }]) })); } catch (e) {} }
     if (!$('sePubField').hidden) patch.published = $('sePublish').checked && !!tid;
     if (!$('seSws').disabled) { const i = $('seSws').value; if (i === '') patch.sws = null; else { const prof = await STORE.profile(STORE.me.id) || {}; const r = (prof.swsResults && prof.swsResults.results || [])[+i]; if (r) patch.sws = { i: +i, date: r.date, race: r.race || r.cat, track: r.track, pos: r.pos, best: r.best }; } }
     const b = $('seSave'); b.classList.add('busy'); setStatus('seStatus', t('Saving…'));
@@ -4594,14 +4817,16 @@ const SESSEDIT = (() => {
 const ADMIN = (() => {
   const A = { tid: null, lid: null, map: null, G: null, E: null, tool: 'pan' };
   async function show(tid, lid) {
-    $('admSub').textContent = t('Track pages, layouts and the track line every analysis is built on. Site admins only.');
+    const admin = STORE.isAdmin();
+    $('admSub').textContent = admin ? t('Track pages, layouts and the track line every analysis is built on. Site admins only.') : t('The tracks you added: their page, layouts and corners. Admins can edit everything.');
+    $('admAddTrack').hidden = !admin; $('admClaimsWrap').hidden = !admin; $('aDelete').hidden = !admin;
     fillCountries($('aCountry'), true);
-    await renderTrackList(); await renderClaims();
+    await renderTrackList(); if (admin) await renderClaims();
     if (tid && STORE.getTrack(tid)) { A.tid = tid; A.lid = lid || null; await renderTrackForm(); await renderLayouts(); if (lid) await renderLayoutEditor(); else $('admLayoutCard').hidden = true; }
     else { A.tid = null; A.lid = null; $('admEmpty').hidden = false; $('admTrackCard').hidden = true; $('admLayoutsCard').hidden = true; $('admLayoutCard').hidden = true; }
   }
   async function addTrack() { const id = await STORE.saveTrack({ name: t('New track'), city: '', country: 'AE', lat: 25.2, lon: 55.3, createdAt: Date.now() }); go('admin~' + id); }
-  async function renderTrackList() { const box = $('admTracks'); box.innerHTML = ''; for (const tr of STORE.getTracks()) { const a = el('a', 'item' + (tr.id === A.tid ? ' sel' : '')); a.href = '#admin~' + tr.id; const lg = el('div', 'logo'); logoInto(lg, tr); a.append(lg, el('span', 'name', tr.name), el('span', 'meta', [tr.city, flag(tr.country)].filter(Boolean).join(' '))); box.appendChild(a); } if (!STORE.getTracks().length) box.appendChild(el('div', 'hint', t('No tracks yet.'))); }
+  async function renderTrackList() { const box = $('admTracks'); box.innerHTML = ''; for (const tr of STORE.getTracks().filter(tr => STORE.canEditTrack(tr))) { const a = el('a', 'item' + (tr.id === A.tid ? ' sel' : '')); a.href = '#admin~' + tr.id; const lg = el('div', 'logo'); logoInto(lg, tr); a.append(lg, el('span', 'name', tr.name), el('span', 'meta', [tr.city, flag(tr.country)].filter(Boolean).join(' '))); box.appendChild(a); } if (!STORE.getTracks().length) box.appendChild(el('div', 'hint', t('No tracks yet.'))); }
   async function renderClaims() { const box = $('admClaims'); box.innerHTML = ''; const cl = await STORE.claims(); if (!cl.length) { box.appendChild(el('div', 'hint', t('No requests.'))); return; } const names = await STORE.names(cl.map(c => c.by)); for (const c of cl) { const row = el('div', 'item'); const tr = STORE.getTrack(c.track); row.append(el('span', 'name', `${tr ? tr.name : c.track} — ${names[c.by] ? names[c.by].name : c.by}`), el('span', 'meta', fmtDate(c.createdAt))); const x = el('button', 'x', '×'); x.type = 'button'; x.onclick = async () => { await STORE.deleteClaim(c.id); renderClaims(); }; row.appendChild(x); box.appendChild(row); } }
   const F = { aName: 'name', aCity: 'city', aCountry: 'country', aLat: 'lat', aLon: 'lon', aAddress: 'address', aPhone: 'phone', aWeb: 'website', aBooking: 'booking', aVideo: 'video', aOpen: 'open', aClose: 'close', aLen: 'lengthM', aCorners: 'corners', aVmax: 'vmax', aSessMin: 'sessMin', aFia: 'fia', aIg: 'instagram', aYt: 'youtube', aFb: 'facebook', aTt: 'tiktok', aDesc: 'description' };
   let pendingCover = undefined, pendingLogo = undefined, pendingPhoto = undefined;
@@ -4609,6 +4834,7 @@ const ADMIN = (() => {
     const tr = STORE.getTrack(A.tid); if (!tr) return;
     $('admEmpty').hidden = true; $('admTrackCard').hidden = false; $('admLayoutsCard').hidden = false; $('admTrackId').textContent = '#' + tr.id;
     for (const id in F) { const k = F[id], v = tr[k]; $(id).value = v === undefined || v === null ? '' : (k === 'fia' ? (v === true || v === 1 || v === '1' ? '1' : (v === false || v === 0 || v === '0' ? '0' : '')) : v); }
+    $('aKarts').value = (Array.isArray(tr.karts) ? tr.karts : []).filter(k => k && k.name).map(k => k.name + (k.cls === 'sport' ? ' · sport' : '')).join('\n');
     pendingCover = undefined; pendingLogo = undefined;
     logoInto($('aLogoPrev'), tr);
     const cover = await STORE.getMedia(`tracks/${A.tid}/media/cover`); $('aCoverPrev').hidden = !cover; if (cover) $('aCoverPrev').src = cover;
@@ -4622,6 +4848,7 @@ const ADMIN = (() => {
     const tr = Object.assign({}, STORE.getTrack(A.tid)); if (!tr.id) return;
     for (const id in F) { const k = F[id]; let v = $(id).value; if (['lat', 'lon', 'lengthM', 'corners', 'vmax', 'sessMin'].includes(k)) v = v === '' ? null : +v; if (k === 'fia') v = v === '' ? '' : v === '1'; tr[k] = typeof v === 'string' ? v.trim() : v; }
     if (pendingLogo !== undefined) tr.logo = pendingLogo || '';
+    tr.karts = $('aKarts').value.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(l => { const sport = /(^|[\s·|,(-])(sport|спорт)\b/i.test(l); const name = l.replace(/[\s·|,(-]*(sport|спорт)[\s)]*$/i, '').trim(); return { name: name.slice(0, 40), cls: sport ? 'sport' : 'rental' }; }).filter(k => k.name);
     const b = $('aSave'); b.classList.add('busy');
     try { await STORE.saveTrack(tr); if (pendingCover !== undefined) await STORE.setMedia(`tracks/${A.tid}/media/cover`, pendingCover); setStatus('aStatus', t('Saved'), 'ok'); renderTrackList(); if (APP.geo) APP.geo.draw(); } catch (e) { setStatus('aStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');
