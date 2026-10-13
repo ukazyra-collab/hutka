@@ -3622,15 +3622,18 @@ $('tabUpload').onclick = () => UPLOAD.open(APP.route === 'lab' && LAB.tid ? { tr
 const NATIVE = window.NATIVE = {
   on: !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()),
   redirect: 'hutka://auth',
-  plugin(n) { try { return window.Capacitor.registerPlugin(n); } catch (e) { return null; } },
-  async openUrl(url) { const B = this.plugin('Browser'); if (B) { await B.open({ url, presentationStyle: 'popover' }); return; } window.open(url, '_blank'); },
-  async closeBrowser() { const B = this.plugin('Browser'); if (B) { try { await B.close(); } catch (e) {} } },
-  async readFile(url) { const F = this.plugin('Filesystem'); if (!F) return null; const r = await F.readFile({ path: url }); const raw = typeof r.data === 'string' ? r.data : ''; const bin = atob(raw); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); const name = decodeURIComponent((String(url).split('?')[0].split('/').pop() || '').trim()) || 'session.alf2'; return new File([u8], name); },
+  // the site does not ship the Capacitor JS runtime (it runs in ordinary browsers too), so plugins are called through the bridge the
+  // native shell injects into the page: Capacitor.nativePromise(plugin, method, options) and Capacitor.addListener(plugin, event, cb)
+  call(plugin, method, options) { const C = window.Capacitor; if (!C || !C.nativePromise) return Promise.reject(new Error('no bridge')); return C.nativePromise(plugin, method, options || {}); },
+  listen(plugin, event, cb) { const C = window.Capacitor; if (!C || !C.addListener) return null; return C.addListener(plugin, event, cb); },
+  async openUrl(url) { try { await this.call('Browser', 'open', { url, presentationStyle: 'popover' }); } catch (e) { window.open(url, '_blank'); } },
+  async closeBrowser() { try { await this.call('Browser', 'close'); } catch (e) {} },
+  async readFile(url) { const r = await this.call('Filesystem', 'readFile', { path: url }); const raw = typeof r.data === 'string' ? r.data : ''; const bin = atob(raw); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); const name = decodeURIComponent((String(url).split('?')[0].split('/').pop() || '').trim()) || 'session.alf2'; return new File([u8], name); },
   async init() {
-    if (!this.on) return; document.documentElement.classList.add('native'); const A = this.plugin('App'); if (!A) return;
-    try { A.addListener('appUrlOpen', (e) => this.onUrl(e && e.url)); } catch (e) {}
-    try { const l = await A.getLaunchUrl(); if (l && l.url) this.onUrl(l.url); } catch (e) {}
-    const SS = this.plugin('SplashScreen'); if (SS) { try { await SS.hide(); } catch (e) {} }
+    if (!this.on) return; document.documentElement.classList.add('native');
+    try { this.listen('App', 'appUrlOpen', (e) => this.onUrl(e && e.url)); } catch (e) {}
+    try { const l = await this.call('App', 'getLaunchUrl'); if (l && l.url) this.onUrl(l.url); } catch (e) {}
+    try { await this.call('SplashScreen', 'hide'); } catch (e) {}
   },
   async onUrl(url) {
     if (!url) return; url = String(url);
