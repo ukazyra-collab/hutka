@@ -5,6 +5,7 @@
 // Beta / billing: FREE_MODE=1 (default) — nobody is charged, only the fair-use caps apply; FREE_MODE=0 — credits and Pro (Stripe).
 // Caps (all optional): LIMIT_HOUR=15 per driver, LIMIT_DAY=50 per driver, LIMIT_IP_DAY=120 per network address, LIMIT_GLOBAL_DAY=800 for everyone,
 // MAX_TEXT_CHARS=1500, MAX_SYSTEM_CHARS=48000, MAX_OUT_TOKENS=1200. AI_PAUSED=1 switches the coach off without redeploying.
+// ASK_STREAM=1 streams the answer token by token (the edge runtime's CPU budget can cut long streams); default: the whole answer in one JSON reply.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const cors = {
@@ -20,6 +21,7 @@ const MODEL = Deno.env.get("ANTHROPIC_MODEL") || "claude-sonnet-5-5";
 const FREE_MODE = (Deno.env.get("FREE_MODE") ?? "1") !== "0";
 const PAUSED = (Deno.env.get("AI_PAUSED") || "0") === "1";
 const LIM = { hour: num("LIMIT_HOUR", 15), day: num("LIMIT_DAY", 50), ip: num("LIMIT_IP_DAY", 120), global: num("LIMIT_GLOBAL_DAY", 800), text: num("MAX_TEXT_CHARS", 1500), system: num("MAX_SYSTEM_CHARS", 48000), out: num("MAX_OUT_TOKENS", 1200) };
+const STREAM = (Deno.env.get("ASK_STREAM") || "0") === "1";
 
 // the network address is kept only as a short hash — enough to notice one address opening many accounts, useless for anything else
 async function ipHash(req: Request) {
@@ -95,12 +97,28 @@ Deno.serve(async (req) => {
   const system = String(body.system || "").slice(0, LIM.system);
 
   // the system prompt (rules + the driver's memory + the session breakdown) repeats between questions: cache it
+  const payload = { model: MODEL, max_tokens: LIM.out, system: system ? [{ type: "text", text: system, cache_control: { type: "ephemeral" } }] : undefined, messages, stream: STREAM };
   const upstream = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: LIM.out, system: system ? [{ type: "text", text: system, cache_control: { type: "ephemeral" } }] : undefined, messages, stream: true }),
+    body: JSON.stringify(payload),
   });
   if (!upstream.ok || !upstream.body) { const t = await upstream.text(); return json({ error: "upstream", status: upstream.status, detail: t.slice(0, 300) }, 502); }
+  const creditsLeft = FREE_MODE ? "" : String(pro ? wallet.credits : Math.max(0, (wallet.credits || 0) - 1));
+  const plan = FREE_MODE ? "beta" : (pro ? "pro" : "free");
+
+  // ---- whole answer at once (default): one JSON reply, stored, then returned
+  if (!STREAM) {
+    const j = await upstream.json();
+    const reply = Array.isArray(j.content) ? j.content.filter((c: { type: string }) => c.type === "text").map((c: { text: string }) => c.text).join("") : "";
+    const u = j.usage || {}; const tokIn = (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0), tokOut = u.output_tokens || 0;
+    try {
+      const { data: m } = await db.from("messages").insert({ chat_id: chatId, user_id: user.id, role: "assistant", content: reply, tokens_in: tokIn, tokens_out: tokOut, credits: (FREE_MODE || pro) ? 0 : 1 }).select("id").single();
+      await db.from("chats").update({ updated_at: new Date().toISOString() }).eq("id", chatId);
+      if (!FREE_MODE && !pro && m) { await db.from("wallets").update({ credits: Math.max(0, (wallet.credits || 0) - 1), updated_at: new Date().toISOString() }).eq("user_id", user.id); await db.from("ledger").insert({ user_id: user.id, delta: -1, reason: "ask", ref: "msg:" + m.id }); }
+    } catch (_) { /* best effort */ }
+    return new Response(JSON.stringify({ text: reply, chat_id: chatId, stop: j.stop_reason || "", credits: creditsLeft, plan, used_day: usedDay + 1, limit_day: LIM.day }), { headers: { ...cors, "Content-Type": "application/json", "X-Chat-Id": String(chatId), "X-Credits": creditsLeft, "X-Plan": plan, "X-Used-Day": String(usedDay + 1), "X-Limit-Day": String(LIM.day) } });
+  }
 
   // forward the SSE stream; collect the reply and the usage, then store (and charge when billing is on)
   let reply = "", tokIn = 0, tokOut = 0, tokCacheR = 0, tokCacheW = 0, buf = "";
@@ -133,7 +151,6 @@ Deno.serve(async (req) => {
     },
     async flush() { await finish(); },
   });
-  const creditsLeft = FREE_MODE ? "" : String(pro ? wallet.credits : Math.max(0, (wallet.credits || 0) - 1));
-  const headers = { ...cors, "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache", "X-Chat-Id": String(chatId), "X-Credits": creditsLeft, "X-Plan": FREE_MODE ? "beta" : (pro ? "pro" : "free"), "X-Used-Day": String(usedDay + 1), "X-Limit-Day": String(LIM.day) };
+  const headers = { ...cors, "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache", "X-Chat-Id": String(chatId), "X-Credits": creditsLeft, "X-Plan": plan, "X-Used-Day": String(usedDay + 1), "X-Limit-Day": String(LIM.day) };
   return new Response(upstream.body.pipeThrough(out), { headers });
 });

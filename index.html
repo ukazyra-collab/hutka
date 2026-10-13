@@ -3048,6 +3048,12 @@ const STORE = (() => {
     const r = await fnCall('ask', { chat_id: o.chatId || undefined, session_id: o.sessionId || undefined, track_id: o.trackId || undefined, layout_id: o.layoutId || undefined, title: o.title || undefined, system: o.system || '', text: o.text, lang: I18N.lang }, { signal: o.signal });
     if (!r.ok) throw await errOf(r);
     const chatId = Number(r.headers.get('x-chat-id')) || o.chatId || null, credits = r.headers.get('x-credits'), plan = r.headers.get('x-plan'), usedDay = r.headers.get('x-used-day'), limitDay = r.headers.get('x-limit-day');
+    // the whole answer in one JSON reply (default): reveal it progressively so it reads like it is being typed
+    if (/application\/json/i.test(r.headers.get('content-type') || '')) {
+      const j = await r.json(); const full = String(j.text || ''); walletCache = null;
+      if (o.onText) { const step = Math.max(24, Math.round(full.length / 60)); for (let i = step; i < full.length; i += step) { if (o.signal && o.signal.aborted) break; o.onText(full.slice(0, i)); await new Promise(res => setTimeout(res, 18)); } o.onText(full); }
+      return { text: full, chatId: Number(j.chat_id) || chatId, credits: j.credits ? Number(j.credits) : null, plan: j.plan || plan, usedDay: j.used_day !== undefined ? Number(j.used_day) : (usedDay ? Number(usedDay) : null), limitDay: j.limit_day !== undefined ? Number(j.limit_day) : (limitDay ? Number(limitDay) : null), stop: j.stop || '' };
+    }
     const reader = r.body.getReader(), dec = new TextDecoder(); let buf = '', text = '';
     while (true) { const { value, done } = await reader.read(); if (done) break; buf += dec.decode(value, { stream: true }); let i; while ((i = buf.indexOf('\n')) >= 0) { const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1); if (!line.startsWith('data:')) continue; try { const ev = JSON.parse(line.slice(5).trim()); if (ev.type === 'content_block_delta' && ev.delta && ev.delta.text) { text += ev.delta.text; if (o.onText) o.onText(text); } if (ev.type === 'error') { const e = new Error(ev.error && ev.error.message || 'error'); e.code = 'error'; e.text = text; throw e; } } catch (e) { if (e.code) throw e; } } }
     walletCache = null;
@@ -3076,7 +3082,7 @@ function createMapView(canvas, host) {
   const M = { view: V, hoverIdx: -1, dragIdx: -1, selIdx: -1, panning: null, spaceDown: false, tool: 'pan', badges: [] };
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   function tokens() { const cs = getComputedStyle(document.documentElement), g = (n) => cs.getPropertyValue(n).trim(); return { bg: g('--bg'), surface: g('--surface'), surface2: g('--surface-2'), line: g('--line'), line2: g('--line-2'), fg: g('--fg'), muted: g('--muted'), faint: g('--faint'), accent: g('--accent'), accentInk: g('--accent-ink'), brake: g('--brake'), limit: g('--limit'), lift: g('--lift'), throttle: g('--throttle'), turnin: g('--turnin'), actual: g('--actual'), cmp: g('--cmp'), mono: g('--mono') || 'monospace', body: g('--body') || 'sans-serif' }; }
-  function setup() { const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = canvas.clientWidth || canvas.parentElement.clientWidth || 600, h = host.height ? host.height(w) : Math.round(clamp(w * 0.7, 420, 900)); if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); canvas.style.height = h + 'px'; } const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, w, h }; }
+  function setup() { const w = canvas.clientWidth || canvas.parentElement.clientWidth || 600, h = host.height ? host.height(w) : Math.round(clamp(w * 0.7, 420, 900)); const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1, Math.sqrt(3.2e6 / Math.max(1, w * h)))); if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); canvas.style.height = h + 'px'; } const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, w, h }; }
   const imgSize = () => { const fs = host.getFrameSize ? host.getFrameSize() : null; if (fs) return fs; const im = host.getImage ? host.getImage() : null; return im ? [im.w, im.h] : [1600, 1000]; };
   const toS = (x, y) => { const c = Math.cos(V.rot), si = Math.sin(V.rot); return [V.tx + V.s * (c * x - si * y), V.ty + V.s * (si * x + c * y)]; };
   const toI = (sx, sy) => { const c = Math.cos(V.rot), si = Math.sin(V.rot), x = (sx - V.tx) / V.s, y = (sy - V.ty) / V.s; return [c * x + si * y, -si * x + c * y]; };
@@ -3109,25 +3115,39 @@ function createMapView(canvas, host) {
     if (tiles.size > 180) { let n = 0; for (const kk of tiles.keys()) { const t0 = tiles.get(kk); if (t0 && t0.img) t0.img.src = ''; tiles.delete(kk); if (++n > 70) break; } }
     e = { img: null, ok: false, err: false }; tiles.set(k, e);
     const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async';
-    im.onload = () => { if (z >= 17 && placeholderTile(im)) { e.err = true; if (z - 1 < zCap) zCap = z - 1; tileDraw(); return; } e.ok = true; e.img = im; tileDraw(); };
-    im.onerror = () => { e.err = true; tileFails++; if (host.onTileError) host.onTileError(tileFails); tileDraw(); };
+    im.onload = () => { tilesVersion++; if (z >= 17 && placeholderTile(im)) { e.err = true; if (z - 1 < zCap) zCap = z - 1; tileDraw(); return; } e.ok = true; e.img = im; tileDraw(); };
+    im.onerror = () => { tilesVersion++; e.err = true; tileFails++; if (host.onTileError) host.onTileError(tileFails); tileDraw(); };
     im.src = tileUrl(TL, z, x, y); return e;
   }
+  // the satellite layer only changes with the view or when a tile arrives; between those it is blitted from a cache
+  let tileLayer = null, tilesVersion = 0;
   function drawTiles(ctx, w, h, TL) {
-    const M0 = TL.merc, sc = V.s; if (!M0) return;
+    const M0 = TL.merc; if (!M0) return;
+    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1, Math.sqrt(3.2e6 / Math.max(1, w * h))));
+    const key = [w, h, dpr, V.s.toFixed(4), V.tx.toFixed(1), V.ty.toFixed(1), V.rot.toFixed(4), TL.dx || 0, TL.dy || 0, TL.alpha, tilesVersion, zCap].join('|');
+    if (!tileLayer || tileLayer.key !== key) {
+      const off = tileLayer && tileLayer.canvas ? tileLayer.canvas : document.createElement('canvas');
+      if (off.width !== Math.round(w * dpr) || off.height !== Math.round(h * dpr)) { off.width = Math.round(w * dpr); off.height = Math.round(h * dpr); }
+      const oc = off.getContext('2d'); oc.setTransform(dpr, 0, 0, dpr, 0, 0); oc.clearRect(0, 0, w, h); paintTiles(oc, w, h, TL, dpr);
+      tileLayer = { key, canvas: off };
+    }
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(tileLayer.canvas, 0, 0); ctx.restore();
+    if (TL.attribution) { ctx.font = `10px ${tokens().body}`; const tw = ctx.measureText(TL.attribution).width + 10; ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, h - 15, tw, 15); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left'; ctx.fillText(TL.attribution, 5, h - 4); }
+  }
+  function paintTiles(ctx, w, h, TL, dpr) {
+    const M0 = TL.merc, sc = V.s;
     // visible frame rectangle (frame px = mercator px at M0.z minus the origin, shifted by the alignment offset)
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
     for (const [px, py] of [[0, 0], [w, 0], [w, h], [0, h]]) { const [x, y] = toI(px, py); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
-    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     // the zoom level follows where the zoom animation is heading, so the tiles for the final scale load once, not per frame
     const target = V.ts || sc;
     let z = Math.max(12, Math.min(TL.maxZoom || 20, zCap, M0.z + Math.round(Math.log2(Math.max(0.01, target * dpr)) - 0.3)));
-    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'medium';
     const dx = TL.dx || 0, dy = TL.dy || 0;
     const ox = M0.x0 - dx, oy = M0.y0 - dy;   // tile → frame: frame px = merc px (at M0.z) − origin + shift
     let f, size, tx0, tx1, ty0, ty1;
     // a big screen at a high zoom would need hundreds of tiles: step the zoom down until the count is sane
-    for (;;) { f = Math.pow(2, M0.z - z); size = 256 * f; tx0 = Math.floor((x0 + ox) / size); tx1 = Math.floor((x1 + ox) / size); ty0 = Math.floor((y0 + oy) / size); ty1 = Math.floor((y1 + oy) / size); if ((tx1 - tx0 + 1) * (ty1 - ty0 + 1) <= 160 || z <= 12) break; z--; }
+    for (;;) { f = Math.pow(2, M0.z - z); size = 256 * f; tx0 = Math.floor((x0 + ox) / size); tx1 = Math.floor((x1 + ox) / size); ty0 = Math.floor((y0 + oy) / size); ty1 = Math.floor((y1 + oy) / size); if ((tx1 - tx0 + 1) * (ty1 - ty0 + 1) <= 110 || z <= 12) break; z--; }
     ctx.save(); ctx.translate(V.tx, V.ty); ctx.rotate(V.rot); ctx.scale(sc, sc); ctx.globalAlpha = TL.alpha === undefined ? 1 : TL.alpha;
     const n = Math.pow(2, z);
     for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
@@ -3140,7 +3160,6 @@ function createMapView(canvas, host) {
       }
     }
     ctx.restore();
-    if (TL.attribution) { ctx.font = `10px ${tokens().body}`; const tw = ctx.measureText(TL.attribution).width + 10; ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, h - 15, tw, 15); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left'; ctx.fillText(TL.attribution, 5, h - 4); }
   }
   let drawReq = false;
   function draw() { if (drawReq) return; drawReq = true; requestAnimationFrame(() => { drawReq = false; paint(); if (host.afterDraw) host.afterDraw(); }); }
@@ -3975,7 +3994,7 @@ function labEnsureMap() {
     getTiles: () => { const G = LAB.G; if (!G) return null; const b = G.sat || { dx: 0, dy: 0 }; return SAT.layer(G, LAB.opts.tiles, { dx: b.dx + LAB.satAdj.dx, dy: b.dy + LAB.satAdj.dy }); },
     onSatMove: (dxPx, dyPx) => { if (!LAB.G) return; const mpp = LAB.G.track.mpp; LAB.satAdj.dx += dxPx * mpp; LAB.satAdj.dy -= dyPx * mpp; saveSatAdj(); renderAlignBar(); },
     getOverlay: () => ({ D: LAB.dcmp, role: LAB.mapLap === 'cmp' ? 'cmp' : 'ref', hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor }),
-    onHover: (i) => { LAB.hoverIdx = i; showReadout(); renderInspector(); drawDataCharts(); },
+    onHover: (i) => { LAB.hoverIdx = i; showReadout(); const row = activeRow(), key = row ? row.w.n : 0; if (key !== LAB._inspKey) renderInspector(); scheduleCharts(); },
     onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
   $('lmBack').onclick = () => { if (history.length > 1) history.back(); else go('home'); };
   $('lmPrev').onclick = () => stepCorner(-1); $('lmNext').onclick = () => stepCorner(1); $('inspPrev').onclick = () => stepCorner(-1); $('inspNext').onclick = () => stepCorner(1);
@@ -4008,7 +4027,7 @@ function labEnsureMap() {
   document.addEventListener('fullscreenchange', () => { const fs = document.fullscreenElement === $('hero'); placePickbar(fs); $('fsHead').hidden = !fs; $('btnFull').classList.toggle('active', fs); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); });
   window.addEventListener('resize', () => { if (APP.route === 'lab' && LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (LAB.dcmp) renderInspector(); } });
   window.addEventListener('keydown', (e) => { if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if (APP.route !== 'lab') return; if (e.key === 'Escape' && LAB.selN) { LAB.selN = 0; afterSelect(true); } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { if (LAB.dcmp) { e.preventDefault(); stepCorner(e.key === 'ArrowRight' ? 1 : -1); } } else if (e.key === 'q' || e.key === 'Q') LAB.map.rotateBy(-Math.PI / 24); else if (e.key === 'e' || e.key === 'E') LAB.map.rotateBy(Math.PI / 24); else if (e.key === 'f' || e.key === 'F') $('btnFull').click(); });
-  for (const c of [$('chDataSpeed'), $('chDataDelta')]) { c.addEventListener('pointermove', (e) => { const G = LAB.G; if (!G || !LAB.dcmp) return; const r = c.getBoundingClientRect(), x = e.clientX - r.left; const s = (x - PAD.l) / (r.width - PAD.l - PAD.r) * G.track.lengthM, i = Math.round(s / G.track.ds), ni = (i >= 0 && i < G.track.N) ? i : -1; if (ni !== LAB.hoverIdx) { LAB.hoverIdx = ni; LAB.map.setHover(ni); showReadout(); renderInspector(); drawDataCharts(); } }); c.addEventListener('pointerleave', () => { if (LAB.hoverIdx >= 0) { LAB.hoverIdx = -1; LAB.map.setHover(-1); showReadout(); renderInspector(); drawDataCharts(); } }); }
+  for (const c of [$('chDataSpeed'), $('chDataDelta')]) { c.addEventListener('pointermove', (e) => { const G = LAB.G; if (!G || !LAB.dcmp) return; const r = c.getBoundingClientRect(), x = e.clientX - r.left; const s = (x - PAD.l) / (r.width - PAD.l - PAD.r) * G.track.lengthM, i = Math.round(s / G.track.ds), ni = (i >= 0 && i < G.track.N) ? i : -1; if (ni !== LAB.hoverIdx) { LAB.hoverIdx = ni; LAB.map.setHover(ni); showReadout(); const row = activeRow(), key = row ? row.w.n : 0; if (key !== LAB._inspKey) renderInspector(); scheduleCharts(); } }); c.addEventListener('pointerleave', () => { if (LAB.hoverIdx >= 0) { LAB.hoverIdx = -1; LAB.map.setHover(-1); showReadout(); renderInspector(); scheduleCharts(); } }); }
   // session switch, reference lap, comparison
   $('sessSel').addEventListener('change', async () => { const id = $('sessSel').value; if (!id || (LAB.current && id === LAB.current.id)) return; const loaded = sessOf(id); if (loaded) { LAB.current = loaded; LAB.ref = lapKey(loaded, bestLap(loaded)); LAB.cmp = 'none'; LAB.selN = 0; LAB.chat = []; LAB.social = null; labRender(); } else { const meta = await STORE.getSessionMeta(id); if (meta) { go('lab~' + id); } } });
   $('refSel').addEventListener('change', () => { LAB.ref = $('refSel').value; if (LAB.cmp === LAB.ref) LAB.cmp = 'none'; LAB.selN = 0; LAB.chat = []; labRender(); });
@@ -4340,9 +4359,12 @@ function renderCornersTable() {
     b.onclick = () => selectCorner(w.n, false); mob.appendChild(b); }
   if (isLand() && LAB.selN) { const s = mob.querySelector('.crow.sel'); if (s && s.scrollIntoView) s.scrollIntoView({ block: 'nearest' }); }
 }
+// the data charts follow the mouse: at most one repaint per animation frame
+let chartsReq = false;
+function scheduleCharts() { if (chartsReq) return; chartsReq = true; requestAnimationFrame(() => { chartsReq = false; drawDataCharts(); }); }
 function renderInspector() {
   const D = LAB.dcmp, body = $('inspBody'), empty = $('inspEmpty'); if (!D) return;
-  const r = activeRow(); $('inspector').classList.toggle('open', !!r);
+  const r = activeRow(); $('inspector').classList.toggle('open', !!r); LAB._inspKey = r ? r.w.n : 0;
   if (!r) {
     body.hidden = true; empty.hidden = false;
     const coach = LAB.coach, top = coach ? D.rows.map(x => { const c = coach.corners.find(y => y.n === x.w.n); return c ? { n: x.w.n, d: x.R.time - c.tTop } : null; }).filter(Boolean).filter(x => x.d > 0.03).sort((a, b) => b.d - a.d).slice(0, 3) : [];
