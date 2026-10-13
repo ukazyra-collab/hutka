@@ -232,6 +232,13 @@ textarea{min-height:90px;resize:vertical}
 .tile .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
 .tile .k svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tile .v{font-size:18px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
+/* personal bests: one tile per track · layout · kart */
+.tile.best{text-align:left;display:block;color:inherit;text-decoration:none;border:1px solid var(--line);background:var(--surface);transition:border-color .15s,transform .15s}
+.tile.best:hover{border-color:var(--line-2);transform:translateY(-1px)}
+.tile.best .tn{font-weight:700;font-size:14px;line-height:1.25}
+.tile.best .ln{font-size:12px;color:var(--muted);margin-top:1px}
+.tile.best .v{font:700 22px/1.1 var(--mono);letter-spacing:-.02em;margin-top:8px}
+.tile.best .hint{margin-top:4px;font-size:12px}
 .list{display:flex;flex-direction:column;gap:6px}
 .item{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);min-width:0;text-decoration:none;color:var(--fg)}
 .item:hover{border-color:var(--line-2);background:var(--surface-2)}
@@ -305,6 +312,21 @@ textarea{min-height:90px;resize:vertical}
 .book .t b{display:block;font-size:14.5px}
 .book .t span{color:var(--muted);font-size:13px}
 .layouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+/* the track page: layouts as tabs, then the chosen layout right below (map, guide, sessions) */
+.layout-bar{display:flex;flex-direction:column;gap:6px}
+.layout-tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.layout-tabs::-webkit-scrollbar{display:none}
+.ltab{display:flex;flex-direction:column;align-items:flex-start;gap:2px;flex:none;min-width:150px;max-width:260px;padding:10px 14px;border:1px solid var(--line-2);border-radius:14px;background:var(--surface);text-align:left;font:inherit;color:var(--fg);cursor:pointer;transition:border-color .15s,background .15s}
+.ltab b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ltab span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ltab:hover{border-color:var(--accent)}
+.ltab.on{border-color:var(--btn);background:var(--btn);color:var(--btn-ink)}
+.ltab.on span{color:color-mix(in srgb,var(--btn-ink) 75%,transparent)}
+.layout-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.layout-head .lh-t .sub{color:var(--muted);font-size:13.5px}
+.layout-head .lh-ctl{flex-wrap:wrap;gap:8px;align-items:flex-end}
+.layout-head .field.auto{min-width:220px}
+.layout-head .field label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .layout-card{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--line-2);border-radius:12px;text-decoration:none;color:var(--fg);background:var(--surface)}
 .layout-card:hover{border-color:var(--accent);background:var(--accent-soft)}
 .layout-card b{font-size:15px}
@@ -481,7 +503,8 @@ textarea{min-height:90px;resize:vertical}
 .post .big{font:600 34px/1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .post .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .post .nm{font-weight:600;font-size:15px;margin:6px 0 8px;overflow-wrap:anywhere}
-.post .pf{display:flex;gap:8px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
+.post .pf{display:flex;gap:4px;align-items:center;padding:6px 10px 6px 8px;border-top:1px solid var(--line);flex-wrap:wrap}
+.post .pf .btn.sm{margin-left:4px}
 .post .pf .sp{flex:1}
 .post .pf .cnt{color:var(--muted);font-size:13px;display:inline-flex;align-items:center;gap:5px}
 @media (max-width:640px){.post .pb{grid-template-columns:1fr}.post .pv{height:120px}}
@@ -548,10 +571,16 @@ textarea{min-height:90px;resize:vertical}
 .align-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--accent) 8%,var(--surface));font-size:12.5px}
 .align-bar[hidden]{display:none}
 .align-bar .seg .btn.xs{height:28px;padding:0 10px;font-size:14px}
-.votes{display:inline-flex;gap:4px}
-.btn.vote .ic{font-size:14px;line-height:1}
-.btn.vote.on.up{border-color:var(--throttle);color:var(--throttle);background:color-mix(in srgb,var(--throttle) 10%,var(--surface))}
-.btn.vote.on.down{border-color:var(--brake);color:var(--brake);background:color-mix(in srgb,var(--brake) 10%,var(--surface))}
+.votes{display:inline-flex;gap:2px}
+/* feed actions: helpful / not helpful / comments — quiet icon buttons that light up when they are yours */
+.act{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:600 13px var(--body);cursor:pointer;text-decoration:none;transition:background .15s,color .15s,transform .15s;-webkit-tap-highlight-color:transparent}
+.act svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.act b{font-weight:600;font-variant-numeric:tabular-nums}
+.act:hover{background:var(--surface-2);color:var(--fg)}
+.act.on.up{color:var(--accent)}.act.on.up svg{fill:color-mix(in srgb,var(--accent) 22%,transparent)}
+.act.on.down{color:var(--brake)}.act.on.down svg{fill:color-mix(in srgb,var(--brake) 18%,transparent)}
+.act.pop svg{animation:pop .35s ease}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35) rotate(-8deg)}70%{transform:scale(.95)}100%{transform:scale(1)}}
 .post.low{opacity:.72}
 .post.low .pv{filter:grayscale(1)}
 .karts{display:flex;flex-wrap:wrap;gap:6px}
@@ -593,7 +622,8 @@ textarea{min-height:90px;resize:vertical}
   .post .pb{padding:0 12px 12px;gap:10px;grid-template-columns:1fr}
   .post .pv{height:130px}
   .post .big{font-size:30px}
-  .post .pf{padding:8px 12px;gap:6px}
+  .post .pf{padding:4px 8px 6px 4px;gap:2px}
+  .post .pv{height:170px}
   .post .pf .btn.sm{height:34px;padding:0 10px;font-size:13px}
   .tracks-grid{grid-template-columns:1fr}
   .cover{height:150px;margin:0 -12px}
@@ -807,7 +837,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/></symbol>
     <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5c3 0 5.5 2.2 5.5 5.5"/></symbol>
-    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></symbol><symbol id="i-down" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></symbol><symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></symbol>
     <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></symbol>
     <symbol id="i-rotate" viewBox="0 0 24 24"><rect x="3" y="7" width="14" height="10" rx="2"/><path d="M20 10v4M17 20l-2-2 2-2M15 18h3a2 2 0 002-2"/></symbol>
@@ -823,9 +853,9 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     </a>
     <nav class="nav">
       <a href="#home" data-route="home"><svg><use href="#i-home"/></svg><span data-t="Home">Home</span></a>
-      <a href="#tracks" data-route="tracks"><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></a>
       <a href="#lab" data-route="lab"><svg><use href="#i-lab"/></svg><span data-t="Lab">Lab</span></a>
       <a href="#ai" data-route="ai" id="navAI"><svg><use href="#i-spark"/></svg><span data-t="AI coach">AI coach</span></a>
+      <a href="#tracks" data-route="tracks"><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></a>
       <a href="#profile" data-route="profile"><svg><use href="#i-user"/></svg><span data-t="Profile">Profile</span></a>
       <div class="sep" id="adminSep" hidden></div>
       <a href="#admin" data-route="admin" id="navAdmin" hidden><svg><use href="#i-shield"/></svg><span data-t="Admin Panel">Admin Panel</span></a>
@@ -892,10 +922,30 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
           <div class="meta-row" id="tMeta"></div>
         </div>
       </div>
+      <!-- the layout block: which configuration, whose lap is on the map, then the map, the corner guide and the sessions -->
+      <div class="layout-bar" id="tLayoutBar">
+        <div class="layout-tabs" id="tLayoutTabs"></div>
+        <div class="hint" id="tLayoutsHint"></div>
+      </div>
+      <div class="layout-head" id="lHead" hidden>
+        <div class="lh-t"><div class="sub" id="lSub"></div></div>
+        <div class="row lh-ctl">
+          <div class="field auto" id="lShownField" hidden><label data-t="Lap on the map">Lap on the map</label><select id="lShown"></select></div>
+          <button class="btn primary" id="lUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload my session">Upload my session</span></button>
+          <button class="btn" id="lEdit" type="button" hidden><span data-t="Edit layout">Edit layout</span></button>
+        </div>
+      </div>
+      <div class="banner info" id="lFirst" hidden><svg><use href="#i-info"/></svg><div id="lFirstText"></div></div>
+      <div class="card" id="lPhotoCard" hidden><img id="lPhoto" alt="" style="max-width:100%;max-height:520px;border-radius:12px;display:block"></div>
+      <div class="hero with-insp" id="lHero">
+        <div class="map-wrap"><div class="map-bar"><button class="btn" id="lTiles" type="button" hidden data-t="Satellite">Satellite</button><div class="seg"><button class="btn" id="lRotL" type="button" title="Rotate">↺</button><button class="btn" id="lRotR" type="button" title="Rotate">↻</button></div><div class="seg"><button class="btn" id="lZoomOut" type="button">−</button><button class="btn" id="lZoomIn" type="button">+</button><button class="btn" id="lZoomFit" type="button">⌂</button></div></div><div style="position:relative"><canvas id="lmap"></canvas><div class="map-title" id="lMapTitle" hidden></div><div class="readout" id="lReadout" hidden></div></div><div class="legend" id="lLegend"></div></div>
+        <div class="inspector" id="lInsp"><div class="insp-empty" id="lInspText"></div></div>
+      </div>
+      <div class="card" id="lGuideCard"><h2><svg><use href="#i-corner"/></svg><span data-t="Corner guide">Corner guide</span><span class="sub" id="lGuideSub"></span></h2><div id="lGuide" class="guide"></div><div class="hint" id="lGuideHint"></div></div>
+      <div class="card" id="lSessCard"><h2><svg><use href="#i-timer"/></svg><span data-t="Sessions on this layout">Sessions on this layout</span><span class="sub" id="lSessSub"></span></h2><div id="lSessions"></div></div>
       <div class="card book" id="tBook" hidden><div class="ico"><svg><use href="#i-ticket"/></svg></div><div class="t"><b data-t="Book a session">Book a session</b><span id="tBookSub"></span></div><a class="btn primary" id="tBookBtn" target="_blank" rel="noopener"><span data-t="Book now">Book now</span> ↗</a></div>
       <div class="card" id="tVideo" hidden><h2><svg><use href="#i-play"/></svg><span data-t="Take a virtual lap">Take a virtual lap</span><span class="sub" id="tVideoSub"></span></h2><a class="btn" id="tVideoBtn" target="_blank" rel="noopener"><svg><use href="#i-play"/></svg><span data-t="Watch the onboard">Watch the onboard</span> ↗</a></div>
       <div class="card" id="tDescCard" hidden><p id="tDesc" style="max-width:80ch;line-height:1.6"></p></div>
-      <div class="card"><h2><svg><use href="#i-layouts"/></svg><span data-t="Layouts">Layouts</span></h2><div class="layouts" id="tLayouts"></div><div class="hint" id="tLayoutsHint"></div></div>
       <div class="card" id="tMineCard" hidden><h2><svg><use href="#i-user"/></svg><span data-t="Your sessions on this track">Your sessions on this track</span><span class="sub" id="tMineSub"></span></h2><div id="tMine"></div></div>
       <div class="card" id="tKartsCard" hidden><h2><svg><use href="#i-speed"/></svg><span data-t="Karts people drive here">Karts people drive here</span></h2><div class="karts" id="tKarts"></div></div>
       <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="Hot laps">Hot laps</span><span class="sub" id="tHotSub"></span></h2><div id="tHot"></div></div>
@@ -905,18 +955,6 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     </section>
 
     <!-- ========== LAYOUT ========== -->
-    <section class="page" id="pg-layout" hidden>
-      <div class="ph"><div><div class="hint" id="lCrumb"></div><h1 id="lName">—</h1><div class="sub" id="lSub"></div></div><div class="row"><button class="btn primary" id="lUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload my session">Upload my session</span></button><button class="btn" id="lEdit" type="button" hidden><span data-t="Edit layout">Edit layout</span></button></div></div>
-      <div class="banner info" id="lFirst" hidden><svg><use href="#i-info"/></svg><div id="lFirstText"></div></div>
-      <div class="card" id="lPhotoCard" hidden><img id="lPhoto" alt="" style="max-width:100%;max-height:520px;border-radius:12px;display:block"></div>
-      <div class="hero with-insp" id="lHero">
-        <div class="map-wrap"><div class="map-bar"><button class="btn" id="lTiles" type="button" hidden data-t="Satellite">Satellite</button><div class="seg"><button class="btn" id="lRotL" type="button" title="Rotate">↺</button><button class="btn" id="lRotR" type="button" title="Rotate">↻</button></div><div class="seg"><button class="btn" id="lZoomOut" type="button">−</button><button class="btn" id="lZoomIn" type="button">+</button><button class="btn" id="lZoomFit" type="button">⌂</button></div></div><div style="position:relative"><canvas id="lmap"></canvas><div class="map-title" id="lMapTitle" hidden></div><div class="readout" id="lReadout" hidden></div></div><div class="legend" id="lLegend"></div></div>
-        <div class="inspector" id="lInsp"><div class="insp-empty" id="lInspText"></div></div>
-      </div>
-      <div class="card" id="lGuideCard"><h2><svg><use href="#i-corner"/></svg><span data-t="Corner guide">Corner guide</span><span class="sub" id="lGuideSub"></span></h2><div id="lGuide" class="guide"></div><div class="hint" id="lGuideHint"></div></div>
-      <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="Sessions on this layout">Sessions on this layout</span><span class="sub" id="lSessSub"></span></h2><div id="lSessions"></div></div>
-    </section>
-
     <!-- ========== LAB ========== -->
     <section class="page" id="pg-lab" hidden>
       <div class="ph"><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div><div class="row"><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
@@ -2680,7 +2718,7 @@ Object.assign(I18N.RU, {
   'Showing every kart class — a sport kart and a rental kart are not comparable corner by corner.': 'Показаны все классы картов — спортивный и прокатный карт по поворотам не сравнить.', '{n} session(s) on another kart class are hidden (a sport kart and a rental kart are not comparable).': 'Скрыто сессий на другом классе картов: {n} (спортивный и прокатный карт не сравнить).', 'Hide them': 'Скрыть', 'Show anyway': 'Всё равно показать',
   'Add a new track…': 'Добавить новую трассу…', '— no track (private, custom) —': '— без трассы (приватно, своя) —', 'Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.': 'Трассы ещё нет в Hutka? Назовите её — страница трассы создастся вместе с этой сессией, потом её можно править, а другие гонщики найдут её по GPS.', 'Other rental kart…': 'Другой прокатный карт…', 'Rental kart (model below)': 'Прокатный карт (модель ниже)', 'Sport kart (Rotax, X30, KZ…)': 'Спортивный карт (Rotax, X30, KZ…)', 'Give the new track a name.': 'Дайте новой трассе название.', 'Main': 'Основной', 'Could not create the track: {e}': 'Не удалось создать трассу: {e}', 'Track name': 'Название трассы',
   'Turn the phone sideways: the Lab becomes a full-screen cockpit — the satellite photo, the lap line, live numbers and a scrub bar along the lap.': 'Поверните телефон горизонтально: Лаборатория становится кокпитом на весь экран — спутниковый снимок, линия круга, живые цифры и бегунок по кругу.', '{n} corners · ‹ › to step': 'Поворотов: {n} · ‹ › листать', 'The photo can sit a few metres off the GPS line.': 'Снимок может быть смещён на несколько метров от линии GPS.', 'Move': 'Сдвинуть', 'Signed in.': 'Вы вошли.', 'Password': 'Пароль', 'I have a password': 'У меня есть пароль', 'Email me a link instead': 'Лучше пришлите ссылку', 'Enter the email and the password.': 'Введите почту и пароль.', 'Could not start Apple sign-in: {e}': 'Не удалось начать вход через Apple: {e}', 'Could not sign in: {e}': 'Не удалось войти: {e}', 'Could not open the file: {e}': 'Не удалось открыть файл: {e}',
-  'Rental karts at this track': 'Прокатные карты этой трассы', 'Rental': 'Прокат', 'Other sport kart…': 'Другой спортивный карт…', 'Other': 'Другое', 'Showing every kart — different karts are not comparable corner by corner.': 'Показаны все карты — разные карты по поворотам не сравнить.', '{n} session(s) on another kart are hidden (different karts are not comparable corner by corner).': 'Скрыто сессий на другом карте: {n} (разные карты по поворотам не сравнить).', 'Each kart has its own ranking — a 270 cc rental and a KZ2 are different sports.': 'У каждого карта свой рейтинг — прокатный 270 cc и KZ2 это разные виды спорта.',
+  'Compare': 'Сравнить', 'Comments': 'Комментарии', 'Lap on the map': 'Круг на карте', 'No layouts yet — the first uploaded session creates one.': 'Лейаутов пока нет — первая загруженная сессия создаст его.', 'Rental karts at this track': 'Прокатные карты этой трассы', 'Rental': 'Прокат', 'Other sport kart…': 'Другой спортивный карт…', 'Other': 'Другое', 'Showing every kart — different karts are not comparable corner by corner.': 'Показаны все карты — разные карты по поворотам не сравнить.', '{n} session(s) on another kart are hidden (different karts are not comparable corner by corner).': 'Скрыто сессий на другом карте: {n} (разные карты по поворотам не сравнить).', 'Each kart has its own ranking — a 270 cc rental and a KZ2 are different sports.': 'У каждого карта свой рейтинг — прокатный 270 cc и KZ2 это разные виды спорта.',
   'Upload session': 'Загрузить сессию', 'Karts people drive here': 'Карты, на которых здесь ездят', 'Karts — one per line (add “sport” after a sport kart)': 'Карты — по одному в строке (после спортивного допишите «sport»)', "Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.": 'Alfano .alf2 (эталон), AiM, RaceChrono, TrackAddict, Harry\'s LapTimer, VBOX, GPX — один файл на сессию; можно несколько сразу.',
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
@@ -3626,11 +3664,23 @@ function kartValueOf(m, tr) { const cls = kartClassOf(m); if (cls === 'sport') {
 function kartCompatible(a, b) { const ka = kartKeyOf(a), kb = kartKeyOf(b); if (ka === kb) return true; if (!kartKeyIsSport(ka) && !kartKeyIsSport(kb)) return ka === 'rental' || kb === 'rental'; return false; }
 // group sessions by category, the busiest category first (rental before sport on a tie)
 function groupByKart(list) { const g = new Map(); for (const s of list) { const k = kartKeyOf(s); if (!g.has(k)) g.set(k, []); g.get(k).push(s); } return [...g.entries()].map(([key, items]) => ({ key, items, label: kartKeyLabel(key, items[0]), sport: kartKeyIsSport(key) })).sort((a, b) => b.items.length - a.items.length || a.sport - b.sport); }
-// helpful / not helpful votes on a session: two small buttons that work the same everywhere
+// helpful / not helpful votes on a session: icon buttons that answer at once (the server call follows; a failure rolls back)
 function voteButtons(sid, cnt, onChange) {
-  const wrap = el('span', 'votes'); const mk = (v, cls) => { const b = el('button', 'btn sm vote ' + cls + (cnt && cnt.mine === v ? ' on' : '')); b.type = 'button'; b.innerHTML = `<span class="ic">${v === 1 ? '👍' : '👎'}</span> <b>${v === 1 ? (cnt ? cnt.likes : 0) : (cnt ? cnt.down : 0)}</b>`; b.title = v === 1 ? t('Helpful') : t('Not helpful — irrelevant or misleading');
-    b.onclick = async () => { if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to rate sessions.')); return; } for (const x of wrap.children) x.disabled = true; try { const r = await STORE.vote(sid, v); wrap.replaceWith(voteButtons(sid, r, onChange)); if (onChange) onChange(r); } catch (e) { toast(t('Could not save the vote.')); for (const x of wrap.children) x.disabled = false; } }; return b; };
-  wrap.append(mk(1, 'up'), mk(-1, 'down')); return wrap;
+  const st = { likes: cnt && cnt.likes || 0, down: cnt && cnt.down || 0, mine: cnt && cnt.mine || 0, comments: cnt && cnt.comments || 0 };
+  const wrap = el('span', 'votes');
+  const mk = (v, cls, icon, title) => { const b = el('button', 'act ' + cls); b.type = 'button'; b.title = title; b.innerHTML = `<svg><use href="#${icon}"/></svg><b></b>`; return b; };
+  const up = mk(1, 'up', 'i-up', t('Helpful')), dn = mk(-1, 'down', 'i-down', t('Not helpful — irrelevant or misleading'));
+  const paint = () => { up.classList.toggle('on', st.mine === 1); dn.classList.toggle('on', st.mine === -1); up.querySelector('b').textContent = st.likes; dn.querySelector('b').textContent = st.down; };
+  let busy = false;
+  const tap = async (v, b) => {
+    if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to rate sessions.')); return; }
+    if (busy) return; busy = true; const prev = Object.assign({}, st);
+    if (st.mine === v) { st.mine = 0; if (v === 1) st.likes--; else st.down--; } else { if (st.mine === 1) st.likes--; if (st.mine === -1) st.down--; st.mine = v; if (v === 1) st.likes++; else st.down++; }
+    paint(); b.classList.add('pop'); setTimeout(() => b.classList.remove('pop'), 350); if (onChange) onChange(Object.assign({}, st));
+    try { const r = await STORE.vote(sid, v); Object.assign(st, { likes: r.likes || 0, down: r.down || 0, mine: r.mine || 0, comments: r.comments || st.comments }); } catch (e) { Object.assign(st, prev); toast(t('Could not save the vote.')); }
+    paint(); if (onChange) onChange(Object.assign({}, st)); busy = false;
+  };
+  up.onclick = () => tap(1, up); dn.onclick = () => tap(-1, dn); paint(); wrap.append(up, dn); return wrap;
 }
 // opening hours are judged in the track's own time zone (by country), not the viewer's
 const TZ_BY_COUNTRY = { AE: 'Asia/Dubai', OM: 'Asia/Muscat', QA: 'Asia/Qatar', BH: 'Asia/Bahrain', KW: 'Asia/Kuwait', SA: 'Asia/Riyadh', BY: 'Europe/Minsk', RU: 'Europe/Moscow', UA: 'Europe/Kyiv', KZ: 'Asia/Almaty', GE: 'Asia/Tbilisi', AM: 'Asia/Yerevan', TR: 'Europe/Istanbul', EG: 'Africa/Cairo', PL: 'Europe/Warsaw', LT: 'Europe/Vilnius', LV: 'Europe/Riga', EE: 'Europe/Tallinn', DE: 'Europe/Berlin', FR: 'Europe/Paris', IT: 'Europe/Rome', ES: 'Europe/Madrid', PT: 'Europe/Lisbon', NL: 'Europe/Amsterdam', BE: 'Europe/Brussels', AT: 'Europe/Vienna', CH: 'Europe/Zurich', CZ: 'Europe/Prague', GB: 'Europe/London', IE: 'Europe/Dublin', SE: 'Europe/Stockholm', NO: 'Europe/Oslo', FI: 'Europe/Helsinki', DK: 'Europe/Copenhagen', GR: 'Europe/Athens', CY: 'Asia/Nicosia', IL: 'Asia/Jerusalem', IN: 'Asia/Kolkata', TH: 'Asia/Bangkok', SG: 'Asia/Singapore', MY: 'Asia/Kuala_Lumpur', ID: 'Asia/Jakarta', JP: 'Asia/Tokyo', KR: 'Asia/Seoul', CN: 'Asia/Shanghai', AU: 'Australia/Sydney', NZ: 'Pacific/Auckland', ZA: 'Africa/Johannesburg', BR: 'America/Sao_Paulo', AR: 'America/Argentina/Buenos_Aires', MX: 'America/Mexico_City', CA: 'America/Toronto', US: 'America/New_York' };
@@ -3650,14 +3700,14 @@ async function route() {
     if (name === 'sws') { const pre = SWS.decodeHash((location.hash.split('~')[1] || '')); history.replaceState(null, '', '#profile'); name = 'profile'; r.a = null; setTimeout(() => SWS.open(pre || {}), 300); }
     if (name === 'admin' && !STORE.isAdmin() && !(r.a && STORE.canEditTrack(STORE.getTrack(r.a)))) name = STORE.getTracks().some(tr => STORE.canEditTrack(tr)) ? 'admin' : 'home';
     APP.route = name; APP.a = r.a; APP.b = r.b; APP.c = r.c;
-    for (const p of PAGES) { const pg = $('pg-' + p); if (pg) pg.hidden = p !== name; }
+    for (const p of PAGES) { const pg = $('pg-' + p); if (pg) pg.hidden = p !== name; } if (name === 'layout') $('pg-track').hidden = false;
     if (typeof syncLand === 'function') syncLand();
     for (const a of document.querySelectorAll('.nav a[data-route], .tabbar a[data-route]')) a.classList.toggle('active', a.dataset.route === name || (name === 'track' || name === 'layout') && a.dataset.route === 'tracks' || name === 'driver' && a.dataset.route === 'profile');
     window.scrollTo({ top: 0 });
     if (name === 'home') await renderHomePage();
     else if (name === 'tracks') await renderTracksPage();
-    else if (name === 'track') await renderTrackPage(r.a);
-    else if (name === 'layout') await renderLayoutPage(r.a, r.b);
+    else if (name === 'track') await renderTrackPage(r.a, r.b);
+    else if (name === 'layout') { history.replaceState(null, '', `#track~${r.a}~${r.b || ''}`.replace(/~$/, '')); $('pg-layout') && ($('pg-layout').hidden = true); $('pg-track').hidden = false; APP.route = 'track'; await renderTrackPage(r.a, r.b); }
     else if (name === 'lab' && r.a === 'share') { await LAB.show(null); history.replaceState(null, '', '#lab'); const files = await takeSharedFiles(); if (files.length) UPLOAD.withFiles(files); else toast(t('Nothing was shared — pick the .alf2 file in the upload window.')); }
     else if (name === 'lab') await LAB.show(r.a, r.b);
     else if (name === 'profile') await renderProfile();
@@ -3862,7 +3912,7 @@ function trackRow(tr, d) {
 $('btnAddTrack').onclick = () => ADMIN.addTrack();
 
 // ---------- track page ----------
-async function renderTrackPage(tid) {
+async function renderTrackPage(tid, lid) {
   const tr = STORE.getTrack(tid);
   if (!tr) { $('tName').textContent = t('Track not found'); $('tMeta').innerHTML = ''; return; }
   const open = trackHours(tr);
@@ -3885,10 +3935,14 @@ async function renderTrackPage(tid) {
   $('tBook').hidden = !safeUrl(tr.booking); if (safeUrl(tr.booking)) { $('tBookBtn').href = safeUrl(tr.booking); $('tBookSub').textContent = t('Reserve your spot at {name} through their official booking site.', { name: tr.name }); }
   $('tVideo').hidden = !safeUrl(tr.video); if (safeUrl(tr.video)) { $('tVideoBtn').href = safeUrl(tr.video); $('tVideoSub').textContent = t("Experience {name} from a driver's perspective", { name: tr.name }); }
   $('tDescCard').hidden = !tr.description; $('tDesc').textContent = tr.description || '';
-  // layouts with session counts
+  // layouts as tabs (the busiest first by default), then the chosen layout right here: map, corner guide, sessions
   const layouts = await STORE.getLayouts(tid, true), pubs = await STORE.sessionsFor(tid), mine = (STORE.hasIdentity || !STORE.hasDb) ? await STORE.myOnTrack(tid) : [];
-  const box = $('tLayouts'); box.innerHTML = '';
-  for (const l of layouts) { const a = el('a', 'layout-card'); a.href = `#layout~${tid}~${l.id}`; if (l.photo) { const im = new Image(); im.alt = ''; im.className = 'skel'; a.appendChild(im); STORE.getMedia(`tracks/${tid}/layouts/${l.id}/media/photo`).then(src => { if (src) { im.src = src; im.classList.remove('skel'); } else im.remove(); }); } const tx = el('div'); tx.style.minWidth = '0'; tx.appendChild(el('b', '', l.name)); const m = [l.lengthM ? `${l.lengthM} ${t('m')}` : '', l.corners ? t('{n} corners', { n: l.corners }) : '', l.note || ''].filter(Boolean).join(' · '); if (m) tx.appendChild(el('div', 'meta', m)); a.appendChild(tx); const n = pubs.filter(s => s.layout === l.id).length, my = mine.filter(s => s.layout === l.id && !s.published).length; a.appendChild(el('span', 'cnt', (n ? tn(n, '{n} session', '{n} sessions').replace('{n}', n) : t('be the first')) + (my ? ' · ' + t('{n} yours unpublished', { n: my }) : ''))); box.appendChild(a); }
+  const cntOf = (l) => pubs.filter(s => s.layout === l.id).length;
+  let cur = layouts.find(l => l.id === lid) || layouts.slice().sort((a, b) => cntOf(b) - cntOf(a))[0] || null;
+  const tabs = $('tLayoutTabs'); tabs.innerHTML = '';
+  for (const l of layouts) { const b = el('button', 'ltab' + (cur && l.id === cur.id ? ' on' : '')); b.type = 'button'; const n = cntOf(l), my = mine.filter(s => s.layout === l.id && !s.published).length; b.innerHTML = `<b>${esc(l.name)}</b><span>${[l.lengthM ? `${l.lengthM} ${t('m')}` : '', n ? tn(n, '{n} session', '{n} sessions').replace('{n}', n) : t('be the first'), my ? t('{n} yours unpublished', { n: my }) : ''].filter(Boolean).join(' · ')}</span>`; b.onclick = () => { history.replaceState(null, '', `#track~${tid}~${l.id}`); for (const x of tabs.children) x.classList.toggle('on', x === b); renderLayoutBlock(tid, l.id); }; tabs.appendChild(b); }
+  $('lHead').hidden = !cur; for (const id of ['lFirst', 'lPhotoCard', 'lHero', 'lGuideCard', 'lSessCard']) $(id).hidden = !cur;
+  if (cur) renderLayoutBlock(tid, cur.id); else { $('lFirst').hidden = true; }
   // the viewer's own sessions on this track, with a publish switch
   const mineBox = $('tMine'); mineBox.innerHTML = ''; $('tMineCard').hidden = !mine.length; $('tMineSub').textContent = mine.length ? String(mine.length) : '';
   if (mine.length) {
@@ -3897,7 +3951,7 @@ async function renderTrackPage(tid) {
     tb.appendChild(body); respTable(tb); wrap.appendChild(tb); mineBox.appendChild(wrap);
     if (mine.some(m => !m.published)) mineBox.appendChild(el('div', 'hint', t('Private sessions are only in your library. Publish one to put it on this page and in the hot laps.')));
   }
-  $('tLayoutsHint').textContent = layouts.length ? '' : (STORE.isAdmin() ? t('No layouts yet — add them in the admin panel.') : t('No layouts listed yet.'));
+  $('tLayoutsHint').textContent = layouts.length ? '' : t('No layouts yet — the first uploaded session creates one.');
   // hot laps: the best lap of every published session
   const hot = $('tHot'); hot.innerHTML = '';
   const counts = await STORE.socialCounts(pubs.map(s => s.id)); const low = (s) => STORE.lowRated(counts[s.id]);
@@ -3944,18 +3998,25 @@ async function renderTrackPage(tid) {
   setStatus('tClaimStatus', '');
 }
 
-// ---------- layout page ----------
-const LP = { map: null, G: null, D: null, coach: null, hover: -1, sel: 0, sessions: [], names: {} };
-async function renderLayoutPage(tid, lid) {
-  const tr = STORE.getTrack(tid); if (!tr) { $('lName').textContent = t('Track not found'); return; }
+// ---------- the layout block on the track page: the map with the chosen lap, the corner guide, the sessions ----------
+const LP = { map: null, G: null, D: null, coach: null, hover: -1, sel: 0, sessions: [], names: {}, shown: '' };
+let lpSeq = 0;
+async function renderLayoutBlock(tid, lid, shownId) {
+  const seq = ++lpSeq;   // a quick second click wins: the earlier render stops touching the page
+  const tr = STORE.getTrack(tid); if (!tr) return;
   const layouts = await STORE.getLayouts(tid), l = layouts.find(x => x.id === lid);
-  if (!l) { $('lName').textContent = t('Layout not found'); return; }
-  $('lCrumb').innerHTML = `<a href="#tracks">${t('Tracks')}</a> › <a href="#track~${esc(tid)}">${esc(tr.name)}</a>`;
-  $('lName').textContent = `${tr.name} · ${l.name}`;
+  if (!l) { $('lHead').hidden = true; return; }
+  $('lHead').hidden = false; for (const id of ['lHero', 'lGuideCard', 'lSessCard']) $(id).hidden = false;
   $('lEdit').hidden = !STORE.canEditTrack(tr); $('lEdit').onclick = () => go(`admin~${tid}~${lid}`);
   $('lUpload').onclick = () => UPLOAD.open({ track: tid, layout: lid });
-  const pubs = await STORE.sessionsFor(tid, lid); LP.sessions = pubs;
-  $('lSub').textContent = [l.lengthM ? `${l.lengthM} ${t('m')}` : '', l.corners ? t('{n} corners', { n: l.corners }) : '', l.direction ? (l.direction === 'cw' ? t('clockwise') : t('counter-clockwise')) : '', pubs.length ? t('{n} published sessions', { n: pubs.length }) : t('no sessions yet')].filter(Boolean).join(' · ');
+  const pubs = await STORE.sessionsFor(tid, lid); if (seq !== lpSeq) return; LP.sessions = pubs; LP.tid = tid; LP.lid = lid;
+  $('lSub').textContent = [l.name, l.lengthM ? `${l.lengthM} ${t('m')}` : '', l.corners ? t('{n} corners', { n: l.corners }) : '', l.direction ? (l.direction === 'cw' ? t('clockwise') : t('counter-clockwise')) : '', pubs.length ? t('{n} published sessions', { n: pubs.length }) : t('no sessions yet')].filter(Boolean).join(' · ');
+  // whose lap is on the map: the fastest of the busiest kart category by default, any published session from the list
+  { const groups = groupByKart(pubs), opts = []; for (const g of groups) for (const m of g.items.slice().sort((a, b) => a.bestMs - b.bestMs)) opts.push([m.id, `${fmtMs(m.bestMs)} · ${(LP.names0 && LP.names0[m.owner] && LP.names0[m.owner].name) || ''}`, g.label]);
+    const names = await STORE.names(pubs.map(m => m.owner)); if (seq !== lpSeq) return; LP.names0 = names; for (const o of opts) { const m = pubs.find(x => x.id === o[0]); o[1] = `${fmtMs(m.bestMs)} · ${(names[m.owner] || {}).name || t('Driver')} · ${fmtDate(m.date)}`; }
+    const def = groups[0] ? groups[0].items.slice().sort((a, b) => a.bestMs - b.bestMs)[0].id : '';
+    LP.shown = shownId && pubs.some(m => m.id === shownId) ? shownId : def;
+    $('lShownField').hidden = opts.length < 2; if (opts.length) fillSelect($('lShown'), opts, LP.shown); $('lShown').onchange = () => renderLayoutBlock(tid, lid, $('lShown').value); }
   // geometry
   LP.G = null; LP.D = null; LP.coach = null; LP.sel = 0; LP.hover = -1; LP.model = null;
   let G = null; try { G = await GEOM.build(tid, lid); } catch (e) { G = null; }
@@ -3971,7 +4032,7 @@ async function renderLayoutPage(tid, lid) {
     $('lRotL').onclick = () => LP.map.rotateBy(-Math.PI / 12); $('lRotR').onclick = () => LP.map.rotateBy(Math.PI / 12);
     LP.tiles = SAT.pref(); $('lTiles').onclick = () => { LP.tiles = !LP.tiles; SAT.setPref(LP.tiles); $('lTiles').classList.toggle('active', LP.tiles); LP.map.draw(); };
     $('lZoomIn').onclick = () => LP.map.zoomCenter(1.3); $('lZoomOut').onclick = () => LP.map.zoomCenter(1 / 1.3); $('lZoomFit').onclick = () => { LP.map.fit(); LP.map.draw(); };
-    window.addEventListener('resize', () => { if (APP.route === 'layout' && LP.map) { if (LP.map.V.auto) LP.map.fit(true); LP.map.draw(); } });
+    window.addEventListener('resize', () => { if (APP.route === 'track' && LP.map && LP.G) { if (LP.map.V.auto) LP.map.fit(true); LP.map.draw(); } });
   }
   $('lLegend').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span><span>${t('number — corner from the S/F line')}</span>`;
   $('lMapTitle').hidden = true;
@@ -3980,16 +4041,20 @@ async function renderLayoutPage(tid, lid) {
   LP.kart = null;
   if (G && G.frame && pubs.length) {
     // the guide is built within one kart category (the busiest one here): braking points of a KZ2 say nothing about a rental kart
-    const main = groupByKart(pubs)[0]; LP.kart = main && groupByKart(pubs).length > 1 ? main.label : null;
-    const loaded = []; for (const m of (main ? main.items : pubs).slice(-20)) { try { const s = await STORE.loadSession(m); if (GEOM.attach(s, G).ok) loaded.push(s); } catch (e) {} }
+    const shownMeta = pubs.find(m => m.id === LP.shown) || null, groups = groupByKart(pubs), main = (shownMeta && groups.find(g => g.items.includes(shownMeta))) || groups[0]; LP.kart = main && groups.length > 1 ? main.label : null;
+    const pool = (main ? main.items : pubs).slice(-20); if (shownMeta && !pool.includes(shownMeta)) pool.push(shownMeta);
+    const loaded = []; for (const m of pool) { try { const s = await STORE.loadSession(m); if (GEOM.attach(s, G).ok) loaded.push(s); } catch (e) {} }
+    if (seq !== lpSeq) return;
     const laps = []; for (const s of loaded) for (const L of s.laps) if (L.clean && L.px) laps.push(L);
     if (laps.length) {
-      const bestL = laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a), P = DATA.projectLap(bestL, G.track, G.rev);
+      const shownS = loaded.find(s => s.id === LP.shown), shownLaps = shownS ? shownS.laps.filter(L => L.px) : [];
+      const bestL = (shownLaps.length ? shownLaps : laps).reduce((a, b) => b.timeMs < a.timeMs ? b : a), P = DATA.projectLap(bestL, G.track, G.rev);
       if (P) { const ap = GEOM.apexes(G, P); const D = DATA.buildComparisonP(P, [], 'avg', G.track, () => '', ap, G.corners.R); if (D) { LP.D = D; LP.wins = D.wins; LP.coach = DATA.buildCoach(G.track, D.wins, laps, G.rev); LP.bestL = bestL; LP.names = await STORE.names(loaded.map(s => s.owner)); } }
     }
-    $('lMapTitle').hidden = !LP.D; if (LP.D) { $('lMapTitle').className = 'map-title ref'; $('lMapTitle').textContent = t('Fastest published lap · {t} · {who}', { t: fmtMs(LP.bestL.timeMs), who: (LP.names[LP.bestL._sess.owner] || {}).name || t('Driver') }) + (LP.kart ? ' · ' + LP.kart : ''); }
+    $('lMapTitle').hidden = !LP.D; if (LP.D) { $('lMapTitle').className = 'map-title ref'; const who = (LP.names[LP.bestL._sess.owner] || {}).name || t('Driver'); $('lMapTitle').textContent = (LP.bestL._sess.id === (groups[0] ? groups[0].items.slice().sort((a, b) => a.bestMs - b.bestMs)[0].id : '') ? t('Fastest published lap · {t} · {who}', { t: fmtMs(LP.bestL.timeMs), who }) : `${fmtMs(LP.bestL.timeMs)} · ${who}`) + (LP.kart ? ' · ' + LP.kart : ''); }
   }
   { const sat = SAT.can(G); $('lTiles').hidden = !sat; $('lTiles').classList.toggle('active', sat && LP.tiles); if (sat && LP.tiles && SAT.available === null) SAT.probe(G).then(ok => { if (!ok) { $('lTiles').hidden = true; LP.map.draw(); } }); }
+  if (seq !== lpSeq) return;
   LP.map.fit(); LP.map.draw(); lpInspector(); lpGuide(l); lpSessions(tid, lid, l, pubs);
 }
 function lpCornerAt(i) { const D = LP.D; if (!D || i < 0) return null; const N = LP.G.track.N; return D.rows.find(r => ((i - r.w.a) % N + N) % N < r.w.len) || null; }
@@ -4047,7 +4112,7 @@ async function renderBests(box, pubs) {
   box.innerHTML = ''; if (!pubs.length) { box.appendChild(el('div', 'hint', t('No published sessions yet.'))); return; }
   const by = new Map(); for (const s of pubs) { const k = s.track + '|' + s.layout + '|' + kartKeyOf(s); const cur = by.get(k); if (!cur || s.bestMs < cur.bestMs) by.set(k, s); }
   const tiles = el('div', 'tiles');
-  for (const s of [...by.values()].sort((a, b) => (a.track || '').localeCompare(b.track || '') || a.bestMs - b.bestMs)) { const tr = STORE.getTrack(s.track); const ls = s.track ? await STORE.getLayouts(s.track) : []; const l = ls.find(x => x.id === s.layout); const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(tr ? tr.name : t('Custom'))}${l ? ' · ' + esc(l.name) : ''}</div><div class="v">${fmtMs(s.bestMs)}</div><div class="hint">${esc(kartLabel(s))} · ${esc(fmtDate(s.date))}</div>`; d.style.textAlign = 'left'; tiles.appendChild(d); }
+  for (const s of [...by.values()].sort((a, b) => (a.track || '').localeCompare(b.track || '') || a.bestMs - b.bestMs)) { const tr = STORE.getTrack(s.track); const ls = s.track ? await STORE.getLayouts(s.track) : []; const l = ls.find(x => x.id === s.layout); const d = el('a', 'tile best'); d.href = '#lab~' + esc(s.id); d.innerHTML = `<div class="tn">${esc(tr ? tr.name : t('Custom'))}</div><div class="ln">${esc(l ? l.name : (s.layout === 'custom' || !s.layout ? t('custom layout') : s.layout))}</div><div class="v">${fmtMs(s.bestMs)}</div><div class="hint">${esc(kartLabel(s))} · ${esc(fmtDate(s.date))}</div>`; tiles.appendChild(d); }
   box.appendChild(tiles);
 }
 async function renderSessionsTable(box, pubs, subEl) {
@@ -4086,16 +4151,18 @@ LAB.show = async function (sid, mode) {
   $('labGuestNote').hidden = STORE.hasDb && STORE.hasIdentity;
   $('labGuestText').textContent = STORE.hasAuth ? t('You are viewing as a guest: sessions stay in this browser and cannot be published. Sign in to keep a library on every device and publish to track pages.') : (STORE.hasDb ? t('You are viewing as a guest: sessions stay in this browser and cannot be published. Sign in to claude.ai to keep a library.') : t('Offline mode: sessions you upload stay in this browser. Open the shared Hutka link signed in to claude.ai to publish them and compare with other drivers.'));
   $('labSignIn').hidden = !STORE.hasAuth; $('labSignIn').onclick = () => AUTH.open();
+  // #lab~<id>~discuss (the comments link in the feed): the discussion tab / panel comes into view
+  const showDiscuss = () => { if (mode !== 'discuss' || !LAB.current) return; LAB.tab = 'discuss'; applyMobTab(); setTimeout(() => { const p = $('discussPanel'); if (p && !p.hidden) p.scrollIntoView({ block: 'start', behavior: 'smooth' }); }, 150); };
   if (sid && sid !== 'new') {
     const cur = LAB.current;
     if (!(cur && cur.id === sid && mode !== 'cmp')) {
       const meta = await STORE.getSessionMeta(sid);
-      if (!meta) { toast(t('Session not found')); } else { await LAB.open(meta, mode === 'cmp'); return; }
+      if (!meta) { toast(t('Session not found')); } else { await LAB.open(meta, mode === 'cmp'); showDiscuss(); return; }
     }
   }
   if (LAB.current && LAB.G && LAB.G.layout) { const l = STORE.getLayout(LAB.tid, LAB.lid); if (l && (l.updatedAt || 0) !== (LAB.G.layout.updatedAt || 0)) { await LAB.open(LAB.current, false); return; } }
   if (LAB.needFit && LAB.G) { LAB.map.fit(); LAB.needFit = false; }
-  labRender();
+  labRender(); showDiscuss();
   if (!LAB.current) renderLabStart();
 };
 // open a session as the reference (or as the comparison against my latest session on the same layout)
@@ -4953,7 +5020,7 @@ const fileDate = (f) => { try { const d = new Date(f.lastModified || Date.now())
 // ---------- home: the feed of published sessions, where people drive, who is fastest ----------
 function drawPreview(cv, pv, color) {
   if (!cv || !pv || !pv.pts || pv.pts.length < 3) return false;
-  const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = cv.clientWidth || 200, h = cv.clientHeight || 150;
+  const box = cv.parentElement, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = (box && box.clientWidth) || cv.clientWidth || 200, h = (box && box.clientHeight) || cv.clientHeight || 150; if (w < 20 || h < 20) return false;
   cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const pad = 12, sw = (w - 2 * pad) / Math.max(pv.w || 1, 0.05), sh = (h - 2 * pad) / Math.max(pv.h || 1, 0.05), s = Math.min(sw, sh), ox = (w - (pv.w || 1) * s) / 2, oy = (h - (pv.h || 1) * s) / 2;
   ctx.lineJoin = 'round'; ctx.lineCap = 'round';
@@ -4985,7 +5052,7 @@ async function renderHomePage() {
   { const box = $('homeActive'); box.innerHTML = ''; const by = new Map(); const cut = Date.now() - 60 * 86400000; for (const s of pubs) { if (!s.track) continue; const k = s.track + '~' + (s.layout || 'custom'); const o = by.get(k) || { track: s.track, layout: s.layout, n: 0, recent: 0, best: Infinity }; o.n++; if ((s.createdAt || 0) > cut) o.recent++; o.best = Math.min(o.best, s.bestMs || Infinity); by.set(k, o); }
     const rows = [...by.values()].sort((a, b) => b.recent - a.recent || b.n - a.n).slice(0, 6);
     if (!rows.length) box.appendChild(el('div', 'hint', t('Nothing yet — the first published session opens the board.')));
-    for (const r of rows) { const tr = STORE.getTrack(r.track); const ls = await STORE.getLayouts(r.track); const l = ls.find(x => x.id === r.layout); const a = el('a', 'item'); a.href = r.layout && r.layout !== 'custom' ? `#layout~${r.track}~${r.layout}` : `#track~${r.track}`; a.append(el('span', 'name', `${tr ? tr.name : r.track}${l ? ' · ' + l.name : ''}`), el('span', 'meta', `${tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n)} · ${t('best')} ${fmtMs(r.best)}`)); box.appendChild(a); }
+    for (const r of rows) { const tr = STORE.getTrack(r.track); const ls = await STORE.getLayouts(r.track); const l = ls.find(x => x.id === r.layout); const a = el('a', 'item'); a.href = r.layout && r.layout !== 'custom' ? `#track~${r.track}~${r.layout}` : `#track~${r.track}`; a.append(el('span', 'name', `${tr ? tr.name : r.track}${l ? ' · ' + l.name : ''}`), el('span', 'meta', `${tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n)} · ${t('best')} ${fmtMs(r.best)}`)); box.appendChild(a); }
   }
   // active drivers: who published in the last 30 days, how much, and where they drove last (tracks differ, so no cross-track times)
   { const box = $('homeTop'); box.innerHTML = ''; const cut = Date.now() - 30 * 86400000; const by = new Map();
@@ -5001,10 +5068,10 @@ function postCard(s, names, cnt) {
   const tr = STORE.getTrack(s.track), nm = names[s.owner] || {}, mine = s.owner === STORE.me.id;
   const d = el('div', 'post' + (STORE.lowRated(cnt) ? ' low' : ''));
   const ph = el('div', 'ph'); const im = new Image(); im.src = nm.avatar || GENERIC_AVATAR; im.alt = '';
-  const who = el('div', 'who'); who.innerHTML = `<b><a href="#driver~${esc(s.owner)}">${esc(nm.name || t('Driver'))}</a>${nm.country ? ' ' + flag(nm.country) : ''}</b><span>${tr ? `<a href="#track~${esc(tr.id)}">${esc(tr.name)}</a>` : esc(s.trackName || t('Custom track'))}${s.layout && s.layout !== 'custom' ? ` · <a href="#layout~${esc(s.track)}~${esc(s.layout)}">${esc(layoutName(s.track, s.layout))}</a>` : ''} · ${esc(fmtDate(s.date))}</span>`;
+  const who = el('div', 'who'); who.innerHTML = `<b><a href="#driver~${esc(s.owner)}">${esc(nm.name || t('Driver'))}</a>${nm.country ? ' ' + flag(nm.country) : ''}</b><span>${tr ? `<a href="#track~${esc(tr.id)}">${esc(tr.name)}</a>` : esc(s.trackName || t('Custom track'))}${s.layout && s.layout !== 'custom' ? ` · <a href="#track~${esc(s.track)}~${esc(s.layout)}">${esc(layoutName(s.track, s.layout))}</a>` : ''} · ${esc(fmtDate(s.date))}</span>`;
   ph.append(im, who);
   const pb = el('div', 'pb'); const pv = el('div', 'pv');
-  if (s.preview && s.preview.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); requestAnimationFrame(() => drawPreview(cv, s.preview)); } else pv.appendChild(svgUse('i-track'));
+  if (s.preview && s.preview.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); requestAnimationFrame(() => drawPreview(cv, s.preview)); if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (cv.isConnected) drawPreview(cv, s.preview); }); ro.observe(pv); } } else pv.appendChild(svgUse('i-track'));
   const info = el('div'); info.innerHTML = `<div class="lbl">${t('best lap')}</div><div class="big">${fmtMs(s.bestMs)}</div><div class="nm">${esc(s.label || s.name)}${resultText(s) ? ` <span class="res">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</div>`;
   const chips = el('div', 'chips'); const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
   chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`); if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
@@ -5012,10 +5079,10 @@ function postCard(s, names, cnt) {
   const pf = el('div', 'pf');
   const like = voteButtons(s.id, cnt, (r) => { d.classList.toggle('low', STORE.lowRated(r)); lowTag.hidden = !STORE.lowRated(r); });
   const lowTag = el('span', 'soon', t('rated not helpful')); lowTag.hidden = !STORE.lowRated(cnt); if (STORE.socialOn) ph.appendChild(lowTag);
-  const cm = el('a', 'btn sm'); cm.href = '#lab~' + s.id; cm.innerHTML = `<svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2"><use href="#i-chat"/></svg> ${cnt ? cnt.comments : 0}`;
-  const open = el('a', 'btn sm primary', t('Open analysis')); open.href = '#lab~' + s.id;
+  const cm = el('a', 'act'); cm.href = '#lab~' + esc(s.id) + '~discuss'; cm.title = t('Comments'); cm.innerHTML = `<svg><use href="#i-chat"/></svg><b>${cnt ? cnt.comments : 0}</b>`;
+  const open = el('a', 'btn sm primary', t('Open analysis')); open.href = '#lab~' + esc(s.id);
   if (STORE.socialOn) pf.append(like, cm); else { const soon = el('span', 'soon', t('votes & comments soon')); pf.appendChild(soon); } pf.appendChild(el('span', 'sp'));
-  if (!mine && s.track) { const c = el('a', 'btn sm', t('Compare with mine')); c.href = `#lab~${s.id}~cmp`; pf.appendChild(c); }
+  if (!mine && s.track) { const c = el('a', 'btn sm', t('Compare')); c.href = `#lab~${esc(s.id)}~cmp`; c.title = t('Compare with mine'); pf.appendChild(c); }
   pf.appendChild(open);
   d.append(ph, pb, pf); return d;
 }
@@ -5392,7 +5459,7 @@ const ADMIN = (() => {
   // ----- layout editor: name, facts, photo, reference session; corner numbering on the GPS line -----
   async function renderLayoutEditor() {
     const l = STORE.getLayout(A.tid, A.lid); if (!l) { $('admLayoutCard').hidden = true; return; }
-    $('admLayoutCard').hidden = false; $('admLayoutName').textContent = l.name; $('lyName').value = l.name || ''; $('lyLen').value = l.lengthM || ''; $('lyCorners').value = l.corners || ''; $('lyDir').value = l.direction || ''; $('lyNote').value = l.note || ''; $('lyR').value = l.cornerR || 110; $('lyWidth').value = l.widthM || 8; $('lyOpen').href = `#layout~${A.tid}~${A.lid}`;
+    $('admLayoutCard').hidden = false; $('admLayoutName').textContent = l.name; $('lyName').value = l.name || ''; $('lyLen').value = l.lengthM || ''; $('lyCorners').value = l.corners || ''; $('lyDir').value = l.direction || ''; $('lyNote').value = l.note || ''; $('lyR').value = l.cornerR || 110; $('lyWidth').value = l.widthM || 8; $('lyOpen').href = `#track~${A.tid}~${A.lid}`;
     const pubs = await STORE.sessionsFor(A.tid, A.lid), names = await STORE.names(pubs.map(s => s.owner));
     fillSelect($('lyRef'), [['', t('automatic — the earliest published session')]].concat(pubs.map(s => [s.id, `${names[s.owner] ? names[s.owner].name : t('Driver')} · ${s.label || s.name} · ${fmtMs(s.bestMs)}`])), l.refSession || '');
     setStatus('lyStatus', ''); setStatus('geomStatus', ''); setStatus('geomSaveStatus', '');
