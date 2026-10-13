@@ -9,7 +9,7 @@ async function verify(payload: string, sig: string, secret: string) {
   const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const mac = new Uint8Array(await crypto.subtle.sign("HMAC", key, enc.encode(t + "." + payload)));
   const hex = Array.from(mac).map((b) => b.toString(16).padStart(2, "0")).join("");
-  return hex === v1;
+  if (hex.length !== v1.length) return false; let d = 0; for (let i = 0; i < hex.length; i++) d |= hex.charCodeAt(i) ^ v1.charCodeAt(i); return d === 0;   // constant-time compare
 }
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("method", { status: 405 });

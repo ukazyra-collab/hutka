@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Hutka — rental karting tracks, Alfano session analysis and hot laps">
 <meta name="theme-color" content="#1b2340">
+<meta http-equiv="Content-Security-Policy" content="object-src none; base-uri self">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="favicon.ico?v=3" sizes="32x32 48x48 64x64">
 <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png?v=3">
@@ -3508,6 +3510,8 @@ const kmh = (v) => (v * 3.6).toFixed(0);
 const sg = (x, d) => (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(d === undefined ? 2 : d);
 const esc = (s) => String(s === undefined || s === null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+// external links set by drivers (track socials, booking, websites from OSM): only http(s) goes into an href
+const safeUrl = (u) => { const s = String(u || '').trim(); return /^https?:\/\/[^\s"'<>]+$/i.test(s) ? s : ''; };
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 const svgUse = (id, cls) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); if (cls) s.setAttribute('class', cls); const u = document.createElementNS('http://www.w3.org/2000/svg', 'use'); u.setAttribute('href', '#' + id); s.appendChild(u); return s; };
 let toastT = null;
@@ -3878,8 +3882,8 @@ async function renderTrackPage(tid) {
   $('tCover').classList.toggle('nocover', !cover && !shape); $('tCover').classList.toggle('gen', !cover && !!shape); $('tCoverGen').hidden = !(!cover && shape);
   if (!cover && shape) requestAnimationFrame(() => drawCoverShape($('tCoverGen'), shape, tr.name));
   logoInto($('tLogo'), tr);
-  $('tBook').hidden = !tr.booking; if (tr.booking) { $('tBookBtn').href = tr.booking; $('tBookSub').textContent = t('Reserve your spot at {name} through their official booking site.', { name: tr.name }); }
-  $('tVideo').hidden = !tr.video; if (tr.video) { $('tVideoBtn').href = tr.video; $('tVideoSub').textContent = t("Experience {name} from a driver's perspective", { name: tr.name }); }
+  $('tBook').hidden = !safeUrl(tr.booking); if (safeUrl(tr.booking)) { $('tBookBtn').href = safeUrl(tr.booking); $('tBookSub').textContent = t('Reserve your spot at {name} through their official booking site.', { name: tr.name }); }
+  $('tVideo').hidden = !safeUrl(tr.video); if (safeUrl(tr.video)) { $('tVideoBtn').href = safeUrl(tr.video); $('tVideoSub').textContent = t("Experience {name} from a driver's perspective", { name: tr.name }); }
   $('tDescCard').hidden = !tr.description; $('tDesc').textContent = tr.description || '';
   // layouts with session counts
   const layouts = await STORE.getLayouts(tid, true), pubs = await STORE.sessionsFor(tid), mine = (STORE.hasIdentity || !STORE.hasDb) ? await STORE.myOnTrack(tid) : [];
@@ -3908,7 +3912,7 @@ async function renderTrackPage(tid) {
       tabs.innerHTML = ''; for (const g of groups) { const b = el('button', 'chip' + (g.sport ? ' sport' : '') + (g.key === cur ? ' on' : '')); b.type = 'button'; b.innerHTML = `${esc(g.label)} <b>${g.items.length}</b>`; b.onclick = () => { cur = g.key; render(); }; tabs.appendChild(b); }
       const g = groups.find(x => x.key === cur) || groups[0], best = g.items.slice().sort((a, b) => a.bestMs - b.bestMs).slice(0, 10);
       box.innerHTML = ''; const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl hot'); tb.innerHTML = `<thead><tr><th>#</th><th>${t('Driver')}</th><th>${t('Lap')}</th><th>${t('Layout')}</th><th>${t('Session')}</th><th>${t('Date')}</th><th></th></tr></thead>`; const body = el('tbody');
-      best.forEach((s, i) => { const r = el('tr'); const l = layouts.find(x => x.id === s.layout); r.innerHTML = `<td class="num">${i + 1}</td><td class="drv">${driverLink(s.owner, names)}</td><td class="num">${fmtMs(s.bestMs)}</td><td>${esc(l ? l.name : (s.layout === 'custom' ? t('Custom') : s.layout))}</td><td>${esc(s.label || s.name)}${resultText(s) ? ` <span class="pill">${esc(resultText(s))}</span>` : ''}</td><td>${esc(fmtDate(s.date))}</td><td><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a></td>`; body.appendChild(r); });
+      best.forEach((s, i) => { const r = el('tr'); const l = layouts.find(x => x.id === s.layout); r.innerHTML = `<td class="num">${i + 1}</td><td class="drv">${driverLink(s.owner, names)}</td><td class="num">${fmtMs(s.bestMs)}</td><td>${esc(l ? l.name : (s.layout === 'custom' ? t('Custom') : s.layout))}</td><td>${esc(s.label || s.name)}${resultText(s) ? ` <span class="pill">${esc(resultText(s))}</span>` : ''}</td><td>${esc(fmtDate(s.date))}</td><td><a class="btn xs" href="#lab~${esc(s.id)}">${t('Open')}</a></td>`; body.appendChild(r); });
       tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
       if (groups.length > 1) box.appendChild(el('div', 'hint', t('Each kart has its own ranking — a 270 cc rental and a KZ2 are different sports.')));
     };
@@ -3931,9 +3935,9 @@ async function renderTrackPage(tid) {
   { const first = layouts.find(l => l.photo); const src = first ? await STORE.getMedia(`tracks/${tid}/layouts/${first.id}/media/photo`) : null; $('tAerial').hidden = !src; if (src) $('tAerial').src = src; $('tStatsWrap').style.gridTemplateColumns = src ? 'auto minmax(0,1fr)' : 'minmax(0,1fr)'; }
   // follow
   const soc = $('tSocials'); soc.innerHTML = '';
-  const links = [['tiktok', 'i-tt'], ['website', 'i-globe'], ['youtube', 'i-yt'], ['facebook', 'i-fb'], ['instagram', 'i-ig']].filter(([k]) => tr[k]);
+  const links = [['tiktok', 'i-tt'], ['website', 'i-globe'], ['youtube', 'i-yt'], ['facebook', 'i-fb'], ['instagram', 'i-ig']].filter(([k]) => safeUrl(tr[k]));
   $('tFollowLbl').textContent = t('Follow {name}', { name: tr.name });
-  for (const [k, icon] of links) { const a = el('a'); a.href = tr[k]; a.target = '_blank'; a.rel = 'noopener'; a.title = k; a.appendChild(svgUse(icon)); soc.appendChild(a); }
+  for (const [k, icon] of links) { const a = el('a'); a.href = safeUrl(tr[k]); a.target = '_blank'; a.rel = 'noopener'; a.title = k; a.appendChild(svgUse(icon)); soc.appendChild(a); }
   $('tFollow').hidden = !links.length;
   $('tClaimText').textContent = t('{name} is listed from public information. Claim it to keep the details, photos and events accurate.', { name: tr.name });
   $('tClaimBtn').onclick = async () => { const ok = await confirmDlg(t('Claim this track'), t('Send a request to the Hutka admins to manage this track page?'), t('Send request')); if (!ok) return; try { await STORE.claim(tid, ''); setStatus('tClaimStatus', t('Request sent — the admins will get in touch.'), 'ok'); } catch (e) { setStatus('tClaimStatus', STORE.hasAuth ? t('Could not send the request. Sign in and try again.') : t('Could not send the request. Sign in to claude.ai and try again.'), 'warn'); } };
@@ -3946,7 +3950,7 @@ async function renderLayoutPage(tid, lid) {
   const tr = STORE.getTrack(tid); if (!tr) { $('lName').textContent = t('Track not found'); return; }
   const layouts = await STORE.getLayouts(tid), l = layouts.find(x => x.id === lid);
   if (!l) { $('lName').textContent = t('Layout not found'); return; }
-  $('lCrumb').innerHTML = `<a href="#tracks">${t('Tracks')}</a> › <a href="#track~${tid}">${esc(tr.name)}</a>`;
+  $('lCrumb').innerHTML = `<a href="#tracks">${t('Tracks')}</a> › <a href="#track~${esc(tid)}">${esc(tr.name)}</a>`;
   $('lName').textContent = `${tr.name} · ${l.name}`;
   $('lEdit').hidden = !STORE.canEditTrack(tr); $('lEdit').onclick = () => go(`admin~${tid}~${lid}`);
   $('lUpload').onclick = () => UPLOAD.open({ track: tid, layout: lid });
@@ -4016,7 +4020,7 @@ async function lpSessions(tid, lid, l, pubs) {
   const names = await STORE.names(pubs.map(s => s.owner)), counts = await STORE.socialCounts(pubs.map(s => s.id)), low = (s) => STORE.lowRated(counts[s.id]);
   const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Driver')}</th><th>${t('Session')}</th><th>${t('Kart')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th></th></tr></thead>`; const body = el('tbody');
   const groups = groupByKart(pubs), rows = []; for (const g of groups) { if (groups.length > 1) rows.push({ head: g }); for (const s of g.items.slice().sort((a, b) => low(a) - low(b) || a.bestMs - b.bestMs)) rows.push({ s }); }
-  for (const row of rows) { if (row.head) { const r = el('tr', 'grp'); const td = el('td'); td.colSpan = 8; td.textContent = `${row.head.label} · ${tn(row.head.items.length, '{n} session', '{n} sessions').replace('{n}', row.head.items.length)}`; r.appendChild(td); body.appendChild(r); continue; } const s = row.s; const r = el('tr'); if (low(s)) r.style.opacity = '.6'; r.innerHTML = `<td class="drv" style="font-weight:600">${driverLink(s.owner, names)}</td><td>${esc(s.label || s.name)}${resultText(s) ? ` <span class="pill">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}${low(s) ? ` <span class="soon">${t('rated not helpful')}</span>` : ''}${counts[s.id] && (counts[s.id].likes || counts[s.id].down) ? ` <span class="hint">👍 ${counts[s.id].likes} 👎 ${counts[s.id].down}</span>` : ''}</td><td>${esc(kartLabel(s))}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${s.id}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
+  for (const row of rows) { if (row.head) { const r = el('tr', 'grp'); const td = el('td'); td.colSpan = 8; td.textContent = `${row.head.label} · ${tn(row.head.items.length, '{n} session', '{n} sessions').replace('{n}', row.head.items.length)}`; r.appendChild(td); body.appendChild(r); continue; } const s = row.s; const r = el('tr'); if (low(s)) r.style.opacity = '.6'; r.innerHTML = `<td class="drv" style="font-weight:600">${driverLink(s.owner, names)}</td><td>${esc(s.label || s.name)}${resultText(s) ? ` <span class="pill">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}${low(s) ? ` <span class="soon">${t('rated not helpful')}</span>` : ''}${counts[s.id] && (counts[s.id].likes || counts[s.id].down) ? ` <span class="hint">👍 ${counts[s.id].likes} 👎 ${counts[s.id].down}</span>` : ''}</td><td>${esc(kartLabel(s))}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${esc(s.id)}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${esc(s.id)}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
   tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
 }
 const driverLink = (uid, names) => { const n = names && names[uid] ? names[uid].name : t('Driver'); return uid && uid !== 'local' ? `<a href="#driver~${esc(uid)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line-2)">${esc(n)}</a>` : esc(n); };
@@ -4050,7 +4054,7 @@ async function renderSessionsTable(box, pubs, subEl) {
   box.innerHTML = ''; if (subEl) subEl.textContent = pubs.length ? String(pubs.length) : '';
   if (!pubs.length) { box.appendChild(el('div', 'hint', t('No published sessions yet.'))); return; }
   const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Track')}</th><th>${t('Session')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th></th></tr></thead>`; const body = el('tbody');
-  for (const s of pubs) { const tr = STORE.getTrack(s.track); const ls = s.track ? await STORE.getLayouts(s.track) : []; const l = ls.find(x => x.id === s.layout); const r = el('tr'); r.innerHTML = `<td style="white-space:normal">${esc(tr ? tr.name : t('Custom'))}${l ? ' · ' + esc(l.name) : ''}</td><td style="white-space:normal">${esc(s.label || s.name)}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${s.id}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
+  for (const s of pubs) { const tr = STORE.getTrack(s.track); const ls = s.track ? await STORE.getLayouts(s.track) : []; const l = ls.find(x => x.id === s.layout); const r = el('tr'); r.innerHTML = `<td style="white-space:normal">${esc(tr ? tr.name : t('Custom'))}${l ? ' · ' + esc(l.name) : ''}</td><td style="white-space:normal">${esc(s.label || s.name)}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${esc(s.id)}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${esc(s.id)}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
   tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
 }
 // ---------- the Lab ----------
@@ -5474,7 +5478,7 @@ const ADMIN = (() => {
     rows.sort((a, b) => (!!a.have - !!b.have) || a.name.localeCompare(b.name)); OSM.rows = rows;
     setStatus('osmStatus', rows.length ? t('{n} karting venues found in {c}; {h} already in Hutka.', { n: rows.length, c: countryName(cc), h: rows.filter(r => r.have).length }) : t('Nothing tagged as karting in {c} on OpenStreetMap.', { c: countryName(cc) }), rows.length ? 'ok' : 'warn');
     const body = $('osmTable').querySelector('tbody'); body.innerHTML = '';
-    rows.forEach((r, i) => { const tr = el('tr'); tr.innerHTML = `<td><input type="checkbox" data-i="${i}" ${r.have ? 'disabled' : ''} style="width:16px;height:16px"></td><td style="white-space:normal;font-weight:600">${esc(r.name)}</td><td>${esc(r.city)}</td><td>${r.indoor ? esc(t('indoor')) : ''}</td><td>${r.website ? `<a href="${esc(r.website)}" target="_blank" rel="noopener">${esc(r.website.replace(/^https?:\/\//, '').slice(0, 30))}</a>` : ''}</td><td>${r.have ? `<a class="btn xs" href="#track~${esc(r.have)}">${esc(t('in Hutka'))}</a>` : `<a class="btn xs" href="https://www.openstreetmap.org/${r.osm[0] === 'n' ? 'node' : (r.osm[0] === 'w' ? 'way' : 'relation')}/${r.osm.slice(1)}" target="_blank" rel="noopener">OSM</a>`}</td>`; body.appendChild(tr); });
+    rows.forEach((r, i) => { const tr = el('tr'); tr.innerHTML = `<td><input type="checkbox" data-i="${i}" ${r.have ? 'disabled' : ''} style="width:16px;height:16px"></td><td style="white-space:normal;font-weight:600">${esc(r.name)}</td><td>${esc(r.city)}</td><td>${r.indoor ? esc(t('indoor')) : ''}</td><td>${safeUrl(r.website) ? `<a href="${esc(safeUrl(r.website))}" target="_blank" rel="noopener">${esc(r.website.replace(/^https?:\/\//, '').slice(0, 30))}</a>` : ''}</td><td>${r.have ? `<a class="btn xs" href="#track~${esc(r.have)}">${esc(t('in Hutka'))}</a>` : `<a class="btn xs" href="https://www.openstreetmap.org/${r.osm[0] === 'n' ? 'node' : (r.osm[0] === 'w' ? 'way' : 'relation')}/${r.osm.slice(1)}" target="_blank" rel="noopener">OSM</a>`}</td>`; body.appendChild(tr); });
     $('osmWrap').hidden = !rows.length; $('osmImport').hidden = !rows.some(r => !r.have); $('osmAll').checked = false;
   }
   $('osmFind').onclick = osmFind;

@@ -15,7 +15,8 @@ Deno.serve(async (req) => {
   let body: { kind?: string; return_url?: string }; try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
   const prices: Record<string, string | undefined> = { pro: Deno.env.get("STRIPE_PRICE_PRO"), pack25: Deno.env.get("STRIPE_PRICE_PACK25"), pack80: Deno.env.get("STRIPE_PRICE_PACK80") };
   const kind = String(body.kind || ""), price = prices[kind]; if (!price) return json({ error: "unknown_product" }, 400);
-  const site = (Deno.env.get("SITE_URL") || body.return_url || "").replace(/#.*$/, "");
+  const okSite = (u: string) => /^https:\/\/(hutka\.ai|www\.hutka\.ai|ukazyra-collab\.github\.io)(\/|$)/i.test(u) ? u : "";
+  const site = (Deno.env.get("SITE_URL") || okSite(String(body.return_url || "")) || "").replace(/#.*$/, "");
   if (!site) return json({ error: "no_site_url" }, 500);
   // reuse the Stripe customer when the wallet already knows it
   const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SUPABASE_SECRET_KEY") || "";
