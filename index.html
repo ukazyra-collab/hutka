@@ -204,6 +204,15 @@ textarea{min-height:90px;resize:vertical}
 .chip b{color:var(--fg);font-weight:600}
 .chip.q{cursor:pointer;color:var(--fg)}.chip.q:hover{border-color:var(--accent);color:var(--accent)}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
+/* category tabs (rental models, sport classes) above a ranking */
+.kart-tabs{margin-bottom:10px}
+.kart-tabs .chip{cursor:pointer;font:inherit;font-size:12.5px;padding:5px 11px;border-color:var(--line-2)}
+.kart-tabs .chip.on{background:var(--btn);border-color:var(--btn);color:var(--btn-ink)}
+.kart-tabs .chip.on b{color:var(--btn-ink)}
+.kart-tabs .chip.sport{border-style:dashed}
+.kart-tabs .chip.sport.on{border-style:solid}
+.tbl tr.grp td{background:var(--surface-2);font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:6px 10px}
+.tbl.resp tr.grp{display:block;padding:6px 2px}
 .empty{border:1.5px dashed var(--line-2);border-radius:14px;padding:36px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;color:var(--muted)}
 .empty svg{width:44px;height:44px;stroke:var(--faint);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .empty .t{font-size:16px;color:var(--fg);font-weight:500}
@@ -2665,6 +2674,7 @@ Object.assign(I18N.RU, {
   'Showing every kart class — a sport kart and a rental kart are not comparable corner by corner.': 'Показаны все классы картов — спортивный и прокатный карт по поворотам не сравнить.', '{n} session(s) on another kart class are hidden (a sport kart and a rental kart are not comparable).': 'Скрыто сессий на другом классе картов: {n} (спортивный и прокатный карт не сравнить).', 'Hide them': 'Скрыть', 'Show anyway': 'Всё равно показать',
   'Add a new track…': 'Добавить новую трассу…', '— no track (private, custom) —': '— без трассы (приватно, своя) —', 'Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.': 'Трассы ещё нет в Hutka? Назовите её — страница трассы создастся вместе с этой сессией, потом её можно править, а другие гонщики найдут её по GPS.', 'Other rental kart…': 'Другой прокатный карт…', 'Rental kart (model below)': 'Прокатный карт (модель ниже)', 'Sport kart (Rotax, X30, KZ…)': 'Спортивный карт (Rotax, X30, KZ…)', 'Give the new track a name.': 'Дайте новой трассе название.', 'Main': 'Основной', 'Could not create the track: {e}': 'Не удалось создать трассу: {e}', 'Track name': 'Название трассы',
   'Turn the phone sideways: the Lab becomes a full-screen cockpit — the satellite photo, the lap line, live numbers and a scrub bar along the lap.': 'Поверните телефон горизонтально: Лаборатория становится кокпитом на весь экран — спутниковый снимок, линия круга, живые цифры и бегунок по кругу.', '{n} corners · ‹ › to step': 'Поворотов: {n} · ‹ › листать', 'The photo can sit a few metres off the GPS line.': 'Снимок может быть смещён на несколько метров от линии GPS.', 'Move': 'Сдвинуть', 'Signed in.': 'Вы вошли.', 'Password': 'Пароль', 'I have a password': 'У меня есть пароль', 'Email me a link instead': 'Лучше пришлите ссылку', 'Enter the email and the password.': 'Введите почту и пароль.', 'Could not start Apple sign-in: {e}': 'Не удалось начать вход через Apple: {e}', 'Could not sign in: {e}': 'Не удалось войти: {e}', 'Could not open the file: {e}': 'Не удалось открыть файл: {e}',
+  'Rental karts at this track': 'Прокатные карты этой трассы', 'Rental': 'Прокат', 'Other sport kart…': 'Другой спортивный карт…', 'Other': 'Другое', 'Showing every kart — different karts are not comparable corner by corner.': 'Показаны все карты — разные карты по поворотам не сравнить.', '{n} session(s) on another kart are hidden (different karts are not comparable corner by corner).': 'Скрыто сессий на другом карте: {n} (разные карты по поворотам не сравнить).', 'Each kart has its own ranking — a 270 cc rental and a KZ2 are different sports.': 'У каждого карта свой рейтинг — прокатный 270 cc и KZ2 это разные виды спорта.',
   'Upload session': 'Загрузить сессию', 'Karts people drive here': 'Карты, на которых здесь ездят', 'Karts — one per line (add “sport” after a sport kart)': 'Карты — по одному в строке (после спортивного допишите «sport»)', "Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.": 'Alfano .alf2 (эталон), AiM, RaceChrono, TrackAddict, Harry\'s LapTimer, VBOX, GPX — один файл на сессию; можно несколько сразу.',
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
@@ -2845,7 +2855,7 @@ const STORE = (() => {
   function sessionMeta(sess) {
     const clean = sess.laps.filter(L => L.clean), best = sess.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a), avg = clean.length ? clean.reduce((s, L) => s + L.timeMs, 0) / clean.length : best.timeMs;
     let la = 0, lo = 0, n = 0; for (const L of clean.length ? clean : sess.laps) for (let i = 0; i < L.pts.length; i += 5) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
-    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', kart: sess.kart || '', kartClass: sess.kartClass || (sess.kart ? 'rental' : ''), format: sess.format || '', pos: +sess.pos || 0, drivers: +sess.drivers || 0, nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
+    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', kart: sess.kart || '', kartClass: sess.kartClass || (sess.kart ? 'rental' : ''), kartCat: sess.kartCat || '', format: sess.format || '', pos: +sess.pos || 0, drivers: +sess.drivers || 0, nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
   }
 
   // ===== backend: claude.ai artifact (db + user capabilities) =====
@@ -3552,10 +3562,62 @@ const formatName = (k) => { const f = FORMATS.find(x => x[0] === k); return f &&
 function fillFormats(sel, v) { fillSelect(sel, FORMATS.map(([k, n]) => [k, k ? t(n) : n]), v || ''); }
 // "Ironman · P3 / 50" — from the fields, or from the linked SWS result
 function resultText(m) { if (!m) return ''; if (m.sws && (m.sws.race || m.sws.pos)) return [m.sws.race, m.sws.pos ? 'P' + String(m.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · '); const bits = []; if (m.format) bits.push(formatName(m.format)); if (m.pos) bits.push('P' + m.pos + (m.drivers ? ' / ' + m.drivers : '')); else if (m.drivers) bits.push(t('{n} drivers', { n: m.drivers })); return bits.join(' · '); }
-// kart classes: rental karts are the default world; sport karts (Rotax, X30, KZ…) are compared only with each other
+// ---------- kart categories ----------
+// Every session is driven in one category: a rental kart model of the track (Sodi RT8, Birel N35…) or a sport class (Rotax Senior, X30,
+// KZ2…). Rankings, hot laps, personal bests and the Lab's comparisons never mix categories — a 270 cc rental and a KZ2 are different sports.
+const SPORT_CLASSES = [
+  ['rotax-micro', 'Rotax Micro MAX', 'Rotax'], ['rotax-mini', 'Rotax Mini MAX', 'Rotax'], ['rotax-junior', 'Rotax Junior MAX', 'Rotax'], ['rotax-senior', 'Rotax Senior MAX', 'Rotax'], ['rotax-dd2', 'Rotax DD2', 'Rotax'], ['rotax-dd2-masters', 'Rotax DD2 Masters', 'Rotax'],
+  ['iame-swift', 'IAME Mini Swift (60 cc)', 'IAME'], ['x30-junior', 'IAME X30 Junior', 'IAME'], ['x30-senior', 'IAME X30 Senior', 'IAME'], ['x30-master', 'IAME X30 Master', 'IAME'], ['ka100', 'IAME KA100', 'IAME'],
+  ['mini-60', 'Mini 60 / Cadet', 'OK · CIK-FIA'], ['okj', 'OK-Junior', 'OK · CIK-FIA'], ['ok', 'OK', 'OK · CIK-FIA'], ['okn', 'OK-N / OKJ-N', 'OK · CIK-FIA'],
+  ['kz2', 'KZ2', 'KZ · shifter'], ['kz', 'KZ', 'KZ · shifter'], ['shifter-125', 'Shifter 125 (other)', 'KZ · shifter'],
+  ['rok-mini', 'Mini ROK', 'Vortex ROK'], ['rok-junior', 'ROK Junior', 'Vortex ROK'], ['rok-senior', 'ROK Senior', 'Vortex ROK'], ['rok-shifter', 'ROK Shifter', 'Vortex ROK'], ['rok-gp', 'ROK GP', 'Vortex ROK'],
+  ['lo206', 'Briggs LO206', '4-stroke'], ['honda-cadet', 'Honda GX cadet', '4-stroke'], ['comer-cadet', 'Comer cadet (C50 / C51)', '4-stroke'], ['prokart', 'Prokart (twin Honda)', '4-stroke'], ['tkm', 'TKM', '2-stroke, other'], ['bambino', 'Bambino', '2-stroke, other']
+];
+const sportClass = (id) => SPORT_CLASSES.find(x => x[0] === id) || null;
+const kartSlug = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, '');
+// free text typed earlier ("Rotax", "X30 jr", "KZ2") → the class it most likely means
+function matchSport(text) {
+  const x = String(text || '').toLowerCase(); if (!x) return '';
+  if (/dd2/.test(x)) return /master/.test(x) ? 'rotax-dd2-masters' : 'rotax-dd2';
+  if (/rotax|\bmax\b/.test(x)) return /micro/.test(x) ? 'rotax-micro' : (/mini/.test(x) ? 'rotax-mini' : (/junior|\bjr\b|\bj\b/.test(x) ? 'rotax-junior' : 'rotax-senior'));
+  if (/ka100/.test(x)) return 'ka100';
+  if (/x30|iame/.test(x)) return /swift|mini/.test(x) ? 'iame-swift' : (/junior|\bjr\b/.test(x) ? 'x30-junior' : (/master/.test(x) ? 'x30-master' : 'x30-senior'));
+  if (/\brok\b|vortex/.test(x)) return /mini/.test(x) ? 'rok-mini' : (/junior|\bjr\b/.test(x) ? 'rok-junior' : (/shift/.test(x) ? 'rok-shifter' : (/\bgp\b/.test(x) ? 'rok-gp' : 'rok-senior')));
+  if (/kz2/.test(x)) return 'kz2'; if (/\bkz\b|kz1/.test(x)) return 'kz'; if (/shift/.test(x)) return 'shifter-125';
+  if (/okj|ok-j|ok junior/.test(x)) return 'okj'; if (/ok-?n\b/.test(x)) return 'okn'; if (/\bok\b/.test(x)) return 'ok';
+  if (/lo206|briggs/.test(x)) return 'lo206'; if (/prokart/.test(x)) return 'prokart'; if (/honda/.test(x)) return 'honda-cadet'; if (/comer/.test(x)) return 'comer-cadet';
+  if (/tkm/.test(x)) return 'tkm'; if (/bambino/.test(x)) return 'bambino'; if (/mini ?60|60 ?cc|cadet/.test(x)) return 'mini-60';
+  return '';
+}
 const kartClassOf = (m) => (m && m.kartClass) || 'rental';
 const kartClassName = (cls) => cls === 'sport' ? t('sport kart') : t('rental kart');
-const kartLabel = (m) => { if (!m) return ''; const cls = kartClassOf(m); return m.kart ? (cls === 'sport' ? `${m.kart} · ${t('sport')}` : m.kart) : kartClassName(cls); };
+// the category key of a session: 'rental' (model unknown), 'rental:<model>', a sport class id, 'sport:<name>' or 'sport'
+function kartKeyOf(m) {
+  if (!m) return 'rental';
+  if (kartClassOf(m) === 'sport') { const c = (m.kartCat && sportClass(m.kartCat) ? m.kartCat : '') || matchSport(m.kart); return c || (m.kart ? 'sport:' + kartSlug(m.kart) : 'sport'); }
+  return m.kart ? 'rental:' + kartSlug(m.kart) : 'rental';
+}
+const kartKeyIsSport = (key) => !/^rental(:|$)/.test(key);
+// what to call a category (a session of it gives the typed name for the free-text ones)
+function kartKeyLabel(key, sample) { const c = sportClass(key); if (c) return c[1]; if (key === 'rental') return t('rental kart'); if (key === 'sport') return t('sport kart'); const nm = sample && sample.kart ? sample.kart : key.replace(/^(rental|sport):/, ''); return key.startsWith('sport:') ? `${nm} · ${t('sport')}` : nm; }
+const kartLabel = (m) => { if (!m) return ''; const cls = kartClassOf(m); if (cls === 'sport') { const c = sportClass((m.kartCat && sportClass(m.kartCat) ? m.kartCat : '') || matchSport(m.kart)); return c ? c[1] : (m.kart ? `${m.kart} · ${t('sport')}` : kartClassName(cls)); } return m.kart || kartClassName(cls); };
+// the kart <select> for the upload window and the session editor: the track's rental models, then the sport classes by family
+function kartOptions(tr) {
+  const list = (tr && Array.isArray(tr.karts) ? tr.karts : []).filter(k => k && k.name && (k.cls || 'rental') !== 'sport'), grp = t('Rental karts at this track');
+  const opts = list.map(k => [`rental|${k.name}`, k.name, grp]);
+  opts.push(['rental|', list.length ? t('Other rental kart…') : t('Rental kart (model below)'), list.length ? grp : t('Rental')]);
+  for (const [id, label, g] of SPORT_CLASSES) opts.push([`sport|${id}`, label, g]);
+  opts.push(['sport|', t('Other sport kart…'), t('Other')]);
+  return opts;
+}
+// select value (+ the free-text field) → { cls, name, cat }
+function kartFromValue(v, other) { v = v || 'rental|'; const cls = v.split('|')[0] === 'sport' ? 'sport' : 'rental', rest = v.split('|').slice(1).join('|'), typed = String(other || '').trim().slice(0, 40); if (cls === 'sport') { const c = sportClass(rest); if (c) return { cls, name: c[1], cat: c[0] }; return { cls, name: typed, cat: matchSport(typed) }; } return { cls, name: rest || typed, cat: '' }; }
+// a session → the select value and the free-text it needs (for editing)
+function kartValueOf(m, tr) { const cls = kartClassOf(m); if (cls === 'sport') { const cat = (m.kartCat && sportClass(m.kartCat) ? m.kartCat : '') || matchSport(m.kart); return cat ? { v: 'sport|' + cat, other: '' } : { v: 'sport|', other: m.kart || '' }; } const listed = !!(m.kart && tr && Array.isArray(tr.karts) && tr.karts.some(k => k && k.name && k.name.toLowerCase() === m.kart.toLowerCase())); return listed ? { v: 'rental|' + tr.karts.find(k => k.name.toLowerCase() === m.kart.toLowerCase()).name, other: '' } : { v: 'rental|', other: m.kart || '' }; }
+// comparable sessions: the same category; a rental session whose model is unknown goes with every rental kart
+function kartCompatible(a, b) { const ka = kartKeyOf(a), kb = kartKeyOf(b); if (ka === kb) return true; if (!kartKeyIsSport(ka) && !kartKeyIsSport(kb)) return ka === 'rental' || kb === 'rental'; return false; }
+// group sessions by category, the busiest category first (rental before sport on a tie)
+function groupByKart(list) { const g = new Map(); for (const s of list) { const k = kartKeyOf(s); if (!g.has(k)) g.set(k, []); g.get(k).push(s); } return [...g.entries()].map(([key, items]) => ({ key, items, label: kartKeyLabel(key, items[0]), sport: kartKeyIsSport(key) })).sort((a, b) => b.items.length - a.items.length || a.sport - b.sport); }
 // helpful / not helpful votes on a session: two small buttons that work the same everywhere
 function voteButtons(sid, cnt, onChange) {
   const wrap = el('span', 'votes'); const mk = (v, cls) => { const b = el('button', 'btn sm vote ' + cls + (cnt && cnt.mine === v ? ' on' : '')); b.type = 'button'; b.innerHTML = `<span class="ic">${v === 1 ? '👍' : '👎'}</span> <b>${v === 1 ? (cnt ? cnt.likes : 0) : (cnt ? cnt.down : 0)}</b>`; b.title = v === 1 ? t('Helpful') : t('Not helpful — irrelevant or misleading');
@@ -3831,19 +3893,28 @@ async function renderTrackPage(tid) {
   // hot laps: the best lap of every published session
   const hot = $('tHot'); hot.innerHTML = '';
   const counts = await STORE.socialCounts(pubs.map(s => s.id)); const low = (s) => STORE.lowRated(counts[s.id]);
-  const best = pubs.filter(s => !low(s)).sort((a, b) => (kartClassOf(a) === 'sport') - (kartClassOf(b) === 'sport') || a.bestMs - b.bestMs).slice(0, 10);
+  // one ranking per kart category: a tab per rental model / sport class driven here, the top 10 of the chosen one
+  const groups = groupByKart(pubs.filter(s => !low(s)));
   $('tHotSub').textContent = pubs.length ? t('{n} published sessions', { n: pubs.length }) : '';
-  if (!best.length) hot.appendChild(el('div', 'hint', t('No hot laps posted yet — open a layout to add yours.')));
+  if (!groups.length) hot.appendChild(el('div', 'hint', t('No hot laps posted yet — open a layout to add yours.')));
   else {
-    const names = await STORE.names(best.map(s => s.owner));
-    const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl hot'); tb.innerHTML = `<thead><tr><th>#</th><th>${t('Driver')}</th><th>${t('Lap')}</th><th>${t('Layout')}</th><th>${t('Kart')}</th><th>${t('Session')}</th><th>${t('Date')}</th><th></th></tr></thead>`; const body = el('tbody');
-    best.forEach((s, i) => { const r = el('tr'); const l = layouts.find(x => x.id === s.layout); r.innerHTML = `<td class="num">${i + 1}</td><td class="drv">${driverLink(s.owner, names)}</td><td class="num">${fmtMs(s.bestMs)}</td><td>${esc(l ? l.name : (s.layout === 'custom' ? t('Custom') : s.layout))}</td><td>${esc(kartLabel(s))}</td><td>${esc(s.label || s.name)}</td><td>${esc(fmtDate(s.date))}</td><td><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a></td>`; body.appendChild(r); });
-    tb.appendChild(body); respTable(tb); wrap.appendChild(tb); hot.appendChild(wrap);
+    const names = await STORE.names(pubs.map(s => s.owner)); let cur = groups[0].key;
+    const tabs = el('div', 'chips kart-tabs'), box = el('div'); hot.append(tabs, box);
+    const render = () => {
+      tabs.innerHTML = ''; for (const g of groups) { const b = el('button', 'chip' + (g.sport ? ' sport' : '') + (g.key === cur ? ' on' : '')); b.type = 'button'; b.innerHTML = `${esc(g.label)} <b>${g.items.length}</b>`; b.onclick = () => { cur = g.key; render(); }; tabs.appendChild(b); }
+      const g = groups.find(x => x.key === cur) || groups[0], best = g.items.slice().sort((a, b) => a.bestMs - b.bestMs).slice(0, 10);
+      box.innerHTML = ''; const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl hot'); tb.innerHTML = `<thead><tr><th>#</th><th>${t('Driver')}</th><th>${t('Lap')}</th><th>${t('Layout')}</th><th>${t('Session')}</th><th>${t('Date')}</th><th></th></tr></thead>`; const body = el('tbody');
+      best.forEach((s, i) => { const r = el('tr'); const l = layouts.find(x => x.id === s.layout); r.innerHTML = `<td class="num">${i + 1}</td><td class="drv">${driverLink(s.owner, names)}</td><td class="num">${fmtMs(s.bestMs)}</td><td>${esc(l ? l.name : (s.layout === 'custom' ? t('Custom') : s.layout))}</td><td>${esc(s.label || s.name)}${resultText(s) ? ` <span class="pill">${esc(resultText(s))}</span>` : ''}</td><td>${esc(fmtDate(s.date))}</td><td><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a></td>`; body.appendChild(r); });
+      tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
+      if (groups.length > 1) box.appendChild(el('div', 'hint', t('Each kart has its own ranking — a 270 cc rental and a KZ2 are different sports.')));
+    };
+    render();
   }
   // the karts people drive here: the track's own list plus whatever drivers reported with their sessions
-  { const box = $('tKarts'); box.innerHTML = ''; const seen = new Map(); for (const k of (Array.isArray(tr.karts) ? tr.karts : [])) if (k && k.name) seen.set(k.name.toLowerCase(), { name: k.name, cls: k.cls || 'rental', n: 0 }); for (const s of pubs) { if (!s.kart) continue; const key = s.kart.toLowerCase(); const o = seen.get(key) || { name: s.kart, cls: kartClassOf(s), n: 0 }; o.n++; seen.set(key, o); }
-    const list = [...seen.values()].sort((a, b) => (a.cls === 'sport') - (b.cls === 'sport') || b.n - a.n); $('tKartsCard').hidden = !list.length;
-    for (const k of list) { const c = el('span', 'chip'); c.innerHTML = `${esc(k.name)}${k.cls === 'sport' ? ' · ' + esc(t('sport')) : ''}${k.n ? ` <b>${k.n}</b>` : ''}`; box.appendChild(c); } }
+  { const box = $('tKarts'); box.innerHTML = ''; const seen = new Map(); for (const k of (Array.isArray(tr.karts) ? tr.karts : [])) if (k && k.name && (k.cls || 'rental') !== 'sport') seen.set('rental:' + kartSlug(k.name), { name: k.name, sport: false, n: 0 });
+    for (const g of groupByKart(pubs.filter(s => s.kart || kartClassOf(s) === 'sport'))) { const o = seen.get(g.key) || { name: g.label, sport: g.sport, n: 0 }; o.n += g.items.length; seen.set(g.key, o); }
+    const list = [...seen.values()].sort((a, b) => a.sport - b.sport || b.n - a.n); $('tKartsCard').hidden = !list.length;
+    for (const k of list) { const c = el('span', 'chip' + (k.sport ? ' sport' : '')); c.innerHTML = `${esc(k.name)}${k.n ? ` <b>${k.n}</b>` : ''}`; box.appendChild(c); } }
   // stats tiles
   const tiles = $('tTiles'); tiles.innerHTML = '';
   const tile = (icon, k, v) => { const d = el('div', 'tile'); const kk = el('div', 'k'); kk.appendChild(svgUse(icon)); kk.appendChild(document.createTextNode(k)); d.appendChild(kk); d.appendChild(el('div', 'v', v)); tiles.appendChild(d); };
@@ -3898,14 +3969,17 @@ async function renderLayoutPage(tid, lid) {
   $('lMapTitle').hidden = true;
   // community data: the published sessions (newest 20) → windows from the best lap, coach from all clean laps
   LP.wins = null;
+  LP.kart = null;
   if (G && G.frame && pubs.length) {
-    const loaded = []; for (const m of pubs.slice(-20)) { try { const s = await STORE.loadSession(m); if (GEOM.attach(s, G).ok) loaded.push(s); } catch (e) {} }
+    // the guide is built within one kart category (the busiest one here): braking points of a KZ2 say nothing about a rental kart
+    const main = groupByKart(pubs)[0]; LP.kart = main && groupByKart(pubs).length > 1 ? main.label : null;
+    const loaded = []; for (const m of (main ? main.items : pubs).slice(-20)) { try { const s = await STORE.loadSession(m); if (GEOM.attach(s, G).ok) loaded.push(s); } catch (e) {} }
     const laps = []; for (const s of loaded) for (const L of s.laps) if (L.clean && L.px) laps.push(L);
     if (laps.length) {
       const bestL = laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a), P = DATA.projectLap(bestL, G.track, G.rev);
       if (P) { const ap = GEOM.apexes(G, P); const D = DATA.buildComparisonP(P, [], 'avg', G.track, () => '', ap, G.corners.R); if (D) { LP.D = D; LP.wins = D.wins; LP.coach = DATA.buildCoach(G.track, D.wins, laps, G.rev); LP.bestL = bestL; LP.names = await STORE.names(loaded.map(s => s.owner)); } }
     }
-    $('lMapTitle').hidden = !LP.D; if (LP.D) { $('lMapTitle').className = 'map-title ref'; $('lMapTitle').textContent = t('Fastest published lap · {t} · {who}', { t: fmtMs(LP.bestL.timeMs), who: (LP.names[LP.bestL._sess.owner] || {}).name || t('Driver') }); }
+    $('lMapTitle').hidden = !LP.D; if (LP.D) { $('lMapTitle').className = 'map-title ref'; $('lMapTitle').textContent = t('Fastest published lap · {t} · {who}', { t: fmtMs(LP.bestL.timeMs), who: (LP.names[LP.bestL._sess.owner] || {}).name || t('Driver') }) + (LP.kart ? ' · ' + LP.kart : ''); }
   }
   { const sat = SAT.can(G); $('lTiles').hidden = !sat; $('lTiles').classList.toggle('active', sat && LP.tiles); if (sat && LP.tiles && SAT.available === null) SAT.probe(G).then(ok => { if (!ok) { $('lTiles').hidden = true; LP.map.draw(); } }); }
   LP.map.fit(); LP.map.draw(); lpInspector(); lpGuide(l); lpSessions(tid, lid, l, pubs);
@@ -3928,7 +4002,7 @@ function lpInspector() {
 function lpGuide(l) {
   const box = $('lGuide'); box.innerHTML = '';
   if (!LP.coach) { $('lGuideSub').textContent = ''; $('lGuideHint').textContent = LP.D ? t('The guide needs at least 4 clean laps.') : t('The corner guide is built from everything drivers publish on this layout: the best quarter of all passes through each corner. Nothing here yet.'); return; }
-  { const m = Object.keys(LP.names).length; $('lGuideSub').textContent = t('built from {n} clean laps of {m}', { n: LP.coach.nLaps, m: tn(m, '{m} driver', '{m} drivers').replace('{m}', m) }); }
+  { const m = Object.keys(LP.names).length; $('lGuideSub').textContent = t('built from {n} clean laps of {m}', { n: LP.coach.nLaps, m: tn(m, '{m} driver', '{m} drivers').replace('{m}', m) }) + (LP.kart ? ' · ' + LP.kart : ''); }
   $('lGuideHint').textContent = t('Ranges are the middle half of the best passes. Hover a card to see the corner on the map.');
   for (const r of LP.D.rows) { const c = LP.coach.corners.find(x => x.n === r.w.n); if (!c) continue; const d = el('div', 'gcard'); d.dataset.n = r.w.n; d.innerHTML = `<b class="n">T${r.w.n}</b><span class="d">${r.w.dir === 'L' ? t('left') : t('right')} · R ${r.w.Rmin.toFixed(0)} ${t('m')} · ${c.kind === 'brake' ? t('braking corner') : (c.kind === 'lift' ? t('lift corner') : t('flat-out corner'))}</span><div style="margin-top:6px">${esc(DATA.coachText(c))}</div>`; d.onmouseenter = () => { LP.hover = r.w.apex; lpInspector(); LP.map.draw(); }; d.onmouseleave = () => { LP.hover = -1; lpInspector(); LP.map.draw(); }; d.onclick = () => { LP.sel = LP.sel === r.w.n ? 0 : r.w.n; lpInspector(); LP.map.draw(); $('lHero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }; box.appendChild(d); }
 }
@@ -3937,7 +4011,8 @@ async function lpSessions(tid, lid, l, pubs) {
   if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); e.appendChild(el('div', 't', t('No sessions yet'))); e.appendChild(el('div', '', t('Upload your session and publish it — it becomes the reference others compare with.'))); const b = el('button', 'btn primary', t('Upload my session')); b.type = 'button'; b.onclick = () => UPLOAD.open({ track: tid, layout: lid }); e.appendChild(b); box.appendChild(e); return; }
   const names = await STORE.names(pubs.map(s => s.owner)), counts = await STORE.socialCounts(pubs.map(s => s.id)), low = (s) => STORE.lowRated(counts[s.id]);
   const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Driver')}</th><th>${t('Session')}</th><th>${t('Kart')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th></th></tr></thead>`; const body = el('tbody');
-  for (const s of pubs.slice().sort((a, b) => low(a) - low(b) || (kartClassOf(a) === 'sport') - (kartClassOf(b) === 'sport') || a.bestMs - b.bestMs)) { const r = el('tr'); if (low(s)) r.style.opacity = '.6'; r.innerHTML = `<td class="drv" style="font-weight:600">${driverLink(s.owner, names)}</td><td>${esc(s.label || s.name)}${resultText(s) ? ` <span class="pill">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}${low(s) ? ` <span class="soon">${t('rated not helpful')}</span>` : ''}${counts[s.id] && (counts[s.id].likes || counts[s.id].down) ? ` <span class="hint">👍 ${counts[s.id].likes} 👎 ${counts[s.id].down}</span>` : ''}</td><td>${esc(kartLabel(s))}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${s.id}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
+  const groups = groupByKart(pubs), rows = []; for (const g of groups) { if (groups.length > 1) rows.push({ head: g }); for (const s of g.items.slice().sort((a, b) => low(a) - low(b) || a.bestMs - b.bestMs)) rows.push({ s }); }
+  for (const row of rows) { if (row.head) { const r = el('tr', 'grp'); const td = el('td'); td.colSpan = 8; td.textContent = `${row.head.label} · ${tn(row.head.items.length, '{n} session', '{n} sessions').replace('{n}', row.head.items.length)}`; r.appendChild(td); body.appendChild(r); continue; } const s = row.s; const r = el('tr'); if (low(s)) r.style.opacity = '.6'; r.innerHTML = `<td class="drv" style="font-weight:600">${driverLink(s.owner, names)}</td><td>${esc(s.label || s.name)}${resultText(s) ? ` <span class="pill">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}${low(s) ? ` <span class="soon">${t('rated not helpful')}</span>` : ''}${counts[s.id] && (counts[s.id].likes || counts[s.id].down) ? ` <span class="hint">👍 ${counts[s.id].likes} 👎 ${counts[s.id].down}</span>` : ''}</td><td>${esc(kartLabel(s))}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${s.id}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${s.id}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
   tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
 }
 const driverLink = (uid, names) => { const n = names && names[uid] ? names[uid].name : t('Driver'); return uid && uid !== 'local' ? `<a href="#driver~${esc(uid)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line-2)">${esc(n)}</a>` : esc(n); };
@@ -3962,9 +4037,9 @@ async function renderDriverPage(uid) {
 async function publishedBy(uid) { const out = []; for (const tr of STORE.getTracks()) { const list = await STORE.sessionsFor(tr.id); for (const s of list) if (s.owner === uid) out.push(s); } return out.sort((a, b) => (b.date || '').localeCompare(a.date || '')); }
 async function renderBests(box, pubs) {
   box.innerHTML = ''; if (!pubs.length) { box.appendChild(el('div', 'hint', t('No published sessions yet.'))); return; }
-  const by = new Map(); for (const s of pubs) { const k = s.track + '|' + s.layout; const cur = by.get(k); if (!cur || s.bestMs < cur.bestMs) by.set(k, s); }
+  const by = new Map(); for (const s of pubs) { const k = s.track + '|' + s.layout + '|' + kartKeyOf(s); const cur = by.get(k); if (!cur || s.bestMs < cur.bestMs) by.set(k, s); }
   const tiles = el('div', 'tiles');
-  for (const s of by.values()) { const tr = STORE.getTrack(s.track); const ls = s.track ? await STORE.getLayouts(s.track) : []; const l = ls.find(x => x.id === s.layout); const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(tr ? tr.name : t('Custom'))}${l ? ' · ' + esc(l.name) : ''}</div><div class="v">${fmtMs(s.bestMs)}</div><div class="hint">${esc(fmtDate(s.date))}</div>`; d.style.textAlign = 'left'; tiles.appendChild(d); }
+  for (const s of [...by.values()].sort((a, b) => (a.track || '').localeCompare(b.track || '') || a.bestMs - b.bestMs)) { const tr = STORE.getTrack(s.track); const ls = s.track ? await STORE.getLayouts(s.track) : []; const l = ls.find(x => x.id === s.layout); const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(tr ? tr.name : t('Custom'))}${l ? ' · ' + esc(l.name) : ''}</div><div class="v">${fmtMs(s.bestMs)}</div><div class="hint">${esc(kartLabel(s))} · ${esc(fmtDate(s.date))}</div>`; d.style.textAlign = 'left'; tiles.appendChild(d); }
   box.appendChild(tiles);
 }
 async function renderSessionsTable(box, pubs, subEl) {
@@ -4025,7 +4100,7 @@ LAB.open = async function (meta, asCmp) {
   if (!G) { setStatus('labStatus', t('No clean laps with GPS in this session.'), 'warn'); return; }
   LAB.G = G; LAB.sessions = [];
   const add = (s) => { if (LAB.sessions.some(x => x.id === s.id)) return false; const r = GEOM.attach(s, G); if (r.ok) LAB.sessions.push(s); return !!r.ok; };
-  const cls = kartClassOf(sess), sameKart = (m) => LAB.allKarts || kartClassOf(m) === cls;
+  const sameKart = (m) => LAB.allKarts || kartCompatible(m, sess);
   add(sess); LAB.otherKarts = 0; if (G.refSess) { if (sameKart(G.refSess)) add(G.refSess); else if (G.refSess.published) LAB.otherKarts++; }   // the layout's reference lap is only a comparison when the kart class matches
   // the coach ("reserve", best passes) learns from every lap on this layout: my other sessions and the published ones
   const mine = (await STORE.mySessions()).filter(m => m.id !== sess.id && sameKart(m) && (STORE.hasDb ? (m.track === LAB.tid && m.layout === LAB.lid) : true));
@@ -4416,10 +4491,10 @@ function renderCmpPicker() {
   const push = (meta, loaded, same, mine) => rows.push({ meta, loaded, same, mine });
   for (const sx of LAB.sessions) if (sx !== sess) push(sx, true, true, mySession(sx));
   (async () => {
-    const cls = kartClassOf(sess), sameKart = (m) => LAB.allKarts || kartClassOf(m) === cls; let hidden = 0;
+    const sameKart = (m) => LAB.allKarts || kartCompatible(m, sess); let hidden = 0;
     const mine = await STORE.mySessions(); for (const m of mine) if (m.id !== sess.id && !sessOf(m.id)) { if (sameKart(m)) push(m, false, m.track === LAB.tid && m.layout === LAB.lid, true); else hidden++; }
     if (LAB.tid) { const pubs = await STORE.sessionsFor(LAB.tid, LAB.lid); for (const m of pubs) if (m.id !== sess.id && !sessOf(m.id) && !rows.some(r => r.meta.id === m.id)) { if (sameKart(m)) push(m, false, true, false); else hidden++; } }
-    if (hidden || LAB.allKarts) { const h = $('cmpPickerHint'); h.textContent = (LAB.allKarts ? t('Showing every kart class — a sport kart and a rental kart are not comparable corner by corner.') : t('{n} session(s) on another kart class are hidden (a sport kart and a rental kart are not comparable).', { n: hidden })) + ' '; const a = el('a', 'tref', LAB.allKarts ? t('Hide them') : t('Show anyway')); a.href = '#'; a.onclick = async (e) => { e.preventDefault(); LAB.allKarts = !LAB.allKarts; LAB.pickerOpen = true; await LAB.open(LAB.current, false); }; h.appendChild(a); }
+    if (hidden || LAB.allKarts) { const h = $('cmpPickerHint'); h.textContent = (LAB.allKarts ? t('Showing every kart — different karts are not comparable corner by corner.') : t('{n} session(s) on another kart are hidden (different karts are not comparable corner by corner).', { n: hidden })) + ' '; const a = el('a', 'tref', LAB.allKarts ? t('Hide them') : t('Show anyway')); a.href = '#'; a.onclick = async (e) => { e.preventDefault(); LAB.allKarts = !LAB.allKarts; LAB.pickerOpen = true; await LAB.open(LAB.current, false); }; h.appendChild(a); }
     const names = await STORE.names(rows.map(r => r.meta.owner));
     rows.sort((a, b) => (b.same - a.same) || (b.mine - a.mine) || (b.meta.date || '').localeCompare(a.meta.date || ''));
     list.innerHTML = '';
@@ -4429,7 +4504,7 @@ function renderCmpPicker() {
       const tr = STORE.getTrack(m.track); const who = el('span', 'who', r.mine ? t('You') : ((names[m.owner] || {}).name || t('Driver')));
       const nm = el('span', 'nm', `${m.label || m.name} · ${fmtDate(m.date)}${!r.same ? ` · ${tr ? tr.name : (m.trackName || t('Custom'))}` : ''}`);
       const pill = el('span', 'pill ' + (r.same ? 'ok' : 'off'), r.same ? t('same layout') : t('other layout'));
-      b.append(who, nm, el('span', 'tm', fmtMs(m.bestMs)), pill); if (m.kart || kartClassOf(m) !== kartClassOf(sess)) b.appendChild(el('span', 'pill ' + (kartClassOf(m) === kartClassOf(sess) ? '' : 'off'), kartLabel(m)));
+      b.append(who, nm, el('span', 'tm', fmtMs(m.bestMs)), pill); if (m.kart || kartClassOf(m) !== kartClassOf(sess)) b.appendChild(el('span', 'pill ' + (kartCompatible(m, sess) ? '' : 'off'), kartLabel(m)));
       b.onclick = async () => { b.classList.add('busy'); try { const s = r.loaded ? m : await LAB.load(m); LAB.cmp = sessAvg(s) ? 'avg:' + s.id : lapKey(s, bestLap(s)); LAB.pickerOpen = false; LAB.chat = []; LAB.selN = 0; labRender(); } catch (e) { toast(t('Could not load that session: {e}', { e: e && e.message || e })); b.classList.remove('busy'); } };
       list.appendChild(b);
     }
@@ -4819,13 +4894,11 @@ const UPLOAD = (() => {
   function syncNew() { const nw = $('uplTrack').value === '__new__'; $('uplNewTrack').hidden = !nw; $('uplLayout').parentElement.hidden = nw; if (nw) $('uplPublish').checked = true; }
   // the kart: the track's own list first, then any other rental kart or a sport kart (named by hand)
   function fillKarts() {
-    const tid = $('uplTrack').value, tr = tid && tid !== '__new__' ? STORE.getTrack(tid) : null, list = (tr && Array.isArray(tr.karts) ? tr.karts : []).filter(k => k && k.name);
-    const opts = list.map(k => [`${k.cls || 'rental'}|${k.name}`, `${k.name}${k.cls === 'sport' ? ' · ' + t('sport') : ''}`]);
-    opts.push(['rental|', list.length ? t('Other rental kart…') : t('Rental kart (model below)')], ['sport|', t('Sport kart (Rotax, X30, KZ…)')]);
+    const tid = $('uplTrack').value, tr = tid && tid !== '__new__' ? STORE.getTrack(tid) : null, opts = kartOptions(tr);
     const cur = $('uplKart').value; fillSelect($('uplKart'), opts, opts.some(o => o[0] === cur) ? cur : (opts[0][0])); syncKart();
   }
   function syncKart() { const v = $('uplKart').value || 'rental|'; const custom = /\|$/.test(v); $('uplKartOtherField').hidden = !custom; $('uplKartOther').placeholder = v.startsWith('sport') ? 'Rotax Max, X30, KZ2…' : 'Sodi RT8, Birel N35…'; }
-  const kartPick = () => { const v = $('uplKart').value || 'rental|', cls = v.split('|')[0] || 'rental', nm = v.split('|')[1] || $('uplKartOther').value.trim(); return { cls, name: nm }; };
+  const kartPick = () => kartFromValue($('uplKart').value, $('uplKartOther').value);
   $('uplKart').addEventListener('change', syncKart);
   async function fillLayouts() { const tid = $('uplTrack').value; const ls = tid && tid !== '__new__' ? await STORE.getLayouts(tid) : []; fillSelect($('uplLayout'), ls.map(l => [l.id, l.name + (l.lengthM ? ` · ${l.lengthM} ${t('m')}` : '')]).concat([['custom', t('Custom / not listed')]]), ls.length ? ls[0].id : 'custom'); showLayoutPhoto(); }
   async function showLayoutPhoto() { const tid = $('uplTrack').value, lid = $('uplLayout').value, l = tid && tid !== '__new__' ? STORE.getLayout(tid, lid) : null; let src = null; if (l && l.photo) src = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/photo`); if ($('uplLayout').value !== lid) return; $('uplLayoutPhotoField').hidden = !src; if (src) $('uplLayoutPhoto').src = src; }
@@ -4851,11 +4924,11 @@ const UPLOAD = (() => {
     }
     const tr = tid ? STORE.getTrack(tid) : null;
     // a kart this track did not list yet is remembered on the track page (for the next driver's picker)
-    if (tr && kart.name && STORE.canEditTrack(tr) && !(tr.karts || []).some(k => k.name.toLowerCase() === kart.name.toLowerCase())) { try { await STORE.saveTrack(Object.assign({}, tr, { karts: (tr.karts || []).concat([{ name: kart.name, cls: kart.cls }]) })); } catch (e) {} }
+    if (tr && kart.name && kart.cls !== 'sport' && STORE.canEditTrack(tr) && !(tr.karts || []).some(k => k.name.toLowerCase() === kart.name.toLowerCase())) { try { await STORE.saveTrack(Object.assign({}, tr, { karts: (tr.karts || []).concat([{ name: kart.name, cls: kart.cls }]) })); } catch (e) {} }
     let first = null;
     for (let k = 0; k < parsed.length; k++) {
       const pub = STORE.canWrite() && !!tid && $('uplPublish').checked;
-      const p = parsed[k], sess = { id: 's' + STORE.uid(), name: p.data.name, label: parsed.length > 1 ? (label ? `${label} · ${k + 1}` : '') : label, driver: p.meta.driver, date: p.meta.date || fileDate(p.file), trackName: tr ? tr.name : p.meta.track, track: tid, layout: tid ? lid : 'custom', note, kart: kart.name, kartClass: kart.cls, format: $('uplFormat').value || '', pos: +$('uplPos').value || 0, drivers: +$('uplDrivers').value || 0, published: pub, source: p.data.source || null, createdAt: Date.now(), laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
+      const p = parsed[k], sess = { id: 's' + STORE.uid(), name: p.data.name, label: parsed.length > 1 ? (label ? `${label} · ${k + 1}` : '') : label, driver: p.meta.driver, date: p.meta.date || fileDate(p.file), trackName: tr ? tr.name : p.meta.track, track: tid, layout: tid ? lid : 'custom', note, kart: kart.name, kartClass: kart.cls, kartCat: kart.cat || '', format: $('uplFormat').value || '', pos: +$('uplPos').value || 0, drivers: +$('uplDrivers').value || 0, published: pub, source: p.data.source || null, createdAt: Date.now(), laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
       for (const L of sess.laps) L._sess = sess;
       // loggers without a start/finish beacon: start every lap at the layout's S/F so corners line up with everyone else's
       if (sess.source && sess.source.app !== 'alfano' && tid && lid !== 'custom') { try { const G = await GEOM.build(tid, lid); IMPORT.alignToStart(sess, G); } catch (e) {} }
@@ -5237,10 +5310,8 @@ const SESSEDIT = (() => {
   function close() { $('sessModal').hidden = true; cur = null; }
   // the kart: the track's list, or a rental / sport kart named by hand
   function fillKarts(meta) {
-    const tid = $('seTrack').value, tr = tid ? STORE.getTrack(tid) : null, list = (tr && Array.isArray(tr.karts) ? tr.karts : []).filter(k => k && k.name);
-    const opts = list.map(k => [`${k.cls || 'rental'}|${k.name}`, `${k.name}${k.cls === 'sport' ? ' · ' + t('sport') : ''}`]).concat([['rental|', list.length ? t('Other rental kart…') : t('Rental kart (model below)')], ['sport|', t('Sport kart (Rotax, X30, KZ…)')]]);
-    const m = meta || cur || {}, cls = m.kartClass || 'rental', key = `${cls}|${m.kart || ''}`; const listed = opts.some(o => o[0] === key);
-    fillSelect($('seKart'), opts, listed ? key : `${cls}|`); $('seKartOther').value = listed ? '' : (m.kart || ''); syncKart();
+    const tid = $('seTrack').value, tr = tid ? STORE.getTrack(tid) : null, opts = kartOptions(tr), m = meta || cur || {}, kv = kartValueOf(m, tr);
+    fillSelect($('seKart'), opts, kv.v); $('seKartOther').value = kv.other; syncKart();
   }
   function syncKart() { const v = $('seKart').value || 'rental|'; $('seKartOtherField').hidden = !/\|$/.test(v); }
   $('seKart').addEventListener('change', syncKart);
@@ -5248,9 +5319,9 @@ const SESSEDIT = (() => {
   $('seCancel').onclick = close; $('sessModal').addEventListener('click', (e) => { if (e.target === $('sessModal')) close(); });
   $('seSave').onclick = async () => {
     if (!cur) return; const tid = $('seTrack').value, tr = tid ? STORE.getTrack(tid) : null;
-    const kv = $('seKart').value || 'rental|', kart = { cls: kv.split('|')[0] || 'rental', name: kv.split('|')[1] || $('seKartOther').value.trim().slice(0, 40) };
-    const patch = { label: $('seName').value.trim().slice(0, 80), note: $('seNote').value.trim().slice(0, 120), track: tid, trackName: tr ? tr.name : (cur.trackName || ''), layout: tid ? ($('seLayout').value || 'custom') : 'custom', kart: kart.name, kartClass: kart.cls, format: $('seFormat').value || '', pos: +$('sePos').value || 0, drivers: +$('seDrivers').value || 0 };
-    if (tr && kart.name && STORE.canEditTrack(tr) && !(tr.karts || []).some(k => k.name.toLowerCase() === kart.name.toLowerCase())) { try { await STORE.saveTrack(Object.assign({}, tr, { karts: (tr.karts || []).concat([{ name: kart.name, cls: kart.cls }]) })); } catch (e) {} }
+    const kart = kartFromValue($('seKart').value, $('seKartOther').value);
+    const patch = { label: $('seName').value.trim().slice(0, 80), note: $('seNote').value.trim().slice(0, 120), track: tid, trackName: tr ? tr.name : (cur.trackName || ''), layout: tid ? ($('seLayout').value || 'custom') : 'custom', kart: kart.name, kartClass: kart.cls, kartCat: kart.cat || '', format: $('seFormat').value || '', pos: +$('sePos').value || 0, drivers: +$('seDrivers').value || 0 };
+    if (tr && kart.name && kart.cls !== 'sport' && STORE.canEditTrack(tr) && !(tr.karts || []).some(k => k.name.toLowerCase() === kart.name.toLowerCase())) { try { await STORE.saveTrack(Object.assign({}, tr, { karts: (tr.karts || []).concat([{ name: kart.name, cls: kart.cls }]) })); } catch (e) {} }
     if (!$('sePubField').hidden) patch.published = $('sePublish').checked && !!tid;
     if (!$('seSws').disabled) { const i = $('seSws').value; if (i === '') patch.sws = null; else { const prof = await STORE.profile(STORE.me.id) || {}; const r = (prof.swsResults && prof.swsResults.results || [])[+i]; if (r) patch.sws = { i: +i, date: r.date, race: r.race || r.cat, track: r.track, pos: r.pos, best: r.best }; } }
     const b = $('seSave'); b.classList.add('busy'); setStatus('seStatus', t('Saving…'));
@@ -5421,7 +5492,7 @@ const ADMIN = (() => {
   $('q').placeholder = t('Search tracks, drivers...');
   try { await STORE.init(); } catch (e) {}
   renderShell(); I18N.applyStatic();
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { await NATIVE.init(); } catch (e) {}
