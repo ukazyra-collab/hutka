@@ -3990,7 +3990,7 @@ function afterSelect(follow) {
 function labEnsureMap() {
   if (LAB.map) return;
   LAB.map = createMapView($('map'), { height: labMapHeight, getTrack: () => LAB.G ? LAB.G.track : null, getWidthM: () => LAB.G ? LAB.G.widthM : 8, getFrameSize: () => LAB.G ? [LAB.G.W, LAB.G.H] : null,
-    getImage: () => { if (!LAB.G) return null; const im = LAB.G.image; return im && LAB.G.source !== 'gps' ? im : (LAB.opts.aerial ? im : null); },
+    getImage: () => { if (!LAB.G) return null; const im = LAB.G.image; if (LAB.G.source === 'gps' && SAT.can(LAB.G) && LAB.opts.tiles) return null; return im && LAB.G.source !== 'gps' ? im : (LAB.opts.aerial ? im : null); },
     getTiles: () => { const G = LAB.G; if (!G) return null; const b = G.sat || { dx: 0, dy: 0 }; return SAT.layer(G, LAB.opts.tiles, { dx: b.dx + LAB.satAdj.dx, dy: b.dy + LAB.satAdj.dy }); },
     onSatMove: (dxPx, dyPx) => { if (!LAB.G) return; const mpp = LAB.G.track.mpp; LAB.satAdj.dx += dxPx * mpp; LAB.satAdj.dy -= dyPx * mpp; saveSatAdj(); renderAlignBar(); },
     getOverlay: () => ({ D: LAB.dcmp, role: LAB.mapLap === 'cmp' ? 'cmp' : 'ref', hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor }),
