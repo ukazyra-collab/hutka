@@ -479,34 +479,16 @@ body.onboarding #toast{z-index:50}
 @keyframes rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .soon{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 8px}
 /* ---------- home feed ---------- */
-.home-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr);gap:22px;padding:28px 30px 24px;color:#eef1f8;background:radial-gradient(900px 420px at 110% -20%,rgba(255,90,90,.22),transparent 60%),radial-gradient(700px 360px at -10% 120%,rgba(47,107,240,.28),transparent 60%),linear-gradient(135deg,#131a33,#1b2340 55%,#171f3a);border-color:#2a3558;box-shadow:0 14px 40px rgba(16,22,48,.25)}
-.home-hero .trace{position:absolute;right:-20px;top:50%;transform:translateY(-54%);width:min(52%,560px);height:auto;pointer-events:none;opacity:.9}
-.home-hero .trace .tarmac{fill:none;stroke:rgba(255,255,255,.07);stroke-width:22;stroke-linejoin:round}
-.home-hero .trace .line{fill:none;stroke:url(#heroSpeed);stroke-width:3.5;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:1400;stroke-dashoffset:1400;animation:heroDraw 2.4s cubic-bezier(.4,0,.2,1) .2s forwards}
-@keyframes heroDraw{to{stroke-dashoffset:0}}
-.home-hero .trace .corners circle{fill:#0f1630;stroke:rgba(255,255,255,.7);stroke-width:1.5}
-.home-hero .trace .corners text{fill:rgba(255,255,255,.55);font:600 11px/1 var(--mono);text-anchor:middle;letter-spacing:.06em}
-.home-hero .trace .kart{fill:#fff}
-.home-hero .trace .kart-glow{fill:#ff5a5a;opacity:.8}
-.home-hero .t{position:relative;z-index:1;max-width:60ch}
-.home-hero .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#aab4d4;margin-bottom:10px}
-.home-hero .eyebrow i{width:8px;height:8px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 0 4px rgba(255,90,90,.25)}
-.home-hero h1{font-size:34px;line-height:1.08;letter-spacing:-.025em;margin-bottom:10px;color:#fff}
-.home-hero p{color:#c3cae0;font-size:15px;line-height:1.55;max-width:56ch}
-.home-hero .btn{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff}
-.home-hero .btn:hover{background:rgba(255,255,255,.12)}
-.home-hero .btn.primary{background:#fff;color:#141b33;border-color:#fff}
-.home-hero .btn.primary:hover{background:#eef1f8}
-.home-hero .btn svg{color:currentColor}
-.home-hero .feats{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px;font-size:12.5px;color:#aab4d4}
-.home-hero .feats>span{display:inline-flex;gap:8px;align-items:baseline}
-.home-hero .feats b{font:700 10.5px/1 var(--mono);color:#ff8a8a;letter-spacing:.08em}
-.home-hero .stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:0;border-top:1px solid rgba(255,255,255,.12);padding-top:16px}
-.home-hero .stats .tile{min-width:0;padding:0 26px 0 0;margin-right:26px;background:none;border:0;border-right:1px solid rgba(255,255,255,.12);text-align:left;border-radius:0}
-.home-hero .stats .tile:last-child{border-right:0;margin-right:0;padding-right:0}
-.home-hero .stats .tile .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#aab4d4}
-.home-hero .stats .tile .v{font:600 26px/1.15 var(--mono);letter-spacing:-.02em;color:#fff}
-@media (max-width:900px){.home-hero{padding:22px 20px 18px}.home-hero .trace{width:72%;right:-26%;top:0;transform:none;opacity:.35}.home-hero h1{font-size:27px}.home-hero p{font-size:14px}.home-hero .feats{gap:6px 14px;font-size:12px}.home-hero .stats{grid-template-columns:repeat(4,1fr)}.home-hero .stats .tile{padding:0 8px 0 0;margin-right:8px}.home-hero .stats .tile .v{font-size:20px}}
+.home-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px 40px;align-items:end;padding:24px 26px}
+.home-hero h1{font-size:26px;line-height:1.15;letter-spacing:-.02em;margin-bottom:6px}
+.home-hero p{color:var(--muted);font-size:14.5px;line-height:1.5;max-width:46ch}
+.home-hero .stats{display:flex;gap:0;flex-wrap:nowrap}
+.home-hero .stats .tile{min-width:0;padding:0 22px;background:none;border:0;border-left:1px solid var(--line);text-align:left;border-radius:0}
+.home-hero .stats .tile:first-child{border-left:0;padding-left:0}
+.home-hero .stats .tile:last-child{padding-right:0}
+.home-hero .stats .tile .v{font:700 34px/1 var(--body);letter-spacing:-.03em;color:var(--fg);font-variant-numeric:tabular-nums}
+.home-hero .stats .tile .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+@media (max-width:900px){.home-hero{grid-template-columns:1fr;gap:18px;padding:20px 18px}.home-hero h1{font-size:23px}.home-hero .stats{border-top:1px solid var(--line);padding-top:14px}.home-hero .stats .tile{flex:1;padding:0 10px}.home-hero .stats .tile .v{font-size:26px}}
 .home-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start;margin-top:16px}
 @media (max-width:1100px){.home-grid{grid-template-columns:1fr}}
 .hh{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700;margin:4px 0 12px}
@@ -662,7 +644,6 @@ body.onboarding #toast{z-index:50}
   .home-hero{padding:16px}
   .home-hero h1{font-size:24px}
   .home-hero p{font-size:14px}
-  .home-hero .stats .tile .v{font-size:19px}
   .post .ph{padding:10px 12px}
   .post .pb{padding:0 12px 12px;gap:10px;grid-template-columns:1fr}
   .post .pv{height:130px}
@@ -926,19 +907,10 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     <!-- ========== HOME ========== -->
     <section class="page" id="pg-home" hidden>
       <div class="home-hero card">
-        <svg class="trace" viewBox="0 0 560 300" aria-hidden="true" preserveAspectRatio="xMaxYMid meet">
-          <defs><linearGradient id="heroSpeed" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff5a5a"/><stop offset=".35" stop-color="#ffb347"/><stop offset=".7" stop-color="#4ade80"/><stop offset="1" stop-color="#ff5a5a"/></linearGradient><filter id="heroGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter></defs>
-          <path class="tarmac" d="M70,205 C70,120 150,78 240,88 C330,98 345,40 430,58 C515,76 500,170 440,198 C380,226 310,178 250,208 C190,238 130,262 70,205 Z"/>
-          <path class="line" d="M70,205 C70,120 150,78 240,88 C330,98 345,40 430,58 C515,76 500,170 440,198 C380,226 310,178 250,208 C190,238 130,262 70,205 Z"/>
-          <g class="corners"><circle cx="240" cy="88" r="5"/><text x="240" y="72">T1</text><circle cx="430" cy="58" r="5"/><text x="430" y="42">T3</text><circle cx="440" cy="198" r="5"/><text x="462" y="203">T5</text><circle cx="250" cy="208" r="5"/><text x="250" y="232">T7</text></g>
-          <circle class="kart-glow" cx="150" cy="78" r="12" filter="url(#heroGlow)"/><circle class="kart" cx="150" cy="78" r="5"/>
-        </svg>
         <div class="t">
-          <div class="eyebrow"><i></i>Hutka · <span data-t="racing AI">racing AI</span></div>
           <h1 data-t="See where the time is">See where the time is</h1>
           <p id="homeSub"></p>
-          <div class="row" style="margin-top:16px"><button class="btn primary" id="homeUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#tracks"><svg><use href="#i-track"/></svg><span data-t="Browse tracks">Browse tracks</span></a><button class="btn" id="homeSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button></div>
-          <div class="feats"><span><b>01</b><span data-t="Every braking point, apex and throttle point">Every braking point, apex and throttle point</span></span><span><b>02</b><span data-t="Corner-by-corner comparison with the fastest on the same layout">Corner-by-corner comparison with the fastest on the same layout</span></span><span><b>03</b><span data-t="An AI coach that has read your data before you ask">An AI coach that has read your data before you ask</span></span></div>
+          <div class="row" style="margin-top:14px"><button class="btn primary" id="homeUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#tracks"><svg><use href="#i-track"/></svg><span data-t="Browse tracks">Browse tracks</span></a><button class="btn" id="homeSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button></div>
         </div>
         <div class="stats" id="homeStats"></div>
       </div>
@@ -2831,6 +2803,7 @@ Object.assign(I18N.RU, {
   '{n} comments · {f} follows': '{n} комментариев · {f} подписок', 'AI questions': 'Вопросов ИИ', '{n} layouts': '{n} лейаутов', 'Sign-ups, last 30 days': 'Регистрации за 30 дней', 'Uploads, last 30 days': 'Загрузки за 30 дней', 'today': 'сегодня', 'Tracks by sessions': 'Трассы по сессиям',
   'Visits and devices: Google Analytics (analytics.google.com), when the measurement ID is in config.js.': 'Посещения и устройства — в Google Analytics (analytics.google.com), когда measurement ID прописан в config.js.', 'Could not load: {e}': 'Не загрузилось: {e}'
 });
+Object.assign(I18N.RU, { 'Upload a session — every corner, compared with the fastest on the same layout.': 'Загрузи сессию — каждый поворот в сравнении с самыми быстрыми на этом лейауте.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -5181,7 +5154,7 @@ function drawPreview(cv, pv, color) {
   return true;
 }
 async function renderHomePage() {
-  $('homeSub').textContent = t('Upload a session from your lap timer: Hutka reads every corner — where you braked, where the apex was, where the throttle came back — and shows where the fastest drivers on the same layout gain on you.');
+  $('homeSub').textContent = t('Upload a session — every corner, compared with the fastest on the same layout.');
   $('homeUpload').onclick = () => UPLOAD.open({});
   $('homeSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity); $('homeSignIn').onclick = () => AUTH.open();
   const feed = $('homeFeed'); feed.innerHTML = '';
@@ -5191,7 +5164,7 @@ async function renderHomePage() {
   const names = await STORE.names(pubs.map(s => s.owner)), counts = await STORE.socialCounts(pubs.map(s => s.id));
   for (const tid of new Set(pubs.map(s => s.track).filter(Boolean))) await STORE.getLayouts(tid);
   // hero stats
-  { const st = $('homeStats'); st.innerHTML = ''; const drivers = new Set(pubs.map(s => s.owner)).size, laps = pubs.reduce((a, s) => a + (s.nLaps || 0), 0); for (const [k, v] of [[t('Tracks'), STORE.getTracks().length], [t('Sessions'), pubs.length], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${v}</div>`; st.appendChild(d); } }
+  { const st = $('homeStats'); st.innerHTML = ''; const drivers = new Set(pubs.map(s => s.owner)).size, laps = pubs.reduce((a, s) => a + (s.nLaps || 0), 0); for (const [k, v] of [[t('Tracks'), STORE.getTracks().length], [t('Sessions'), pubs.length], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="v">${v}</div><div class="k">${esc(k)}</div>`; st.appendChild(d); } }
   feed.innerHTML = ''; $('feedSub').textContent = pubs.length ? t('{n} published', { n: pubs.length }) : '';
   if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); e.appendChild(el('div', 't', STORE.hasDb ? t('No sessions published yet') : t('Sign in to see the feed'))); e.appendChild(el('div', '', STORE.hasDb ? t('Be the first: upload your session and publish it on the track page.') : t('The shared library needs a connection. Browse tracks meanwhile.'))); feed.appendChild(e); }
   // sessions several drivers marked as not helpful sink to the bottom of the feed
