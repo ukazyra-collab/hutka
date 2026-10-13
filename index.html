@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="Hutka">
 <style>[hidden]{display:none!important}html{color-scheme:light}</style>
 <script src="config.js"></script>
-<script>if ("serviceWorker" in navigator && location.protocol === "https:") addEventListener("load", () => { navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => { const u = (r.active || r.waiting || r.installing || {}).scriptURL || ""; if (u && !/\/sw\.js$/.test(u)) r.unregister(); })).catch(() => {}); if (window.caches) caches.keys().then(ks => ks.forEach(k => { if (!k.startsWith("hutka-")) caches.delete(k); })).catch(() => {}); navigator.serviceWorker.register("sw.js").catch(() => {}); });</script>
+<script>if ("serviceWorker" in navigator && location.protocol === "https:" && !window.Capacitor) addEventListener("load", () => { navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => { const u = (r.active || r.waiting || r.installing || {}).scriptURL || ""; if (u && !/\/sw\.js$/.test(u)) r.unregister(); })).catch(() => {}); if (window.caches) caches.keys().then(ks => ks.forEach(k => { if (!k.startsWith("hutka-")) caches.delete(k); })).catch(() => {}); navigator.serviceWorker.register("sw.js").catch(() => {}); });</script>
 <script src="supabase.js"></script>
 </head>
 <body>
@@ -653,6 +653,8 @@ textarea{min-height:90px;resize:vertical}
   .tbl.resp td:last-child::before,.tbl.resp td.noLbl::before{display:none}
   .tbl.resp td .row{flex-wrap:wrap}
 }
+/* the native app shell: the status bar is native, the page starts right under it */
+html.native .top{padding-top:max(8px,env(safe-area-inset-top,0px))}
 /* ---------- the phone cockpit: a phone held sideways, or the full-screen map on a phone — a logger-app layout over the whole screen:
    live data at the top left, round buttons on the right, the lap scrub bar at the bottom; corners, digest, coach and the comparison open as sheets ---------- */
 .ck-hud,.ck-btns,.ck-scrub{display:none}
@@ -1173,7 +1175,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
   <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="seCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="seSave" type="button" data-t="Save">Save</button></div>
 </div></div>
 <!-- sign-in modal (standalone hosting) -->
-<div class="modal" id="authModal" hidden><div class="box" style="width:min(440px,100%)"><h3 data-t="Sign in to Hutka">Sign in to Hutka</h3><p class="hint" data-t="A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.">A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.</p><div class="field"><label>Email</label><input type="text" id="authEmail" placeholder="you@example.com" autocomplete="email"></div><div class="row"><button class="btn primary" id="authEmailBtn" type="button" data-t="Email me a link">Email me a link</button><button class="btn" id="authGoogleBtn" type="button" hidden>Google</button><button class="btn ghost" id="authCancel" type="button" data-t="Cancel">Cancel</button></div><div class="status" id="authStatus"></div></div></div>
+<div class="modal" id="authModal" hidden><div class="box" style="width:min(440px,100%)"><h3 data-t="Sign in to Hutka">Sign in to Hutka</h3><p class="hint" data-t="A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.">A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.</p><div class="field"><label>Email</label><input type="text" id="authEmail" placeholder="you@example.com" autocomplete="email"></div><div class="field" id="authPassField" hidden><label data-t="Password">Password</label><input type="password" id="authPass" autocomplete="current-password"></div><div class="row"><button class="btn primary" id="authEmailBtn" type="button" data-t="Email me a link">Email me a link</button><button class="btn primary" id="authPassBtn" type="button" hidden data-t="Sign in">Sign in</button><button class="btn" id="authAppleBtn" type="button" hidden> Apple</button><button class="btn" id="authGoogleBtn" type="button" hidden>Google</button><button class="btn ghost" id="authCancel" type="button" data-t="Cancel">Cancel</button></div><div class="row"><button class="btn xs ghost" id="authPassToggle" type="button" data-t="I have a password">I have a password</button></div><div class="status" id="authStatus"></div></div></div>
 <!-- confirm modal -->
 <div class="modal" id="cfModal" hidden><div class="box" style="width:min(440px,100%)"><h3 id="cfTitle"></h3><p class="hint" id="cfText"></p><div class="row" style="justify-content:flex-end"><button class="btn" id="cfNo" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="cfYes" type="button"></button></div></div></div>
 <div class="toast" id="toast" hidden></div>
@@ -2659,7 +2661,7 @@ Object.assign(I18N.RU, {
   'Turn the phone sideways: the map and the corners side by side, step corner by corner.': 'Поверните телефон горизонтально: карта и повороты рядом, листайте от поворота к повороту.', 'Corner': 'Поворот',
   'Showing every kart class — a sport kart and a rental kart are not comparable corner by corner.': 'Показаны все классы картов — спортивный и прокатный карт по поворотам не сравнить.', '{n} session(s) on another kart class are hidden (a sport kart and a rental kart are not comparable).': 'Скрыто сессий на другом классе картов: {n} (спортивный и прокатный карт не сравнить).', 'Hide them': 'Скрыть', 'Show anyway': 'Всё равно показать',
   'Add a new track…': 'Добавить новую трассу…', '— no track (private, custom) —': '— без трассы (приватно, своя) —', 'Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.': 'Трассы ещё нет в Hutka? Назовите её — страница трассы создастся вместе с этой сессией, потом её можно править, а другие гонщики найдут её по GPS.', 'Other rental kart…': 'Другой прокатный карт…', 'Rental kart (model below)': 'Прокатный карт (модель ниже)', 'Sport kart (Rotax, X30, KZ…)': 'Спортивный карт (Rotax, X30, KZ…)', 'Give the new track a name.': 'Дайте новой трассе название.', 'Main': 'Основной', 'Could not create the track: {e}': 'Не удалось создать трассу: {e}', 'Track name': 'Название трассы',
-  'Turn the phone sideways: the Lab becomes a full-screen cockpit — the satellite photo, the lap line, live numbers and a scrub bar along the lap.': 'Поверните телефон горизонтально: Лаборатория становится кокпитом на весь экран — спутниковый снимок, линия круга, живые цифры и бегунок по кругу.', '{n} corners · ‹ › to step': 'Поворотов: {n} · ‹ › листать', 'The photo can sit a few metres off the GPS line.': 'Снимок может быть смещён на несколько метров от линии GPS.', 'Move': 'Сдвинуть',
+  'Turn the phone sideways: the Lab becomes a full-screen cockpit — the satellite photo, the lap line, live numbers and a scrub bar along the lap.': 'Поверните телефон горизонтально: Лаборатория становится кокпитом на весь экран — спутниковый снимок, линия круга, живые цифры и бегунок по кругу.', '{n} corners · ‹ › to step': 'Поворотов: {n} · ‹ › листать', 'The photo can sit a few metres off the GPS line.': 'Снимок может быть смещён на несколько метров от линии GPS.', 'Move': 'Сдвинуть', 'Signed in.': 'Вы вошли.', 'Password': 'Пароль', 'I have a password': 'У меня есть пароль', 'Email me a link instead': 'Лучше пришлите ссылку', 'Enter the email and the password.': 'Введите почту и пароль.', 'Could not start Apple sign-in: {e}': 'Не удалось начать вход через Apple: {e}', 'Could not sign in: {e}': 'Не удалось войти: {e}', 'Could not open the file: {e}': 'Не удалось открыть файл: {e}',
   'Upload session': 'Загрузить сессию', 'Karts people drive here': 'Карты, на которых здесь ездят', 'Karts — one per line (add “sport” after a sport kart)': 'Карты — по одному в строке (после спортивного допишите «sport»)', "Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.": 'Alfano .alf2 (эталон), AiM, RaceChrono, TrackAddict, Harry\'s LapTimer, VBOX, GPX — один файл на сессию; можно несколько сразу.',
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
@@ -2952,8 +2954,12 @@ const STORE = (() => {
       async recentPublished(n) { return must(await sb.from('sessions').select('id,meta').eq('published', true).order('created_at', { ascending: false }).limit(n)).map(r => Object.assign({ id: r.id }, r.meta)); },
       async socialCounts(ids, me) { const out = {}; for (const id of ids) out[id] = { likes: 0, down: 0, comments: 0, liked: false, mine: 0 }; if (!ids.length) return out; try { let r = await sb.from('likes').select('session_id,user_id,vote').in('session_id', ids).limit(5000); if (r.error && noCol(r.error)) { A.votes = false; r = await sb.from('likes').select('session_id,user_id').in('session_id', ids).limit(5000); } for (const x of must(r)) { const o = out[x.session_id]; if (o) { const v = x.vote === -1 ? -1 : 1; if (v === -1) o.down++; else o.likes++; if (me && x.user_id === me) { o.mine = v; o.liked = v === 1; } } } } catch (e) {} try { for (const r of must(await sb.from('comments').select('session_id').in('session_id', ids).limit(5000))) { const o = out[r.session_id]; if (o) o.comments++; } } catch (e) {} return out; },
       // auth
-      signInEmail: async (email) => must(await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname } })),
-      signInGoogle: async () => must(await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } })),
+      // inside the native app the browser comes back to hutka://auth (a deep link); on the web, to this page
+      signInEmail: async (email) => must(await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: (window.NATIVE && window.NATIVE.on) ? window.NATIVE.redirect : location.origin + location.pathname } })),
+      signInGoogle: async () => { if (window.NATIVE && window.NATIVE.on) { const r = must(await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.NATIVE.redirect, skipBrowserRedirect: true } })); if (r && r.url) await window.NATIVE.openUrl(r.url); return r; } return must(await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } })); },
+      signInApple: async () => { const native = window.NATIVE && window.NATIVE.on; const r = must(await sb.auth.signInWithOAuth({ provider: 'apple', options: native ? { redirectTo: window.NATIVE.redirect, skipBrowserRedirect: true } : { redirectTo: location.origin + location.pathname } })); if (native && r && r.url) await window.NATIVE.openUrl(r.url); return r; },
+      signInPassword: async (email, password) => must(await sb.auth.signInWithPassword({ email, password })),
+      finishSignIn: async (url) => { const u = new URL(String(url).replace(/^hutka:\/\//i, 'https://hutka.app/')); const code = u.searchParams.get('code'); if (code) { must(await sb.auth.exchangeCodeForSession(code)); return true; } const h = new URLSearchParams((u.hash || '').replace(/^#/, '')); const at = h.get('access_token'), rt = h.get('refresh_token'); if (at && rt) { must(await sb.auth.setSession({ access_token: at, refresh_token: rt })); return true; } const err = h.get('error_description') || u.searchParams.get('error_description'); if (err) throw new Error(err); return false; },
       signOut: async () => { await sb.auth.signOut(); },
       token: () => session && session.access_token || ''
     };
@@ -3608,14 +3614,43 @@ async function renderShell() {
 $('langEn').onclick = $('langEnM').onclick = () => { I18N.setLang('en'); renderShell(); route(); };
 $('langRu').onclick = $('langRuM').onclick = () => { I18N.setLang('ru'); renderShell(); route(); };
 $('tabUpload').onclick = () => UPLOAD.open(APP.route === 'lab' && LAB.tid ? { track: LAB.tid, layout: LAB.lid } : {});
+// ---------- the native shell (the iOS / Android app is a Capacitor wrapper around this site): deep links bring sign-in back from the
+// system browser, files opened "in Hutka" land in the upload window, and the splash screen goes away once the page is up ----------
+const NATIVE = window.NATIVE = {
+  on: !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()),
+  redirect: 'hutka://auth',
+  plugin(n) { try { return window.Capacitor.registerPlugin(n); } catch (e) { return null; } },
+  async openUrl(url) { const B = this.plugin('Browser'); if (B) { await B.open({ url, presentationStyle: 'popover' }); return; } window.open(url, '_blank'); },
+  async closeBrowser() { const B = this.plugin('Browser'); if (B) { try { await B.close(); } catch (e) {} } },
+  async readFile(url) { const F = this.plugin('Filesystem'); if (!F) return null; const r = await F.readFile({ path: url }); const raw = typeof r.data === 'string' ? r.data : ''; const bin = atob(raw); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); const name = decodeURIComponent((String(url).split('?')[0].split('/').pop() || '').trim()) || 'session.alf2'; return new File([u8], name); },
+  async init() {
+    if (!this.on) return; document.documentElement.classList.add('native'); const A = this.plugin('App'); if (!A) return;
+    try { A.addListener('appUrlOpen', (e) => this.onUrl(e && e.url)); } catch (e) {}
+    try { const l = await A.getLaunchUrl(); if (l && l.url) this.onUrl(l.url); } catch (e) {}
+    const SS = this.plugin('SplashScreen'); if (SS) { try { await SS.hide(); } catch (e) {} }
+  },
+  async onUrl(url) {
+    if (!url) return; url = String(url);
+    if (/^hutka:\/\/auth/i.test(url)) { await this.closeBrowser(); try { const ok = await STORE.adapter.finishSignIn(url); if (ok) { AUTH.close(); toast(t('Signed in.')); } } catch (e) { toast(t('Could not sign in: {e}', { e: e && e.message || e })); } return; }
+    if (/^(file|content):/i.test(url)) { try { const f = await this.readFile(url); if (f) { if (APP.route !== 'lab') go('lab'); setTimeout(() => UPLOAD.withFiles([f]), 400); } } catch (e) { toast(t('Could not open the file: {e}', { e: e && e.message || e })); } }
+  }
+};
 // sign-in (standalone hosting with Supabase auth)
+// Google and Apple buttons follow config.js; inside the native app a social button is shown only when Apple sign-in is set up too
+// (App Store rule 4.8: an app that offers Google must offer Sign in with Apple). A password sign-in is there for accounts created with one
+// (the App Store review account, for instance) — it stays folded away behind "I have a password".
 const AUTH = {
-  open() { $('authStatus').textContent = ''; $('authEmail').value = ''; $('authGoogleBtn').hidden = !(window.HUTKA_CONFIG && window.HUTKA_CONFIG.googleAuth); $('authModal').hidden = false; $('authEmail').focus(); },
+  open() { const cfg = window.HUTKA_CONFIG || {}, apple = !!cfg.appleAuth, google = !!cfg.googleAuth && (!NATIVE.on || apple); $('authStatus').textContent = ''; $('authEmail').value = ''; $('authPass').value = ''; $('authGoogleBtn').hidden = !google; $('authAppleBtn').hidden = !apple; AUTH.pass(false); $('authModal').hidden = false; $('authEmail').focus(); },
+  pass(on) { $('authPassField').hidden = !on; $('authPassBtn').hidden = !on; $('authEmailBtn').hidden = !!on; $('authPassToggle').textContent = on ? t('Email me a link instead') : t('I have a password'); if (on) $('authPass').focus(); },
   close() { $('authModal').hidden = true; }
 };
 $('btnSignIn').onclick = AUTH.open; $('authCancel').onclick = AUTH.close; $('authModal').addEventListener('click', (e) => { if (e.target === $('authModal')) AUTH.close(); });
 $('authEmailBtn').onclick = async () => { const email = $('authEmail').value.trim(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setStatus('authStatus', t('Enter a valid email.'), 'warn'); return; } $('authEmailBtn').disabled = true; try { await STORE.adapter.signInEmail(email); setStatus('authStatus', t('Check your inbox: open the link in the email and you are in.'), 'ok'); } catch (e) { setStatus('authStatus', t('Could not send the link: {e}', { e: e && e.message || e }), 'warn'); } $('authEmailBtn').disabled = false; };
 $('authGoogleBtn').onclick = async () => { try { await STORE.adapter.signInGoogle(); } catch (e) { setStatus('authStatus', t('Could not start Google sign-in: {e}', { e: e && e.message || e }), 'warn'); } };
+$('authAppleBtn').onclick = async () => { try { await STORE.adapter.signInApple(); } catch (e) { setStatus('authStatus', t('Could not start Apple sign-in: {e}', { e: e && e.message || e }), 'warn'); } };
+$('authPassToggle').onclick = () => AUTH.pass($('authPassField').hidden);
+$('authPassBtn').onclick = async () => { const email = $('authEmail').value.trim(), pass = $('authPass').value; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !pass) { setStatus('authStatus', t('Enter the email and the password.'), 'warn'); return; } $('authPassBtn').disabled = true; try { await STORE.adapter.signInPassword(email, pass); AUTH.close(); } catch (e) { setStatus('authStatus', t('Could not sign in: {e}', { e: e && e.message || e }), 'warn'); } $('authPassBtn').disabled = false; };
+$('authPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authPassBtn').click(); });
 $('authEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authEmailBtn').click(); });
 
 // ---------- search ----------
@@ -5383,6 +5418,7 @@ const ADMIN = (() => {
   window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
+  try { await NATIVE.init(); } catch (e) {}
 })();
 })();
 </script>

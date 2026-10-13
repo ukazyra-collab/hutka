@@ -1,0 +1,11 @@
+node_modules/
+# the site copied into www by build.sh (the app loads the live site; these are the bundled fallback)
+www/index.html
+www/config.js
+www/supabase.js
+www/geo.txt
+www/manifest.webmanifest
+www/logo.png
+www/icon-512.png
+www/privacy.html
+.DS_Store

@@ -1,0 +1,25 @@
+{
+  "appId": "com.hutkakart.app",
+  "appName": "Hutka",
+  "webDir": "www",
+  "server": {
+    "url": "https://ukazyra-collab.github.io/hutka/",
+    "errorPath": "offline.html",
+    "allowNavigation": ["ukazyra-collab.github.io", "hutkakart.com", "*.hutkakart.com", "*.supabase.co"]
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "backgroundColor": "#ffffff",
+    "preferredContentMode": "mobile",
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "android": {
+    "backgroundColor": "#ffffff",
+    "allowMixedContent": false,
+    "captureInput": true
+  },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 600, "launchAutoHide": true, "backgroundColor": "#ffffff", "showSpinner": false, "splashFullScreen": false, "splashImmersive": false },
+    "StatusBar": { "style": "LIGHT", "backgroundColor": "#ffffff", "overlaysWebView": false }
+  }
+}

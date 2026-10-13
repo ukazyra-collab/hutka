@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hutka — Privacy Policy</title>
+<style>
+  body{margin:0;background:#f5f6f8;color:#1a2237;font:16px/1.6 -apple-system,"Segoe UI",system-ui,Arial,sans-serif}
+  main{max-width:760px;margin:0 auto;padding:32px 20px 60px}
+  h1{font-size:28px;margin:0 0 4px}h2{font-size:20px;margin:28px 0 8px}
+  .sub{color:#5b6475;margin-bottom:24px}
+  a{color:#2f6bf0}
+  .lang{display:flex;gap:10px;margin-bottom:20px}
+  .lang button{border:1px solid #cdd3dd;background:#fff;border-radius:999px;padding:6px 14px;font:600 14px inherit;cursor:pointer}
+  .lang button.on{background:#1f2b48;color:#fff;border-color:#1f2b48}
+  [hidden]{display:none!important}
+  ul{padding-left:20px}
+</style>
+</head>
+<body>
+<main>
+  <div class="lang"><button id="en" class="on" type="button">English</button><button id="ru" type="button">Русский</button></div>
+
+  <section id="s-en">
+    <h1>Hutka — Privacy Policy</h1>
+    <div class="sub">Last updated: 13 October 2026 · applies to the Hutka website and the Hutka iOS / Android app</div>
+
+    <h2>What Hutka is</h2>
+    <p>Hutka is a community for rental karting: track pages, drivers' published sessions and a Lab that analyses telemetry logs (Alfano and other GPS lap timers). The app is a shell around the same website.</p>
+
+    <h2>What we collect</h2>
+    <ul>
+      <li><b>Account</b>: your email address and, if you sign in with Google or Apple, the name and avatar they share. We use them to sign you in and to show your racing name on your profile.</li>
+      <li><b>Profile</b>: the racing name, country, home track and photo you add yourself.</li>
+      <li><b>Sessions</b>: the telemetry files you upload (GPS trace, speed, lap times) and the notes you attach (track, kart, session type). A session is private until you publish it on a track page.</li>
+      <li><b>Community content</b>: comments, helpful/not-helpful votes, follows, tracks you add.</li>
+      <li><b>AI coach chats</b>: the questions you ask and the answers; the relevant parts of your sessions are sent to the AI provider to answer. Usage counts (requests per hour/day) are kept to prevent abuse; the IP address is stored only as a one-way hash for the same purpose.</li>
+      <li><b>Technical</b>: standard server logs of our hosting providers. We do not run advertising trackers or analytics SDKs.</li>
+    </ul>
+
+    <h2>Where the data lives and who processes it</h2>
+    <ul>
+      <li><b>Supabase</b> (database, authentication, file storage, edge functions) — hosts accounts, sessions and community content.</li>
+      <li><b>GitHub Pages</b> — serves the website files.</li>
+      <li><b>Anthropic</b> — answers AI coach questions; receives only the session summary needed for the answer.</li>
+      <li><b>Esri</b> — satellite imagery tiles shown under the track line (your device requests the tiles directly).</li>
+      <li><b>Google / Apple</b> — only if you choose to sign in with them.</li>
+    </ul>
+    <p>Data is not sold and not used for advertising. Published sessions, profiles, comments and track pages are visible to everyone; private sessions are visible only to you.</p>
+
+    <h2>Your rights</h2>
+    <p>You can edit or delete your sessions, comments and profile in the app at any time. To delete the whole account with everything attached to it, write to <a href="mailto:hello@hutkakart.com">hello@hutkakart.com</a> from the account's email — it is done within 30 days. The same address answers any question about this policy.</p>
+
+    <h2>Children</h2>
+    <p>Hutka is not directed at children under 13 and we do not knowingly collect their data.</p>
+
+    <h2>Changes</h2>
+    <p>If this policy changes, the new version is published at this address with a new date.</p>
+  </section>
+
+  <section id="s-ru" hidden lang="ru">
+    <h1>Hutka — Политика конфиденциальности</h1>
+    <div class="sub">Обновлено: 13 октября 2026 · действует для сайта Hutka и приложения Hutka для iOS / Android</div>
+
+    <h2>Что такое Hutka</h2>
+    <p>Hutka — сообщество прокатного картинга: страницы трасс, опубликованные сессии гонщиков и Лаборатория, которая разбирает телеметрию (Alfano и другие GPS-лаптаймеры). Приложение — оболочка вокруг того же сайта.</p>
+
+    <h2>Что мы собираем</h2>
+    <ul>
+      <li><b>Аккаунт</b>: адрес почты и, при входе через Google или Apple, имя и аватар, которые они передают. Нужны, чтобы вас впустить и показать гоночное имя в профиле.</li>
+      <li><b>Профиль</b>: гоночное имя, страна, домашняя трасса и фото, которые вы добавляете сами.</li>
+      <li><b>Сессии</b>: файлы телеметрии, которые вы загружаете (GPS-трек, скорость, времена кругов), и подписи к ним (трасса, карт, тип сессии). Сессия приватна, пока вы не опубликуете её на странице трассы.</li>
+      <li><b>Сообщество</b>: комментарии, оценки «полезно / не полезно», подписки, добавленные вами трассы.</li>
+      <li><b>Чаты с ИИ-тренером</b>: вопросы и ответы; нужные для ответа части ваших сессий отправляются провайдеру ИИ. Счётчики запросов (в час / в день) хранятся для защиты от злоупотреблений; IP-адрес — только в виде необратимого хеша для той же цели.</li>
+      <li><b>Техническое</b>: стандартные серверные логи хостинг-провайдеров. Рекламных трекеров и аналитических SDK нет.</li>
+    </ul>
+
+    <h2>Где лежат данные и кто их обрабатывает</h2>
+    <ul>
+      <li><b>Supabase</b> (база данных, вход, хранилище файлов, функции) — аккаунты, сессии и контент сообщества.</li>
+      <li><b>GitHub Pages</b> — раздаёт файлы сайта.</li>
+      <li><b>Anthropic</b> — отвечает на вопросы ИИ-тренеру; получает только сводку сессии, нужную для ответа.</li>
+      <li><b>Esri</b> — спутниковые снимки под линией трассы (устройство запрашивает их напрямую).</li>
+      <li><b>Google / Apple</b> — только если вы выбрали вход через них.</li>
+    </ul>
+    <p>Данные не продаются и не используются для рекламы. Опубликованные сессии, профили, комментарии и страницы трасс видны всем; приватные сессии — только вам.</p>
+
+    <h2>Ваши права</h2>
+    <p>Сессии, комментарии и профиль можно изменить или удалить в приложении в любой момент. Чтобы удалить аккаунт целиком со всем содержимым, напишите на <a href="mailto:hello@hutkakart.com">hello@hutkakart.com</a> с почты аккаунта — это делается в течение 30 дней. Туда же — любые вопросы по этой политике.</p>
+
+    <h2>Дети</h2>
+    <p>Hutka не предназначена для детей младше 13 лет, и мы сознательно не собираем их данные.</p>
+
+    <h2>Изменения</h2>
+    <p>Если политика меняется, новая версия публикуется по этому адресу с новой датой.</p>
+  </section>
+</main>
+<script>
+  const pick = (l) => { document.getElementById('s-en').hidden = l !== 'en'; document.getElementById('s-ru').hidden = l !== 'ru'; document.getElementById('en').classList.toggle('on', l === 'en'); document.getElementById('ru').classList.toggle('on', l === 'ru'); document.documentElement.lang = l; };
+  document.getElementById('en').onclick = () => pick('en'); document.getElementById('ru').onclick = () => pick('ru');
+  if (/^ru/i.test(navigator.language || '') || location.hash === '#ru') pick('ru');
+</script>
+</body>
+</html>
