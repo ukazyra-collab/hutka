@@ -3079,7 +3079,9 @@ function createMapView(canvas, host) {
   const tiles = new Map(); let tileFails = 0, zCap = 99;
   // providers answer beyond their real coverage with a flat grey "no data" picture (HTTP 200): spot it and stop asking for that zoom
   function placeholderTile(im) {
-    try { const c = document.createElement('canvas'); c.width = c.height = 24; const cx = c.getContext('2d', { willReadFrequently: true }); cx.drawImage(im, 0, 0, 24, 24); const d = cx.getImageData(0, 0, 24, 24).data; let n = 0, sum = 0, sum2 = 0, grey = 0; for (let i = 0; i < d.length; i += 4) { const r = d[i], g = d[i + 1], b = d[i + 2], l = (r + g + b) / 3; sum += l; sum2 += l * l; n++; if (Math.abs(r - g) < 6 && Math.abs(g - b) < 6) grey++; } const mean = sum / n, sd = Math.sqrt(Math.max(0, sum2 / n - mean * mean)); return grey / n > 0.97 && mean > 195 && mean < 245 && sd < 18; } catch (e) { return false; }
+    try { const c = document.createElement('canvas'); c.width = c.height = 24; const cx = c.getContext('2d', { willReadFrequently: true }); cx.drawImage(im, 0, 0, 24, 24); const d = cx.getImageData(0, 0, 24, 24).data; let n = 0, sum = 0, sum2 = 0, grey = 0; for (let i = 0; i < d.length; i += 4) { const r = d[i], g = d[i + 1], b = d[i + 2], l = (r + g + b) / 3; sum += l; sum2 += l * l; n++; if (Math.abs(r - g) < 6 && Math.abs(g - b) < 6) grey++; } const mean = sum / n, sd = Math.sqrt(Math.max(0, sum2 / n - mean * mean)); if (grey / n < 0.9 || mean < 170) return false; if (sd < 18) return true;
+      // flat background with some text on it: most pixels share one value
+      const hist = new Map(); for (let i = 0; i < d.length; i += 4) { const k = d[i] >> 2; hist.set(k, (hist.get(k) || 0) + 1); } let top = 0; for (const v of hist.values()) top = Math.max(top, v); return top / n > 0.6; } catch (e) { return false; }
   }
   function tileUrl(TL, z, x, y) { return String(TL.url || 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').replace('{z}', z).replace('{x}', x).replace('{y}', y); }
   function tile(TL, z, x, y) {

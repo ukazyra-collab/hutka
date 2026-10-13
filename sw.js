@@ -1,5 +1,5 @@
 // Hutka service worker: offline app shell + "share to Hutka" from the Alfano app (Web Share Target)
-const V = 'hutka-shell-v17';
+const V = 'hutka-shell-v18';
 const SHELL = ['./', './index.html', './config.js', './geo.txt', './supabase.js', './manifest.webmanifest'];
 self.addEventListener('install', (e) => { e.waitUntil((async () => { const c = await caches.open(V); for (const u of SHELL) { try { await c.add(new Request(u, { cache: 'reload' })); } catch (err) {} } self.skipWaiting(); })()); });
 self.addEventListener('activate', (e) => { e.waitUntil((async () => { for (const k of await caches.keys()) if (k !== V && k !== 'hutka-share') await caches.delete(k); await self.clients.claim(); })()); });
@@ -20,7 +20,7 @@ self.addEventListener('fetch', (e) => {
   const pageLike = req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('/index.html') || url.pathname.endsWith('/config.js');
   e.respondWith((async () => {
     const c = await caches.open(V);
-    if (pageLike) { try { const r = await fetch(req); c.put(req, r.clone()); return r; } catch (err) { return (await c.match(req)) || (await c.match('./index.html')) || Response.error(); } }
+    if (pageLike) { try { const r = await fetch(req, { cache: 'no-cache' }); c.put(req, r.clone()); return r; } catch (err) { return (await c.match(req)) || (await c.match('./index.html')) || Response.error(); } }
     const hit = await c.match(req); const net = fetch(req).then(r => { c.put(req, r.clone()); return r; }).catch(() => null);
     return hit || (await net) || Response.error();
   })());
