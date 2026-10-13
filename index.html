@@ -122,6 +122,27 @@ p{margin:0}
   .page{padding-inline:16px}
   .userchip .nm,.userchip .sub{display:none}
 }
+.lab-mob{position:sticky;top:56px;z-index:6;display:flex;align-items:center;gap:8px;padding:8px 10px;margin:0 -12px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.lab-mob .lm-t{flex:1;min-width:0;display:flex;flex-direction:column}
+.lab-mob .lm-t .lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lab-mob .lm-t b{font:600 22px/1.1 var(--mono);letter-spacing:-.02em}
+.lab-mob .btn.sm{height:34px;padding:0 10px;font-size:13px}
+.lab-mob .btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.lab-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.lab-tabs::-webkit-scrollbar{display:none}
+.lab-tabs button{flex:1 0 auto;border:1px solid var(--line-2);background:var(--surface);border-radius:999px;padding:8px 14px;font:600 13px var(--body);color:var(--muted);cursor:pointer;white-space:nowrap}
+.lab-tabs button.active{background:var(--btn);border-color:var(--btn);color:#fff}
+.crows{display:flex;flex-direction:column;gap:6px}
+.crow{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:4px 10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-align:left;font:inherit;color:var(--fg);cursor:pointer}
+.crow.sel{border-color:var(--accent);background:var(--accent-soft)}
+.crow b{font-size:16px;font-weight:800}
+.crow .k{font-size:12.5px;color:var(--muted);white-space:normal;line-height:1.35;grid-column:2}
+.crow .ty{font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;grid-column:2}
+.crow .ty.b{color:var(--brake)}.crow .ty.y{color:var(--lift)}.crow .ty.g{color:var(--throttle)}
+.crow .d{font:600 13px var(--mono);white-space:nowrap;grid-row:1 / span 2;align-self:center}
+.crow .d.loss{color:var(--brake)}.crow .d.gain{color:var(--throttle)}.crow .d.m{color:var(--muted)}
+.crow .r{font:500 11.5px var(--mono);color:var(--muted);white-space:nowrap;grid-row:1 / span 2;align-self:center}
+.crow .r.hot{color:var(--brake);font-weight:600}
 .hero.fs-fallback{position:fixed;inset:0;z-index:60;overflow:auto;background:var(--bg);padding:12px;display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:12px}
 .hero.fs-fallback .fs-head{display:flex}
 .hero.fs-fallback .map-wrap{display:flex;flex-direction:column}
@@ -548,6 +569,29 @@ textarea{min-height:90px;resize:vertical}
   .hero{gap:10px}
   .hero .inspector{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom,0px));max-height:50vh;overflow:auto;border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);z-index:25;transform:translateY(115%);transition:transform .25s ease;padding:14px 16px 18px}
   .hero .inspector.open{transform:none}
+  .lab-mob[hidden]{display:none!important}
+  #pickbar{display:none}
+  #pickbar.open{display:block;position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom,0px));max-height:72vh;overflow:auto;z-index:26;border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);padding:14px 16px 18px}
+  #pickbar .lapline,#pickbar #ownerRow{display:none}
+  #labTabs[hidden]{display:none!important}
+  .mob-hide{display:none!important}
+  #cornersWrap{display:none}
+  .hero.fs-fallback{padding:0;gap:0;grid-template-rows:auto minmax(0,1fr);height:100%}
+  .hero.fs-fallback .fs-head{padding:8px 12px}
+  .hero.fs-fallback .fs-head .lapline .big{font-size:22px}
+  .hero.fs-fallback .fs-head .chips{display:none}
+  .hero.fs-fallback .map-wrap{border:0;border-radius:0;min-height:0}
+  .hero.fs-fallback .map-bar{padding:4px 8px;justify-content:space-between}
+  .hero.fs-fallback .map-bar #btnFull,.hero.fs-fallback .map-bar #optBand,.hero.fs-fallback .map-bar #tglSat{display:none}
+  .hero.fs-fallback .fs-head{display:flex;align-items:center;gap:10px}
+  .hero.fs-fallback .fs-head .lapline{flex:1;min-width:0;gap:8px}
+  .hero.fs-fallback .fs-head .lapline .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55vw}
+  #pg-lab.has .ph{display:none}
+  #pg-lab.has .lab-mob{top:56px}
+  .map-bar #optBand{display:none}
+  .hero.fs-fallback .legend{display:none}
+  .hero.fs-fallback .charts.under{padding:2px 4px 4px}
+  .hero.fs-fallback .inspector{bottom:0;max-height:55vh}
   .hero .inspector .insp-empty{display:none}
   .insp-close{display:grid;place-items:center;position:absolute;right:10px;top:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);font-size:18px;line-height:1;color:var(--muted);cursor:pointer}
   .insp-head b{font-size:22px}
@@ -724,7 +768,9 @@ textarea{min-height:90px;resize:vertical}
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
         <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><button class="btn primary" id="labUpload2" type="button" style="margin-top:10px"><svg><use href="#i-upload"/></svg><span data-t="Upload Alfano session">Upload Alfano session</span></button></div>
       </div>
+      <div class="lab-mob mobile-only" id="labMob" hidden><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><button class="btn sm" id="lmCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
       <div class="card" id="pickbar" hidden>
+        <button class="insp-close mobile-only" id="pickClose" type="button" aria-label="Close">×</button>
         <div class="pickbar">
           <div class="field"><label data-t="Session">Session</label><select id="sessSel"></select></div>
           <div class="field"><label id="refLbl"></label><select id="refSel"></select></div>
@@ -759,9 +805,10 @@ textarea{min-height:90px;resize:vertical}
         </div>
         <div class="inspector" id="inspector"><button class="insp-close" id="inspClose" type="button" aria-label="Close">×</button><div class="insp-empty" id="inspEmpty"></div><div id="inspBody" hidden></div></div>
       </div>
+      <div class="lab-tabs mobile-only" id="labTabs" hidden><button type="button" class="active" data-tab="corners" data-t="Corners">Corners</button><button type="button" data-tab="digest" data-t="Digest">Digest</button><button type="button" data-tab="chart" data-t="Chart">Chart</button><button type="button" data-tab="discuss" data-t="Discussion">Discussion</button><button type="button" data-tab="ai" data-t="Coach">Coach</button></div>
       <div class="card" id="digestPanel" hidden><h2><svg><use href="#i-clip"/></svg><span data-t="Session digest">Session digest</span><span class="sub" id="digestSub"></span></h2><div class="digest" id="digest"></div><details class="gloss"><summary class="hint" data-t="What the terms mean">What the terms mean</summary><ul id="glossList"></ul></details></div>
       <div class="card" id="askPanel" hidden><h2><svg><use href="#i-lab"/></svg><span data-t="Ask the AI about this session">Ask the AI about this session</span></h2><div class="chat" id="chatLog"></div><div class="chips" id="askChips"></div><div class="askrow"><textarea id="askInput"></textarea><div class="askbtns"><button class="btn primary" id="askBtn" type="button" data-t="Ask">Ask</button><button class="btn" id="askStop" type="button" hidden data-t="Stop">Stop</button></div></div><div class="hint" id="askNote" style="margin-top:6px"></div></div>
-      <div class="card" id="cornersPanel" hidden><h2><svg><use href="#i-corner"/></svg><span data-t="Corner by corner">Corner by corner</span><span class="sub" data-t="click a row to pin it on the map">click a row to pin it on the map</span></h2><div class="tblwrap"><table class="tbl corners" id="cornersTable"><thead><tr><th>#</th><th data-t="Type">Type</th><th class="you" id="youColHead"></th><th id="cmpColHead"></th><th>Δt</th><th data-t="Reserve">Reserve</th><th data-t="Main difference">Main difference</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="card" id="cornersPanel" hidden><h2><svg><use href="#i-corner"/></svg><span data-t="Corner by corner">Corner by corner</span><span class="sub" data-t="click a row to pin it on the map">click a row to pin it on the map</span></h2><div class="crows mobile-only" id="cornersMob"></div><div class="tblwrap" id="cornersWrap"><table class="tbl corners" id="cornersTable"><thead><tr><th>#</th><th data-t="Type">Type</th><th class="you" id="youColHead"></th><th id="cmpColHead"></th><th>Δt</th><th data-t="Reserve">Reserve</th><th data-t="Main difference">Main difference</th></tr></thead><tbody></tbody></table></div></div>
       <div class="card" id="discussPanel" hidden><h2><svg><use href="#i-chat"/></svg><span data-t="Discussion">Discussion</span><span class="sub" id="discussSub"></span></h2><div class="comments" id="commentList"></div><div class="askrow" id="commentForm"><textarea id="commentInput" rows="2"></textarea><div class="askbtns"><button class="btn primary" id="commentBtn" type="button" data-t="Post">Post</button></div></div><div class="hint" id="commentNote"></div></div>
     </section>
 
@@ -801,7 +848,7 @@ textarea{min-height:90px;resize:vertical}
             <div class="field"><label>Instagram</label><input type="text" id="profIg" maxlength="80" placeholder="@name"></div>
             <div class="field"><label data-t="Contact link (Telegram / WhatsApp)">Contact link (Telegram / WhatsApp)</label><input type="text" id="profContact" maxlength="160" placeholder="https://t.me/name"></div>
             <div class="field wide"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profCoach" style="width:18px;height:18px"><span data-t="I coach — show “Book a training” on my page (uses the contact link)">I coach — show “Book a training” on my page (uses the contact link)</span></label></div>
-            <div class="field wide"><label data-t="SWS (Sodi World Series) profile link">SWS (Sodi World Series) profile link</label><div class="row"><input type="url" id="profSws" class="grow" placeholder="https://www.sodiwseries.com/en-gb/drivers/…"><button class="btn sm" id="profSwsImport" type="button" data-t="Import SWS results">Import SWS results</button></div><div class="hint" id="profSwsHint"></div></div>
+            <div class="field wide" id="profSwsField" hidden><label data-t="SWS (Sodi World Series) profile link">SWS (Sodi World Series) profile link</label><div class="row"><input type="url" id="profSws" class="grow" placeholder="https://www.sodiwseries.com/en-gb/drivers/…"><button class="btn sm" id="profSwsImport" type="button" data-t="Import SWS results">Import SWS results</button></div><div class="hint" id="profSwsHint"></div></div>
           </div>
           <div class="row" style="margin-top:12px"><button class="btn primary" id="profSave" type="button" data-t="Save">Save</button><button class="btn ghost" id="profSignOut" type="button" hidden data-t="Sign out">Sign out</button><span class="status" id="profStatus"></span></div>
           <div class="row mobile-only" style="margin-top:14px;gap:10px;align-items:center"><span class="hint" data-t="Language">Language</span><div class="lang" role="group"><button type="button" id="langEnM">EN</button><button type="button" id="langRuM">RU</button></div><a class="btn sm" href="#admin" id="profAdminLink" hidden><svg><use href="#i-shield"/></svg><span data-t="Admin Panel">Admin Panel</span></a></div>
@@ -945,7 +992,7 @@ textarea{min-height:90px;resize:vertical}
     <div class="field"><label data-t="Track">Track</label><select id="seTrack"></select></div>
     <div class="field"><label data-t="Layout">Layout</label><select id="seLayout"></select></div>
     <div class="field wide"><label data-t="Kart / notes">Kart / notes</label><input type="text" id="seNote" maxlength="120"></div>
-    <div class="field wide" id="seSwsField" hidden><label data-t="SWS race this session belongs to">SWS race this session belongs to</label><select id="seSws"></select></div>
+    <div class="field wide"><label data-t="SWS race this session belongs to (optional)">SWS race this session belongs to (optional)</label><select id="seSws"></select><div class="hint" id="seSwsHint"></div></div>
     <div class="field wide" id="sePubField"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="sePublish" style="width:18px;height:18px"><span data-t="Published on the track page">Published on the track page</span></label></div>
   </div>
   <div class="status" id="seStatus"></div>
@@ -2401,6 +2448,16 @@ Object.assign(I18N.RU, {
   'Read the pasted text': 'Прочитать вставленный текст',
   'Save to my profile': 'Сохранить в профиль',
   'SWS race this session belongs to': 'Гонка SWS, к которой относится сессия',
+
+  // ----- v22: phone lab, sws tidy -----
+  'SWS race this session belongs to (optional)': 'Гонка SWS, к которой относится сессия (необязательно)',
+  'No SWS results imported yet. ': 'Результаты SWS ещё не импортированы. ',
+  'Import results from your SWS page': 'Импортировать результаты со своей страницы SWS',
+  'SWS results saved — pick the race in the session editor (Edit).': 'Результаты SWS сохранены — выбери гонку в редакторе сессии (Edit).',
+  'Map': 'Карта',
+  'Corners': 'Повороты',
+  'Digest': 'Разбор',
+  'Chart': 'График',
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
@@ -3051,12 +3108,13 @@ function createMapView(canvas, host) {
   // ----- input -----
   // touch: one finger scrolls the page, two fingers move and pinch-zoom the map, a tap selects
   const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches; canvas.style.touchAction = coarse ? 'pan-y' : 'none';
-  M.ptrs = new Map(); M.pinch = null;
+  M.ptrs = new Map(); M.pinch = null; M.touchFree = false;
+  function setTouchFree(on) { M.touchFree = !!on; canvas.style.touchAction = M.touchFree ? 'none' : (coarse ? 'pan-y' : 'none'); }
   canvas.addEventListener('pointerdown', (e) => {
     const [sx, sy] = getPos(e); canvas.setPointerCapture(e.pointerId);
     M.ptrs.set(e.pointerId, [sx, sy]);
     if (M.ptrs.size === 2) { const [a, b] = [...M.ptrs.values()]; M.pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx: (a[0] + b[0]) / 2, my: (a[1] + b[1]) / 2 }; M.panning = null; M.tap = null; canvas.classList.remove('panning'); return; }
-    if (e.pointerType === 'touch') { M.tap = { x: sx, y: sy, t: Date.now() }; return; }
+    if (e.pointerType === 'touch') { M.tap = { x: sx, y: sy, t: Date.now() }; if (M.touchFree && M.tool === 'pan') { M.panning = { x: sx, y: sy, tx: V.tx, ty: V.ty, sx, sy, moved: false }; } return; }
     const panMode = M.tool === 'pan' || e.button === 1 || M.spaceDown;
     if (panMode) { M.panning = { x: sx, y: sy, tx: V.tx, ty: V.ty, sx, sy, moved: false }; canvas.classList.add('panning'); return; }
     if (e.button === 2) return;
@@ -3082,7 +3140,8 @@ function createMapView(canvas, host) {
   });
   const endDrag = (e) => {
     if (e) { M.ptrs.delete(e.pointerId); if (M.ptrs.size < 2) M.pinch = null; }
-    if (e && e.type === 'pointerup' && e.pointerType === 'touch' && M.tap && Date.now() - M.tap.t < 400) { const [sx, sy] = getPos(e); if (Math.hypot(sx - M.tap.x, sy - M.tap.y) < 12 && host.onClick) { const b = badgeAt(sx, sy); const i = b ? b.w.apex : nearestLineIdx(sx, sy); if (host.onHover) host.onHover(i); host.onClick(i, b); } M.tap = null; return; }
+    if (e && e.type === 'pointerup' && e.pointerType === 'touch' && M.tap && Date.now() - M.tap.t < 400) { const [sx, sy] = getPos(e); const moved = M.panning && M.panning.moved; M.panning = null; canvas.classList.remove('panning'); if (!moved && Math.hypot(sx - M.tap.x, sy - M.tap.y) < 12 && host.onClick) { const b = badgeAt(sx, sy); const i = b ? b.w.apex : nearestLineIdx(sx, sy); if (host.onHover) host.onHover(i); host.onClick(i, b); } M.tap = null; return; }
+    if (e && e.pointerType === 'touch' && M.panning) { M.panning = null; canvas.classList.remove('panning'); M.tap = null; return; }
     M.tap = null;
     if (M.photoDrag) { M.photoDrag = null; canvas.classList.remove('panning'); if (host.onPhotoDone) host.onPhotoDone(); }
     if (M.panning) { const moved = M.panning.moved; M.panning = null; canvas.classList.remove('panning'); if (!moved && e && e.type === 'pointerup' && e.button === 0 && host.onClick) { const [sx, sy] = getPos(e); const b = badgeAt(sx, sy); host.onClick(b ? b.w.apex : nearestLineIdx(sx, sy), b); } }
@@ -3094,7 +3153,7 @@ function createMapView(canvas, host) {
   canvas.addEventListener('contextmenu', (e) => { e.preventDefault(); const [sx, sy] = getPos(e); if (M.tool === 'corner') { if (host.onCorner) host.onCorner(sx, sy, true); return; } const hit = hitPoint(sx, sy); if (hit >= 0 && host.onPointDel) { host.onPointDel(hit); M.selIdx = -1; } });
   function setTool(tl) { M.tool = tl; canvas.className = tl === 'pan' ? '' : (tl === 'trace' ? 'edit' : 'pick'); draw(); }
   function setHover(i) { if (i !== M.hoverIdx) { M.hoverIdx = i; draw(); } }
-  return { V, M, fit, draw, zoomAt, zoomCenter, rotateBy, toS, toI, setTool, setHover, nearestStation, nearestLineIdx, badgeAt, setup, tokens, lapPos: (P, i) => lapPos(host.getTrack(), P, i) };
+  return { V, M, fit, draw, zoomAt, zoomCenter, rotateBy, toS, toI, setTool, setHover, setTouchFree, nearestStation, nearestLineIdx, badgeAt, setup, tokens, lapPos: (P, i) => lapPos(host.getTrack(), P, i) };
 }
 (() => {
 const $ = (id) => document.getElementById(id);
@@ -3483,8 +3542,8 @@ async function renderDriverPage(uid) {
   const home = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null;
   $('drvMeta').textContent = [prof.country ? flag(prof.country) + ' ' + countryName(prof.country) : '', home ? t('Home track: {name}', { name: home.name }) : '', nm.isMe ? t('this is you') : ''].filter(Boolean).join(' · ');
   $('drvBio').textContent = prof.bio || '';
-  { const links = $('drvLinks'); links.innerHTML = ''; if (prof.instagram) { const a = el('a', 'btn sm', 'Instagram'); a.href = 'https://instagram.com/' + String(prof.instagram).replace(/^@/, ''); a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); } if (prof.coach && prof.contact) { const a = el('a', 'btn sm primary', t('Book a training')); a.href = /^https?:/.test(prof.contact) ? prof.contact : 'https://' + prof.contact; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); } else if (prof.contact) { const a = el('a', 'btn sm', t('Message')); a.href = /^https?:/.test(prof.contact) ? prof.contact : 'https://' + prof.contact; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); } if (prof.sws) { const a = el('a', 'btn sm', 'SWS ↗'); a.href = prof.sws; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); } if (prof.coach) links.appendChild(el('span', 'pill acc', t('Coach'))); }
-  { const card = $('drvSwsCard'); const has = prof.swsResults && prof.swsResults.results && prof.swsResults.results.length; card.hidden = !has; if (has) SWS.renderResults($('drvSwsBox'), prof.swsResults, $('drvSwsSub')); }
+  { const links = $('drvLinks'); links.innerHTML = ''; if (prof.instagram) { const a = el('a', 'btn sm', 'Instagram'); a.href = 'https://instagram.com/' + String(prof.instagram).replace(/^@/, ''); a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); } if (prof.coach && prof.contact) { const a = el('a', 'btn sm primary', t('Book a training')); a.href = /^https?:/.test(prof.contact) ? prof.contact : 'https://' + prof.contact; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); } else if (prof.contact) { const a = el('a', 'btn sm', t('Message')); a.href = /^https?:/.test(prof.contact) ? prof.contact : 'https://' + prof.contact; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a); }  if (prof.coach) links.appendChild(el('span', 'pill acc', t('Coach'))); }
+  $('drvSwsCard').hidden = true;
   const socOn = await STORE.socialAvailable();
   const fb = $('drvFollow'); fb.hidden = nm.isMe || !STORE.hasDb || !socOn; fb.textContent = t('Follow'); fb.classList.remove('active');
   const paint = (f) => { $('drvFollowers').textContent = `${tn(f.followers, '{n} follower', '{n} followers').replace('{n}', f.followers)} · ${t('{n} following', { n: f.following })}`; fb.textContent = f.iFollow ? t('Following ✓') : t('Follow'); fb.classList.toggle('active', !!f.iFollow); };
@@ -3581,11 +3640,22 @@ LAB.load = async function (meta) {
 };
 // ask the lab to drop its loaded state (after a session was edited or deleted elsewhere)
 LAB.invalidate = function (sid) { if (!sid || (LAB.current && LAB.current.id === sid) || LAB.sessions.some(s => s.id === sid)) { LAB.current = null; LAB.G = null; LAB.sessions = []; LAB.loaded = false; LAB.dcmp = null; } };
+const isPhone = () => window.matchMedia && window.matchMedia('(max-width:700px)').matches;
 function labMapHeight(w) {
   const fs = document.fullscreenElement === $('hero') || $('hero').classList.contains('fs-fallback');
   const ratio = LAB.G ? LAB.G.H / LAB.G.W : 0.65;
+  if (fs && isPhone()) return Math.max(220, window.innerHeight - ($('fsHead').offsetHeight || 50) - ($('dataPanel').offsetHeight || 180) - 2);
   if (fs) return Math.max(240, window.innerHeight - 28 - 62 - 49 - 34 - 262);
+  if (isPhone()) return Math.round(window.innerHeight * 0.5);
   return Math.round(clamp(w * ratio, 340, Math.min(Math.max(360, window.innerHeight - 470), 720)));
+}
+// phone: which panel is shown under the map
+LAB.tab = 'corners';
+function applyMobTab() {
+  const map = { corners: 'cornersPanel', digest: 'digestPanel', chart: 'dataPanel', discuss: 'discussPanel', ai: 'askPanel' };
+  const fs = $('hero').classList.contains('fs-fallback');
+  for (const k in map) { const e = $(map[k]); if (!e) continue; e.classList.toggle('mob-hide', !(k === LAB.tab || (k === 'chart' && fs))); }
+  for (const b of $('labTabs').querySelectorAll('button')) b.classList.toggle('active', b.dataset.tab === LAB.tab);
 }
 function labEnsureMap() {
   if (LAB.map) return;
@@ -3599,7 +3669,11 @@ function labEnsureMap() {
   $('optBand').onclick = () => { LAB.opts.band = !LAB.opts.band; syncOpts(); }; $('optTicks').onclick = () => { LAB.opts.ticks = !LAB.opts.ticks; syncOpts(); }; $('optLabels').onclick = () => { LAB.opts.labelsAll = !LAB.opts.labelsAll; syncOpts(); };
   $('tglSat').onclick = () => { LAB.opts.aerial = !LAB.opts.aerial; syncOpts(); };
   // full screen: map, charts, readout and the corner inspector on one screen
-  const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); };
+  const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); };
+  $('lmMap').onclick = () => fsFallbackOn(true);
+  $('lmCompare').onclick = () => { $('pickbar').classList.toggle('open'); };
+  $('pickClose').onclick = () => $('pickbar').classList.remove('open');
+  for (const b of $('labTabs').querySelectorAll('button')) b.onclick = () => { LAB.tab = b.dataset.tab; applyMobTab(); if (LAB.tab === 'chart') drawDataCharts(); };
   const fsOn = () => document.fullscreenElement === $('hero') || $('hero').classList.contains('fs-fallback');
   $('btnFull').onclick = () => { const h = $('hero'); if (fsOn()) { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); return; } if (h.requestFullscreen) h.requestFullscreen().catch(() => fsFallbackOn(true)); else fsFallbackOn(true); };
   $('btnFullExit').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); };
@@ -3648,12 +3722,13 @@ async function renderLabStart() {
 
 function labRender() {
   const G = LAB.G, has = !!(G && LAB.sessions.length && allLaps().length && LAB.current);
-  $('labStart').hidden = has; for (const id of ['pickbar', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has;
+  $('labStart').hidden = has; for (const id of ['pickbar', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open'); }
   $('labEmptyText').textContent = t('Upload an Alfano .alf2 export, pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.');
   $('labSub').textContent = has ? `${LAB.trackName}${G.layout ? ' · ' + G.layout.name : (LAB.lid === 'custom' ? ' · ' + t('custom layout') : '')}` : t('Alfano session analysis');
-  $('hero').classList.toggle('with-insp', has);
+  $('hero').classList.toggle('with-insp', has); $('pg-lab').classList.toggle('has', has);
   LAB.dcmp = null; LAB.coach = null;
   if (!has) return;
+  if (LAB.map.V.auto || LAB.needFit) { LAB.map.fit(true); LAB.needFit = false; }   // the map is only measurable once the hero is visible
   const sess = LAB.current;
   // reference: a lap ('sid|n') or the session average ('avg:sid') of the current session
   const refOk = isAvgKey(LAB.ref) ? (LAB.ref.slice(4) === sess.id && !!sessAvg(sess)) : !!(findLap(LAB.ref) && findLap(LAB.ref).sess === sess && findLap(LAB.ref).L.px);
@@ -3697,6 +3772,7 @@ function labRender() {
   $('map1Title').hidden = false; $('map1Title').className = 'map-title ' + (LAB.mapLap === 'cmp' ? 'cmp' : 'ref');
   $('map1Title').textContent = LAB.mapLap === 'cmp' && D.O ? `${nameOf(D.O)} · ${fmtLap(D.O.T)} · ${t('points of this lap')}` : `${t('Reference')} · ${refName}${refIsAvg || !D.ref.mine ? ' · ' + shortSess(sess) : ''} · ${fmtLap(D.R.T)} · ${t('points of this lap')}`;
   $('lapLbl').textContent = `${shortSess(sess)} · ${refName}`; $('lapBig').textContent = fmtLap(D.R.T);
+  $('lmLbl').textContent = `${shortSess(sess)} · ${refName}${D.O ? ' · vs ' + nameOf(D.O) + ' ' + sg(D.total) : ''}`; $('lmBig').textContent = fmtLap(D.R.T); $('labMob').hidden = false; $('labTabs').hidden = false; applyMobTab();
   const chips = $('lapChips'); chips.innerHTML = ''; const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
   let vmax = 0, vmin = Infinity; for (let i = 0; i < D.R.N; i++) { vmax = Math.max(vmax, D.R.v[i]); vmin = Math.min(vmin, D.R.v[i]); }
   const N = D.R.N, s1 = D.R.t[Math.floor(N / 3)], s2 = D.R.t[Math.floor(2 * N / 3)];
@@ -3900,6 +3976,12 @@ function renderCornersTable() {
     tr.addEventListener('mouseenter', () => { LAB.hoverIdx = w.apex; LAB.map.setHover(w.apex); renderInspector(); }); tr.addEventListener('mouseleave', () => { LAB.hoverIdx = -1; LAB.map.setHover(-1); renderInspector(); });
     tb.appendChild(tr);
   }
+  // phone: one compact row per corner
+  const mob = $('cornersMob'); mob.innerHTML = '';
+  for (const r of D.rows) { const w = r.w, m = r.R, c = coachOf(w.n), res = c ? Math.max(0, m.time - c.tTop) : 0; const b = el('button', 'crow' + (LAB.selN === w.n ? ' sel' : '')); b.type = 'button';
+    const main = r.cmp && Math.abs(r.cmp.dt) >= 0.04 && r.cmp.items[0] ? r.cmp.items[0].t : (c && c.infl && c.infl[0] && Math.abs(c.infl[0].corr) >= 0.35 ? t('what matters here is {f}', { f: c.infl[0].name }) : '');
+    b.innerHTML = `<b>T${w.n}</b><span class="ty ${kindCls(m)}">${esc((w.dir === 'L' ? t('left') : t('right')) + ' · ' + kindWord(m))}</span><span class="d ${r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm'}">${r.cmp ? sg(r.cmp.dt) : m.time.toFixed(2) + ' ' + t('s')}</span><span class="r ${res > 0.1 ? 'hot' : ''}">${c ? (res > 0.03 ? t('reserve') + ' ' + res.toFixed(2) : t('ok')) : ''}</span><span class="k">${esc(short(m))}${main ? ' — ' + esc(main) : ''}</span>`;
+    b.onclick = () => selectCorner(w.n, false); mob.appendChild(b); }
 }
 function renderInspector() {
   const D = LAB.dcmp, body = $('inspBody'), empty = $('inspEmpty'); if (!D) return;
@@ -4404,7 +4486,7 @@ const SWS = (() => {
   $('swsSave').onclick = async () => {
     if (!parsed || !parsed.results.length) return; if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); return; }
     const b = $('swsSave'); b.classList.add('busy');
-    try { const p = Object.assign({}, await STORE.profile(STORE.me.id) || {}); p.swsResults = parsed; await STORE.saveProfile(p); toast(t('SWS results saved to your profile.')); close(); if (APP.route === 'profile') renderProfile(); else go('profile'); }
+    try { const p = Object.assign({}, await STORE.profile(STORE.me.id) || {}); p.swsResults = parsed; await STORE.saveProfile(p); toast(t('SWS results saved — pick the race in the session editor (Edit).')); close(); }
     catch (e) { setStatus('swsStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');
   };
@@ -4436,7 +4518,7 @@ async function renderProfile() {
   $('profRacing').value = prof.racingName || ''; $('profBio').value = prof.bio || ''; $('profIg').value = prof.instagram || ''; $('profContact').value = prof.contact || ''; $('profCoach').checked = !!prof.coach; $('profSws').value = prof.sws || '';
   $('profSwsHint').textContent = t('Paste the link to your SWS driver page; it is shown on your public page. “Import SWS results” brings your race history here.');
   $('profSwsImport').onclick = () => SWS.open({});
-  { const card = $('profSwsCard'); card.hidden = !STORE.hasIdentity; if (!card.hidden) SWS.renderResults($('profSwsBox'), prof.swsResults, $('profSwsSub')); }
+  { const card = $('profSwsCard'); card.hidden = true; }   // SWS lives inside the session editor for now (less noise on the profile)
   $('profSave').onclick = async () => {
     const body = { racingName: $('profRacing').value.trim().slice(0, 40), country: $('profCountry').value, homeTrack: $('profHome').value, avatar: pendingAvatar === undefined ? (prof.avatar || '') : (pendingAvatar || ''), bio: $('profBio').value.trim().slice(0, 160), instagram: $('profIg').value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@').replace(/\/$/, '').slice(0, 80), contact: $('profContact').value.trim().slice(0, 160), coach: $('profCoach').checked, sws: $('profSws').value.trim().slice(0, 200), swsResults: prof.swsResults || null };
     const b = $('profSave'); b.classList.add('busy'); setStatus('profStatus', t('Saving…'));
@@ -4490,7 +4572,7 @@ const SESSEDIT = (() => {
     fillSelect($('seTrack'), [['', t('— not in the catalogue (custom) —')]].concat(STORE.getTracks().map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), meta.track || '');
     await fillLayouts(meta.track || '', meta.layout || '');
     $('sePubField').hidden = !(STORE.canWrite() && meta.owner !== 'local'); $('sePublish').checked = !!meta.published;
-    { const prof = STORE.hasIdentity ? (await STORE.profile(STORE.me.id) || {}) : {}; const res = prof.swsResults && prof.swsResults.results || []; $('seSwsField').hidden = !res.length; if (res.length) fillSelect($('seSws'), [['', t('— not an SWS race —')]].concat(res.map((r, i) => [String(i), SWS.label(r)])), meta.sws && meta.sws.i !== undefined ? String(meta.sws.i) : ''); }
+    { const prof = STORE.hasIdentity ? (await STORE.profile(STORE.me.id) || {}) : {}; const res = prof.swsResults && prof.swsResults.results || []; fillSelect($('seSws'), [['', t('— not an SWS race —')]].concat(res.map((r, i) => [String(i), SWS.label(r)])), meta.sws && meta.sws.i !== undefined ? String(meta.sws.i) : ''); $('seSws').disabled = !res.length; const h = $('seSwsHint'); h.innerHTML = ''; if (!res.length) { h.appendChild(document.createTextNode(t('No SWS results imported yet. ') )); const a = el('a', 'tref', t('Import results from your SWS page')); a.href = '#'; a.onclick = (e) => { e.preventDefault(); SESSEDIT.close(); SWS.open({}); }; h.appendChild(a); } }
     $('sessModal').hidden = false; $('seName').focus();
   }
   function close() { $('sessModal').hidden = true; cur = null; }
@@ -4500,7 +4582,7 @@ const SESSEDIT = (() => {
     if (!cur) return; const tid = $('seTrack').value, tr = tid ? STORE.getTrack(tid) : null;
     const patch = { label: $('seName').value.trim().slice(0, 80), note: $('seNote').value.trim().slice(0, 120), track: tid, trackName: tr ? tr.name : (cur.trackName || ''), layout: tid ? ($('seLayout').value || 'custom') : 'custom' };
     if (!$('sePubField').hidden) patch.published = $('sePublish').checked && !!tid;
-    if (!$('seSwsField').hidden) { const i = $('seSws').value; if (i === '') patch.sws = null; else { const prof = await STORE.profile(STORE.me.id) || {}; const r = (prof.swsResults && prof.swsResults.results || [])[+i]; if (r) patch.sws = { i: +i, date: r.date, race: r.race || r.cat, track: r.track, pos: r.pos, best: r.best }; } }
+    if (!$('seSws').disabled) { const i = $('seSws').value; if (i === '') patch.sws = null; else { const prof = await STORE.profile(STORE.me.id) || {}; const r = (prof.swsResults && prof.swsResults.results || [])[+i]; if (r) patch.sws = { i: +i, date: r.date, race: r.race || r.cat, track: r.track, pos: r.pos, best: r.best }; } }
     const b = $('seSave'); b.classList.add('busy'); setStatus('seStatus', t('Saving…'));
     try { await STORE.updateSession(cur.id, patch); Object.assign(cur, patch); close(); toast(t('Session updated.')); if (done) done(cur); } catch (e) { setStatus('seStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');
@@ -4616,7 +4698,7 @@ const ADMIN = (() => {
   $('q').placeholder = t('Search tracks, drivers...');
   try { await STORE.init(); } catch (e) {}
   renderShell(); I18N.applyStatic();
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
 })();
