@@ -517,6 +517,9 @@ textarea{min-height:90px;resize:vertical}
 .insp-nav span{flex:1;min-width:0;text-align:center;font:600 13px var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .insp-nav .btn.sm{height:32px;padding:0 12px;font-size:18px;line-height:1}
 .post .nm .res{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:600;vertical-align:middle}
+.align-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--accent) 8%,var(--surface));font-size:12.5px}
+.align-bar[hidden]{display:none}
+.align-bar .seg .btn.xs{height:28px;padding:0 10px;font-size:14px}
 .votes{display:inline-flex;gap:4px}
 .btn.vote .ic{font-size:14px;line-height:1}
 .btn.vote.on.up{border-color:var(--throttle);color:var(--throttle);background:color-mix(in srgb,var(--throttle) 10%,var(--surface))}
@@ -857,7 +860,7 @@ textarea{min-height:90px;resize:vertical}
         <div class="map-wrap" id="mapWrap1">
           <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
           <div class="map-bar" id="mapBar">
-            <div class="seg" id="viewSeg"><button class="btn" id="tglTiles" type="button" hidden data-t="Satellite">Satellite</button><button class="btn" id="tglSat" type="button" data-t="Aerial">Aerial</button></div>
+            <div class="seg" id="viewSeg"><button class="btn" id="tglTiles" type="button" hidden data-t="Satellite">Satellite</button><button class="btn" id="tglAlign" type="button" hidden data-t="Align">Align</button><button class="btn" id="tglSat" type="button" data-t="Aerial">Aerial</button></div>
             <button class="btn" id="optBand" type="button" data-t="Track edges">Track edges</button>
             <button class="btn" id="optTicks" type="button" data-t="Markers">Markers</button>
             <button class="btn" id="optLabels" type="button" data-t="Labels">Labels</button>
@@ -865,6 +868,7 @@ textarea{min-height:90px;resize:vertical}
             <div class="seg"><button class="btn" id="zoomOut" type="button">−</button><button class="btn" id="zoomIn" type="button">+</button><button class="btn" id="zoomFit" type="button">⌂</button></div>
             <button class="btn" id="btnFull" type="button" title="Full screen"><svg><use href="#i-full"/></svg><span data-t="Full screen">Full screen</span></button>
           </div>
+          <div class="align-bar" id="alignBar" hidden><span class="hint" id="alignHint"></span><div class="seg"><button class="btn xs" id="alL" type="button" title="0.5 m">←</button><button class="btn xs" id="alU" type="button" title="0.5 m">↑</button><button class="btn xs" id="alD" type="button" title="0.5 m">↓</button><button class="btn xs" id="alR" type="button" title="0.5 m">→</button></div><span class="hint" id="alignOff"></span><button class="btn xs" id="alReset" type="button" data-t="Reset">Reset</button><button class="btn xs primary" id="alSave" type="button" hidden data-t="Save for everyone">Save for everyone</button><button class="btn xs" id="alDone" type="button" data-t="Done">Done</button></div>
           <div style="position:relative" id="mapBox"><canvas id="map"></canvas>
           <div class="map-title" id="map1Title" hidden></div>
           <div class="readout" id="readout" hidden></div>
@@ -2548,6 +2552,7 @@ Object.assign(I18N.RU, {
   'Corners': 'Повороты',
   'Digest': 'Разбор',
   'Chart': 'График',
+  'Align': 'Совместить', 'Save for everyone': 'Сохранить для всех', 'Done': 'Готово', 'Drag the picture until it sits under the line': 'Тяните картинку, пока она не ляжет под линию', 'Drag the picture (or use the arrows, 0.5 m) until it sits under the line': 'Тяните картинку (или стрелками по 0,5 м), пока она не ляжет под линию', '{x} m east, {y} m north': '{x} м на восток, {y} м на север', 'no shift': 'без сдвига', 'Imagery alignment saved for this layout.': 'Совмещение снимка сохранено для этой конфигурации.',
   'Upload a session — every braking point, apex and throttle point, and a comparison with drivers on the same layout.': 'Загрузи сессию — каждая точка торможения, апекса и газа и сравнение с гонщиками на той же конфигурации.',
   'Session type (optional)': 'Тип сессии (необязательно)', 'Result (optional)': 'Результат (необязательно)', 'of': 'из', 'drivers': 'гонщиков', 'Practice': 'Практика', 'Qualifying': 'Квалификация', 'Sprint': 'Спринт', 'Race': 'Гонка', 'Ironman': 'Ironman', 'Endurance': 'Эндуранс', 'Other': 'Другое', '{n} drivers': '{n} гонщиков', 'session': 'сессия',
   'All countries': 'Все страны', 'Search': 'Поиск', 'Asking OpenStreetMap… (10–40 s)': 'Спрашиваю OpenStreetMap… (10–40 с)', 'OpenStreetMap did not answer — try again in a minute.': 'OpenStreetMap не ответил — попробуйте через минуту.', '{n} karting venues found in {c}; {h} already in Hutka.': 'Найдено картинговых площадок в {c}: {n}; уже в Hutka: {h}.', 'Nothing tagged as karting in {c} on OpenStreetMap.': 'В OpenStreetMap ничего не помечено как картинг в {c}.', 'indoor': 'крытый', 'in Hutka': 'в Hutka', 'Tick the tracks to import first.': 'Сначала отметьте трассы для импорта.', 'Imported {n} of {m}…': 'Импортировано {n} из {m}…', '{n} tracks imported — open them in the list to add logos, karts and hours.': 'Импортировано трасс: {n} — откройте их в списке, чтобы добавить логотипы, карты и часы работы.',
@@ -3071,14 +3076,18 @@ function createMapView(canvas, host) {
   function rotateBy(dRot) { const { w, h } = setup(), cx = w / 2, cy = h / 2, [px, py] = toI(cx, cy); V.rot += dRot; const c = Math.cos(V.rot), si = Math.sin(V.rot); V.tx = cx - V.s * (c * px - si * py); V.ty = cy - V.s * (si * px + c * py); V.auto = false; draw(); }
   function zoomCenter(f) { const { w, h } = setup(); zoomAt(f, w / 2, h / 2); }
   // ----- satellite tiles under a Web-Mercator frame (the GPS layouts are built at zoom 19, so tiles line up by construction) -----
-  const tiles = new Map(); let tileFails = 0;
+  const tiles = new Map(); let tileFails = 0, zCap = 99;
+  // providers answer beyond their real coverage with a flat grey "no data" picture (HTTP 200): spot it and stop asking for that zoom
+  function placeholderTile(im) {
+    try { const c = document.createElement('canvas'); c.width = c.height = 24; const cx = c.getContext('2d', { willReadFrequently: true }); cx.drawImage(im, 0, 0, 24, 24); const d = cx.getImageData(0, 0, 24, 24).data; let n = 0, sum = 0, sum2 = 0, grey = 0; for (let i = 0; i < d.length; i += 4) { const r = d[i], g = d[i + 1], b = d[i + 2], l = (r + g + b) / 3; sum += l; sum2 += l * l; n++; if (Math.abs(r - g) < 6 && Math.abs(g - b) < 6) grey++; } const mean = sum / n, sd = Math.sqrt(Math.max(0, sum2 / n - mean * mean)); return grey / n > 0.97 && mean > 195 && mean < 245 && sd < 18; } catch (e) { return false; }
+  }
   function tileUrl(TL, z, x, y) { return String(TL.url || 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').replace('{z}', z).replace('{x}', x).replace('{y}', y); }
   function tile(TL, z, x, y) {
     const k = `${z}/${x}/${y}`; let e = tiles.get(k); if (e) return e;
     if (tiles.size > 600) { let n = 0; for (const kk of tiles.keys()) { tiles.delete(kk); if (++n > 200) break; } }
     e = { img: null, ok: false, err: false }; tiles.set(k, e);
     const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async';
-    im.onload = () => { e.ok = true; e.img = im; draw(); };
+    im.onload = () => { if (z >= 17 && placeholderTile(im)) { e.err = true; if (z - 1 < zCap) zCap = z - 1; draw(); return; } e.ok = true; e.img = im; draw(); };
     im.onerror = () => { e.err = true; tileFails++; if (host.onTileError) host.onTileError(tileFails); draw(); };
     im.src = tileUrl(TL, z, x, y); return e;
   }
@@ -3088,7 +3097,8 @@ function createMapView(canvas, host) {
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
     for (const [px, py] of [[0, 0], [w, 0], [w, h], [0, h]]) { const [x, y] = toI(px, py); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
     const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-    const z = Math.max(12, Math.min(TL.maxZoom || 20, M0.z + Math.round(Math.log2(Math.max(0.01, sc * dpr)))));
+    const z = Math.max(12, Math.min(TL.maxZoom || 20, zCap, M0.z + Math.round(Math.log2(Math.max(0.01, sc * dpr)))));
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
     const f = Math.pow(2, M0.z - z);   // frame px per tile px at zoom z
     const dx = TL.dx || 0, dy = TL.dy || 0;
     const ox = M0.x0 - dx, oy = M0.y0 - dy;   // tile → frame: frame = merc/f*... see below
@@ -3395,7 +3405,7 @@ const loadImg = (src) => new Promise((res, rej) => { const im = new Image(); im.
 // satellite imagery under a GPS layout: the frame is Web Mercator (zoom 19), so tiles line up by construction; a layout may carry a small alignment offset in metres
 const SAT = {
   available: null,   // null = not probed yet, false = tiles cannot load here (offline, blocked)
-  cfg() { const c = window.HUTKA_CONFIG || {}; return { url: c.satTiles || '', attribution: c.satAttribution || 'Imagery © Esri, Maxar, Earthstar Geographics', maxZoom: +c.satMaxZoom || 20 }; },
+  cfg() { const c = window.HUTKA_CONFIG || {}; return { url: c.satTiles || '', attribution: c.satAttribution || 'Imagery © Esri, Maxar, Earthstar Geographics', maxZoom: +c.satMaxZoom || 21 }; },
   can(G) { return !!(G && G.frame && G.frame.merc && G.track && SAT.available !== false); },
   layer(G, on, sat) { if (!SAT.can(G)) return null; const mpp = G.track.mpp || 1, o = sat || G.sat || { dx: 0, dy: 0 }; return Object.assign({ on: !!on, merc: G.frame.merc, dx: (+o.dx || 0) / mpp, dy: -(+o.dy || 0) / mpp }, SAT.cfg()); },
   pref() { try { const v = localStorage.getItem('hutka.sat'); return v === null ? true : v === '1'; } catch (e) { return true; } },
@@ -3850,7 +3860,7 @@ LAB.open = async function (meta, asCmp) {
   labEnsureMap(); setStatus('labStatus', t('Loading session…'));
   if (!(LAB.current && LAB.current.id === meta.id)) LAB.allKarts = false;
   let sess; try { sess = await STORE.loadSession(meta); } catch (e) { setStatus('labStatus', t('Could not load this session.'), 'warn'); return; }
-  LAB.tid = meta.track || ''; LAB.lid = meta.layout || 'custom'; LAB.trackName = (STORE.getTrack(LAB.tid) || {}).name || meta.trackName || t('Custom track');
+  LAB.tid = meta.track || ''; LAB.lid = meta.layout || 'custom'; LAB.trackName = (STORE.getTrack(LAB.tid) || {}).name || meta.trackName || t('Custom track'); loadSatAdj(); if (LAB.aligning) setAligning(false);
   let G = null; try { G = await GEOM.build(LAB.tid, LAB.lid, sess); } catch (e) { G = null; }
   if (!G) { setStatus('labStatus', t('No clean laps with GPS in this session.'), 'warn'); return; }
   LAB.G = G; LAB.sessions = [];
@@ -3940,7 +3950,8 @@ function labEnsureMap() {
   if (LAB.map) return;
   LAB.map = createMapView($('map'), { height: labMapHeight, getTrack: () => LAB.G ? LAB.G.track : null, getWidthM: () => LAB.G ? LAB.G.widthM : 8, getFrameSize: () => LAB.G ? [LAB.G.W, LAB.G.H] : null,
     getImage: () => { if (!LAB.G) return null; const im = LAB.G.image; return im && LAB.G.source !== 'gps' ? im : (LAB.opts.aerial ? im : null); },
-    getTiles: () => SAT.layer(LAB.G, LAB.opts.tiles),
+    getTiles: () => { const G = LAB.G; if (!G) return null; const b = G.sat || { dx: 0, dy: 0 }; return SAT.layer(G, LAB.opts.tiles, { dx: b.dx + LAB.satAdj.dx, dy: b.dy + LAB.satAdj.dy }); },
+    onSatMove: (dxPx, dyPx) => { if (!LAB.G) return; const mpp = LAB.G.track.mpp; LAB.satAdj.dx += dxPx * mpp; LAB.satAdj.dy -= dyPx * mpp; saveSatAdj(); renderAlignBar(); },
     getOverlay: () => ({ D: LAB.dcmp, role: LAB.mapLap === 'cmp' ? 'cmp' : 'ref', hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor }),
     onHover: (i) => { LAB.hoverIdx = i; showReadout(); renderInspector(); drawDataCharts(); },
     onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
@@ -3952,7 +3963,14 @@ function labEnsureMap() {
   $('zoomIn').onclick = () => LAB.map.zoomCenter(1.3); $('zoomOut').onclick = () => LAB.map.zoomCenter(1 / 1.3); $('zoomFit').onclick = () => { LAB.map.fit(); LAB.map.draw(); };
   $('optBand').onclick = () => { LAB.opts.band = !LAB.opts.band; syncOpts(); }; $('optTicks').onclick = () => { LAB.opts.ticks = !LAB.opts.ticks; syncOpts(); }; $('optLabels').onclick = () => { LAB.opts.labelsAll = !LAB.opts.labelsAll; syncOpts(); };
   $('tglSat').onclick = () => { LAB.opts.aerial = !LAB.opts.aerial; syncOpts(); };
-  $('tglTiles').onclick = () => { LAB.opts.tiles = !LAB.opts.tiles; SAT.setPref(LAB.opts.tiles); syncOpts(); };
+  $('tglTiles').onclick = () => { LAB.opts.tiles = !LAB.opts.tiles; SAT.setPref(LAB.opts.tiles); if (!LAB.opts.tiles) setAligning(false); syncOpts(); };
+  // moving the picture under the line: for this device, or saved on the layout by whoever may edit the track
+  $('tglAlign').onclick = () => setAligning(!LAB.aligning);
+  const nudge = (dx, dy) => { LAB.satAdj.dx += dx; LAB.satAdj.dy += dy; saveSatAdj(); renderAlignBar(); LAB.map.draw(); };
+  $('alL').onclick = () => nudge(-0.5, 0); $('alR').onclick = () => nudge(0.5, 0); $('alU').onclick = () => nudge(0, 0.5); $('alD').onclick = () => nudge(0, -0.5);
+  $('alReset').onclick = () => { LAB.satAdj = { dx: 0, dy: 0 }; saveSatAdj(); renderAlignBar(); LAB.map.draw(); };
+  $('alDone').onclick = () => setAligning(false);
+  $('alSave').onclick = async () => { const l = STORE.getLayout(LAB.tid, LAB.lid), tr = STORE.getTrack(LAB.tid); if (!l || !tr || !STORE.canEditTrack(tr)) return; const b = $('alSave'); b.classList.add('busy'); try { const base = l.sat || { dx: 0, dy: 0 }; await STORE.saveLayout(LAB.tid, Object.assign({}, l, { sat: { dx: +(base.dx + LAB.satAdj.dx).toFixed(2), dy: +(base.dy + LAB.satAdj.dy).toFixed(2) } })); LAB.satAdj = { dx: 0, dy: 0 }; saveSatAdj(); GEOM.invalidate(); setAligning(false); toast(t('Imagery alignment saved for this layout.')); await LAB.open(LAB.current, false); } catch (e) { toast(t('Could not save: {e}', { e: e && e.message || e })); } b.classList.remove('busy'); };
   // full screen: map, charts, readout and the corner inspector on one screen
   const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); } }, 60); };
   $('lmMap').onclick = () => fsFallbackOn(true);
@@ -3987,8 +4005,20 @@ function labEnsureMap() {
   $('askBtn').onclick = askAI; $('askStop').onclick = () => { if (askCtl) askCtl.abort(); };
   $('askInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); askAI(); } });
 }
+// the per-device imagery nudge, remembered per layout
+LAB.satAdj = { dx: 0, dy: 0 }; LAB.aligning = false;
+const satKey = () => `hutka.sat.${LAB.tid}~${LAB.lid}`;
+function loadSatAdj() { try { const v = JSON.parse(localStorage.getItem(satKey()) || 'null'); LAB.satAdj = v && typeof v.dx === 'number' ? { dx: v.dx, dy: +v.dy || 0 } : { dx: 0, dy: 0 }; } catch (e) { LAB.satAdj = { dx: 0, dy: 0 }; } }
+function saveSatAdj() { try { if (Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01) localStorage.setItem(satKey(), JSON.stringify({ dx: +LAB.satAdj.dx.toFixed(2), dy: +LAB.satAdj.dy.toFixed(2) })); else localStorage.removeItem(satKey()); } catch (e) {} }
+function setAligning(on) { LAB.aligning = !!on && LAB.opts.tiles; $('tglAlign').classList.toggle('active', LAB.aligning); $('alignBar').hidden = !LAB.aligning; LAB.map.setTool(LAB.aligning ? 'sat' : 'pan'); if (LAB.aligning) renderAlignBar(); if (LAB.map && LAB.G) { setTimeout(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); }, 30); } }
+function renderAlignBar() {
+  const tr = LAB.tid ? STORE.getTrack(LAB.tid) : null, canSave = !!(tr && STORE.canEditTrack(tr) && LAB.lid && LAB.lid !== 'custom' && STORE.getLayout(LAB.tid, LAB.lid));
+  $('alignHint').textContent = isPhone() ? t('Drag the picture until it sits under the line') : t('Drag the picture (or use the arrows, 0.5 m) until it sits under the line');
+  $('alignOff').textContent = (Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01) ? t('{x} m east, {y} m north', { x: LAB.satAdj.dx.toFixed(1), y: LAB.satAdj.dy.toFixed(1) }) : t('no shift');
+  $('alSave').hidden = !canSave;
+}
 function syncOpts() {
-  const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles);
+  const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles); $('tglAlign').hidden = !(sat && LAB.opts.tiles); if (!(sat && LAB.opts.tiles) && LAB.aligning) setAligning(false);
   if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; LAB.map.draw(); } });
   $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))); LAB.map.draw(); }
 function selectCorner(n, scroll) { LAB.selN = (LAB.selN === n) ? 0 : n; afterSelect(true); if (scroll && LAB.selN && !isLand()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
