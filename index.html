@@ -449,6 +449,33 @@ textarea{min-height:90px;resize:vertical}
 .rank .w a{color:inherit;text-decoration:none}
 .rank .w span{display:block;color:var(--muted);font-size:12px}
 .rank .tm{font-family:var(--mono);font-size:13px}
+/* ---------- AI coach ---------- */
+.ai-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+.ai-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.wallet .wl{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.wallet .wl b{font:600 28px/1 var(--mono)}
+.chatlist{max-height:60vh;overflow:auto}
+.chatlist .item{flex-direction:column;align-items:flex-start;gap:2px;padding:9px 12px}
+.chatlist .item .name{white-space:normal;font-size:14px;line-height:1.3}
+.chatlist .item .meta{white-space:normal}
+.ai-main{display:flex;flex-direction:column;gap:10px;min-height:60vh}
+.ai-head{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.ai-head .t{flex:1;min-width:0}
+.ai-head b{font-size:16px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-new{display:grid;gap:8px;padding:12px;border:1px dashed var(--line-2);border-radius:12px;background:var(--surface-2)}
+.ai-log{flex:1;max-height:none;min-height:200px}
+.msg.ai p{margin:0 0 8px}.msg.ai p:last-child{margin:0}
+.msg.ai ul{margin:4px 0 8px;padding-left:18px}
+.msg .meta{display:block;font-size:11px;color:var(--muted);margin-top:4px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.plan{border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;background:var(--surface)}
+.plan.best{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.plan .nm{font-weight:700;font-size:15px}
+.plan .pr{font:600 26px/1.1 var(--mono)}
+.plan .pr small{font:500 12px var(--body);color:var(--muted)}
+.plan ul{margin:6px 0 10px;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.5}
+.plan .btn{margin-top:auto}
+@media (max-width:900px){.ai-grid{grid-template-columns:1fr}.ai-grid.chat-open .ai-side{display:none}.ai-grid:not(.chat-open) .ai-main{display:none}.chatlist{max-height:none}}
 /* ---------- admin ---------- */
 .admin-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;align-items:start}
 @media (max-width:1000px){.admin-grid{grid-template-columns:1fr}}
@@ -575,6 +602,7 @@ textarea{min-height:90px;resize:vertical}
     <symbol id="i-fb" viewBox="0 0 24 24"><path d="M14 8h2V5h-2a3 3 0 0 0-3 3v2H9v3h2v7h3v-7h2l.5-3H14V8z"/></symbol>
     <symbol id="i-tt" viewBox="0 0 24 24"><path d="M14 4v9.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 4c.5 2.5 2 4 4.5 4"/></symbol>
     <symbol id="i-clip" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/></symbol>
     <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5c3 0 5.5 2.2 5.5 5.5"/></symbol>
     <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></symbol>
@@ -594,6 +622,7 @@ textarea{min-height:90px;resize:vertical}
       <a href="#home" data-route="home"><svg><use href="#i-home"/></svg><span data-t="Home">Home</span></a>
       <a href="#tracks" data-route="tracks"><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></a>
       <a href="#lab" data-route="lab"><svg><use href="#i-lab"/></svg><span data-t="Lab">Lab</span></a>
+      <a href="#ai" data-route="ai" id="navAI"><svg><use href="#i-spark"/></svg><span data-t="AI coach">AI coach</span></a>
       <a href="#profile" data-route="profile"><svg><use href="#i-user"/></svg><span data-t="Profile">Profile</span></a>
       <div class="sep" id="adminSep" hidden></div>
       <a href="#admin" data-route="admin" id="navAdmin" hidden><svg><use href="#i-shield"/></svg><span data-t="Admin Panel">Admin Panel</span></a>
@@ -734,6 +763,29 @@ textarea{min-height:90px;resize:vertical}
       <div class="card" id="discussPanel" hidden><h2><svg><use href="#i-chat"/></svg><span data-t="Discussion">Discussion</span><span class="sub" id="discussSub"></span></h2><div class="comments" id="commentList"></div><div class="askrow" id="commentForm"><textarea id="commentInput" rows="2"></textarea><div class="askbtns"><button class="btn primary" id="commentBtn" type="button" data-t="Post">Post</button></div></div><div class="hint" id="commentNote"></div></div>
     </section>
 
+    <!-- ========== AI COACH ========== -->
+    <section class="page" id="pg-ai" hidden>
+      <div class="ph"><div><h1 data-t="AI coach">AI coach</h1><div class="sub" id="aiSub"></div></div><div class="row"><button class="btn primary" id="aiNew" type="button"><svg><use href="#i-plus"/></svg><span data-t="New chat">New chat</span></button></div></div>
+      <div class="banner info" id="aiSoon" hidden><svg><use href="#i-info"/></svg><div id="aiSoonText"></div></div>
+      <div class="ai-grid" id="aiGrid">
+        <aside class="ai-side" id="aiSide">
+          <div class="card wallet" id="walletCard"><div class="wl"><span class="lbl" data-t="Credits">Credits</span><b id="walletCredits">—</b></div><div class="hint" id="walletNote"></div><div class="row" style="margin-top:10px"><button class="btn primary sm" id="walletBuy" type="button" data-t="Get credits">Get credits</button><button class="btn sm" id="walletManage" type="button" hidden data-t="Manage plan">Manage plan</button></div></div>
+          <div class="card"><h2><svg><use href="#i-chat"/></svg><span data-t="Chats">Chats</span><span class="sub" id="aiChatsSub"></span></h2><div class="list chatlist" id="aiChats"></div></div>
+        </aside>
+        <div class="card ai-main" id="aiMain">
+          <div class="ai-head" id="aiHead"><button class="btn sm mobile-only" id="aiBack" type="button">‹ <span data-t="Chats">Chats</span></button><div class="t"><b id="aiTitle"></b><div class="hint" id="aiCtx"></div></div><div class="row"><button class="btn sm ghost" id="aiRename" type="button" hidden data-t="Rename">Rename</button><button class="btn sm ghost danger" id="aiDelete" type="button" hidden>×</button></div></div>
+          <div class="ai-new" id="aiNewBox" hidden>
+            <div class="field"><label data-t="What is this chat about?">What is this chat about?</label><select id="aiCtxSel"></select></div>
+            <div class="hint" id="aiNewHint"></div>
+          </div>
+          <div class="chat ai-log" id="aiLog"></div>
+          <div class="chips" id="aiChips"></div>
+          <div class="askrow"><textarea id="aiInput" rows="2"></textarea><div class="askbtns"><button class="btn primary" id="aiSend" type="button" data-t="Ask">Ask</button><button class="btn" id="aiStop" type="button" hidden data-t="Stop">Stop</button></div></div>
+          <div class="hint" id="aiNote"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- ========== PROFILE ========== -->
     <section class="page" id="pg-profile" hidden>
       <div class="ph"><div><h1 data-t="Profile">Profile</h1><div class="sub" id="profSub"></div></div></div>
@@ -836,9 +888,9 @@ textarea{min-height:90px;resize:vertical}
 <!-- mobile tab bar -->
 <nav class="tabbar" id="tabbar" aria-label="Main">
   <a href="#home" data-route="home"><svg><use href="#i-home"/></svg><span data-t="Home">Home</span></a>
-  <a href="#tracks" data-route="tracks"><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></a>
-  <button type="button" id="tabUpload" class="up" aria-label="Upload"><span class="circ"><svg><use href="#i-upload"/></svg></span><span data-t="Upload">Upload</span></button>
   <a href="#lab" data-route="lab"><svg><use href="#i-lab"/></svg><span data-t="Lab">Lab</span></a>
+  <button type="button" id="tabUpload" class="up" aria-label="Upload"><span class="circ"><svg><use href="#i-upload"/></svg></span><span data-t="Upload">Upload</span></button>
+  <a href="#ai" data-route="ai" id="tabAI"><svg><use href="#i-spark"/></svg><span data-t="AI coach">AI coach</span></a>
   <a href="#profile" data-route="profile"><svg><use href="#i-user"/></svg><span data-t="Profile">Profile</span></a>
 </nav>
 <!-- upload modal -->
@@ -861,6 +913,12 @@ textarea{min-height:90px;resize:vertical}
     <div class="row" style="justify-content:flex-end"><button class="btn" id="uplCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="uplGo" type="button" disabled data-t="Analyse">Analyse</button></div>
   </div>
 </div>
+<!-- credits & plan modal -->
+<div class="modal" id="payModal" hidden><div class="box" style="width:min(720px,100%)"><h3 data-t="Credits and Pro">Credits and Pro</h3><p class="hint" id="payIntro"></p>
+  <div class="plans" id="payPlans"></div>
+  <div class="status" id="payStatus"></div>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="payClose" type="button" data-t="Close">Close</button></div>
+</div></div>
 <!-- session edit modal -->
 <div class="modal" id="sessModal" hidden><div class="box" style="width:min(560px,100%)"><h3 data-t="Edit session">Edit session</h3>
   <div class="form">
@@ -2052,6 +2110,80 @@ Object.assign(I18N.RU, {
   'Published on the track page': 'Опубликована на странице трека',
   'likes & comments soon': 'лайки и комменты скоро',
   'Nothing was shared — pick the .alf2 file in the upload window.': 'Ничего не передано — выбери файл .alf2 в окне загрузки.', 'Upload': 'Загрузить', 'Language': 'Язык',
+
+  // ----- v18: AI coach, credits -----
+  'Sign in to ask the coach about your session.': 'Войди, чтобы спросить тренера о своей сессии.',
+  'The AI coach is being connected.': 'AI-тренер подключается.',
+  'Pro — unlimited questions.': 'Pro — вопросы без ограничений.',
+  '{n} credits left · one per answer': 'осталось кредитов: {n} · один за ответ',
+  'open this chat in the AI coach': 'открыть этот чат в AI-тренере',
+  'open in the AI coach': 'открыть в AI-тренере',
+  'Ask the coach about this session… (Ctrl+Enter to send)': 'Спроси тренера об этой сессии… (Ctrl+Enter — отправить)',
+  'Compare me with the fastest published lap here': 'Сравни меня с самым быстрым опубликованным кругом здесь',
+  'No credits left — get a pack or Pro.': 'Кредиты закончились — возьми пакет или Pro.',
+  'Too many questions in an hour — take a break and try again.': 'Слишком много вопросов за час — сделай паузу и попробуй снова.',
+  'The AI coach is not connected yet.': 'AI-тренер ещё не подключён.',
+  'Knows your sessions and the fastest published laps on your layouts. Every answer costs one credit; Pro has no limit.': 'Знает твои сессии и самые быстрые опубликованные круги на твоих конфигурациях. Каждый ответ — один кредит; в Pro без ограничений.',
+  'The AI coach is being connected. Meanwhile the Lab analysis works without it.': 'AI-тренер подключается. Разбор в лаборатории работает и без него.',
+  'Sign in to talk to the AI coach — it remembers your sessions.': 'Войди, чтобы общаться с AI-тренером — он помнит твои сессии.',
+  'Payment received — credits appear within a few seconds.': 'Оплата прошла — кредиты появятся через несколько секунд.',
+  'Credits and the AI coach are being connected.': 'Кредиты и AI-тренер подключаются.',
+  'Pro until {d}: unlimited questions.': 'Pro до {d}: вопросы без ограничений.',
+  'One credit per answer. You started with {n} free.': 'Один кредит за ответ. На старте ты получил {n} бесплатных.',
+  'No credits left — get a pack or Pro to keep asking.': 'Кредиты закончились — возьми пакет или Pro, чтобы продолжить.',
+  'Add credits': 'Добавить кредиты',
+  'Get credits': 'Получить кредиты',
+  'No chats yet. Ask about one of your sessions or anything about your driving.': 'Чатов пока нет. Спроси о любой своей сессии или о своём пилотаже.',
+  'Chat': 'Чат',
+  'session': 'сессия',
+  'general': 'общий',
+  'New chat': 'Новый чат',
+  'General — my driving, my sessions, what to work on': 'Общий — мой пилотаж, мои сессии, над чем работать',
+  'Pick a session and the coach gets its full corner-by-corner breakdown; the general chat knows your library and the fastest laps on your layouts.': 'Выбери сессию — тренер получит её полный разбор по поворотам; общий чат знает твою библиотеку и самые быстрые круги на твоих конфигурациях.',
+  'About session': 'О сессии',
+  'open in the Lab': 'открыть в лаборатории',
+  'General chat': 'Общий чат',
+  'What should I work on next?': 'Над чем мне работать дальше?',
+  'How do my sessions compare with the fastest drivers?': 'Как мои сессии выглядят на фоне самых быстрых?',
+  'Where is my biggest reserve across my sessions?': 'Где мой главный резерв по всем сессиям?',
+  'Plan my next practice stint': 'Спланируй мой следующий стинт',
+  'Loading…': 'Загрузка…',
+  'Ask anything about your laps. The coach answers only from your data and the published laps — no guessing.': 'Спрашивай что угодно о своих кругах. Тренер отвечает только по твоим данным и опубликованным кругам — без догадок.',
+  'Pro — unlimited questions. Ctrl+Enter to send.': 'Pro — вопросы без ограничений. Ctrl+Enter — отправить.',
+  '{n} credits left · one per answer · Ctrl+Enter to send': 'осталось кредитов: {n} · один за ответ · Ctrl+Enter — отправить',
+  'No credits left.': 'Кредиты закончились.',
+  'Ask the coach… (Ctrl+Enter to send)': 'Спроси тренера… (Ctrl+Enter — отправить)',
+  'Every answer of the coach costs one credit. Pro removes the limit and is the best deal for anyone who drives every week.': 'Каждый ответ тренера — один кредит. Pro снимает лимит и выгоднее всего тем, кто катается каждую неделю.',
+  'Starter pack': 'Стартовый пакет',
+  'one-off': 'разово',
+  '25 answers': '25 ответов',
+  'never expire': 'не сгорают',
+  'for an occasional check-up': 'для разбора время от времени',
+  'per month': 'в месяц',
+  'unlimited questions (fair use)': 'вопросы без ограничений (в разумных пределах)',
+  'the coach remembers all your sessions': 'тренер помнит все твои сессии',
+  'priority for new tools': 'новые инструменты первым',
+  'cancel any time': 'отмена в любой момент',
+  'Season pack': 'Сезонный пакет',
+  '80 answers': '80 ответов',
+  'about 30 % cheaper per answer': 'на ~30 % дешевле за ответ',
+  'Current plan': 'Текущий план',
+  'Choose': 'Выбрать',
+  'Payments are being set up — you still have your free credits. Check back soon.': 'Оплата настраивается — бесплатные кредиты у тебя есть. Загляни позже.',
+  'Could not start the payment.': 'Не удалось начать оплату.',
+  'Could not start the payment: {e}': 'Не удалось начать оплату: {e}',
+  'Payments are being set up — the buttons will work as soon as Stripe is connected.': 'Оплата настраивается — кнопки заработают, как только подключится Stripe.',
+  'Could not open the billing portal.': 'Не удалось открыть страницу подписки.',
+  'Chat title': 'Название чата',
+  'Delete this chat?': 'Удалить этот чат?',
+  'The messages are removed; credits are not returned.': 'Сообщения удалятся; кредиты не возвращаются.',
+  'AI coach': 'AI-тренер',
+  'Credits': 'Кредиты',
+  'Manage plan': 'Управлять планом',
+  'Chats': 'Чаты',
+  'What is this chat about?': 'О чём этот чат?',
+  'Credits and Pro': 'Кредиты и Pro',
+  'Close': 'Закрыть',
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
@@ -2463,6 +2595,37 @@ const STORE = (() => {
   async function socialCounts(ids) { if (!adapter || !ids.length) { const o = {}; for (const id of ids) o[id] = { likes: 0, comments: 0, liked: false }; return o; } try { return await adapter.socialCounts(ids, me.id); } catch (e) { const o = {}; for (const id of ids) o[id] = { likes: 0, comments: 0, liked: false }; return o; } }
   async function refreshProfile() { if (adapter && me.id) { try { const p = await adapter.getProfile(me.id); profiles.set(me.id, p); return p; } catch (e) {} } return profiles.get(me.id) || null; }
 
+  // ----- the racing AI (standalone hosting): chats live in the project, answers and billing go through the edge functions -----
+  const aiCfg = () => { const c = window.HUTKA_CONFIG || {}; return c.askUrl && adapter && adapter.kind === 'supabase' ? { base: String(c.askUrl).replace(/\/ask\/?$/, ''), key: c.supabaseAnonKey || '' } : null; };
+  async function fnCall(name, body, opts) {
+    const c = aiCfg(); if (!c) { const e = new Error('ai off'); e.code = 'not_configured'; throw e; }
+    const r = await fetch(c.base + '/' + name, { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': c.key, 'Authorization': 'Bearer ' + (adapter.token ? adapter.token() : '') }, body: JSON.stringify(body || {}), signal: opts && opts.signal });
+    return r;
+  }
+  const errOf = async (r) => { let d = null; try { d = await r.json(); } catch (e) {} const e = new Error((d && (d.detail || d.error)) || ('http ' + r.status)); e.code = (d && d.error) || (r.status === 401 ? 'sign_in' : r.status === 402 ? 'no_credits' : r.status === 429 ? 'rate_limited' : (r.status === 404 || r.status === 503) ? 'not_configured' : 'error'); e.data = d; return e; };
+  let walletCache = null;
+  async function wallet(fresh) {
+    if (!fresh && walletCache && Date.now() - walletCache.t < 30000) return walletCache.w;
+    if (!aiCfg() || !me.id) return { off: true };
+    try { const r = await fnCall('wallet', {}); if (!r.ok) { const e = await errOf(r); return { off: true, code: e.code }; } const w = await r.json(); walletCache = { t: Date.now(), w }; return w; } catch (e) { return { off: true, code: 'network' }; }
+  }
+  async function chats() { if (!aiCfg() || !me.id) return []; try { return (await adapter.sb.from('chats').select('*').eq('user_id', me.id).order('updated_at', { ascending: false }).limit(200)).data || []; } catch (e) { return []; } }
+  async function chatMessages(id) { if (!aiCfg()) return []; try { return (await adapter.sb.from('messages').select('id,role,content,created_at,credits').eq('chat_id', id).order('created_at', { ascending: true }).limit(400)).data || []; } catch (e) { return []; } }
+  async function deleteChat(id) { if (!aiCfg()) return; await adapter.sb.from('chats').delete().eq('id', id); }
+  async function renameChat(id, title) { if (!aiCfg()) return; await adapter.sb.from('chats').update({ title: String(title || '').slice(0, 80) }).eq('id', id); }
+  // one question → streamed answer; resolves with the full text, the chat id and the remaining credits
+  async function ask(o) {
+    const r = await fnCall('ask', { chat_id: o.chatId || undefined, session_id: o.sessionId || undefined, track_id: o.trackId || undefined, layout_id: o.layoutId || undefined, title: o.title || undefined, system: o.system || '', text: o.text, lang: I18N.lang }, { signal: o.signal });
+    if (!r.ok) throw await errOf(r);
+    const chatId = Number(r.headers.get('x-chat-id')) || o.chatId || null, credits = r.headers.get('x-credits'), plan = r.headers.get('x-plan');
+    const reader = r.body.getReader(), dec = new TextDecoder(); let buf = '', text = '';
+    while (true) { const { value, done } = await reader.read(); if (done) break; buf += dec.decode(value, { stream: true }); let i; while ((i = buf.indexOf('\n')) >= 0) { const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1); if (!line.startsWith('data:')) continue; try { const ev = JSON.parse(line.slice(5).trim()); if (ev.type === 'content_block_delta' && ev.delta && ev.delta.text) { text += ev.delta.text; if (o.onText) o.onText(text); } if (ev.type === 'error') { const e = new Error(ev.error && ev.error.message || 'error'); e.code = 'error'; e.text = text; throw e; } } catch (e) { if (e.code) throw e; } } }
+    walletCache = null;
+    return { text, chatId, credits: credits !== null ? Number(credits) : null, plan };
+  }
+  async function checkout(kind) { const r = await fnCall('stripe-checkout', { kind, return_url: location.origin + location.pathname }); if (!r.ok) throw await errOf(r); return r.json(); }
+  async function portal() { const r = await fnCall('stripe-portal', {}); if (!r.ok) throw await errOf(r); return r.json(); }
+
   async function claim(tid, text) { if (!adapter) throw new Error('offline'); await adapter.addClaim({ track: tid, by: me.id || 'local', text: text || '', createdAt: Date.now() }); }
   async function claims() { if (!adapter) return []; try { return (await adapter.listClaims()).sort((a, b) => b.createdAt - a.createdAt); } catch (e) { return []; } }
   async function deleteClaim(id) { if (adapter) await adapter.deleteClaim(id); }
@@ -2471,7 +2634,8 @@ const STORE = (() => {
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid,
-    sessionSocial, toggleLike, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, get socialOn() { return socialOn === true; } };
+    sessionSocial, toggleLike, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, get socialOn() { return socialOn === true; },
+    get aiOn() { return !!aiCfg(); }, wallet, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
 // optional model line, and (for the admin editor) the traced control points. Pan, smooth zoom, rotation, hover and click. ----------
@@ -2762,7 +2926,7 @@ const trackHours = (tr) => { if (!tr.close) return null; if (!tr.open) return { 
 const APP = { route: 'tracks', a: null, b: null, geo: null, hoverTrack: null };
 function parseHash() { const h = (location.hash || '#home').slice(1); const parts = h.includes('~') ? h.split('~') : h.split('-'); return { name: parts[0] || 'home', a: parts[1] || null, b: parts[2] || null, c: parts[3] || null }; }
 function go(hash) { if (location.hash === '#' + hash) route(); else location.hash = hash; }
-const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver'];
+const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver', 'ai'];
 let routing = false;
 async function route() {
   if (routing) return; routing = true;
@@ -2781,6 +2945,7 @@ async function route() {
     else if (name === 'lab') await LAB.show(r.a, r.b);
     else if (name === 'profile') await renderProfile();
     else if (name === 'driver') await renderDriverPage(r.a);
+    else if (name === 'ai') await renderAIPage(r.a, r.b);
     else if (name === 'admin') await ADMIN.show(r.a, r.b);
   } finally { routing = false; }
 }
@@ -2796,7 +2961,7 @@ async function renderShell() {
   $('chipName').textContent = (prof && prof.racingName) || (STORE.hasIdentity ? (me.name || t('You')) : t('Guest'));
   $('chipSub').textContent = STORE.hasIdentity ? (me.canEdit ? t('admin') : t('driver')) : (STORE.hasAuth ? t('not signed in') : t('local library only'));
   $('userChip').hidden = STORE.hasAuth && !STORE.hasIdentity; $('btnSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity);
-  $('navAdmin').hidden = !STORE.isAdmin(); $('adminSep').hidden = !STORE.isAdmin();
+  $('navAdmin').hidden = !STORE.isAdmin(); $('adminSep').hidden = !STORE.isAdmin(); $('navAI').hidden = !STORE.hasAuth; $('tabAI').hidden = !STORE.hasAuth;
   $('modeNote').textContent = STORE.hasAuth ? (STORE.hasIdentity ? '' : t('Sign in to upload sessions and keep a library across devices. Browsing is open to everyone.')) : (STORE.hasDb ? (STORE.hasIdentity ? (STORE.canWrite() ? '' : t('Read-only access: ask the owner for Contributor access to publish sessions.')) : t('Sign in to claude.ai to publish sessions and keep a library across devices.')) : t('Offline mode: sessions stay in this browser. Open the shared Hutka link signed in to claude.ai to publish and compare with others.'));
   $('langEn').classList.toggle('active', I18N.lang === 'en'); $('langRu').classList.toggle('active', I18N.lang === 'ru'); $('langEnM').classList.toggle('active', I18N.lang === 'en'); $('langRuM').classList.toggle('active', I18N.lang === 'ru'); $('profAdminLink').hidden = !STORE.isAdmin();
   $('q').placeholder = t('Search tracks, drivers...'); $('uplName').placeholder = t('Pasha, Al Forsan, stint 1'); $('uplNote').placeholder = t('Sodi RT10 #14, wet'); $('newLayoutName').placeholder = t('New layout name');
@@ -3161,7 +3326,7 @@ LAB.open = async function (meta, asCmp) {
   if (LAB.tid) { const pubs = (await STORE.sessionsFor(LAB.tid, LAB.lid)).filter(m => !LAB.sessions.some(x => x.id === m.id)); for (const m of pubs.slice(-10)) { try { add(await STORE.loadSession(m)); } catch (e) {} } }
   LAB.names = await STORE.names(LAB.sessions.map(s => s.owner));
   LAB.sessions.sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.createdAt || 0) - (b.createdAt || 0));
-  LAB.current = sess; LAB.selN = 0; LAB.chat = []; LAB.mapLap = 'you'; LAB.pickerOpen = false; LAB.social = null;
+  LAB.current = sess; LAB.selN = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = false; LAB.social = null;
   if (asCmp) { const my = LAB.sessions.filter(s => mySession(s) && s.id !== sess.id).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]; if (my) { LAB.ref = lapKey(my, bestLap(my)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : lapKey(sess, bestLap(sess)); LAB.current = my; } else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; } }
   else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; }
   LAB.loaded = true; LAB.needFit = true; if (APP.route === 'lab') { LAB.map.fit(); LAB.needFit = false; } labRender();
@@ -3611,6 +3776,15 @@ function edgeSample(url) {
 function renderAskState() {
   const note = $('askNote'), input = $('askInput'), btn = $('askBtn');
   const needSignIn = STORE.hasAuth && !STORE.hasIdentity;
+  if (STORE.aiOn) {
+    // hosted: the coach with memory; the thread is a chat tied to this session
+    if (needSignIn) { note.textContent = t('Sign in to ask the coach about your session.'); input.disabled = true; btn.disabled = true; }
+    else { input.disabled = false; btn.disabled = false; STORE.wallet(false).then(w => { if (w.off) { note.innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('The AI coach is being connected.'))}`; input.disabled = true; btn.disabled = true; } else { note.innerHTML = (w.plan === 'pro' ? esc(t('Pro — unlimited questions.')) : esc(t('{n} credits left · one per answer', { n: w.credits }))) + (LAB.chatId ? ` · <a href="#ai~${LAB.chatId}">${esc(t('open this chat in the AI coach'))}</a>` : ` · <a href="#ai~new~${esc(LAB.current ? LAB.current.id : '')}">${esc(t('open in the AI coach'))}</a>`); } }); }
+    input.placeholder = t('Ask the coach about this session… (Ctrl+Enter to send)');
+    const chips = $('askChips'); chips.innerHTML = '';
+    for (const q of [t('What is the main thing to fix in this session?'), t('Where do I lose the most and why?'), t('Which three corners would give the most time?'), t('Compare me with the fastest published lap here')]) { const c = el('span', 'chip q', q); c.onclick = () => { $('askInput').value = q; askAI(); }; chips.appendChild(c); }
+    renderChat(); return;
+  }
   if (sampleFn === null || needSignIn) { note.innerHTML = needSignIn ? esc(t('Sign in to ask the AI about your session.')) : (STORE.hasAuth ? `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('The racing AI — a separate chat that knows your sessions and the fastest published laps on your layouts — is being prepared. The analysis above does not need it.'))}` : esc(t('AI answers work when the page is open in Claude; here they are off. The analysis above does not need them.'))); input.disabled = true; btn.disabled = true; }
   else if (sampleFn === undefined) note.textContent = t('Connecting the AI…');
   else { note.textContent = STORE.hasAuth ? t('Answers are computed from this analysis only.') : t('The first question asks for permission to use Claude from your account. Answers are computed from this analysis only.'); input.disabled = false; btn.disabled = false; }
@@ -3628,6 +3802,7 @@ function aiContext() {
 }
 const AI_RULES = () => `You are a rental-karting coach (Sodi RT10, Honda GX390, up to ~80 km/h) and an Alfano telemetry analyst. Below is a JSON breakdown of one session on a track: corners T1…Tn are numbered from the start/finish line; for each one you get what the driver did on the reference lap and on the comparison lap: points in metres from S/F, speeds in km/h, corner time, plus "coach" — statistics of the best passes through that corner across all loaded laps and the reserve. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, briefly and concretely, in plain language without jargon, referring to corner numbers and the numbers in the data. If asked about something not in the data (video, a line more precise than ±1 m, kart condition), say so plainly. Never invent numbers. Plain text, no tables or headings; lists only when short.`;
 async function askAI() {
+  if (STORE.aiOn) return askCoachInline();
   const q = $('askInput').value.trim(); if (!q || !sampleFn || !LAB.dcmp) return;
   LAB.chat = LAB.chat || []; LAB.chat.push({ role: 'user', content: q }); $('askInput').value = '';
   const bubble = renderChat(true);
@@ -3645,6 +3820,24 @@ async function askAI() {
     else if (code !== 'cancelled') $('askNote').textContent = t('No answer ({code}). Try again.', { code: code || 'error' });
   }
   askCtl = null; $('askBtn').disabled = sampleFn === null; $('askStop').hidden = true; renderChat(); if (sampleFn === null) renderAskState();
+}
+async function askCoachInline() {
+  const q = $('askInput').value.trim(); if (!q || !LAB.dcmp || !STORE.hasIdentity) return;
+  const sess = LAB.current; LAB.chat = LAB.chat || []; LAB.chat.push({ role: 'user', content: q }); $('askInput').value = '';
+  const bubble = renderChat(true); $('askBtn').disabled = true; $('askStop').hidden = false; askCtl = new AbortController();
+  try {
+    const system = await aiSystem(sess);
+    const r = await STORE.ask({ chatId: LAB.chatId || null, sessionId: sess.id, trackId: sess.track, layoutId: sess.layout, title: `${shortSess(sess)} · ${q.slice(0, 40)}`, system, text: q, signal: askCtl.signal, onText: (tx) => { bubble.textContent = tx; bubble.classList.remove('thinking'); } });
+    LAB.chat.push({ role: 'assistant', content: r.text }); if (r.chatId) LAB.chatId = r.chatId;
+  } catch (e) {
+    const code = e && e.code; if (e && e.text) LAB.chat.push({ role: 'assistant', content: e.text }); else LAB.chat.pop();
+    if (code === 'no_credits') { toast(t('No credits left — get a pack or Pro.')); if (typeof openPay === 'function') { await renderWallet(true); openPay(); } }
+    else if (code === 'sign_in') AUTH.open();
+    else if (code === 'rate_limited') toast(t('Too many questions in an hour — take a break and try again.'));
+    else if (code === 'not_configured') toast(t('The AI coach is not connected yet.'));
+    else if (!(e && e.name === 'AbortError')) toast(t('No answer ({code}). Try again.', { code: code || (e && e.message) || 'error' }));
+  }
+  askCtl = null; $('askBtn').disabled = false; $('askStop').hidden = true; renderChat(); renderAskState();
 }
 function renderChat(withThinking) {
   const log = $('chatLog'); log.innerHTML = ''; let last = null;
@@ -3772,6 +3965,147 @@ function postCard(s, names, cnt) {
 }
 function layoutName(tid, lid) { const l = STORE.getLayout(tid, lid); return l ? l.name : lid; }
 $('homeUpload').onclick = () => UPLOAD.open({});
+// ---------- AI coach: chats with memory of the driver's sessions; credits and the Pro plan ----------
+const AI = { chats: [], cur: null, msgs: [], wallet: null, busy: false, ctl: null, newCtx: '' };
+const AI_RULES_V2 = () => `You are Hutka's racing coach: an analyst of rental-karting telemetry (Alfano and similar loggers; Sodi RT10-class karts, ~80 km/h). Everything you say must come from the data below: the driver's own sessions, the corner-by-corner breakdown of the session this chat is about (if any), and the fastest published laps of other drivers on the same layouts. Corners T1…Tn are numbered from the start/finish line; points are metres from S/F, speeds in km/h. Compare the driver with the fast published laps when the layout matches; say which corners and what exactly (brake point, apex speed, throttle point, exit speed). If a question needs data that is not here (another session, video, kart setup, a line more precise than ±1 m), say so and tell the driver what to upload or publish. Never invent numbers or corners. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, short and concrete, plain language, no headings or tables; short lists are fine. Address the driver as "you".`;
+// the memory: profile, the session library, fast laps on the driver's layouts, and the open session in detail
+async function aiSystem(sessionMeta) {
+  const parts = [AI_RULES_V2()];
+  const me = STORE.me, prof = STORE.hasIdentity ? (await STORE.profile(me.id) || {}) : {};
+  const home = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null;
+  parts.push(`DRIVER: ${prof.racingName || me.name || 'driver'}${prof.country ? ', ' + countryName(prof.country) : ''}${home ? ', home track ' + home.name : ''}.`);
+  const mine = (await STORE.mySessions()).slice(0, 40);
+  if (mine.length) { const lines = []; for (const m of mine) { const tr = STORE.getTrack(m.track); const ls = m.track ? await STORE.getLayouts(m.track) : []; const l = ls.find(x => x.id === m.layout); lines.push(`- [${m.id}] ${m.label || m.name} — ${tr ? tr.name : (m.trackName || 'custom track')}${l ? ' · ' + l.name : ''} · ${fmtDate(m.date)} · best ${fmtMs(m.bestMs)} · avg clean ${fmtMs(m.avgMs)} · ${m.nLaps} laps (${m.cleanLaps} clean)${m.published ? ' · published' : ''}${m.note ? ' · ' + m.note : ''}`); } parts.push('THE DRIVER\'S SESSIONS (newest first):\n' + lines.join('\n')); }
+  else parts.push('THE DRIVER\'S SESSIONS: none uploaded yet.');
+  // fast published laps on the layouts the driver has driven
+  const keys = new Set(mine.filter(m => m.track).map(m => m.track + '~' + (m.layout || 'custom'))); if (sessionMeta && sessionMeta.track) keys.add(sessionMeta.track + '~' + (sessionMeta.layout || 'custom'));
+  const fast = [];
+  for (const k of [...keys].slice(0, 6)) { const [tid, lid] = k.split('~'); const tr = STORE.getTrack(tid); if (!tr) continue; const pubs = (await STORE.sessionsFor(tid, lid)).filter(s => s.owner !== me.id).sort((a, b) => a.bestMs - b.bestMs); if (!pubs.length) continue; const names = await STORE.names(pubs.slice(0, 3).map(s => s.owner)); const ls = await STORE.getLayouts(tid); const l = ls.find(x => x.id === lid); fast.push(`${tr.name}${l ? ' · ' + l.name : ''}: ` + pubs.slice(0, 3).map(s => `${(names[s.owner] || {}).name || 'driver'} ${fmtMs(s.bestMs)} (avg ${fmtMs(s.avgMs)}, ${fmtDate(s.date)})`).join('; ')); }
+  if (fast.length) parts.push('FASTEST PUBLISHED LAPS ON THE SAME LAYOUTS (other drivers):\n' + fast.join('\n'));
+  // the session this chat is about, in detail (loaded into the Lab)
+  if (sessionMeta) {
+    try { if (!(LAB.current && LAB.current.id === sessionMeta.id && LAB.dcmp)) { await LAB.open(sessionMeta, false); } if (LAB.dcmp && LAB.current && LAB.current.id === sessionMeta.id) parts.push('THIS CHAT IS ABOUT SESSION [' + sessionMeta.id + ']. Corner-by-corner breakdown (JSON):\n' + aiContext()); } catch (e) {}
+  }
+  return parts.join('\n\n').slice(0, 70000);
+}
+async function renderAIPage(a, b) {
+  $('aiSub').textContent = t('Knows your sessions and the fastest published laps on your layouts. Every answer costs one credit; Pro has no limit.');
+  const on = STORE.aiOn;
+  $('aiSoon').hidden = on && STORE.hasIdentity; $('aiGrid').hidden = !(on && STORE.hasIdentity);
+  if (!on) { $('aiSoonText').innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('The AI coach is being connected. Meanwhile the Lab analysis works without it.'))}`; return; }
+  if (!STORE.hasIdentity) { $('aiSoonText').innerHTML = esc(t('Sign in to talk to the AI coach — it remembers your sessions.')) + ' '; const bt = el('button', 'btn sm primary', t('Sign in')); bt.type = 'button'; bt.onclick = () => AUTH.open(); $('aiSoonText').appendChild(bt); return; }
+  if (a === 'paid') { toast(t('Payment received — credits appear within a few seconds.')); setTimeout(() => renderWallet(true), 2500); history.replaceState(null, '', '#ai'); a = null; }
+  await renderWallet(false);
+  AI.chats = await STORE.chats(); renderChatList();
+  if (a === 'new') { await startNew(b ? await STORE.getSessionMeta(b) : null); }
+  else if (a && /^\d+$/.test(a)) { const c = AI.chats.find(x => String(x.id) === a); if (c) await openChat(c); else await startNew(null); }
+  else if (AI.cur && AI.chats.some(c => c.id === AI.cur.id)) await openChat(AI.cur);
+  else if (AI.chats.length && !window.matchMedia('(max-width:900px)').matches) await openChat(AI.chats[0]);
+  else { $('aiGrid').classList.remove('chat-open'); await startNew(null, true); }
+}
+async function renderWallet(fresh) {
+  const w = await STORE.wallet(fresh); AI.wallet = w;
+  const note = $('walletNote'), cr = $('walletCredits');
+  if (w.off) { cr.textContent = '—'; note.innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('Credits and the AI coach are being connected.'))}`; $('walletBuy').hidden = true; $('walletManage').hidden = true; return; }
+  const pro = w.plan === 'pro';
+  cr.textContent = pro ? 'Pro' : String(w.credits);
+  note.textContent = pro ? t('Pro until {d}: unlimited questions.', { d: w.plan_until ? fmtDate(w.plan_until) : '—' }) : (w.credits > 0 ? t('One credit per answer. You started with {n} free.', { n: w.free_credits || 10 }) : t('No credits left — get a pack or Pro to keep asking.'));
+  $('walletBuy').hidden = false; $('walletBuy').textContent = pro ? t('Add credits') : t('Get credits'); $('walletManage').hidden = !w.has_customer;
+}
+function renderChatList() {
+  const box = $('aiChats'); box.innerHTML = ''; $('aiChatsSub').textContent = AI.chats.length ? String(AI.chats.length) : '';
+  if (!AI.chats.length) { box.appendChild(el('div', 'hint', t('No chats yet. Ask about one of your sessions or anything about your driving.'))); return; }
+  for (const c of AI.chats) { const a = el('a', 'item' + (AI.cur && AI.cur.id === c.id ? ' sel' : '')); a.href = '#ai~' + c.id; const tr = c.track_id ? STORE.getTrack(c.track_id) : null; a.append(el('span', 'name', c.title || t('Chat')), el('span', 'meta', [tr ? tr.name + (c.layout_id ? ' · ' + c.layout_id : '') : (c.session_id ? t('session') : t('general')), fmtDate(c.updated_at)].join(' · '))); box.appendChild(a); }
+}
+async function startNew(sessionMeta, quiet) {
+  AI.cur = null; AI.msgs = []; AI.newCtx = sessionMeta ? sessionMeta.id : '';
+  $('aiGrid').classList.toggle('chat-open', !quiet); renderChatList();
+  $('aiTitle').textContent = t('New chat'); $('aiCtx').textContent = '';
+  $('aiRename').hidden = true; $('aiDelete').hidden = true; $('aiNewBox').hidden = false;
+  const mine = await STORE.mySessions();
+  fillSelect($('aiCtxSel'), [['', t('General — my driving, my sessions, what to work on')]].concat(mine.slice(0, 60).map(m => { const tr = STORE.getTrack(m.track); return [m.id, `${m.label || m.name} · ${tr ? tr.name : (m.trackName || t('Custom'))} · ${fmtDate(m.date)} · ${fmtMs(m.bestMs)}`]; })), AI.newCtx);
+  $('aiCtxSel').onchange = () => { AI.newCtx = $('aiCtxSel').value; renderAiChips(); };
+  $('aiNewHint').textContent = t('Pick a session and the coach gets its full corner-by-corner breakdown; the general chat knows your library and the fastest laps on your layouts.');
+  renderAiChips(); renderAiLog(); renderAiNote(); $('aiInput').focus();
+}
+async function openChat(c) {
+  AI.cur = c; $('aiGrid').classList.add('chat-open'); renderChatList();
+  $('aiTitle').textContent = c.title || t('Chat'); const tr = c.track_id ? STORE.getTrack(c.track_id) : null;
+  $('aiCtx').innerHTML = c.session_id ? `${t('About session')} <a href="#lab~${esc(c.session_id)}">${esc(tr ? tr.name + (c.layout_id ? ' · ' + c.layout_id : '') : t('open in the Lab'))}</a>` : t('General chat');
+  $('aiRename').hidden = false; $('aiDelete').hidden = false; $('aiNewBox').hidden = true;
+  AI.msgs = []; renderAiLog(true);
+  AI.msgs = (await STORE.chatMessages(c.id)).map(m => ({ role: m.role, content: m.content, at: m.created_at }));
+  if (AI.cur !== c) return;
+  renderAiChips(); renderAiLog(); renderAiNote();
+}
+function renderAiChips() {
+  const box = $('aiChips'); box.innerHTML = ''; const sid = AI.cur ? AI.cur.session_id : AI.newCtx;
+  const qs = sid ? [t('What is the main thing to fix in this session?'), t('Where do I lose the most and why?'), t('Which three corners would give the most time?'), t('Compare me with the fastest published lap here')] : [t('What should I work on next?'), t('How do my sessions compare with the fastest drivers?'), t('Where is my biggest reserve across my sessions?'), t('Plan my next practice stint')];
+  for (const q of qs) { const c = el('span', 'chip q', q); c.onclick = () => { $('aiInput').value = q; aiSend(); }; box.appendChild(c); }
+}
+function mdLite(text) {
+  const esc1 = esc(text); const blocks = esc1.split(/\n{2,}/); const out = [];
+  for (const b of blocks) { const lines = b.split('\n'); if (lines.every(l => /^\s*([-•*]|\d+[.)])\s+/.test(l))) out.push('<ul>' + lines.map(l => '<li>' + l.replace(/^\s*([-•*]|\d+[.)])\s+/, '') + '</li>').join('') + '</ul>'); else out.push('<p>' + lines.join('<br>') + '</p>'); }
+  return out.join('').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\bT(\d{1,2})\b/g, '<span class="tref" style="border:0;cursor:default">T$1</span>');
+}
+function renderAiLog(loading) {
+  const log = $('aiLog'); log.innerHTML = '';
+  if (loading) { const d = el('div', 'msg ai thinking', t('Loading…')); log.appendChild(d); return d; }
+  if (!AI.msgs.length && !AI.busy) { log.appendChild(el('div', 'hint', AI.cur ? '' : t('Ask anything about your laps. The coach answers only from your data and the published laps — no guessing.'))); }
+  let last = null;
+  for (const m of AI.msgs) { const d = el('div', 'msg ' + (m.role === 'user' ? 'user' : 'ai')); if (m.role === 'user') d.textContent = m.content; else d.innerHTML = mdLite(m.content); log.appendChild(d); last = d; }
+  if (AI.busy) { const d = el('div', 'msg ai thinking', t('Thinking…')); log.appendChild(d); last = d; }
+  log.scrollTop = log.scrollHeight; return last;
+}
+function renderAiNote() {
+  const w = AI.wallet || {}, n = $('aiNote');
+  if (w.off) n.textContent = ''; else if (w.plan === 'pro') n.textContent = t('Pro — unlimited questions. Ctrl+Enter to send.'); else n.textContent = w.credits > 0 ? t('{n} credits left · one per answer · Ctrl+Enter to send', { n: w.credits }) : t('No credits left.');
+  $('aiSend').disabled = AI.busy || (w.off === true) || (w.plan !== 'pro' && !(w.credits > 0));
+  $('aiInput').placeholder = t('Ask the coach… (Ctrl+Enter to send)');
+}
+async function aiSend() {
+  const text = $('aiInput').value.trim(); if (!text || AI.busy) return;
+  const w = AI.wallet || {}; if (!w.off && w.plan !== 'pro' && !(w.credits > 0)) { openPay(); return; }
+  const sessionId = AI.cur ? AI.cur.session_id : AI.newCtx; const meta = sessionId ? await STORE.getSessionMeta(sessionId) : null;
+  AI.msgs.push({ role: 'user', content: text }); $('aiInput').value = ''; AI.busy = true; $('aiNewBox').hidden = true;
+  const bubble = renderAiLog(); renderAiNote(); $('aiStop').hidden = false; AI.ctl = new AbortController();
+  try {
+    const system = await aiSystem(meta);
+    const r = await STORE.ask({ chatId: AI.cur ? AI.cur.id : null, sessionId: meta ? meta.id : null, trackId: meta ? meta.track : null, layoutId: meta ? meta.layout : null, title: AI.cur ? null : (meta ? `${meta.label || meta.name} · ${text.slice(0, 40)}` : text.slice(0, 60)), system, text, signal: AI.ctl.signal, onText: (tx) => { bubble.classList.remove('thinking'); bubble.innerHTML = mdLite(tx); $('aiLog').scrollTop = $('aiLog').scrollHeight; } });
+    AI.msgs.push({ role: 'assistant', content: r.text });
+    if (!AI.cur) { AI.chats = await STORE.chats(); AI.cur = AI.chats.find(c => c.id === r.chatId) || AI.chats[0] || null; if (AI.cur) { $('aiTitle').textContent = AI.cur.title; const tr = AI.cur.track_id ? STORE.getTrack(AI.cur.track_id) : null; $('aiCtx').innerHTML = AI.cur.session_id ? `${t('About session')} <a href="#lab~${esc(AI.cur.session_id)}">${esc(tr ? tr.name : t('open in the Lab'))}</a>` : t('General chat'); $('aiRename').hidden = false; $('aiDelete').hidden = false; history.replaceState(null, '', '#ai~' + AI.cur.id); } renderChatList(); }
+    if (r.credits !== null && AI.wallet && !AI.wallet.off) { AI.wallet.credits = r.credits; AI.wallet.plan = r.plan || AI.wallet.plan; $('walletCredits').textContent = AI.wallet.plan === 'pro' ? 'Pro' : String(r.credits); }
+  } catch (e) {
+    const code = e && e.code; if (e && e.text) AI.msgs.push({ role: 'assistant', content: e.text }); else AI.msgs.pop();
+    if (code === 'no_credits') { toast(t('No credits left — get a pack or Pro.')); await renderWallet(true); openPay(); }
+    else if (code === 'sign_in') AUTH.open();
+    else if (code === 'rate_limited') toast(t('Too many questions in an hour — take a break and try again.'));
+    else if (code === 'not_configured') toast(t('The AI coach is not connected yet.'));
+    else if (code !== 'cancelled' && !(e && e.name === 'AbortError')) toast(t('No answer ({code}). Try again.', { code: code || (e && e.message) || 'error' }));
+  }
+  AI.busy = false; AI.ctl = null; $('aiStop').hidden = true; renderAiLog(); renderAiNote(); renderWallet(false).then(renderAiNote);
+}
+function openPay() {
+  const w = AI.wallet || {}, cfg = (window.HUTKA_CONFIG || {}).pricing || {}, box = $('payPlans'); box.innerHTML = '';
+  $('payIntro').textContent = t('Every answer of the coach costs one credit. Pro removes the limit and is the best deal for anyone who drives every week.');
+  const plans = [
+    { kind: 'pack25', name: t('Starter pack'), price: cfg.pack25 || '$9', per: t('one-off'), bullets: [t('25 answers'), t('never expire'), t('for an occasional check-up')] },
+    { kind: 'pro', name: 'Pro', price: cfg.pro || '$29', per: t('per month'), best: true, bullets: [t('unlimited questions (fair use)'), t('the coach remembers all your sessions'), t('priority for new tools'), t('cancel any time')] },
+    { kind: 'pack80', name: t('Season pack'), price: cfg.pack80 || '$24', per: t('one-off'), bullets: [t('80 answers'), t('never expire'), t('about 30 % cheaper per answer')] },
+  ];
+  for (const p of plans) { const d = el('div', 'plan' + (p.best ? ' best' : '')); d.innerHTML = `<div class="nm">${esc(p.name)}</div><div class="pr">${esc(p.price)} <small>${esc(p.per)}</small></div><ul>${p.bullets.map(b => `<li>${esc(b)}</li>`).join('')}</ul>`; const b = el('button', 'btn ' + (p.best ? 'primary' : ''), w.plan === 'pro' && p.kind === 'pro' ? t('Current plan') : t('Choose')); b.type = 'button'; b.disabled = w.plan === 'pro' && p.kind === 'pro'; b.onclick = async () => { if (!w.stripe) { setStatus('payStatus', t('Payments are being set up — you still have your free credits. Check back soon.'), 'warn'); return; } b.classList.add('busy'); try { const r = await STORE.checkout(p.kind); if (r && r.url) location.href = r.url; else setStatus('payStatus', t('Could not start the payment.'), 'warn'); } catch (e) { setStatus('payStatus', t('Could not start the payment: {e}', { e: e && e.message || e }), 'warn'); } b.classList.remove('busy'); }; d.appendChild(b); box.appendChild(d); }
+  setStatus('payStatus', w.stripe ? '' : t('Payments are being set up — the buttons will work as soon as Stripe is connected.'));
+  $('payModal').hidden = false;
+}
+$('payClose').onclick = () => { $('payModal').hidden = true; }; $('payModal').addEventListener('click', (e) => { if (e.target === $('payModal')) $('payModal').hidden = true; });
+$('walletBuy').onclick = openPay;
+$('walletManage').onclick = async () => { const b = $('walletManage'); b.classList.add('busy'); try { const r = await STORE.portal(); if (r && r.url) location.href = r.url; } catch (e) { toast(t('Could not open the billing portal.')); } b.classList.remove('busy'); };
+$('aiNew').onclick = () => startNew(null);
+$('aiBack').onclick = () => { $('aiGrid').classList.remove('chat-open'); };
+$('aiSend').onclick = aiSend; $('aiStop').onclick = () => { if (AI.ctl) AI.ctl.abort(); };
+$('aiInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); aiSend(); } });
+$('aiRename').onclick = async () => { if (!AI.cur) return; const v = prompt(t('Chat title'), AI.cur.title || ''); if (v === null) return; await STORE.renameChat(AI.cur.id, v.trim()); AI.cur.title = v.trim(); $('aiTitle').textContent = AI.cur.title; renderChatList(); };
+$('aiDelete').onclick = async () => { if (!AI.cur) return; if (!(await confirmDlg(t('Delete this chat?'), t('The messages are removed; credits are not returned.'), t('Delete')))) return; await STORE.deleteChat(AI.cur.id); AI.chats = AI.chats.filter(c => c.id !== AI.cur.id); AI.cur = null; renderChatList(); startNew(null, true); };
 // ---------- profile ----------
 let pendingAvatar;
 async function renderProfile() {

@@ -12,6 +12,9 @@
 | `supabase/seed.sql` | 8 трасс ОАЭ с реальными данными и их конфигурации |
 | `supabase/setup.sql` | schema + админ + seed одним файлом (для нового проекта) |
 | `supabase/social.sql` | лайки, комментарии, подписки — запустить один раз после setup.sql |
+| `supabase/ai.sql` | чаты, сообщения, кредиты — запустить один раз для AI-тренера |
+| `supabase/functions/*` | серверные функции: тренер, кошелёк, Stripe |
+| `manifest.webmanifest`, `sw.js`, `icon-*.png` | PWA: установка на телефон, «Поделиться → Hutka» из приложения Alfano (Android) |
 | `supabase/functions/ask/index.ts` | серверная функция «Спросить ИИ» (ключ Anthropic хранится только на сервере) |
 
 Схема: статический сайт (Netlify / Cloudflare Pages) + база и логин в Supabase + ИИ через функцию Supabase.
@@ -51,7 +54,55 @@ Supabase по умолчанию отправляет письма **сам, н�
 
 ---
 
-## 2. ИИ-чат в лаборатории — функция `ask` (по желанию)
+## 2. AI-тренер, кредиты и Stripe
+
+Пока функции не задеплоены, вкладка **AI coach** и панель «Спросить тренера» показывают «скоро» — ничего не ломается.
+
+### 2.1. Таблицы
+SQL Editor → вставить `supabase/ai.sql` → Run (чаты, сообщения, кошельки, журнал кредитов).
+
+### 2.2. Ключ Anthropic
+https://console.anthropic.com → **Billing** → пополнить (от $5) → **API Keys → Create key**. Один ответ тренера стоит ~2–5 центов.
+
+### 2.3. Функции (5 штук)
+Supabase → **Edge Functions → Deploy a new function → Via Editor**. Для каждой: имя из списка, вставить код файла, **Deploy**, затем в настройках функции **выключить «Verify JWT»** (функции сами проверяют, что человек вошёл).
+
+| Имя функции | Файл | Что делает |
+|---|---|---|
+| `ask` | `supabase/functions/ask/index.ts` | ответ тренера, хранит чат, списывает кредит |
+| `wallet` | `supabase/functions/wallet/index.ts` | баланс и план; первый вызов выдаёт стартовые 10 кредитов |
+| `stripe-checkout` | `supabase/functions/stripe-checkout/index.ts` | открывает оплату пакета/подписки |
+| `stripe-webhook` | `supabase/functions/stripe-webhook/index.ts` | получает от Stripe факт оплаты и начисляет |
+| `stripe-portal` | `supabase/functions/stripe-portal/index.ts` | страница управления подпиской |
+
+Через терминал быстрее: `npm i -g supabase && supabase login && supabase link --project-ref <ref>` и в папке `hutka/`: `supabase functions deploy ask wallet stripe-checkout stripe-webhook stripe-portal --no-verify-jwt`.
+
+### 2.4. Секреты
+**Edge Functions → Secrets** (или `supabase secrets set KEY=value`):
+
+| Секрет | Откуда |
+|---|---|
+| `ANTHROPIC_API_KEY` | п. 2.2 |
+| `SITE_URL` | адрес сайта, например `https://ukazyra-collab.github.io/hutka/` |
+| `STRIPE_SECRET_KEY` | Stripe → Developers → API keys → Secret key (`sk_live_…`; для проверки можно `sk_test_…`) |
+| `STRIPE_PRICE_PRO` | id цены подписки (`price_…`), см. 2.5 |
+| `STRIPE_PRICE_PACK25`, `STRIPE_PRICE_PACK80` | id цен пакетов |
+| `STRIPE_WEBHOOK_SECRET` | Stripe → Developers → Webhooks → добавить endpoint `https://<ref>.supabase.co/functions/v1/stripe-webhook`, события: `checkout.session.completed`, `invoice.paid`, `customer.subscription.updated`, `customer.subscription.deleted` → Signing secret (`whsec_…`) |
+| `FREE_CREDITS` (необязательно) | стартовые кредиты, по умолчанию 10 |
+
+### 2.5. Товары в Stripe
+Stripe → **Product catalog → Add product**:
+- **Hutka Pro** — recurring, $29 / month → скопировать `price_…` в `STRIPE_PRICE_PRO`;
+- **Starter pack (25 credits)** — one-time, $9 → `STRIPE_PRICE_PACK25`;
+- **Season pack (80 credits)** — one-time, $24 → `STRIPE_PRICE_PACK80`.
+Суммы можно менять; в `config.js` поле `pricing` — только надписи в окне покупки, поправь их в тон.
+
+### 2.6. Проверка
+Открой сайт → **AI coach** → должно показать 10 кредитов → задай вопрос. **Get credits → Choose** должен уводить на страницу оплаты Stripe и после оплаты возвращать на сайт с начислением (обычно 2–5 секунд).
+
+---
+
+## 2-old. ИИ-чат в лаборатории — функция `ask` (старое описание)
 
 Без неё всё работает, просто панели «Спросить ИИ» не будет.
 
