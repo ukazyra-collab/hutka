@@ -78,7 +78,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.hutkakart.app</string>
+			<string>ai.hutka.app</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>hutka</string>
@@ -96,7 +96,7 @@
 			<string>Alternate</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>com.hutkakart.alf2</string>
+				<string>ai.hutka.alf2</string>
 			</array>
 		</dict>
 		<dict>
@@ -110,8 +110,8 @@
 			<array>
 				<string>public.comma-separated-values-text</string>
 				<string>public.plain-text</string>
-				<string>com.hutkakart.gpx</string>
-				<string>com.hutkakart.vbo</string>
+				<string>ai.hutka.gpx</string>
+				<string>ai.hutka.vbo</string>
 			</array>
 		</dict>
 	</array>
@@ -119,7 +119,7 @@
 	<array>
 		<dict>
 			<key>UTTypeIdentifier</key>
-			<string>com.hutkakart.alf2</string>
+			<string>ai.hutka.alf2</string>
 			<key>UTTypeDescription</key>
 			<string>Alfano session</string>
 			<key>UTTypeConformsTo</key>
@@ -136,7 +136,7 @@
 		</dict>
 		<dict>
 			<key>UTTypeIdentifier</key>
-			<string>com.hutkakart.gpx</string>
+			<string>ai.hutka.gpx</string>
 			<key>UTTypeDescription</key>
 			<string>GPS track</string>
 			<key>UTTypeConformsTo</key>
@@ -153,7 +153,7 @@
 		</dict>
 		<dict>
 			<key>UTTypeIdentifier</key>
-			<string>com.hutkakart.vbo</string>
+			<string>ai.hutka.vbo</string>
 			<key>UTTypeDescription</key>
 			<string>VBOX log</string>
 			<key>UTTypeConformsTo</key>

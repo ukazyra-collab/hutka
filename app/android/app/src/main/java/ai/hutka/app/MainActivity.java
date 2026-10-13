@@ -1,4 +1,4 @@
-package com.hutkakart.app;
+package ai.hutka.app;
 
 import android.content.Intent;
 import android.net.Uri;

@@ -22,19 +22,19 @@
 | **Android Studio** — https://developer.android.com/studio | сборка Android (на Mac или Windows) | — |
 | Node 20+ (`brew install node`) | инструменты сборки (CocoaPods не нужен — Capacitor 8 использует Swift Package Manager) | — |
 
-Почта поддержки `hello@hutkakart.com` указана в политике конфиденциальности (`privacy.html` на сайте) — заведи такой ящик или поменяй адрес в файле.
+Почта поддержки `hello@hutka.ai` указана в политике конфиденциальности (`privacy.html` на сайте) — заведи такой ящик или поменяй адрес в файле.
 
 ## 1. Supabase и Google — две галочки для приложения
 
 1. Supabase → **Authentication → URL Configuration → Redirect URLs** → добавь `hutka://auth` (рядом с адресом сайта). Без этого вход из приложения не вернётся обратно.
 2. Google Cloud (если включён вход через Google) — ничего менять не нужно: redirect там один и тот же, на Supabase.
 3. **Sign in with Apple** — обязателен для App Store, если в приложении есть кнопка Google (правило 4.8). Пока Apple-вход не настроен, приложение само прячет кнопку Google и оставляет вход по ссылке на почту — так тоже можно публиковаться. Чтобы включить:
-   - developer.apple.com → **Certificates, Identifiers & Profiles** → Identifiers → App IDs → `com.hutkakart.app` → включи **Sign in with Apple**.
-   - Там же → Identifiers → **Services IDs** → новый, например `com.hutkakart.web`, включи Sign in with Apple, Configure: домен `tqixfqrludqpxqxypiia.supabase.co`, Return URL `https://tqixfqrludqpxqxypiia.supabase.co/auth/v1/callback`.
+   - developer.apple.com → **Certificates, Identifiers & Profiles** → Identifiers → App IDs → `ai.hutka.app` → включи **Sign in with Apple**.
+   - Там же → Identifiers → **Services IDs** → новый, например `ai.hutka.web`, включи Sign in with Apple, Configure: домен `tqixfqrludqpxqxypiia.supabase.co`, Return URL `https://tqixfqrludqpxqxypiia.supabase.co/auth/v1/callback`.
    - Keys → новый ключ с Sign in with Apple → скачай `.p8`, запомни Key ID и Team ID.
    - Supabase → Authentication → Providers → **Apple** → Services ID, Team ID, Key ID, содержимое `.p8` → Save.
    - В `config.js` на сайте поставь `appleAuth: true` — появится кнопка  Apple (и в приложении вернётся Google).
-4. **Аккаунт для ревью Apple.** Проверяющим нужен вход без почты: Supabase → Authentication → Users → **Add user** → почта `review@hutkakart.com` (любая), пароль, «Auto confirm». В приложении в окне входа есть «У меня есть пароль». Эту пару укажешь в App Store Connect → App Review Information.
+4. **Аккаунт для ревью Apple.** Проверяющим нужен вход без почты: Supabase → Authentication → Users → **Add user** → почта `review@hutka.ai` (любая), пароль, «Auto confirm». В приложении в окне входа есть «У меня есть пароль». Эту пару укажешь в App Store Connect → App Review Information.
 
 ## 2. Сборка на Mac
 
@@ -47,7 +47,7 @@ npx cap open ios     # откроется Xcode (первый раз он мин
 ```
 
 В Xcode:
-1. Слева выбери проект **App** → target **App** → вкладка **Signing & Capabilities** → **Team** = твоя команда разработчика (Automatically manage signing — включено). Bundle Identifier уже `com.hutkakart.app`.
+1. Слева выбери проект **App** → target **App** → вкладка **Signing & Capabilities** → **Team** = твоя команда разработчика (Automatically manage signing — включено). Bundle Identifier уже `ai.hutka.app`.
 2. Подключи iPhone кабелем, выбери его в списке устройств сверху → ▶ Run. Первый раз на телефоне: Настройки → Основные → VPN и управление устройством → доверять разработчику.
 3. Проверь: вход, поворот в Lab, «Поделиться .alf2 → Hutka» из приложения Alfano.
 
@@ -55,9 +55,9 @@ npx cap open ios     # откроется Xcode (первый раз он мин
 
 ## 3. App Store Connect — заявка
 
-1. https://appstoreconnect.apple.com → **My Apps → + → New App**: Platforms iOS, Name **Hutka**, Primary Language English, Bundle ID `com.hutkakart.app`, SKU `hutka`, Full Access.
+1. https://appstoreconnect.apple.com → **My Apps → + → New App**: Platforms iOS, Name **Hutka**, Primary Language English, Bundle ID `ai.hutka.app`, SKU `hutka`, Full Access.
 2. **App Information**: Category **Sports** (Secondary — Utilities), Content Rights — не содержит стороннего контента, Age Rating → опросник → 4+.
-3. **App Privacy** → Privacy Policy URL: `https://ukazyra-collab.github.io/hutka/privacy.html` (после переезда — `https://hutkakart.com/privacy.html`). Data Types: Email Address, Name, Photos (аватар), User Content (сессии, комментарии), Identifiers (User ID) — **Linked to the user**, **not used for tracking**. Crash Data / Analytics — нет.
+3. **App Privacy** → Privacy Policy URL: `https://hutka.ai/privacy.html`. Data Types: Email Address, Name, Photos (аватар), User Content (сессии, комментарии), Identifiers (User ID) — **Linked to the user**, **not used for tracking**. Crash Data / Analytics — нет.
 4. **Version 1.0**:
    - Скриншоты: iPhone 6.9" (1320×2868) — обязательно, остальные Apple подгонит. Снимай на iPhone 16 Pro Max (или в симуляторе: ⌘S). Нужны 3–6 штук: лента, страница трассы, Lab (кокпит горизонтально тоже можно), ИИ-тренер.
    - Description, Keywords (karting, kart, lap timer, alfano, telemetry, go-kart, картинг), Support URL (сайт), Marketing URL (сайт).
@@ -92,7 +92,7 @@ npx cap open android   # откроется Android Studio
 
 - **Сайт** (почти всё): просто деплой на GitHub Pages — приложение подхватит само.
 - **Нативное** (иконка, адрес сайта, новые плагины): правка в `app/`, `sh build.sh`, Version/Build +1, Archive → Upload (iOS) и новый `.aab` (Android).
-- **Переезд на hutkakart.com**: в `capacitor.config.json` поменяй `server.url` на `https://hutkakart.com/`, `allowNavigation` там уже есть; пересобери обе платформы. Redirect URLs в Supabase и домены в Google менять **не надо** — `hutka://auth` от домена не зависит.
+- **Адрес сайта** в `capacitor.config.json` → `server.url` (`https://hutka.ai/`). Если домен когда-нибудь поменяется — поправить и пересобрать обе платформы; Redirect URLs в Supabase и домены в Google от этого не зависят (`hutka://auth`).
 - Иконка: `resources/icon.png` (1024×1024) и `resources/splash.png` — если дизайнер даст векторный логотип, замени картинки в `ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png` и в `android/app/src/main/res/mipmap-*/` (или сгенерируй командой `npx @capacitor/assets generate --iconBackgroundColor '#ffffff' --splashBackgroundColor '#ffffff'`).
 
 ## 6. Как это устроено (для разработчика)

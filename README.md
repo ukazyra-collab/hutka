@@ -101,7 +101,7 @@ Supabase → **Edge Functions → Deploy a new function → Via Editor**. Для
 | Секрет | Откуда |
 |---|---|
 | `ANTHROPIC_API_KEY` | п. 2.2 — **для беты нужен только он** |
-| `SITE_URL` | адрес сайта, например `https://ukazyra-collab.github.io/hutka/` (для Stripe) |
+| `SITE_URL` | адрес сайта: `https://hutka.ai/` (для Stripe) |
 | `STRIPE_SECRET_KEY` | Stripe → Developers → API keys → Secret key (`sk_live_…`; для проверки можно `sk_test_…`) |
 | `STRIPE_PRICE_PRO` | id цены подписки (`price_…`), см. 2.5 |
 | `STRIPE_PRICE_PACK25`, `STRIPE_PRICE_PACK80` | id цен пакетов |
@@ -157,10 +157,10 @@ window.HUTKA_CONFIG = {
 
 Обновление сайта = перетащить папку ещё раз (Netlify: **Deploys → drag and drop**).
 
-### Свой домен
-1. Купи домен (Namecheap / Porkbun / Cloudflare Registrar, оплата картой, ~$10–15 в год; `.ae` требует регистратора в ОАЭ).
-2. Netlify → **Domain management → Add a domain** → по подсказке добавь у регистратора записи `A`/`CNAME`. HTTPS включится сам.
-3. Потом не забудь обновить **Site URL / Redirect URLs** в Supabase на новый домен (и redirect URI в Google, если настраивал).
+### Свой домен — hutka.ai (GitHub Pages)
+1. У регистратора: `A @` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`; `CNAME www` → `ukazyra-collab.github.io` (в Cloudflare — режим DNS only).
+2. В репозитории лежит файл `CNAME` с `hutka.ai` — GitHub Pages подхватывает домен сам; в Settings → Pages поставь галочку **Enforce HTTPS**, когда сертификат выпустится (до часа).
+3. Supabase → Authentication → URL Configuration: Site URL `https://hutka.ai/`, в Redirect URLs `https://hutka.ai/**` (плюс `hutka://auth` для приложения); секрет `SITE_URL` функций → `https://hutka.ai/`. Google Cloud → OAuth: Authorized domains `hutka.ai`, JavaScript origins `https://hutka.ai`.
 
 ---
 
@@ -187,7 +187,7 @@ window.HUTKA_CONFIG = {
 - Карту на телефоне можно **крутить двумя пальцами** (как зум щипком, только поворот); ⌂ в «ещё» возвращает исходный вид.
 - Повороты / дайджест / обсуждение / тренер и выбор сравнения открываются шторкой справа (вертикально — снизу). Ориентацию экрана не блокируем — только подсказка «поверни телефон» в вертикальном режиме.
 - В `manifest.webmanifest` `orientation` теперь `any` — установленное на домашний экран приложение тоже поворачивается.
-- При загрузке сайт снимает чужие service worker'ы и кэши (старый сайт на том же домене не будет показываться из кэша после переезда на `hutkakart.com`).
+- При загрузке сайт снимает чужие service worker'ы и кэши (старый сайт на том же домене не будет показываться из кэша).
 
 ### Классы картов и раздельные рейтинги (v26)
 - При загрузке сессии карт выбирается из списка: прокатные модели этой трассы (Sodi RT8, Birel N35… — список трассы) или спортивный класс по семействам: Rotax (Micro/Mini/Junior/Senior MAX, DD2), IAME (Mini Swift, X30 Junior/Senior/Master, KA100), OK/OKJ/OK-N, KZ/KZ2, Vortex ROK, 4-тактные (LO206, Honda cadet, Prokart) и т.д.; «Другой…» — своё название. Старые сессии с текстом вроде «Rotax», «X30 jr» распознаются в класс автоматически.
@@ -195,7 +195,7 @@ window.HUTKA_CONFIG = {
 
 ### Приложение для iPhone / Android (v25.2)
 - Папка `app/` в репозитории — нативная оболочка (Capacitor) вокруг сайта: вход через системный браузер с возвратом по `hutka://auth`, «Открыть в Hutka» для `.alf2`, иконки, сплэш. Приложение показывает живой сайт, так что обновления сайта попадают в него без пересборки. Весь путь до App Store и Google Play по шагам — в `app/README.md`.
-- Для магазина нужна страница политики — `privacy.html` на сайте (почта `hello@hutkakart.com` в ней — заведи ящик или поменяй).
+- Для магазина нужна страница политики — `privacy.html` на сайте (почта `hello@hutka.ai` в ней — заведи ящик или поменяй).
 - В окне входа появились вход по паролю («У меня есть пароль» — для аккаунта ревьюеров Apple) и кнопка  Apple (`appleAuth: true` в `config.js` после настройки провайдера Apple в Supabase). Внутри приложения кнопка Google показывается только вместе с Apple — требование App Store.
 
 ### Что важно знать

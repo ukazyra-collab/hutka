@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Hutka</string>
     <string name="title_activity_main">Hutka</string>
-    <string name="package_name">com.hutkakart.app</string>
-    <string name="custom_url_scheme">com.hutkakart.app</string>
+    <string name="package_name">ai.hutka.app</string>
+    <string name="custom_url_scheme">ai.hutka.app</string>
 </resources>
