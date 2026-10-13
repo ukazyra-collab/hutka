@@ -1,7 +1,7 @@
-// Hutka — connection settings for standalone hosting. Fill in after creating the Supabase project (see README.md).
+// Hutka — connection settings (public values; access is limited by the database policies in supabase/schema.sql)
 window.HUTKA_CONFIG = {
-  supabaseUrl: "",          // Project URL, e.g. https://abcdefghijkl.supabase.co
-  supabaseAnonKey: "",      // Project API keys → anon public
-  askUrl: "",               // Edge function URL, e.g. https://abcdefghijkl.supabase.co/functions/v1/ask (leave empty to hide the AI chat)
-  googleAuth: false         // true once the Google provider is enabled in Supabase Auth
+  supabaseUrl: "https://tqixfqrludqpxqxypiia.supabase.co",
+  supabaseAnonKey: "sb_publishable_Dk2eCbfo6mKZi0fB1VsJZQ_Td0ezi-a",
+  askUrl: "",            // edge function URL once deployed: https://tqixfqrludqpxqxypiia.supabase.co/functions/v1/ask
+  googleAuth: false      // true once the Google provider is enabled in Supabase Auth
 };
