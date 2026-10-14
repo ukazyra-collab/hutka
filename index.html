@@ -387,6 +387,9 @@ body.onboarding #toast{z-index:50}
   #pickbar.stuck{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 18px;align-items:center;padding:8px 16px;border-radius:0 0 14px 14px;box-shadow:0 10px 24px rgba(16,22,48,.12)}
   #pickbar.stuck .pickbar{gap:8px 10px;align-items:center}
   #pickbar.stuck .pickbar .field{flex:0 1 220px}
+  #pickbar.stuck .pickbar .field.auto{flex:0 0 auto}   /* the compare chips keep their width instead of sliding under the next field */
+  #pickbar.stuck #sessField{display:none}
+  #pickbar.stuck .seg .btn{padding:0 9px;font-size:12.5px;height:32px}
   #pickbar.stuck .pickbar .field label{display:none}
   #pickbar.stuck .lapline{margin:0;flex-wrap:nowrap}
   #pickbar.stuck .lapline .lbl,#pickbar.stuck .lapline .chips,#pickbar.stuck #ownerRow,#pickbar.stuck #labStatus{display:none}
@@ -558,8 +561,26 @@ body.onboarding #toast{z-index:50}
 .post.rich .pb{grid-template-columns:minmax(240px,44%) minmax(0,1fr)}
 .post .pv.rich{height:250px;background:var(--surface)}
 .post .pv .pv-open{position:absolute;inset:0;border-radius:12px}
-.ideal-note{margin-top:6px;font-size:12px;color:var(--muted);max-width:620px;line-height:1.35}
-#pickbar.stuck .ideal-note,#hero:fullscreen .ideal-note{display:none}
+.ideal-break{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.ideal-break .ib-head{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-bottom:8px}
+.ideal-break .ib-head b{font-size:15px}
+.ideal-break .ib-head .hint{font-size:12.5px}
+.ideal-break .ib-note{font-size:12.5px;color:var(--muted);margin:0 0 10px;padding:8px 10px;border-radius:8px;background:color-mix(in srgb,var(--limit) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--limit) 35%,var(--line))}
+.ideal-break table{width:100%;border-collapse:collapse;font-size:13px}
+.ideal-break th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:4px 8px 6px;border-bottom:1px solid var(--line)}
+.ideal-break td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.ideal-break tr.sel td{background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.ideal-break td.n{font:700 13px var(--mono);width:40px}
+.ideal-break td.ref{font:500 12.5px var(--mono);color:var(--muted);white-space:nowrap}
+.ideal-break td.ref .you{color:var(--fg)}
+.ideal-break .lp{display:inline-flex;gap:6px;align-items:baseline;padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);font:500 12.5px var(--mono);color:var(--fg);cursor:pointer;margin:2px 6px 2px 0}
+.ideal-break .lp b{font-weight:700}
+.ideal-break .lp .d{color:var(--muted);font-size:11.5px}
+.ideal-break .lp.best{border-color:color-mix(in srgb,var(--throttle) 60%,var(--line));background:color-mix(in srgb,var(--throttle) 12%,var(--surface))}
+.ideal-break .lp.this{border-style:dashed}
+.ideal-break .lp:hover,.ideal-break .lp.on{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.ideal-break tfoot td{font-size:12.5px;color:var(--muted);border-bottom:0;padding-top:8px}
+@media (max-width:640px){.ideal-break th:nth-child(3),.ideal-break td:nth-child(3){display:none}.ideal-break td{padding:6px 4px}.ideal-break td.n{width:30px}.ideal-break .lp{margin:2px 4px 2px 0;padding:3px 7px}}
 #digest p.ideal{padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--limit) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--limit) 40%,var(--line))}
 .insp-text.ideal{background:color-mix(in srgb,var(--limit) 10%,var(--surface));border-radius:8px;padding:8px 10px}
 @media (max-width:640px){.post .pb,.post.rich .pb{grid-template-columns:1fr}.post .pv{height:120px}.post .pv.rich{height:250px}}
@@ -1086,9 +1107,9 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
       <div class="card" id="pickbar" hidden>
         <button class="insp-close mobile-only" id="pickClose" type="button" aria-label="Close">×</button>
         <div class="pickbar">
-          <div class="field"><label data-t="Session">Session</label><select id="sessSel"></select></div>
+          <div class="field" id="sessField"><label data-t="Session">Session</label><select id="sessSel"></select></div>
           <div class="field"><label id="refLbl"></label><select id="refSel"></select></div>
-          <div class="field auto"><label data-t="Compare">Compare</label><div class="row" style="flex-wrap:nowrap"><div class="seg"><button class="btn" id="qcNone" type="button" data-t="Off">Off</button><button class="btn" id="qcBestAvg" type="button" data-t="Best vs average">Best vs average</button><button class="btn" id="qcIdeal" type="button" data-t="Best vs ideal">Best vs ideal</button><button class="btn" id="qcLap" type="button" data-t="Another lap">Another lap</button><button class="btn" id="qcOther" type="button" data-t="Another session…">Another session…</button></div></div><div class="hint ideal-note" id="idealNote" hidden data-t="Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.">Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.</div></div>
+          <div class="field auto"><label data-t="Compare">Compare</label><div class="row" style="flex-wrap:nowrap"><div class="seg"><button class="btn" id="qcNone" type="button" data-t="Off">Off</button><button class="btn" id="qcBestAvg" type="button" data-t="Best vs average">Best vs average</button><button class="btn" id="qcIdeal" type="button" data-t="Best vs ideal">Best vs ideal</button><button class="btn" id="qcLap" type="button" data-t="Another lap">Another lap</button><button class="btn" id="qcOther" type="button" data-t="Another session…">Another session…</button></div></div></div>
           <div class="field" id="cmpField" hidden><label id="cmpLbl"></label><select id="cmpSel"></select></div>
         </div>
         <div class="cmp-picker" id="cmpPicker" hidden><div class="hint" id="cmpPickerHint"></div><div class="list" id="cmpList"></div></div>
@@ -1135,7 +1156,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
       <div class="lab-tabs mobile-only" id="labTabs" hidden><button type="button" class="active" data-tab="corners" data-t="Corners">Corners</button><button type="button" data-tab="digest" data-t="Digest">Digest</button><button type="button" data-tab="chart" data-t="Chart">Chart</button><button type="button" data-tab="discuss" data-t="Discussion">Discussion</button><button type="button" data-tab="ai" data-t="Coach">Coach</button><button type="button" class="x" id="labTabsClose" aria-label="Close">×</button></div>
       <div class="card" id="digestPanel" hidden><h2><svg><use href="#i-clip"/></svg><span data-t="Session digest">Session digest</span><span class="sub" id="digestSub"></span></h2><div class="digest" id="digest"></div><details class="gloss"><summary class="hint" data-t="What the terms mean">What the terms mean</summary><ul id="glossList"></ul></details></div>
       <div class="card" id="askPanel" hidden><h2><svg><use href="#i-lab"/></svg><span data-t="Ask the AI about this session">Ask the AI about this session</span></h2><div class="chat" id="chatLog"></div><div class="chips" id="askChips"></div><div class="askrow"><textarea id="askInput"></textarea><div class="askbtns"><button class="btn primary" id="askBtn" type="button" data-t="Ask">Ask</button><button class="btn" id="askStop" type="button" hidden data-t="Stop">Stop</button></div></div><div class="hint" id="askNote" style="margin-top:6px"></div></div>
-      <div class="card" id="cornersPanel" hidden><h2><svg><use href="#i-corner"/></svg><span data-t="Corner by corner">Corner by corner</span><span class="sub" data-t="click a row to pin it on the map">click a row to pin it on the map</span></h2><div class="crows mobile-only" id="cornersMob"></div><div class="tblwrap" id="cornersWrap"><table class="tbl corners" id="cornersTable"><thead><tr><th>#</th><th data-t="Type">Type</th><th class="you" id="youColHead"></th><th id="cmpColHead"></th><th>Δt</th><th data-t="Reserve">Reserve</th><th data-t="Main difference">Main difference</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="card" id="cornersPanel" hidden><h2><svg><use href="#i-corner"/></svg><span data-t="Corner by corner">Corner by corner</span><span class="sub" data-t="click a row to pin it on the map">click a row to pin it on the map</span></h2><div class="crows mobile-only" id="cornersMob"></div><div class="tblwrap" id="cornersWrap"><table class="tbl corners" id="cornersTable"><thead><tr><th>#</th><th data-t="Type">Type</th><th class="you" id="youColHead"></th><th id="cmpColHead"></th><th>Δt</th><th data-t="Reserve">Reserve</th><th data-t="Main difference">Main difference</th></tr></thead><tbody></tbody></table></div><div class="ideal-break" id="idealBreak" hidden></div></div>
       <div class="card" id="discussPanel" hidden><h2><svg><use href="#i-chat"/></svg><span data-t="Discussion">Discussion</span><span class="sub" id="discussSub"></span></h2><div class="comments" id="commentList"></div><div class="askrow" id="commentForm"><textarea id="commentInput" rows="2"></textarea><div class="askbtns"><button class="btn primary" id="commentBtn" type="button" data-t="Post">Post</button></div></div><div class="hint" id="commentNote"></div></div>
     </section>
 
@@ -2954,6 +2975,7 @@ Object.assign(I18N.RU, { 'Where the time is': 'Где время' });
 Object.assign(I18N.RU, { 'Preparing the link…': 'Готовлю ссылку…', 'every corner, compared with the fastest': 'каждый поворот в сравнении с лучшими' });
 Object.assign(I18N.RU, { 'Visitors today': 'Посетители сегодня', 'Yesterday': 'Вчера', 'signed in {u} · new {n} · {o} opens': 'вошли {u} · новых {n} · {o} открытий', 'Visitors, 7 days': 'Посетители, 7 дней', '{n} signed in · {m} in 30 days': '{n} вошли · {m} за 30 дней', 'Retention': 'Возвращаемость', 'came back the next day · within 7 days: {p} (of {n} new)': 'вернулись на следующий день · в течение 7 дней: {p} (из {n} новых)', 'Visitors, last 30 days': 'Посетители, 30 дней', 'Devices, 30 days': 'Устройства, 30 дней', 'Days are UTC (Dubai is +4). A visitor is a browser; a driver on a phone and a laptop counts twice.': 'Дни по UTC (Дубай +4). Посетитель — это браузер: один человек с телефона и ноутбука считается дважды.', 'Visitors and retention: run supabase/visits.sql in the SQL editor once — the numbers appear here from the next day.': 'Посетители и возвращаемость: выполни supabase/visits.sql в SQL Editor один раз — цифры появятся здесь со следующего дня.' });
 Object.assign(I18N.RU, { 'Best vs ideal': 'Лучший vs идеальный', 'ideal lap': 'идеальный круг', 'Ideal lap': 'Идеальный круг', 'best corners, approximate': 'лучшие повороты, приблизительно', 'This session needs at least two clean laps for an ideal lap.': 'Для идеального круга нужны хотя бы два чистых круга в сессии.', 'Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.': 'Идеальный круг ≈ самый быстрый проезд каждого поворота, собранный из разных кругов. Приблизительно: связки поворотов не учитываются.', 'The fastest pass through each corner, stitched from {k} different laps of this session — {d} s better than the best lap.': 'Самый быстрый проезд каждого поворота, собранный из {k} разных кругов этой сессии — на {d} с лучше лучшего круга.', 'Where another lap was faster:': 'Где другой круг был быстрее:', 'The best lap is the fastest in every corner.': 'Лучший круг — самый быстрый в каждом повороте.', 'Approximate: corners are judged one by one, combinations are not — a faster entry into one corner can be the reason for a slower next one, and this stitched lap was never driven. A ceiling, not a target.': 'Приблизительно: повороты оцениваются по одному, связки — нет: быстрый вход в один поворот может быть причиной медленного следующего, а такого круга целиком никто не проезжал. Это потолок, а не цель.', 'Your fastest pass through this corner is this very lap.': 'Твой самый быстрый проезд этого поворота — именно этот круг.', 'Your fastest pass through this corner: lap {n}, {t} s ({d} s faster than the reference lap).': 'Твой самый быстрый проезд этого поворота: круг {n}, {t} с (на {d} с быстрее опорного круга).', 'Corners are judged one by one — check the next corner of that lap too.': 'Повороты оцениваются по одному — посмотри и следующий поворот того круга.' });
+Object.assign(I18N.RU, { 'Ideal lap breakdown': 'Из чего состоит идеальный круг', '{t} = the fastest pass through each corner · stitched from {k} laps · best lap {b}': '{t} = самый быстрый проезд каждого поворота · собрано из {k} кругов · лучший круг {b}', 'Approximate: corners are judged one by one, combinations are not — a faster entry into one corner can be the reason for a slower next one. Tap a lap to compare it with your best lap in that corner, or to find it on the camera.': 'Приблизительно: повороты оцениваются по одному, связки — нет: быстрый вход в один поворот может быть причиной медленного следующего. Нажми на круг, чтобы сравнить его с лучшим кругом в этом повороте или найти на камере.', 'Fastest laps in this corner': 'Самые быстрые круги в этом повороте', 'Best lap': 'Лучший круг', 'your best lap': 'твой лучший круг', 'Compare the best lap with lap {n} in T{c}': 'Сравнить лучший круг с кругом {n} в T{c}', 'Σ fastest corners = {t}': 'Σ лучших поворотов = {t}' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4148,7 +4170,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v30.2';
+const APP_VERSION = 'v30.3';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -4553,9 +4575,9 @@ function sessIdeal(sess, R, apexes) {
   const projs = laps.map(L => DATA.projectLap(L, tr, G.rev)).filter(Boolean); if (projs.length < 2) return null;
   const v = new Float64Array(N), o = new Float64Array(N), g = new Float64Array(N), dt = new Float64Array(N), picks = [];
   for (const w of wins) {
-    let best = null, bt = Infinity; for (const P of projs) { const tm = DATA.tw(P, w.b, w.a); if (tm < bt) { bt = tm; best = P; } }
+    const ranked = projs.map(P => ({ P, L: P.lap, time: DATA.tw(P, w.b, w.a) })).sort((a, b) => a.time - b.time), best = ranked[0].P, bt = ranked[0].time;
     for (let k = 0; k < w.len; k++) { const i = (w.a + k) % N; v[i] = best.v[i]; o[i] = best.o[i]; g[i] = best.g[i]; dt[i] = DATA.tw(best, (i + 1) % N, i); }
-    picks.push({ n: w.n, L: best.lap, time: bt });
+    picks.push({ n: w.n, L: best.lap, time: bt, top: ranked.slice(0, 3).map(x => ({ L: x.L, time: x.time })) });
   }
   const tt = new Float64Array(N + 1); for (let i = 0; i < N; i++) tt[i + 1] = tt[i] + dt[i];
   const P = { key: 'ideal:' + sess.id, N, ds: tr.ds, T: tt[N], v, t: tt, o, a: DATA.accelFrom(v, N, tr.ds), g, lap: null, n: projs.length, name: t('ideal lap'), ideal: true, picks, sess, nLapsUsed: new Set(picks.map(p => p.L.n)).size };
@@ -4686,7 +4708,7 @@ LAB.open = async function (meta, asCmp) {
   LAB.names = await STORE.names(LAB.sessions.map(s => s.owner));
   LAB.sessions.sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.createdAt || 0) - (b.createdAt || 0));
   const reopen = !!(LAB.current && LAB.current.id === sess.id);
-  LAB.current = sess; LAB.selN = 0; LAB.ckInsp = false; LAB.scrubIdx = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = reopen && LAB.pickerOpen; LAB.social = null;
+  LAB.current = sess; LAB.selN = 0; LAB.ckInsp = false; LAB.scrubIdx = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = reopen && LAB.pickerOpen; LAB.social = null; LAB.breakOpen = false;
   if (asCmp) { const my = LAB.sessions.filter(s => mySession(s) && s.id !== sess.id).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]; if (my) { LAB.ref = lapKey(my, bestLap(my)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : lapKey(sess, bestLap(sess)); LAB.current = my; } else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; } }
   else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : 'none'; }   // best lap against the session average by default
   LAB.loaded = true; LAB.needFit = true; if (APP.route === 'lab') { LAB.map.fit(); LAB.needFit = false; } labRender();
@@ -4937,12 +4959,12 @@ function labEnsureMap() {
   // session switch, reference lap, comparison
   $('sessSel').addEventListener('change', async () => { const id = $('sessSel').value; if (!id || (LAB.current && id === LAB.current.id)) return; const loaded = sessOf(id); if (loaded) { LAB.current = loaded; LAB.ref = lapKey(loaded, bestLap(loaded)); LAB.cmp = sessAvg(loaded) ? 'avg:' + loaded.id : 'none'; LAB.selN = 0; LAB.chat = []; LAB.social = null; labRender(); } else { const meta = await STORE.getSessionMeta(id); if (meta) { go('lab~' + id); } } });
   $('refSel').addEventListener('change', () => { LAB.ref = $('refSel').value; if (LAB.cmp === LAB.ref) LAB.cmp = 'none'; LAB.selN = 0; LAB.chat = []; labRender(); });
-  $('cmpSel').addEventListener('change', () => { LAB.cmp = $('cmpSel').value; LAB.chat = []; labRender(); });
-  $('qcNone').onclick = () => { LAB.cmp = 'none'; LAB.pickerOpen = false; LAB.chat = []; labRender(); };
-  $('qcBestAvg').onclick = () => { const s = LAB.current; if (!s) return; LAB.ref = lapKey(s, bestLap(s)); LAB.cmp = sessAvg(s) ? 'avg:' + s.id : 'none'; if (LAB.cmp === 'none') toast(t('This session needs at least two clean laps for an average.')); LAB.pickerOpen = false; LAB.selN = 0; LAB.chat = []; labRender(); };
-  $('qcIdeal').onclick = () => { const s = LAB.current; if (!s) return; LAB.ref = lapKey(s, bestLap(s)); LAB.cmp = 'ideal:' + s.id; LAB.pickerOpen = false; LAB.selN = 0; LAB.chat = []; labRender(); if (!isIdealKey(LAB.cmp)) toast(t('This session needs at least two clean laps for an ideal lap.')); };
-  $('qcLap').onclick = () => { const s = LAB.current; if (!s) return; const ref = findLap(LAB.ref); const L = ref && ref.sess === s ? ref.L : null; const nx = s.laps.filter(x => x.px && x !== L).sort((a, b) => (b.clean - a.clean) || a.timeMs - b.timeMs)[0]; if (!nx) { toast(t('No other lap in this session.')); return; } LAB.cmp = lapKey(s, nx); LAB.pickerOpen = false; LAB.chat = []; labRender(); };
-  $('qcOther').onclick = () => { LAB.pickerOpen = !LAB.pickerOpen; renderCmpPicker(); };
+  $('cmpSel').addEventListener('change', () => { LAB.cmp = $('cmpSel').value; LAB.breakOpen = isIdealKey(LAB.cmp); LAB.chat = []; labRender(); });
+  $('qcNone').onclick = () => { LAB.breakOpen = false; LAB.cmp = 'none'; LAB.pickerOpen = false; LAB.chat = []; labRender(); };
+  $('qcBestAvg').onclick = () => { const s = LAB.current; if (!s) return; LAB.breakOpen = false; LAB.ref = lapKey(s, bestLap(s)); LAB.cmp = sessAvg(s) ? 'avg:' + s.id : 'none'; if (LAB.cmp === 'none') toast(t('This session needs at least two clean laps for an average.')); LAB.pickerOpen = false; LAB.selN = 0; LAB.chat = []; labRender(); };
+  $('qcIdeal').onclick = () => { const s = LAB.current; if (!s) return; if (isIdealKey(LAB.cmp)) return; LAB.breakOpen = true; LAB.ref = lapKey(s, bestLap(s)); LAB.cmp = 'ideal:' + s.id; LAB.pickerOpen = false; LAB.chat = []; labRender(); if (!isIdealKey(LAB.cmp)) toast(t('This session needs at least two clean laps for an ideal lap.')); else toast(t('Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.'), 6000); };
+  $('qcLap').onclick = () => { const s = LAB.current; if (!s) return; LAB.breakOpen = false; const ref = findLap(LAB.ref); const L = ref && ref.sess === s ? ref.L : null; const nx = s.laps.filter(x => x.px && x !== L).sort((a, b) => (b.clean - a.clean) || a.timeMs - b.timeMs)[0]; if (!nx) { toast(t('No other lap in this session.')); return; } LAB.cmp = lapKey(s, nx); LAB.pickerOpen = false; LAB.chat = []; labRender(); };
+  $('qcOther').onclick = () => { LAB.breakOpen = false; LAB.pickerOpen = !LAB.pickerOpen; renderCmpPicker(); };
   $('lapYou').onclick = () => { LAB.mapLap = 'you'; labRender(); }; $('lapCmp').onclick = () => { LAB.mapLap = 'cmp'; labRender(); };
   $('labUpload').onclick = () => UPLOAD.open({ track: LAB.tid, layout: LAB.lid }); $('labUpload2').onclick = () => UPLOAD.open({});
   $('btnPublish').onclick = labTogglePublish; $('labBack').onclick = () => LAB.close();
@@ -5043,7 +5065,7 @@ function labRender() {
   if (!D) { $('digest').innerHTML = `<p class="hint">${apexes.length < 2 ? t('No corners found on this line.') : t('Could not project this lap onto the track line.')}</p>`; $('cornersTable').querySelector('tbody').innerHTML = ''; return; }
   D.ref = { sess, L, avg: refIsAvg, name: refName, mine: mySession(sess) }; D.nameOf = nameOf; D.sess = sess; LAB.dcmp = D;
   if (D.O && D.O.ideal) for (const r of D.rows) r.pick = D.O.picks.find(p => p.n === r.w.n) || null;   // which lap won this corner
-  $('idealNote').hidden = !(D.O && D.O.ideal);
+  D.ideal = (D.O && D.O.ideal) ? D.O : ((LAB.breakOpen && cs === sess && !refIsAvg) ? sessIdeal(cs, R, apexes) : null);   // the breakdown stays open while a lap picked from it is the comparison
   markCombos(D);
   LAB.coach = DATA.buildCoach(G.track, D.wins, attached.filter(x => x.L.clean).map(x => x.L), G.rev);
   LAB.corridor = null;
@@ -5399,7 +5421,7 @@ function renderDigest() {
   $('glossList').innerHTML = [['brake', t('Brake — where the deceleration gets stronger than 2.5 m/s²; the number is metres from the start/finish line.')], ['lift', t('Lift — the throttle closes without braking; eased off — a partial lift.')], ['released', t('Released — the brake pedal is let go; earlier usually means the kart rolls and rotates on its own.')], ['apex', t('Apex — the slowest point of the corner; apex speed is the minimum speed.')], ['throttle', t('Throttle — where the full acceleration starts after the apex.')], ['exit', t('Exit — the speed 40 m after the apex: what the whole straight inherits.')], ['reserve', t('Reserve — how much faster the corner would be if driven like the best quarter of all passes in the loaded sessions.')], ['clean', t('Clean lap — no slower than the best by 4 %; the rest are counted as dirty and skipped in averages.')]].map(([k, v]) => `<li>${esc(v)}</li>`).join('');
 }
 function renderCornersTable() {
-  const D = LAB.dcmp, tb = $('cornersTable').querySelector('tbody'); tb.innerHTML = ''; $('cornersTable').classList.add('resp'); if (!D) return;
+  const D = LAB.dcmp, tb = $('cornersTable').querySelector('tbody'); tb.innerHTML = ''; $('cornersTable').classList.add('resp'); renderIdealBreak(); if (!D) return;
   const coachOf = (n) => LAB.coach ? LAB.coach.corners.find(c => c.n === n) : null;
   const short = (m) => `${pedalText(m)} · ${t('apex')} ${kmh(m.vApex)} · ${t('throttle')} ${m.sThr >= 0 ? m.sThr.toFixed(0) + ' ' + t('m') : '—'} · ${t('exit')} ${kmh(m.vExit)} · ${m.time.toFixed(2)} ${t('s')}`;
   for (const r of D.rows) {
@@ -5419,6 +5441,24 @@ function renderCornersTable() {
     b.innerHTML = `<b>T${w.n}</b><span class="ty ${kindCls(m)}">${esc((w.dir === 'L' ? t('left') : t('right')) + ' · ' + kindWord(m))}</span><span class="d ${r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm'}">${r.cmp ? sg(r.cmp.dt) : m.time.toFixed(2) + ' ' + t('s')}</span><span class="r ${res > 0.1 ? 'hot' : ''}">${c ? (res > 0.03 ? t('reserve') + ' ' + res.toFixed(2) : t('ok')) : ''}</span><span class="k">${esc(short(m))}${main ? ' — ' + esc(main) : ''}</span>`;
     b.onclick = () => selectCorner(w.n, false); mob.appendChild(b); }
   if (isLand() && LAB.selN) { const s = mob.querySelector('.crow.sel'); if (s && s.scrollIntoView) s.scrollIntoView({ block: 'nearest' }); }
+}
+// the ideal lap breakdown: per corner the three fastest laps of the session (a chip opens that lap as the comparison, pinned on the corner)
+function renderIdealBreak() {
+  const D = LAB.dcmp, box = $('idealBreak'); if (!D || !D.ideal) { box.hidden = true; box.innerHTML = ''; return; }
+  const sess = D.sess, L = D.ref.L, O = D.ideal; box.hidden = false; box.innerHTML = '';
+  const head = el('div', 'ib-head'); head.innerHTML = `<b>${esc(t('Ideal lap breakdown'))}</b><span class="hint">${esc(t('{t} = the fastest pass through each corner · stitched from {k} laps · best lap {b}', { t: fmtLap(O.T), k: O.nLapsUsed, b: fmtMs(L.timeMs) }))}</span>`; box.appendChild(head);
+  box.appendChild(el('div', 'ib-note', t('Approximate: corners are judged one by one, combinations are not — a faster entry into one corner can be the reason for a slower next one. Tap a lap to compare it with your best lap in that corner, or to find it on the camera.')));
+  const tbl = el('table'); tbl.innerHTML = `<thead><tr><th>#</th><th>${esc(t('Fastest laps in this corner'))}</th><th>${esc(t('Best lap'))}</th></tr></thead>`; const tb = el('tbody'); tbl.appendChild(tb);
+  const cur = findLap(LAB.cmp), curL = cur ? cur.L : null;
+  for (const r of D.rows) {
+    const p = O.picks.find(x => x.n === r.w.n); if (!p) continue; const tr = el('tr'); if (LAB.selN === r.w.n) tr.className = 'sel';
+    const tdN = el('td', 'n', 'T' + r.w.n); const tdL = el('td');
+    p.top.forEach((x, i) => { const b = el('button', 'lp' + (i === 0 ? ' best' : '') + (x.L === L ? ' this' : '') + (curL === x.L ? ' on' : '')); b.type = 'button'; b.innerHTML = `<b>${esc(t('lap {n}', { n: x.L.n }))}</b> ${x.time.toFixed(2)}${i && x.time - p.top[0].time >= 0.005 ? ` <span class="d">+${(x.time - p.top[0].time).toFixed(2)}</span>` : ''}`; b.title = x.L === L ? t('your best lap') : t('Compare the best lap with lap {n} in T{c}', { n: x.L.n, c: r.w.n }); b.onclick = (e) => { e.stopPropagation(); if (x.L === L) { selectCorner(r.w.n, true); return; } LAB.breakOpen = true; LAB.cmp = lapKey(sess, x.L); LAB.selN = r.w.n; LAB.chat = []; labRender(); }; tdL.appendChild(b); });
+    const tdR = el('td', 'ref'); tdR.innerHTML = `<span class="you">${r.R.time.toFixed(2)}</span>${r.R.time - p.time > 0.005 ? ` <span>+${(r.R.time - p.time).toFixed(2)}</span>` : ' ★'}`;
+    tr.append(tdN, tdL, tdR); tr.onclick = () => selectCorner(r.w.n, true); tb.appendChild(tr);
+  }
+  const tf = el('tfoot'); tf.innerHTML = `<tr><td></td><td>${esc(t('Σ fastest corners = {t}', { t: fmtLap(O.T) }))}</td><td>${esc(fmtLap(D.R.T))}${D.R.T - O.T > 0.005 ? ` +${(D.R.T - O.T).toFixed(2)}` : ''}</td></tr>`; tbl.appendChild(tf);
+  box.appendChild(tbl);
 }
 // the data charts follow the mouse: at most one repaint per animation frame
 let chartsReq = false;
