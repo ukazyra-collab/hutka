@@ -653,6 +653,15 @@ body.onboarding #toast{z-index:50}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35) rotate(-8deg)}70%{transform:scale(.95)}100%{transform:scale(1)}}
 .post.low{opacity:.72}
 .post.low .pv{filter:grayscale(1)}
+.hcard h2{margin-bottom:4px}
+.hstep{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:12px 24px;align-items:start;padding:16px 0;border-top:1px solid var(--line)}
+.hstep .tx{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
+.hstep .n{grid-row:1/3;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+.hstep h3{font-size:16px;font-weight:700}
+.hstep p{grid-column:2;color:var(--fg);line-height:1.55;font-size:14px}
+.hstep .pic img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:var(--surface-2)}
+.hlist{margin:10px 0 0 18px;line-height:1.7;font-size:14px}
+@media (max-width:760px){.hstep{grid-template-columns:1fr}.hstep .pic{max-width:360px}}
 .bugbtn{position:fixed;right:14px;bottom:14px;z-index:28;width:38px;height:38px;border-radius:50%;border:1px solid var(--line-2);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px);color:var(--muted);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(16,22,48,.12);opacity:.75;transition:opacity .15s,transform .15s}
 .bugbtn:hover{opacity:1;transform:translateY(-1px);color:var(--fg)}
 .bugbtn svg{width:18px;height:18px}
@@ -1053,7 +1062,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
       <div id="labStart" hidden>
         <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="labMineSub"></span></h2><div id="labMine"></div><div class="hint" id="labMineHint"></div></div>
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
-        <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><button class="btn primary" id="labUpload2" type="button" style="margin-top:10px"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div>
+        <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><div class="row" style="margin-top:10px"><button class="btn primary" id="labUpload2" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#help"><span data-t="How to get the file — step by step">How to get the file — step by step</span></a></div></div>
       </div>
       <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner">›</button></div><button class="btn sm" id="lmCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
       <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close">×</button></div>
@@ -1171,6 +1180,11 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     </section>
 
     <!-- ========== DRIVER ========== -->
+    <!-- ========== HELP: how to get the session file and upload it ========== -->
+    <section class="page" id="pg-help" hidden>
+      <div class="ph"><div class="row" style="gap:12px;align-items:center"><a class="btn sm ghost" href="#lab">‹ <span data-t="Lab">Lab</span></a><div><h1 data-t="How to upload a session">How to upload a session</h1><div class="sub" id="helpSub"></div></div></div></div>
+      <div id="helpBody"></div>
+    </section>
     <section class="page" id="pg-driver" hidden>
       <div class="card"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><img class="avatar" id="drvAvatar" alt="" style="width:72px;height:72px"><div style="min-width:0;flex:1"><div style="font-size:22px;font-weight:800" id="drvName">—</div><div class="hint" id="drvMeta"></div><div class="hint" id="drvFollowers"></div><div id="drvBio" style="margin-top:6px;font-size:14px"></div><div class="row" id="drvLinks" style="margin-top:8px"></div></div><button class="btn primary" id="drvFollow" type="button" hidden></button></div></div>
       <div class="card" id="drvSwsCard" hidden><h2><svg><use href="#i-flag"/></svg><span data-t="SWS results">SWS results</span><span class="sub" id="drvSwsSub"></span></h2><div id="drvSwsBox"></div></div>
@@ -1279,6 +1293,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
   <div class="box">
     <h3 data-t="Upload session">Upload session</h3>
     <div class="upl-drop" id="uplDrop"><div><b data-t="Choose session files">Choose session files</b></div><div class="hint" data-t="Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.">Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.</div><input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden></div>
+    <div class="hint" style="margin-top:-4px"><a href="#help" id="uplHelpLink" data-t="How do I get the file from my Alfano? — step by step">How do I get the file from my Alfano? — step by step</a></div>
     <div class="status" id="uplStatus"></div>
     <div id="uplForm" hidden>
       <div class="form">
@@ -2884,6 +2899,22 @@ Object.assign(I18N.RU, {
   'No reports yet. The button in the corner of every page sends them here and to your inbox.': 'Сообщений пока нет. Кнопка в углу каждой страницы шлёт их сюда и на почту.', 'guest': 'гость', 'session': 'сессия', 'Reopen': 'Открыть заново', 'Done': 'Готово', 'Delete this report?': 'Удалить это сообщение?'
 });
 Object.assign(I18N.RU, { 'Session & compare': 'Сессия и сравнение', 'Sessions': 'Сессии' });
+Object.assign(I18N.RU, {
+  'How to upload a session': 'Как загрузить сессию', 'Three minutes the first time, thirty seconds after that.': 'Три минуты в первый раз, полминуты потом.',
+  'How do I get the file from my Alfano? — step by step': 'Как достать файл из Alfano? — по шагам', 'How to get the file — step by step': 'Как достать файл — по шагам',
+  'Alfano 7 — the ADA app on your phone': 'Alfano 7 — приложение ADA на телефоне', 'The app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.': 'То приложение, в котором ты смотришь круги. Каждая сессия — один файл: сохраняешь его на телефон и отдаёшь Hutka.',
+  'Open the ADA app and go to Sessions': 'Открой ADA и зайди в Sessions', 'In the list “Select your sessions”, tap the session you want — the row lights up. One session = one file.': 'В списке «Select your sessions» нажми нужную сессию — строка подсветится. Одна сессия = один файл.',
+  'Tap the export button — bottom right': 'Нажми кнопку экспорта — справа внизу', 'The icon with the arrow out of a box (2 on the picture). The phone’s share sheet opens.': 'Иконка со стрелкой из коробки (2 на картинке). Откроется меню «Поделиться».',
+  'Save the file on the phone': 'Сохрани файл на телефон', 'tap “Save to Files”, choose a folder (Downloads is fine), tap Save.': 'нажми «Сохранить в Файлы», выбери папку (Downloads подойдёт), Сохранить.', 'choose “Save” / “Downloads”.': 'выбери «Сохранить» / «Загрузки».',
+  'The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.': 'Файл начинается с ALFANO7 и заканчивается на .alf2. Короткий путь, который тоже работает: отправь его себе в Telegram или WhatsApp — на следующем шаге его можно взять оттуда.',
+  'Open hutka.ai and tap Upload': 'Открой hutka.ai и нажми Upload', 'The round button in the middle of the bottom bar (on a computer — “Upload session” at the top right of the Lab). Sign in first if you have not — it takes one email.': 'Круглая кнопка посередине нижней панели (на компьютере — «Upload session» справа вверху в Lab). Если ещё не вошёл — войди, нужна только почта.',
+  'Choose the file': 'Выбери файл', 'Tap “Choose session files”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.': 'Нажми «Choose session files» и найди свой .alf2: iPhone — Обзор → Downloads (или папка Telegram / WhatsApp); Android — Загрузки.',
+  'Check the track, tap Analyse': 'Проверь трассу, нажми Analyse', 'Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap Analyse — the Lab opens with every corner.': 'Hutka узнаёт трассу по GPS и подставляет лейаут и самый частый карт — проверь, поменяй, если надо. «Publish» — другие смогут сравниваться с тобой; сними галочку, чтобы сессия осталась приватной. Нажми Analyse — откроется Lab с разбором по поворотам.',
+  'Other loggers and apps': 'Другие логгеры и приложения', 'Any of these files works the same way: save it on the phone or computer, then Upload → Choose session files.': 'Любой из этих файлов грузится так же: сохрани на телефон или компьютер, потом Upload → Choose session files.',
+  'open the session → ⋮ → Export → RaceChrono CSV (v3) → share / save the file.': 'открой сессию → ⋮ → Export → RaceChrono CSV (v3) → поделиться / сохранить.', 'Race Studio 3 on a computer → the session → Export → CSV.': 'Race Studio 3 на компьютере → сессия → Export → CSV.', 'the .vbo file from the logger or VBOX Test Suite.': 'файл .vbo с логгера или из VBOX Test Suite.', 'Export → CSV / GPX → save.': 'Export → CSV / GPX → сохранить.',
+  'Any phone GPS app': 'Любое GPS-приложение на телефоне', 'export the session as GPX (RaceChrono free and most “GPS logger” apps do). GPS at 1 Hz is enough to see corners; 10 Hz is better.': 'экспортируй сессию в GPX (бесплатный RaceChrono и большинство «GPS logger» умеют). GPS 1 Гц хватает, чтобы увидеть повороты; 10 Гц лучше.',
+  'Stuck?': 'Не получается?', 'Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.': 'Отправь файл тому, кто тебя позвал — загрузить его за тебя дело минуты. Или нажми жука в углу любой страницы и опиши, что случилось.'
+});
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3907,7 +3938,7 @@ const trackHours = (tr) => { if (!tr.close) return null; if (!tr.open) return { 
 const APP = { route: 'tracks', a: null, b: null, geo: null, hoverTrack: null };
 function parseHash() { const h = (location.hash || '#home').slice(1); const parts = h.includes('~') ? h.split('~') : h.split('-'); return { name: parts[0] || 'home', a: parts[1] || null, b: parts[2] || null, c: parts[3] || null }; }
 function go(hash) { if (location.hash === '#' + hash) route(); else location.hash = hash; }
-const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver', 'ai', 'sws'];
+const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver', 'ai', 'sws', 'help'];
 let routeSeq = 0, routeHash = null;
 async function route() {
   if (routeHash === location.hash) return; routeHash = location.hash; const seq = ++routeSeq;   // the same hash twice in a row is one navigation
@@ -3930,6 +3961,7 @@ async function route() {
     else if (name === 'driver') await renderDriverPage(r.a);
     else if (name === 'ai') await renderAIPage(r.a, r.b);
     else if (name === 'admin') await ADMIN.show(r.a, r.b);
+    else if (name === 'help') renderHelpPage();
   } catch (e) { console.error('route', e); }
   finally { if (seq === routeSeq) routeHash = null; }
 }
@@ -3996,6 +4028,27 @@ $('authPassBtn').onclick = async () => { const email = $('authEmail').value.trim
 $('authPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authPassBtn').click(); });
 $('authEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authEmailBtn').click(); });
 
+// ---------- the guide: how to get a session file out of the logger and into Hutka (plain steps with pictures) ----------
+function renderHelpPage() {
+  $('helpSub').textContent = t('Three minutes the first time, thirty seconds after that.');
+  const box = $('helpBody'); box.innerHTML = '';
+  const step = (n, title, text, img, alt) => { const d = el('div', 'hstep'); const tx = el('div', 'tx'); tx.innerHTML = `<div class="n">${n}</div><h3>${esc(title)}</h3><p>${text}</p>`; d.appendChild(tx); if (img) { const im = new Image(); im.src = 'help/' + img; im.alt = alt || ''; im.loading = 'lazy'; const w = el('div', 'pic'); w.appendChild(im); d.appendChild(w); } return d; };
+  const card = (title, sub) => { const c = el('div', 'card hcard'); c.innerHTML = `<h2>${esc(title)}</h2>${sub ? `<p class="hint">${esc(sub)}</p>` : ''}`; return c; };
+  // Alfano 7 — the ADA app on the phone
+  const a = card(t('Alfano 7 — the ADA app on your phone'), t('The app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.'));
+  a.appendChild(step(1, t('Open the ADA app and go to Sessions'), esc(t('In the list “Select your sessions”, tap the session you want — the row lights up. One session = one file.')), 'ada-sessions.jpg'));
+  a.appendChild(step(2, t('Tap the export button — bottom right'), esc(t('The icon with the arrow out of a box (2 on the picture). The phone’s share sheet opens.'))));
+  a.appendChild(step(3, t('Save the file on the phone'), `<b>iPhone:</b> ${esc(t('tap “Save to Files”, choose a folder (Downloads is fine), tap Save.'))}<br><b>Android:</b> ${esc(t('choose “Save” / “Downloads”.'))}<br><span class="hint">${esc(t('The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.'))}</span>`));
+  a.appendChild(step(4, t('Open hutka.ai and tap Upload'), esc(t('The round button in the middle of the bottom bar (on a computer — “Upload session” at the top right of the Lab). Sign in first if you have not — it takes one email.')), 'hutka-upload.jpg'));
+  a.appendChild(step(5, t('Choose the file'), esc(t('Tap “Choose session files”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.')), 'hutka-choose.jpg'));
+  a.appendChild(step(6, t('Check the track, tap Analyse'), esc(t('Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap Analyse — the Lab opens with every corner.')), 'hutka-form.jpg'));
+  box.appendChild(a);
+  // other loggers
+  const o = card(t('Other loggers and apps'), t('Any of these files works the same way: save it on the phone or computer, then Upload → Choose session files.'));
+  const ul = el('ul', 'hlist'); for (const [k, v] of [['RaceChrono', t('open the session → ⋮ → Export → RaceChrono CSV (v3) → share / save the file.')], ['AiM (MyChron)', t('Race Studio 3 on a computer → the session → Export → CSV.')], ['VBOX', t('the .vbo file from the logger or VBOX Test Suite.')], ['TrackAddict / Harry’s LapTimer', t('Export → CSV / GPX → save.')], [t('Any phone GPS app'), t('export the session as GPX (RaceChrono free and most “GPS logger” apps do). GPS at 1 Hz is enough to see corners; 10 Hz is better.')]]) { const li = el('li'); li.innerHTML = `<b>${esc(k)}</b> — ${esc(v)}`; ul.appendChild(li); }
+  o.appendChild(ul); box.appendChild(o);
+  const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
+}
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
 const APP_VERSION = 'v29.4';
 const BUG = { errors: [], shot: null,
@@ -5250,6 +5303,7 @@ const UPLOAD = (() => {
   $('uplFile').addEventListener('change', (e) => onFiles(Array.from(e.target.files || [])));
   if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) $('uplFile').removeAttribute('accept');
   $('uplDrop').addEventListener('click', () => $('uplFile').click());
+  $('uplHelpLink').onclick = () => { $('uplModal').hidden = true; };   // the guide opens as a page; the window closes
   $('uplDrop').addEventListener('dragover', (e) => { e.preventDefault(); $('uplDrop').classList.add('over'); }); $('uplDrop').addEventListener('dragleave', () => $('uplDrop').classList.remove('over'));
   $('uplDrop').addEventListener('drop', (e) => { e.preventDefault(); $('uplDrop').classList.remove('over'); onFiles(Array.from(e.dataTransfer.files || [])); });
   $('uplCancel').onclick = close; $('uplModal').addEventListener('click', (e) => { if (e.target === $('uplModal')) close(); });
