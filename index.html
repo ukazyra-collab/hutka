@@ -345,14 +345,31 @@ body.onboarding #toast{z-index:50}
 .hot td.drv{font-weight:600}
 
 /* ---------- lab ---------- */
-.pickbar{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:flex-end}
-.pickbar .field{flex:1 1 220px;min-width:0;max-width:420px}
+.pickbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end}
+.pickbar .field{flex:1 1 200px;min-width:0;max-width:340px}
+@media (min-width:901px){#pickbar.card{padding:12px 18px 12px}.pickbar .field label{font-size:11px}.pickbar select{padding:7px 10px;font-size:13.5px}.pickbar .seg .btn{height:32px}}
 .pickbar .field.auto{flex:0 0 auto;max-width:none}
 .pickbar select{width:100%}
 @media (max-width:700px){.pickbar .field.auto{flex:1 1 100%}.pickbar .seg{flex-wrap:wrap;width:100%}.pickbar .seg .btn{flex:1 1 auto;border-bottom:1px solid var(--line-2);max-width:none}.pickbar .seg .btn:last-child{border-right:0}}
 .pickbar .field label{font-size:12px}
-.lapline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-.lapline .big{font:600 40px/1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.lapline{display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap;margin-top:10px}
+.lapline .big{font:600 26px/1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.lapline .chips{gap:4px}.lapline .chip{padding:3px 8px;font-size:11.5px}
+.ph .sess-acts{flex-wrap:wrap;align-items:center;gap:8px}
+.fs-head .lapline{margin-top:0}
+/* desktop: the pickbar stays at the top while the charts and the corner guide scroll under it, folded to one line */
+@media (min-width:901px){
+  #pickbar{position:sticky;top:var(--topH,76px);z-index:12}
+  #hero #pickbar,#hero:fullscreen #pickbar{position:static}   /* full screen: the hero lays it out itself */
+  #pickbar.stuck{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 18px;align-items:center;padding:8px 16px;border-radius:0 0 14px 14px;box-shadow:0 10px 24px rgba(16,22,48,.12)}
+  #pickbar.stuck .pickbar{gap:8px 10px;align-items:center}
+  #pickbar.stuck .pickbar .field{flex:0 1 220px}
+  #pickbar.stuck .pickbar .field label{display:none}
+  #pickbar.stuck .lapline{margin:0;flex-wrap:nowrap}
+  #pickbar.stuck .lapline .lbl,#pickbar.stuck .lapline .chips,#pickbar.stuck #ownerRow,#pickbar.stuck #labStatus{display:none}
+  #pickbar.stuck .lapline .big{font-size:20px}
+  #pickbar.stuck .cmp-picker{grid-column:1/-1}
+}
 .lapline .lbl{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
 .hero{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start}
 @media (min-width:1200px){.hero.with-insp{grid-template-columns:minmax(0,1fr) 380px}}
@@ -360,7 +377,8 @@ body.onboarding #toast{z-index:50}
 .map-wrap canvas{display:block;width:100%;touch-action:none;cursor:grab}
 .map-wrap canvas.panning{cursor:grabbing}.map-wrap canvas.edit{cursor:crosshair}.map-wrap canvas.pick{cursor:cell}
 .map-bar{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
-.map-bar .btn{height:32px;font-size:12.5px;padding:0 10px;border-radius:8px}
+.map-bar .btn{height:32px;font-size:12.5px;padding:0 9px;border-radius:8px}
+@media (min-width:901px) and (max-width:1600px){.map-bar #btnFull span{display:none}.map-bar #btnFull{padding:0 8px}}
 .map-bar .seg{border-radius:8px}.map-bar .seg .btn{height:30px;border-radius:0}
 .brand{color:#1f2b48}
 .map-tools{position:absolute;top:10px;right:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100% - 20px)}
@@ -538,6 +556,11 @@ body.onboarding #toast{z-index:50}
 .ai-head b{font-size:16px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ai-new{display:grid;gap:8px;padding:12px;border:1px dashed var(--line-2);border-radius:12px;background:var(--surface-2)}
 .ai-log{flex:1;max-height:none;min-height:200px}
+.msg.ai .ai-map{float:right;width:210px;height:150px;margin:0 0 6px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--line);cursor:pointer}
+.msg.ai .ai-map+p,.msg.ai .ai-map+ul{margin-top:0}
+.msg.ai .tref.go{border-bottom:1px dotted currentColor!important;cursor:pointer!important}
+.msg.ai .ai-cut{display:block;clear:both;margin-top:8px}
+@media (max-width:640px){.msg.ai .ai-map{float:none;width:100%;height:140px;margin:0 0 8px}}
 .ai-lab{display:grid;grid-template-columns:132px minmax(0,1fr) auto;grid-template-areas:"pv t open" "pv corners corners";gap:8px 14px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
 .ai-lab .pv{grid-area:pv;width:132px;height:96px;border-radius:8px;overflow:hidden;background:var(--surface);border:1px solid var(--line)}
 .ai-lab .pv canvas{display:block;width:100%;height:100%}
@@ -669,6 +692,7 @@ body.onboarding #toast{z-index:50}
   .pickbar .field,.pickbar .field.auto{flex:1 1 100%;max-width:none}
   .lapline .big{font-size:32px}
   .map-bar{padding:6px 8px;gap:4px;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .map-bar>*,.map-bar .seg .btn{flex:0 0 auto}
   .map-bar::-webkit-scrollbar{display:none}
   .map-bar .btn{flex:none}
   .charts.under{padding:4px 6px 6px}
@@ -892,7 +916,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     </div>
   </aside>
   <div class="main">
-    <header class="top">
+    <header class="top" id="top">
       <a class="brand mobile" href="#home" aria-label="Hutka"><img class="mark" src="logo.png?v=2" alt="" width="220" height="164"></a>
       <div class="search">
         <svg><use href="#i-search"/></svg>
@@ -987,7 +1011,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     <!-- ========== LAYOUT ========== -->
     <!-- ========== LAB ========== -->
     <section class="page" id="pg-lab" hidden>
-      <div class="ph"><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div><div class="row"><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
+      <div class="ph"><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
       <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div><button class="btn primary sm" id="labSignIn" style="margin-left:auto;flex:none" hidden data-t="Sign in">Sign in</button></div>
       <div id="labStart" hidden>
         <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="labMineSub"></span></h2><div id="labMine"></div><div class="hint" id="labMineHint"></div></div>
@@ -996,6 +1020,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
       </div>
       <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner">›</button></div><button class="btn sm" id="lmCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
       <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close">×</button></div>
+      <div id="pickSentinel" style="height:1px;margin:-1px 0 0" hidden></div>
       <div class="card" id="pickbar" hidden>
         <button class="insp-close mobile-only" id="pickClose" type="button" aria-label="Close">×</button>
         <div class="pickbar">
@@ -1003,11 +1028,9 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
           <div class="field"><label id="refLbl"></label><select id="refSel"></select></div>
           <div class="field auto"><label data-t="Compare">Compare</label><div class="row" style="flex-wrap:nowrap"><div class="seg"><button class="btn" id="qcNone" type="button" data-t="Off">Off</button><button class="btn" id="qcBestAvg" type="button" data-t="Best vs average">Best vs average</button><button class="btn" id="qcLap" type="button" data-t="Another lap">Another lap</button><button class="btn" id="qcOther" type="button" data-t="Another session…">Another session…</button></div></div></div>
           <div class="field" id="cmpField" hidden><label id="cmpLbl"></label><select id="cmpSel"></select></div>
-          <div class="field auto" id="lapSegField" hidden><label data-t="Show on map">Show on map</label><div class="seg" id="lapSeg"><button class="btn active" id="lapYou" type="button">Reference</button><button class="btn" id="lapCmp" type="button">Comparison</button></div></div>
-          <div class="field auto"><label data-t="This session">This session</label><div class="row" style="flex-wrap:nowrap"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button></div></div>
         </div>
         <div class="cmp-picker" id="cmpPicker" hidden><div class="hint" id="cmpPickerHint"></div><div class="list" id="cmpList"></div></div>
-        <div class="lapline" style="margin-top:14px"><span class="lbl" id="lapLbl"></span><span class="big" id="lapBig">—</span><div class="chips" id="lapChips"></div></div>
+        <div class="lapline" id="lapLine"><span class="lbl" id="lapLbl"></span><span class="big" id="lapBig">—</span><div class="chips" id="lapChips"></div></div>
         <div class="row" id="ownerRow" style="margin-top:8px" hidden><span class="hint" id="ownerLbl"></span><button class="btn xs" id="btnFollowOwner" type="button"></button></div>
         <div class="status" id="labStatus" style="margin-top:6px"></div>
       </div>
@@ -1015,6 +1038,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
         <div class="map-wrap" id="mapWrap1">
           <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn mobile-only" id="fsCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
           <div class="map-bar" id="mapBar">
+            <div class="seg" id="lapSegField" title="Show on map" hidden><button class="btn active" id="lapYou" type="button">Reference</button><button class="btn" id="lapCmp" type="button">Comparison</button></div>
             <div class="seg" id="viewSeg"><button class="btn" id="tglTiles" type="button" hidden data-t="Satellite">Satellite</button><button class="btn" id="tglAlign" type="button" hidden data-t="Align">Align</button><button class="btn" id="tglSat" type="button" data-t="Aerial">Aerial</button></div>
             <button class="btn" id="optBand" type="button" data-t="Track edges">Track edges</button>
             <button class="btn" id="optTicks" type="button" data-t="Markers">Markers</button>
@@ -2804,6 +2828,7 @@ Object.assign(I18N.RU, {
   'Visits and devices: Google Analytics (analytics.google.com), when the measurement ID is in config.js.': 'Посещения и устройства — в Google Analytics (analytics.google.com), когда measurement ID прописан в config.js.', 'Could not load: {e}': 'Не загрузилось: {e}'
 });
 Object.assign(I18N.RU, { 'Upload a session — every corner, compared with the fastest on the same layout.': 'Загрузи сессию — каждый поворот в сравнении с самыми быстрыми на этом лейауте.' });
+Object.assign(I18N.RU, { 'Tap a corner to open it in the Lab': 'Нажми на поворот — откроется в Lab', 'Open T{n} in the Lab': 'Открыть T{n} в Lab', 'The answer was cut short — continue': 'Ответ оборвался — продолжить', 'Continue exactly where you stopped, briefly.': 'Продолжи ровно с того места, где остановился, коротко.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -2933,10 +2958,10 @@ const GEO = (() => {
 const STORE = (() => {
   let adapter = null, mode = 'local', ready = null;
   const me = { id: null, name: '', avatarUrl: '', color: '', canEdit: false, isOwner: false, canWrite: null, email: '' };
-  const tracks = new Map(), layouts = new Map(), media = new Map(), profiles = new Map(), sessCache = new Map();
+  const tracks = new Map(), layouts = new Map(), media = new Map(), profiles = new Map(), sessCache = new Map(), sessForCache = new Map();
   const subs = new Set();
   const uid = () => 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-  const notify = (kind) => { for (const fn of subs) { try { fn(kind); } catch (e) {} } };
+  const notify = (kind) => { if (kind === 'sessions') sessForCache.clear(); for (const fn of subs) { try { fn(kind); } catch (e) {} } };
   const onChange = (fn) => { subs.add(fn); return () => subs.delete(fn); };
   const sortTracks = (a, b) => (a.name || '').localeCompare(b.name || '');
   const sortLayouts = (a, b) => (a.order || 0) - (b.order || 0) || (a.name || '').localeCompare(b.name || '');
@@ -3047,8 +3072,9 @@ const STORE = (() => {
         const u = session.user, admin = must(await sb.rpc('is_admin')) === true;
         const name = (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || (u.email || '').split('@')[0];
         // every signed-in person gets a profile row, so comments and search can show a name from the first day
-        try { const rows = must(await sb.from('profiles').select('id').eq('id', u.id).limit(1)); if (!rows.length) must(await sb.from('profiles').insert({ id: u.id, racing_name: name })); } catch (e) {}
-        return { id: u.id, name, avatarUrl: (u.user_metadata && u.user_metadata.avatar_url) || '', color: '#2f6bf0', canEdit: admin, isOwner: admin, canWrite: true, email: u.email || '' };
+        let firstLogin = false;
+        try { const rows = must(await sb.from('profiles').select('id').eq('id', u.id).limit(1)); if (!rows.length) { must(await sb.from('profiles').insert({ id: u.id, racing_name: name })); firstLogin = true; } } catch (e) {}
+        return { id: u.id, name, avatarUrl: (u.user_metadata && u.user_metadata.avatar_url) || '', color: '#2f6bf0', canEdit: admin, isOwner: admin, canWrite: true, email: u.email || '', firstLogin };
       },
       async subscribeTracks(fn) { const rows = must(await sb.from('tracks').select('id,data')); fn(rows.map(row2doc)); },
       async saveTrack(id, body) { const row = { id, data: body, updated_at: new Date().toISOString() }; if (body.createdBy && A.communityCols !== false) { const r = await sb.from('tracks').upsert(Object.assign({ created_by: body.createdBy }, row)); if (!(r.error && noCol(r.error))) return must(r); A.communityCols = false; } return must(await sb.from('tracks').upsert(row)); },
@@ -3165,7 +3191,15 @@ const STORE = (() => {
     const all = await LDB.all('sessions').catch(() => []); return all.map(r => r.meta).sort(byDate);
   }
   async function myOnTrack(tid) { if (adapter && me.id) { try { return (await adapter.myOnTrack(me.id, tid)).sort(byDate); } catch (e) { return []; } } return (await mySessions()).filter(m => m.track === tid); }
-  async function sessionsFor(tid, lid) { if (!adapter) return []; try { return (await adapter.sessionsFor(tid, lid)).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)); } catch (e) { return []; } }
+  // published sessions of a track (or a layout): the track page, the Lab and the feed ask for the same list many times in a row —
+  // one network round trip per 20 s per key, dropped as soon as any session changes
+  async function sessionsFor(tid, lid) {
+    if (!adapter) return []; const key = tid + '|' + (lid || ''), c = sessForCache.get(key); if (c && Date.now() - c.t < 20000) return c.list.slice();
+    if (c && c.p) return c.p;
+    const p = (async () => { try { const list = (await adapter.sessionsFor(tid, lid)).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)); sessForCache.set(key, { t: Date.now(), list }); return list.slice(); } catch (e) { sessForCache.delete(key); return []; } })();
+    sessForCache.set(key, { t: 0, list: [], p }); return p;
+  }
+  async function sessionsByOwner(uid) { if (!adapter || !uid || uid === 'local') return []; try { return (await adapter.sessionsByOwners([uid])).filter(m => m.published).sort(byDate); } catch (e) { return []; } }
   async function getSessionMeta(sid) { const c = sessCache.get(sid); if (c) return c; if (adapter) { try { const m = await adapter.getSessionMeta(sid); if (m) return m; } catch (e) {} } const rec = await LDB.get('sessions', sid).catch(() => null); return rec ? rec.meta : null; }
   async function loadSession(meta) {
     if (sessCache.has(meta.id)) return sessCache.get(meta.id);
@@ -3289,7 +3323,7 @@ const STORE = (() => {
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta,
-    profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
+    profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal };
 })();
@@ -3808,9 +3842,9 @@ const APP = { route: 'tracks', a: null, b: null, geo: null, hoverTrack: null };
 function parseHash() { const h = (location.hash || '#home').slice(1); const parts = h.includes('~') ? h.split('~') : h.split('-'); return { name: parts[0] || 'home', a: parts[1] || null, b: parts[2] || null, c: parts[3] || null }; }
 function go(hash) { if (location.hash === '#' + hash) route(); else location.hash = hash; }
 const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver', 'ai', 'sws'];
-let routing = false;
+let routeSeq = 0, routeHash = null;
 async function route() {
-  if (routing) return; routing = true;
+  if (routeHash === location.hash) return; routeHash = location.hash; const seq = ++routeSeq;   // the same hash twice in a row is one navigation
   try {
     const r = parseHash(); let name = PAGES.includes(r.name) ? r.name : 'home';
     if (name === 'sws') { const pre = SWS.decodeHash((location.hash.split('~')[1] || '')); history.replaceState(null, '', '#profile'); name = 'profile'; r.a = null; setTimeout(() => SWS.open(pre || {}), 300); }
@@ -3830,7 +3864,8 @@ async function route() {
     else if (name === 'driver') await renderDriverPage(r.a);
     else if (name === 'ai') await renderAIPage(r.a, r.b);
     else if (name === 'admin') await ADMIN.show(r.a, r.b);
-  } finally { routing = false; }
+  } catch (e) { console.error('route', e); }
+  finally { if (seq === routeSeq) routeHash = null; }
 }
 window.addEventListener('hashchange', route);
 
@@ -4145,7 +4180,7 @@ async function renderLayoutBlock(tid, lid, shownId) {
   if (!LP.map) {
     LP.map = createMapView($('lmap'), { height: (w) => Math.round(clamp(w * 0.72, 380, 760)), getTrack: () => LP.G ? LP.G.track : null, getWidthM: () => LP.G ? LP.G.widthM : 8, getFrameSize: () => LP.G ? [LP.G.W, LP.G.H] : null,
       getImage: () => LP.G ? LP.G.image : null, getTiles: () => SAT.layer(LP.G, LP.tiles),
-      getOverlay: () => ({ D: LP.D, role: 'ref', hiRow: lpActiveRow(), band: true, ticks: true, labelsAll: false, model: null, modelOn: false, showApexes: !LP.D, apexes: LP.G && !LP.D ? GEOM.apexes(LP.G, null) : null, wins: LP.wins }),
+      getOverlay: () => ({ D: LP.D, role: 'ref', hiRow: lpActiveRow(), band: false, ticks: true, labelsAll: false, model: null, modelOn: false, showApexes: !LP.D, apexes: LP.G && !LP.D ? GEOM.apexes(LP.G, null) : null, wins: LP.wins }),
       onHover: (i) => { LP.hover = i; lpInspector(); }, onClick: (i, b) => { const row = b || (i >= 0 ? lpCornerAt(i) : null); LP.sel = row ? (LP.sel === row.w.n ? 0 : row.w.n) : 0; lpInspector(); LP.map.draw(); } });
     $('lRotL').onclick = () => LP.map.rotateBy(-Math.PI / 12); $('lRotR').onclick = () => LP.map.rotateBy(Math.PI / 12);
     LP.tiles = SAT.pref(); $('lTiles').onclick = () => { LP.tiles = !LP.tiles; SAT.setPref(LP.tiles); $('lTiles').classList.toggle('active', LP.tiles); LP.map.draw(); };
@@ -4225,7 +4260,7 @@ async function renderDriverPage(uid) {
   const pubs = await publishedBy(uid);
   renderBests($('drvBest'), pubs); renderSessionsTable($('drvSessions'), pubs, $('drvSessSub'));
 }
-async function publishedBy(uid) { const out = []; for (const tr of STORE.getTracks()) { const list = await STORE.sessionsFor(tr.id); for (const s of list) if (s.owner === uid) out.push(s); } return out.sort((a, b) => (b.date || '').localeCompare(a.date || '')); }
+async function publishedBy(uid) { return (await STORE.sessionsByOwner(uid)).sort((a, b) => (b.date || '').localeCompare(a.date || '')); }
 async function renderBests(box, pubs) {
   box.innerHTML = ''; if (!pubs.length) { box.appendChild(el('div', 'hint', t('No published sessions yet.'))); return; }
   const by = new Map(); for (const s of pubs) { const k = s.track + '|' + s.layout + '|' + kartKeyOf(s); const cur = by.get(k); if (!cur || s.bestMs < cur.bestMs) by.set(k, s); }
@@ -4270,10 +4305,14 @@ LAB.show = async function (sid, mode) {
   $('labGuestText').textContent = STORE.hasAuth ? t('You are viewing as a guest: sessions stay in this browser and cannot be published. Sign in to keep a library on every device and publish to track pages.') : (STORE.hasDb ? t('You are viewing as a guest: sessions stay in this browser and cannot be published. Sign in to claude.ai to keep a library.') : t('Offline mode: sessions you upload stay in this browser. Open the shared Hutka link signed in to claude.ai to publish them and compare with other drivers.'));
   $('labSignIn').hidden = !STORE.hasAuth; $('labSignIn').onclick = () => AUTH.open();
   // #lab~<id>~discuss (the comments link in the feed): the discussion tab / panel comes into view
-  const showDiscuss = () => { if (mode !== 'discuss' || !LAB.current) return; LAB.tab = 'discuss'; applyMobTab(); setTimeout(() => { const p = $('discussPanel'); if (p && !p.hidden) p.scrollIntoView({ block: 'start', behavior: 'smooth' }); }, 150); };
+  const showDiscuss = () => {
+    if (!LAB.current) return;
+    if (mode === 'discuss') { LAB.tab = 'discuss'; applyMobTab(); setTimeout(() => { const p = $('discussPanel'); if (p && !p.hidden) p.scrollIntoView({ block: 'start', behavior: 'smooth' }); }, 150); }
+    const tm = /^t(\d{1,2})$/.exec(mode || ''); if (tm && LAB.dcmp) { const n = +tm[1]; if (LAB.dcmp.rows.some(r => r.w.n === n)) { LAB.selN = 0; selectCorner(n, true); } }   // #lab~<id>~t7: corner 7 selected, from the coach
+  };
   if (sid && sid !== 'new') {
     const cur = LAB.current;
-    if (!(cur && cur.id === sid && mode !== 'cmp')) {
+    if (!(cur && cur.id === sid && mode !== 'cmp')) {   // a 't7' mode on the open session falls through to showDiscuss below
       const meta = await STORE.getSessionMeta(sid);
       if (!meta) { toast(t('Session not found')); } else { await LAB.open(meta, mode === 'cmp'); showDiscuss(); return; }
     }
@@ -4304,7 +4343,7 @@ LAB.open = async function (meta, asCmp) {
   const reopen = !!(LAB.current && LAB.current.id === sess.id);
   LAB.current = sess; LAB.selN = 0; LAB.ckInsp = false; LAB.scrubIdx = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = reopen && LAB.pickerOpen; LAB.social = null;
   if (asCmp) { const my = LAB.sessions.filter(s => mySession(s) && s.id !== sess.id).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]; if (my) { LAB.ref = lapKey(my, bestLap(my)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : lapKey(sess, bestLap(sess)); LAB.current = my; } else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; } }
-  else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; }
+  else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : 'none'; }   // best lap against the session average by default
   LAB.loaded = true; LAB.needFit = true; if (APP.route === 'lab') { LAB.map.fit(); LAB.needFit = false; } labRender();
   setStatus('labStatus', G.fitNote || '', 'ok');
   // older sessions have no shape preview for the feed: add one the first time the owner opens them
@@ -4333,7 +4372,14 @@ function labMapHeight(w) {
   if (fs && isPhone()) return Math.max(220, window.innerHeight - ($('fsHead').offsetHeight || 50) - ($('dataPanel').offsetHeight || 180) - 2);
   if (fs) { const hgt = (id) => { const e = $(id); return e && e.offsetParent !== null ? e.offsetHeight : 0; }; return Math.max(240, window.innerHeight - 28 - hgt('fsHead') - hgt('pickbar') - hgt('mapBar') - hgt('legendData') - hgt('dataPanel') - 24); }
   if (isPhone()) return Math.round(window.innerHeight * 0.5);
-  return Math.round(clamp(w * ratio, 340, Math.min(Math.max(360, window.innerHeight - 470), 720)));
+  // desktop: the map fills what is left of the window under the (stuck) pickbar — no scrolling to see the whole lap
+  const wrap = $('mapWrap1'); let free = window.innerHeight - 470;
+  if (wrap && wrap.offsetParent !== null) {
+    // where the map card sits with the page scrolled to the top (stable while scrolling), minus the map's own toolbar and legend
+    const se = document.scrollingElement || document.documentElement, absTop = wrap.getBoundingClientRect().top + (se ? se.scrollTop : 0), chrome = (($('mapBar') && $('mapBar').offsetHeight) || 48) + (($('legendData') && $('legendData').offsetParent !== null) ? $('legendData').offsetHeight : 0) + 8;
+    free = window.innerHeight - absTop - chrome - 18;
+  }
+  return Math.round(clamp(free, 360, Math.min(820, Math.max(440, w * ratio * 1.3))));
 }
 // the part of the map the cockpit overlays leave free: fit and corner fly-to aim at it (a sheet on the right or at the bottom narrows it)
 function ckInset(w, h) {
@@ -4525,11 +4571,14 @@ function labEnsureMap() {
   { const ang = () => typeof window.orientation === 'number' ? (window.orientation + 360) % 360 : ((screen.orientation && typeof screen.orientation.angle === 'number') ? screen.orientation.angle : 0); let last = ang(), lastAt = 0;
     const onTurn = () => { const a = ang(), d = ((a - last + 540) % 360) - 180; last = a; if (!d || Date.now() - lastAt < 150) return; lastAt = Date.now(); if (LAB.map && LAB.G) LAB.map.deviceTurn(d, isCockpit() || fsOn()); };
     if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', onTurn); window.addEventListener('orientationchange', onTurn); }
+  { const sen = $('pickSentinel'), pb = $('pickbar'); const topH = () => (($('top') || {}).offsetHeight || 76); document.documentElement.style.setProperty('--topH', topH() + 'px');
+    if (window.IntersectionObserver && sen) { const io = new IntersectionObserver((es) => { const e = es[0]; const stuck = !e.isIntersecting && e.boundingClientRect.top < topH() + 2 && !isPhone() && !isCockpit() && !fsOn(); if (pb.classList.contains('stuck') !== stuck) { pb.classList.toggle('stuck', stuck); } }, { rootMargin: `-${topH() + 1}px 0px 0px 0px`, threshold: 0 }); io.observe(sen); }
+    window.addEventListener('resize', () => document.documentElement.style.setProperty('--topH', topH() + 'px')); }
   window.addEventListener('resize', () => { if (APP.route === 'lab' && LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (LAB.dcmp) { renderInspector(); if (isCockpit()) { renderHud(); drawScrub(); } } } });
   window.addEventListener('keydown', (e) => { if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if (APP.route !== 'lab') return; if (e.key === 'Escape' && LAB.selN) { LAB.selN = 0; afterSelect(true); } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { if (LAB.dcmp) { e.preventDefault(); stepCorner(e.key === 'ArrowRight' ? 1 : -1); } } else if (e.key === 'q' || e.key === 'Q') LAB.map.rotateBy(-Math.PI / 24); else if (e.key === 'e' || e.key === 'E') LAB.map.rotateBy(Math.PI / 24); else if (e.key === 'f' || e.key === 'F') $('btnFull').click(); });
   for (const c of [$('chDataSpeed'), $('chDataDelta')]) { c.addEventListener('pointermove', (e) => { const G = LAB.G; if (!G || !LAB.dcmp) return; const r = c.getBoundingClientRect(), x = e.clientX - r.left; const s = (x - PAD.l) / (r.width - PAD.l - PAD.r) * G.track.lengthM, i = Math.round(s / G.track.ds), ni = (i >= 0 && i < G.track.N) ? i : -1; if (ni !== LAB.hoverIdx) { LAB.hoverIdx = ni; if (isCockpit() && ni >= 0) LAB.scrubIdx = ni; LAB.map.setHover(ni); hoverChanged(); } }); c.addEventListener('pointerleave', () => { if (LAB.hoverIdx >= 0) { hoverOff(); if (!isCockpit()) renderInspector(); } }); }
   // session switch, reference lap, comparison
-  $('sessSel').addEventListener('change', async () => { const id = $('sessSel').value; if (!id || (LAB.current && id === LAB.current.id)) return; const loaded = sessOf(id); if (loaded) { LAB.current = loaded; LAB.ref = lapKey(loaded, bestLap(loaded)); LAB.cmp = 'none'; LAB.selN = 0; LAB.chat = []; LAB.social = null; labRender(); } else { const meta = await STORE.getSessionMeta(id); if (meta) { go('lab~' + id); } } });
+  $('sessSel').addEventListener('change', async () => { const id = $('sessSel').value; if (!id || (LAB.current && id === LAB.current.id)) return; const loaded = sessOf(id); if (loaded) { LAB.current = loaded; LAB.ref = lapKey(loaded, bestLap(loaded)); LAB.cmp = sessAvg(loaded) ? 'avg:' + loaded.id : 'none'; LAB.selN = 0; LAB.chat = []; LAB.social = null; labRender(); } else { const meta = await STORE.getSessionMeta(id); if (meta) { go('lab~' + id); } } });
   $('refSel').addEventListener('change', () => { LAB.ref = $('refSel').value; if (LAB.cmp === LAB.ref) LAB.cmp = 'none'; LAB.selN = 0; LAB.chat = []; labRender(); });
   $('cmpSel').addEventListener('change', () => { LAB.cmp = $('cmpSel').value; LAB.chat = []; labRender(); });
   $('qcNone').onclick = () => { LAB.cmp = 'none'; LAB.pickerOpen = false; LAB.chat = []; labRender(); };
@@ -4593,7 +4642,7 @@ async function renderLabStart() {
 
 function labRender() {
   const G = LAB.G, has = !!(G && LAB.sessions.length && allLaps().length && LAB.current);
-  $('labStart').hidden = has; for (const id of ['pickbar', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open'); }
+  $('labStart').hidden = has; for (const id of ['pickbar', 'pickSentinel', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open'); }
   $('labEmptyText').textContent = t('Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.');
   $('labSub').textContent = has ? `${LAB.trackName}${G.layout ? ' · ' + G.layout.name : (LAB.lid === 'custom' ? ' · ' + t('custom layout') : '')}` : t('Session analysis');
   $('hero').classList.toggle('with-insp', has); $('pg-lab').classList.toggle('has', has); syncLand();
@@ -4642,7 +4691,7 @@ function labRender() {
   $('lapYou').textContent = t('Reference'); $('lapCmp').textContent = t('Comparison');
   $('map1Title').hidden = false; $('map1Title').className = 'map-title ' + (LAB.mapLap === 'cmp' ? 'cmp' : 'ref');
   $('map1Title').textContent = LAB.mapLap === 'cmp' && D.O ? `${nameOf(D.O)} · ${fmtLap(D.O.T)} · ${t('points of this lap')}` : `${t('Reference')} · ${refName}${refIsAvg || !D.ref.mine ? ' · ' + shortSess(sess) : ''} · ${fmtLap(D.R.T)} · ${t('points of this lap')}`;
-  $('lapLbl').textContent = `${shortSess(sess)} · ${refName}`; $('lapBig').textContent = fmtLap(D.R.T);
+  $('lapLbl').textContent = refName; $('lapBig').textContent = fmtLap(D.R.T);
   $('lmLbl').textContent = `${shortSess(sess)} · ${refName}${D.O ? ' · vs ' + nameOf(D.O) + ' ' + sg(D.total) : ''}`; $('lmBig').textContent = fmtLap(D.R.T); $('labMob').hidden = false; $('labTabs').hidden = false; applyMobTab();
   const chips = $('lapChips'); chips.innerHTML = ''; const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
   let vmax = 0, vmin = Infinity; for (let i = 0; i < D.R.N; i++) { vmax = Math.max(vmax, D.R.v[i]); vmin = Math.min(vmin, D.R.v[i]); }
@@ -5213,7 +5262,7 @@ function layoutName(tid, lid) { const l = STORE.getLayout(tid, lid); return l ? 
 $('homeUpload').onclick = () => UPLOAD.open({});
 // ---------- AI coach: chats with memory of the driver's sessions; credits and the Pro plan ----------
 const AI = { chats: [], cur: null, msgs: [], wallet: null, busy: false, ctl: null, newCtx: '' };
-const AI_RULES_V2 = () => `You are Hutka's racing coach: an analyst of karting telemetry (Alfano and similar loggers). Most sessions are rental karts (Sodi RT8/RT10-class, ~70–80 km/h); a session may name a sport kart (Rotax, X30, KZ…) — a different world with far higher speeds and later brake points: never compare times across kart classes and fit the advice to the class named. Everything you say must come from the data below: the driver's own sessions, the corner-by-corner breakdown of the session this chat is about (if any), and the fastest published laps of other drivers on the same layouts. Corners T1…Tn are numbered from the start/finish line; points are metres from S/F, speeds in km/h. Compare the driver with the fast published laps when the layout matches; say which corners and what exactly (brake point, apex speed, throttle point, exit speed). If a question needs data that is not here (another session, video, kart setup, a line more precise than ±1 m), say so and tell the driver what to upload or publish. Never invent numbers or corners. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, short and concrete, plain language, no headings or tables; short lists are fine. Address the driver as "you".`;
+const AI_RULES_V2 = () => `You are Hutka's racing coach: an analyst of karting telemetry (Alfano and similar loggers). Most sessions are rental karts (Sodi RT8/RT10-class, ~70–80 km/h); a session may name a sport kart (Rotax, X30, KZ…) — a different world with far higher speeds and later brake points: never compare times across kart classes and fit the advice to the class named. Everything you say must come from the data below: the driver's own sessions, the corner-by-corner breakdown of the session this chat is about (if any), and the fastest published laps of other drivers on the same layouts. Corners T1…Tn are numbered from the start/finish line; points are metres from S/F, speeds in km/h. Compare the driver with the fast published laps when the layout matches; say which corners and what exactly (brake point, apex speed, throttle point, exit speed). If a question needs data that is not here (another session, video, kart setup, a line more precise than ±1 m), say so and tell the driver what to upload or publish. Never invent numbers or corners. Always name corners as T<number> (T7, T12) — the app turns them into markers on the lap map. Be compact: lead with the one thing that matters, then at most three corners, one or two lines each with the numbers (brake / apex / throttle / exit); about 180 words, never more than 260, unless the driver asks for a full breakdown. Finish every sentence — no trailing lists. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, plain language, no headings or tables; short lists are fine. Address the driver as "you".`;
 // the memory: profile, the session library, fast laps on the driver's layouts, and the open session in detail
 async function aiSystem(sessionMeta) {
   const parts = [AI_RULES_V2()];
@@ -5320,6 +5369,7 @@ async function renderAiLab(sid) {
     const D = LAB.dcmp, coach = LAB.coach; let total = 0;
     for (const r of D.rows) { const c = coach && coach.corners.find(x => x.n === r.w.n); const res = c ? Math.max(0, r.R.time - c.tTop) : 0; total += res; const ch = el('button', 'chip' + (res > 0.25 ? ' hot' : res > 0.1 ? ' warm' : '')); ch.type = 'button'; ch.innerHTML = `<b>T${r.w.n}</b>${res >= 0.005 ? '−' + res.toFixed(2) + ' s' : '✓'}`; ch.title = t('Ask the coach about T{n}', { n: r.w.n }); ch.onclick = () => { $('aiInput').value = t('T{n}: what exactly am I losing here and what should I change?', { n: r.w.n }); aiSend(); }; cb.appendChild(ch); }
     $('aiLabRes').textContent = total.toFixed(2) + ' s'; cb.appendChild(el('span', 'hint', t('reserve per corner vs your best passes · tap a corner to ask about it')));
+    if (!AI.busy && AI.msgs.length) renderAiLog();   // the answers get their corner maps now that the lap is loaded
   } else cb.appendChild(el('span', 'hint', t('The corner breakdown appears once the session opens in the Lab.')));
 }
 function renderAiChips() {
@@ -5332,12 +5382,47 @@ function mdLite(text) {
   for (const b of blocks) { const lines = b.split('\n'); if (lines.every(l => /^\s*([-•*]|\d+[.)])\s+/.test(l))) out.push('<ul>' + lines.map(l => '<li>' + l.replace(/^\s*([-•*]|\d+[.)])\s+/, '') + '</li>').join('') + '</ul>'); else out.push('<p>' + lines.join('<br>') + '</p>'); }
   return out.join('').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\bT(\d{1,2})\b/g, '<span class="tref" style="border:0;cursor:default">T$1</span>');
 }
+const cutWords = (s, n) => { s = String(s || '').trim(); if (s.length <= n) return s; const c = s.slice(0, n); const k = c.lastIndexOf(' '); return (k > n * 0.5 ? c.slice(0, k) : c) + '…'; };
+// the session the open chat is about, once the Lab has it loaded (the insert opened it)
+const aiLabSid = () => { const sid = AI.cur ? AI.cur.session_id : AI.newCtx; return sid && LAB.current && LAB.current.id === sid && LAB.G && LAB.dcmp ? sid : ''; };
+// a small lap map next to an answer: the track line, every corner as a dot, the corners the answer talks about as numbered badges
+function aiMiniMap(text) {
+  const sid = aiLabSid(); if (!sid) return null;
+  const want = new Set(); for (const m of String(text).matchAll(/\bT(\d{1,2})\b/g)) want.add(+m[1]); if (!want.size) return null;
+  const tr = LAB.G.track, D = LAB.dcmp, coach = LAB.coach, rows = D.rows.filter(r => want.has(r.w.n)); if (!rows.length) return null;
+  const cv = document.createElement('canvas'); cv.className = 'ai-map'; cv.title = t('Tap a corner to open it in the Lab');
+  const paint = () => {
+    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), W = cv.clientWidth || 220, H = cv.clientHeight || 150; if (W < 40) return;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (let i = 0; i < tr.N; i++) { x0 = Math.min(x0, tr.cx[i]); x1 = Math.max(x1, tr.cx[i]); y0 = Math.min(y0, tr.cy[i]); y1 = Math.max(y1, tr.cy[i]); }
+    const pad = 14, s = Math.min((W - 2 * pad) / Math.max(1, x1 - x0), (H - 2 * pad) / Math.max(1, y1 - y0)), ox = (W - s * (x1 - x0)) / 2, oy = (H - s * (y1 - y0)) / 2, P = (i) => [ox + s * (tr.cx[i] - x0), oy + s * (tr.cy[i] - y0)];
+    const cs = getComputedStyle(document.documentElement), col = (n, d) => cs.getPropertyValue(n).trim() || d;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = col('--line-2', '#cdd3dd'); ctx.lineWidth = 3; ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, y] = P(i); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); ctx.stroke();
+    ctx.fillStyle = col('--faint', '#98a1b3'); for (const r of D.rows) if (!want.has(r.w.n)) { const [x, y] = P(r.w.apex); ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2); ctx.fill(); }
+    { const [x, y] = P(0); ctx.fillStyle = col('--fg', '#1a2237'); ctx.fillRect(x - 1.5, y - 5, 3, 10); }
+    cv._hits = [];
+    ctx.font = `700 10px ${col('--mono', 'monospace')}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const r of rows) { const c = coach && coach.corners.find(x => x.n === r.w.n), res = c ? Math.max(0, r.R.time - c.tTop) : 0; const [x, y] = P(r.w.apex); const bg = res > 0.25 ? col('--brake', '#e23d3d') : res > 0.1 ? col('--limit', '#e9a23b') : col('--accent', '#2f6bf0'); ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.fillText(String(r.w.n), x, y + 0.5); cv._hits.push({ x, y, n: r.w.n }); }
+  };
+  cv.onclick = (e) => { const b = cv.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top; const h = (cv._hits || []).find(p => Math.hypot(p.x - x, p.y - y) < 12); if (h) location.hash = '#lab~' + sid + '~t' + h.n; };
+  requestAnimationFrame(paint); if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (cv.isConnected) paint(); }); ro.observe(cv); }
+  return cv;
+}
 function renderAiLog(loading) {
   const log = $('aiLog'); log.innerHTML = '';
   if (loading) { const d = el('div', 'msg ai thinking', t('Loading…')); log.appendChild(d); return d; }
   if (!AI.msgs.length && !AI.busy) { log.appendChild(el('div', 'hint', AI.cur ? '' : t('Ask anything about your laps. The coach answers only from your data and the published laps — no guessing.'))); }
-  let last = null;
-  for (const m of AI.msgs) { const d = el('div', 'msg ' + (m.role === 'user' ? 'user' : 'ai')); if (m.role === 'user') d.textContent = m.content; else d.innerHTML = mdLite(m.content); log.appendChild(d); last = d; }
+  let last = null; const sid = aiLabSid();
+  for (const m of AI.msgs) {
+    const d = el('div', 'msg ' + (m.role === 'user' ? 'user' : 'ai'));
+    if (m.role === 'user') d.textContent = m.content;
+    else {
+      d.innerHTML = mdLite(m.content); const mm = aiMiniMap(m.content); if (mm) d.prepend(mm);
+      if (sid) for (const sp of d.querySelectorAll('.tref')) { const n = +sp.textContent.slice(1); if (LAB.dcmp.rows.some(r => r.w.n === n)) { sp.classList.add('go'); sp.style.cursor = 'pointer'; sp.title = t('Open T{n} in the Lab', { n }); sp.onclick = () => { location.hash = '#lab~' + sid + '~t' + n; }; } }
+      if (m.cut) { const c = el('button', 'btn xs ghost ai-cut'); c.type = 'button'; c.textContent = t('The answer was cut short — continue'); c.onclick = () => { $('aiInput').value = t('Continue exactly where you stopped, briefly.'); aiSend(); }; d.appendChild(c); }
+    }
+    log.appendChild(d); last = d;
+  }
   if (AI.busy) { const d = el('div', 'msg ai thinking', t('Thinking…')); log.appendChild(d); last = d; }
   log.scrollTop = log.scrollHeight; return last;
 }
@@ -5355,8 +5440,8 @@ async function aiSend() {
   const bubble = renderAiLog(); renderAiNote(); $('aiStop').hidden = false; AI.ctl = new AbortController();
   try {
     const system = await aiSystem(meta);
-    const r = await STORE.ask({ chatId: AI.cur ? AI.cur.id : null, sessionId: meta ? meta.id : null, trackId: meta ? meta.track : null, layoutId: meta ? meta.layout : null, title: AI.cur ? null : (meta ? `${meta.label || meta.name} · ${text.slice(0, 40)}` : text.slice(0, 60)), system, text, signal: AI.ctl.signal, onText: (tx) => { bubble.classList.remove('thinking'); bubble.innerHTML = mdLite(tx); $('aiLog').scrollTop = $('aiLog').scrollHeight; } });
-    AI.msgs.push({ role: 'assistant', content: r.text });
+    const r = await STORE.ask({ chatId: AI.cur ? AI.cur.id : null, sessionId: meta ? meta.id : null, trackId: meta ? meta.track : null, layoutId: meta ? meta.layout : null, title: AI.cur ? null : (meta ? `${meta.label || meta.name} · ${cutWords(text, 40)}` : cutWords(text, 60)), system, text, signal: AI.ctl.signal, onText: (tx) => { bubble.classList.remove('thinking'); bubble.innerHTML = mdLite(tx); $('aiLog').scrollTop = $('aiLog').scrollHeight; } });
+    AI.msgs.push({ role: 'assistant', content: r.text, cut: r.stop === 'max_tokens' });
     if (!AI.cur) { AI.chats = await STORE.chats(); AI.cur = AI.chats.find(c => c.id === r.chatId) || AI.chats[0] || null; if (AI.cur) { $('aiTitle').textContent = AI.cur.title; const tr = AI.cur.track_id ? STORE.getTrack(AI.cur.track_id) : null; $('aiCtx').innerHTML = AI.cur.session_id ? `${t('About session')} <a href="#lab~${esc(AI.cur.session_id)}">${esc(tr ? tr.name : t('open in the Lab'))}</a>` : t('General chat'); $('aiRename').hidden = false; $('aiDelete').hidden = false; history.replaceState(null, '', '#ai~' + AI.cur.id); } renderChatList(); }
     if (AI.wallet && !AI.wallet.off) { if (AI.wallet.free) { if (r.usedDay !== null) { AI.wallet.used_day = r.usedDay; AI.wallet.used_hour = (AI.wallet.used_hour || 0) + 1; $('walletCredits').textContent = `${r.usedDay}/${r.limitDay || AI.wallet.limit_day}`; } } else if (r.credits !== null) { AI.wallet.credits = r.credits; AI.wallet.plan = r.plan || AI.wallet.plan; $('walletCredits').textContent = AI.wallet.plan === 'pro' ? 'Pro' : String(r.credits); } }
   } catch (e) {
@@ -5461,8 +5546,17 @@ const ageOf = (y) => { if (!y) return null; const a = new Date().getFullYear() -
 function personBits(prof) { const a = ageOf(prof && prof.birthYear); return [a ? tn(a, '{n} year old', '{n} years old').replace('{n}', a) : '', prof && prof.weightKg ? `${prof.weightKg} ${t('kg')}` : ''].filter(Boolean).join(' · '); }
 // first sign-in: the profile has to be filled before anything else — bare profiles (an email prefix as the name) are what we had
 const ONBOARD = {
-  needed(prof) { if (!STORE.hasIdentity) return false; const p = prof || {}; const a = STORE.adapter || {}; if (a.profilePerson === false) return !p.racingName || /@/.test(p.racingName) || !p.country || (!!STORE.me.email && p.racingName.toLowerCase() === String(STORE.me.email).split('@')[0].toLowerCase()); return !p.firstName || !p.lastName || !p.country; },
-  async check() { if (!STORE.hasIdentity) return false; let prof = null; try { prof = await STORE.profile(STORE.me.id); } catch (e) {} if (!ONBOARD.needed(prof)) return false; ONBOARD.open(prof || {}); return true; },
+  // a real name on the profile: first + last, or a racing name that is not the email prefix
+  hasName(prof) { const p = prof || {}; if (p.firstName && p.lastName) return true; const rn = String(p.racingName || '').trim(), local = String(STORE.me.email || '').split('@')[0].toLowerCase(); return rn.length >= 2 && !/@/.test(rn) && rn.toLowerCase() !== local; },
+  // the form shows on the first sign-in of a new account, and for a profile that still has no name at all (the email prefix only)
+  needed(prof) { if (!STORE.hasIdentity) return false; if (STORE.me.firstLogin) return true; return !ONBOARD.hasName(prof); },
+  async check() {
+    if (!STORE.hasIdentity) return false; let prof = null; try { prof = await STORE.profile(STORE.me.id); } catch (e) {}
+    if (ONBOARD.needed(prof)) { ONBOARD.open(prof || {}); return true; }
+    // an older profile with a racing name but no first / last name: split it quietly, no questions
+    const p = prof || {}; if (!(p.firstName || p.lastName) && p.racingName && (STORE.adapter || {}).profilePerson !== false) { const nm = splitName(p); if (nm.first) { try { await STORE.saveProfile(Object.assign({}, p, { firstName: nm.first, lastName: nm.last })); } catch (e) {} } }
+    return false;
+  },
   photo: undefined,
   open(prof) {
     const me = STORE.me, nm = splitName(prof, me.name);
@@ -5491,7 +5585,7 @@ $('onbSave').onclick = async () => {
   try {
     const prof = (await STORE.profile(STORE.me.id)) || {};
     const body = Object.assign({}, prof, { firstName: first, lastName: last, racingName: `${first} ${last}`.slice(0, 40), country, homeTrack: home === '-' ? '' : home, birthYear: +$('onbYear').value || null, weightKg: cleanWeight($('onbWeight').value), avatar: ONBOARD.photo === undefined ? (prof.avatar || '') : (ONBOARD.photo || '') });
-    await STORE.saveProfile(body); await STORE.refreshProfile();
+    await STORE.saveProfile(body); await STORE.refreshProfile(); STORE.me.firstLogin = false;
     ONBOARD.close(); toast(t('Welcome, {name}! Your profile is set.', { name: first })); renderShell(); if (APP.route === 'profile') renderProfile();
   } catch (e) { setStatus('onbStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
   b.classList.remove('busy');
@@ -5534,7 +5628,7 @@ async function renderProfile() {
   $('profUpload').onclick = () => UPLOAD.open({});
   // community numbers
   const sc = $('profSocialCard'); sc.hidden = !(STORE.hasIdentity && STORE.hasDb && await STORE.socialAvailable());
-  if (!sc.hidden) { const box = $('profSocial'); box.innerHTML = ''; try { const f = await STORE.followInfo(me.id, true), pubs = await publishedBy(me.id); let likes = 0; for (const s of pubs.slice(0, 20)) { try { likes += (await STORE.sessionSocial(s.id)).likes; } catch (e) {} } for (const [k, v] of [[t('Followers'), f.followers], [t('Following'), f.following], [t('Published'), pubs.length], [t('Likes'), likes]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${v}</div>`; box.appendChild(d); } } catch (e) {} $('profSocialHint').textContent = t('Your public page: other drivers see your published sessions, follow you and discuss your laps.'); const a = el('a', 'btn sm', t('Open my public page')); a.href = '#driver~' + me.id; a.style.marginTop = '8px'; $('profSocialHint').appendChild(document.createElement('br')); $('profSocialHint').appendChild(a); }
+  if (!sc.hidden) { const box = $('profSocial'); box.innerHTML = ''; try { const f = await STORE.followInfo(me.id, true), pubs = await publishedBy(me.id); let likes = 0; try { const sc2 = await STORE.socialCounts(pubs.slice(0, 50).map(s => s.id)); for (const k in sc2) likes += sc2[k].likes || 0; } catch (e) {} for (const [k, v] of [[t('Followers'), f.followers], [t('Following'), f.following], [t('Published'), pubs.length], [t('Likes'), likes]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${v}</div>`; box.appendChild(d); } } catch (e) {} $('profSocialHint').textContent = t('Your public page: other drivers see your published sessions, follow you and discuss your laps.'); const a = el('a', 'btn sm', t('Open my public page')); a.href = '#driver~' + me.id; a.style.marginTop = '8px'; $('profSocialHint').appendChild(document.createElement('br')); $('profSocialHint').appendChild(a); }
   await renderMySessionsTable($('profSessions'), { hint: $('profSessHint'), sub: $('profSessSub') });
 }
 // ---------- my sessions: one table for the profile and the Lab start screen ----------

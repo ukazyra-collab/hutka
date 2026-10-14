@@ -20,7 +20,7 @@ const FREE = num("FREE_CREDITS", 10);
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") || "claude-sonnet-5-5";
 const FREE_MODE = (Deno.env.get("FREE_MODE") ?? "1") !== "0";
 const PAUSED = (Deno.env.get("AI_PAUSED") || "0") === "1";
-const LIM = { hour: num("LIMIT_HOUR", 15), day: num("LIMIT_DAY", 50), ip: num("LIMIT_IP_DAY", 120), global: num("LIMIT_GLOBAL_DAY", 800), text: num("MAX_TEXT_CHARS", 1500), system: num("MAX_SYSTEM_CHARS", 48000), out: num("MAX_OUT_TOKENS", 1200) };
+const LIM = { hour: num("LIMIT_HOUR", 15), day: num("LIMIT_DAY", 50), ip: num("LIMIT_IP_DAY", 120), global: num("LIMIT_GLOBAL_DAY", 800), text: num("MAX_TEXT_CHARS", 1500), system: num("MAX_SYSTEM_CHARS", 48000), out: num("MAX_OUT_TOKENS", 2500) };
 const STREAM = (Deno.env.get("ASK_STREAM") || "0") === "1";
 
 // the network address is kept only as a short hash — enough to notice one address opening many accounts, useless for anything else
