@@ -374,7 +374,16 @@ body.onboarding #toast{z-index:50}
 /* desktop: the pickbar stays at the top while the charts and the corner guide scroll under it, folded to one line */
 @media (min-width:901px){
   #pickbar{position:sticky;top:var(--topH,76px);z-index:12}
-  #hero #pickbar,#hero:fullscreen #pickbar{position:static}   /* full screen: the hero lays it out itself */
+  /* full screen: the panel is an overlay under the header strip — hover the strip (or press “Session & compare”) and it drops down; the map keeps the whole screen */
+  #hero:fullscreen > #pickbar,.hero.fs-fallback > #pickbar{position:absolute;left:14px;right:14px;top:calc(14px + var(--fsHeadH,54px));z-index:30;margin:0;animation:none;transform:translateY(-10px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .16s,transform .16s,visibility 0s .16s;max-height:calc(100vh - 140px);overflow:auto;border-radius:0 0 14px 14px;box-shadow:0 18px 40px rgba(16,22,48,.22)}
+  #hero:fullscreen > #pickbar.open,#hero:fullscreen > #pickbar.peek,.hero.fs-fallback > #pickbar.open,.hero.fs-fallback > #pickbar.peek{transform:none;opacity:1;visibility:visible;pointer-events:auto;transition:opacity .16s,transform .16s,visibility 0s}
+  #hero:fullscreen .fs-head,.hero.fs-fallback .fs-head{cursor:default}
+  #hero:fullscreen .fs-head .lapline,.hero.fs-fallback .fs-head .lapline{flex:1;min-width:0;flex-wrap:nowrap}
+  #hero:fullscreen .fs-head .lapline .lbl,#hero:fullscreen .fs-head .lapline .big,.hero.fs-fallback .fs-head .lapline .lbl,.hero.fs-fallback .fs-head .lapline .big{white-space:nowrap;flex:none}
+  #hero:fullscreen .fs-head .chips,.hero.fs-fallback .fs-head .chips{flex-wrap:nowrap;overflow:hidden;min-width:0;mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+  #hero:fullscreen .fs-head .chips .chip,.hero.fs-fallback .fs-head .chips .chip{flex:none;white-space:nowrap}
+  #hero:fullscreen #fsCompare,.hero.fs-fallback #fsCompare{display:inline-flex!important}
+  #hero:fullscreen > #pickbar #pickClose,.hero.fs-fallback > #pickbar #pickClose{display:grid!important;place-items:center;position:absolute;right:10px;top:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);font-size:18px;line-height:1;color:var(--muted);cursor:pointer}
   #pickbar.stuck{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 18px;align-items:center;padding:8px 16px;border-radius:0 0 14px 14px;box-shadow:0 10px 24px rgba(16,22,48,.12)}
   #pickbar.stuck .pickbar{gap:8px 10px;align-items:center}
   #pickbar.stuck .pickbar .field{flex:0 1 220px}
@@ -1039,7 +1048,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     <!-- ========== LAYOUT ========== -->
     <!-- ========== LAB ========== -->
     <section class="page" id="pg-lab" hidden>
-      <div class="ph"><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
+      <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
       <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div><button class="btn primary sm" id="labSignIn" style="margin-left:auto;flex:none" hidden data-t="Sign in">Sign in</button></div>
       <div id="labStart" hidden>
         <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="labMineSub"></span></h2><div id="labMine"></div><div class="hint" id="labMineHint"></div></div>
@@ -1064,7 +1073,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
       </div>
       <div class="hero" id="hero" hidden>
         <div class="map-wrap" id="mapWrap1">
-          <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn mobile-only" id="fsCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
+          <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn mobile-only" id="fsCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Session &amp; compare">Session &amp; compare</span></button><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
           <div class="map-bar" id="mapBar">
             <div class="seg" id="lapSegField" title="Show on map" hidden><button class="btn active" id="lapYou" type="button">Reference</button><button class="btn" id="lapCmp" type="button">Comparison</button></div>
             <div class="seg" id="viewSeg"><button class="btn" id="tglTiles" type="button" hidden data-t="Satellite">Satellite</button><button class="btn" id="tglAlign" type="button" hidden data-t="Align">Align</button><button class="btn" id="tglSat" type="button" data-t="Aerial">Aerial</button></div>
@@ -2874,6 +2883,7 @@ Object.assign(I18N.RU, {
   'Bug reports': 'Сообщения о проблемах', 'Run supabase/reports.sql and deploy the `report` function — reports appear here and in your inbox.': 'Запусти supabase/reports.sql и задеплой функцию `report` — сообщения появятся здесь и в почте.', 'New reports also arrive by email (REPORT_TO secret).': 'Новые сообщения приходят и на почту (секрет REPORT_TO).',
   'No reports yet. The button in the corner of every page sends them here and to your inbox.': 'Сообщений пока нет. Кнопка в углу каждой страницы шлёт их сюда и на почту.', 'guest': 'гость', 'session': 'сессия', 'Reopen': 'Открыть заново', 'Done': 'Готово', 'Delete this report?': 'Удалить это сообщение?'
 });
+Object.assign(I18N.RU, { 'Session & compare': 'Сессия и сравнение', 'Sessions': 'Сессии' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4397,6 +4407,8 @@ LAB.show = async function (sid, mode) {
   labRender(); showDiscuss();
   if (!LAB.current) renderLabStart();
 };
+// back to the start page: the session stays in memory, the Lab shows the library again
+LAB.close = function () { if (fsOn()) { if (document.fullscreenElement) { try { document.exitFullscreen(); } catch (e) {} } else $('hero').classList.remove('fs-fallback'); } LAB.current = null; LAB.sessions = []; LAB.G = null; LAB.dcmp = null; LAB.coach = null; LAB.loaded = false; LAB.selN = 0; if (location.hash !== '#lab') history.replaceState(null, '', '#lab'); labRender(); renderLabStart(); window.scrollTo({ top: 0 }); };
 // open a session as the reference (or as the comparison against my latest session on the same layout)
 LAB.open = async function (meta, asCmp) {
   labEnsureMap(); setStatus('labStatus', t('Loading session…'));
@@ -4445,7 +4457,7 @@ function labMapHeight(w) {
   const ratio = LAB.G ? LAB.G.H / LAB.G.W : 0.65;
   if (isCockpit()) { const box = $('mapBox').clientHeight; return Math.max(120, box || window.innerHeight); }
   if (fs && isPhone()) return Math.max(220, window.innerHeight - ($('fsHead').offsetHeight || 50) - ($('dataPanel').offsetHeight || 180) - 2);
-  if (fs) { const hgt = (id) => { const e = $(id); return e && e.offsetParent !== null ? e.offsetHeight : 0; }; return Math.max(240, window.innerHeight - 28 - hgt('fsHead') - hgt('pickbar') - hgt('mapBar') - hgt('legendData') - hgt('dataPanel') - 24); }
+  if (fs) { const hgt = (id) => { const e = $(id); return e && e.offsetParent !== null ? e.offsetHeight : 0; }; return Math.max(240, window.innerHeight - 28 - hgt('fsHead') - hgt('mapBar') - hgt('legendData') - hgt('dataPanel') - 24); }
   if (isPhone()) return Math.round(window.innerHeight * 0.5);
   // desktop: the map fills what is left of the window under the (stuck) pickbar — no scrolling to see the whole lap
   const wrap = $('mapWrap1'); let free = window.innerHeight - 470;
@@ -4629,12 +4641,20 @@ function labEnsureMap() {
   $('alDone').onclick = () => setAligning(false);
   $('alSave').onclick = async () => { const l = STORE.getLayout(LAB.tid, LAB.lid), tr = STORE.getTrack(LAB.tid); if (!l || !tr || !STORE.canEditTrack(tr)) return; const b = $('alSave'); b.classList.add('busy'); try { const base = l.sat || { dx: 0, dy: 0 }; await STORE.saveLayout(LAB.tid, Object.assign({}, l, { sat: { dx: +(base.dx + LAB.satAdj.dx).toFixed(2), dy: +(base.dy + LAB.satAdj.dy).toFixed(2) } })); LAB.satAdj = { dx: 0, dy: 0 }; saveSatAdj(); GEOM.invalidate(); setAligning(false); toast(t('Imagery alignment saved for this layout.')); await LAB.open(LAB.current, false); } catch (e) { toast(t('Could not save: {e}', { e: e && e.message || e })); } b.classList.remove('busy'); };
   // full screen: map, charts, readout and the corner inspector on one screen
-  const placePickbar = (fs) => { const pb = $('pickbar'), h = $('hero'); if (fs) { if (pb.parentElement !== h) h.insertBefore(pb, h.firstChild); } else if (pb.parentElement === h) { h.parentElement.insertBefore(pb, h); pb.classList.remove('open'); } };
-  $('fsCompare').onclick = () => $('pickbar').classList.toggle('open');
+  const placePickbar = (fs) => { const pb = $('pickbar'), h = $('hero'); pb.classList.remove('open', 'peek'); if (fs) { if (pb.parentElement !== h) h.insertBefore(pb, h.firstChild); document.documentElement.style.setProperty('--fsHeadH', ($('fsHead').offsetHeight || 54) + 'px'); } else if (pb.parentElement === h) { h.parentElement.insertBefore(pb, h); } };
+  // desktop full screen: hovering the header strip drops the panel down; it folds when the pointer leaves both, unless pinned (.open) or a select is in use
+  { const pb = $('pickbar'), head = $('fsHead'); let hideT = null, showT = null, over = false;
+    const want = () => fsOn() && !isPhone();
+    const headH = () => document.documentElement.style.setProperty('--fsHeadH', (head.offsetHeight || 54) + 'px');   // the panel sits right under the header strip, never over its buttons
+    const show = () => { clearTimeout(hideT); if (want()) { headH(); pb.classList.add('peek'); } };
+    const hide = () => { clearTimeout(hideT); hideT = setTimeout(() => { if (!over && !pb.classList.contains('open') && !pb.contains(document.activeElement)) pb.classList.remove('peek'); }, 320); };
+    for (const el of [head, pb]) { el.addEventListener('pointerenter', (e) => { if (e.pointerType === 'touch' || !want()) return; over = true; clearTimeout(showT); showT = setTimeout(show, el === head ? 140 : 0); }); el.addEventListener('pointerleave', (e) => { if (e.pointerType === 'touch') return; over = false; clearTimeout(showT); hide(); }); }
+    pb.addEventListener('focusout', () => { if (want()) hide(); }); }
+  $('fsCompare').onclick = () => { const pb = $('pickbar'); document.documentElement.style.setProperty('--fsHeadH', ($('fsHead').offsetHeight || 54) + 'px'); pb.classList.toggle('open'); if (pb.classList.contains('open')) pb.classList.add('peek'); else pb.classList.remove('peek'); };
   const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); placePickbar(on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); syncLand(); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (isCockpit()) { renderHud(); renderCkStep(); drawScrub(); } } }, 60); };
   $('lmMap').onclick = () => fsFallbackOn(true);
   $('lmCompare').onclick = () => { $('pickbar').classList.toggle('open'); };
-  $('pickClose').onclick = () => $('pickbar').classList.remove('open');
+  $('pickClose').onclick = () => $('pickbar').classList.remove('open', 'peek');
   for (const b of $('labTabs').querySelectorAll('button[data-tab]')) b.onclick = () => { LAB.tab = b.dataset.tab; applyMobTab(); if (LAB.tab === 'chart') drawDataCharts(); };
   const fsOn = () => document.fullscreenElement === $('hero') || $('hero').classList.contains('fs-fallback');
   $('btnFull').onclick = () => { const h = $('hero'); if (fsOn()) { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); return; } if (h.requestFullscreen) h.requestFullscreen().catch(() => fsFallbackOn(true)); else fsFallbackOn(true); };
@@ -4662,7 +4682,7 @@ function labEnsureMap() {
   $('qcOther').onclick = () => { LAB.pickerOpen = !LAB.pickerOpen; renderCmpPicker(); };
   $('lapYou').onclick = () => { LAB.mapLap = 'you'; labRender(); }; $('lapCmp').onclick = () => { LAB.mapLap = 'cmp'; labRender(); };
   $('labUpload').onclick = () => UPLOAD.open({ track: LAB.tid, layout: LAB.lid }); $('labUpload2').onclick = () => UPLOAD.open({});
-  $('btnPublish').onclick = labTogglePublish;
+  $('btnPublish').onclick = labTogglePublish; $('labBack').onclick = () => LAB.close();
   $('btnEditSess').onclick = () => { const s = LAB.current; if (s) SESSEDIT.open(s, () => { LAB.invalidate(s.id); go('lab~' + s.id); }); };
   $('btnFollowOwner').onclick = async () => { const s = LAB.current; if (!s || mySession(s)) return; if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to follow drivers.')); return; } const b = $('btnFollowOwner'); b.classList.add('busy'); try { await STORE.toggleFollow(s.owner); await renderOwnerRow(); } catch (e) { toast(t('Could not save.')); } b.classList.remove('busy'); };
   $('commentBtn').onclick = postComment; $('commentInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); postComment(); } });
@@ -4717,7 +4737,7 @@ async function renderLabStart() {
 
 function labRender() {
   const G = LAB.G, has = !!(G && LAB.sessions.length && allLaps().length && LAB.current);
-  $('labStart').hidden = has; for (const id of ['pickbar', 'pickSentinel', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open'); }
+  $('labStart').hidden = has; $('labBack').hidden = !has; for (const id of ['pickbar', 'pickSentinel', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open', 'peek'); }
   $('labEmptyText').textContent = t('Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.');
   $('labSub').textContent = has ? `${LAB.trackName}${G.layout ? ' · ' + G.layout.name : (LAB.lid === 'custom' ? ' · ' + t('custom layout') : '')}` : t('Session analysis');
   $('hero').classList.toggle('with-insp', has); $('pg-lab').classList.toggle('has', has); syncLand();
@@ -5405,7 +5425,7 @@ async function renderWallet(fresh) {
 function renderChatList() {
   const box = $('aiChats'); box.innerHTML = ''; $('aiChatsSub').textContent = AI.chats.length ? String(AI.chats.length) : '';
   if (!AI.chats.length) { box.appendChild(el('div', 'hint', t('No chats yet. Ask about one of your sessions or anything about your driving.'))); return; }
-  for (const c of AI.chats) { const a = el('a', 'item' + (AI.cur && AI.cur.id === c.id ? ' sel' : '')); a.href = '#ai~' + c.id; const tr = c.track_id ? STORE.getTrack(c.track_id) : null; a.append(el('span', 'name', c.title || t('Chat')), el('span', 'meta', [tr ? tr.name + (c.layout_id ? ' · ' + c.layout_id : '') : (c.session_id ? t('session') : t('general')), fmtDate(c.updated_at)].join(' · '))); box.appendChild(a); }
+  for (const c of AI.chats) { const a = el('a', 'item' + (AI.cur && AI.cur.id === c.id ? ' sel' : '')); a.href = '#ai~' + c.id; const tr = c.track_id ? STORE.getTrack(c.track_id) : null; const ly = tr && c.layout_id ? STORE.getLayout(c.track_id, c.layout_id) : null; a.append(el('span', 'name', c.title || t('Chat')), el('span', 'meta', [tr ? tr.name + (ly ? ' · ' + ly.name : (c.layout_id && c.layout_id !== 'custom' ? ' · ' + c.layout_id : '')) : (c.session_id ? t('session') : t('general')), fmtDate(c.updated_at)].join(' · '))); box.appendChild(a); }
 }
 async function startNew(sessionMeta, quiet) {
   AI.cur = null; AI.msgs = []; AI.newCtx = sessionMeta ? sessionMeta.id : '';
@@ -5421,7 +5441,8 @@ async function startNew(sessionMeta, quiet) {
 async function openChat(c) {
   AI.cur = c; $('aiGrid').classList.add('chat-open'); renderChatList();
   $('aiTitle').textContent = c.title || t('Chat'); const tr = c.track_id ? STORE.getTrack(c.track_id) : null;
-  $('aiCtx').innerHTML = c.session_id ? `${t('About session')} <a href="#lab~${esc(c.session_id)}">${esc(tr ? tr.name + (c.layout_id ? ' · ' + c.layout_id : '') : t('open in the Lab'))}</a>` : t('General chat');
+  const lay = tr && c.layout_id ? STORE.getLayout(c.track_id, c.layout_id) : null;
+  $('aiCtx').innerHTML = c.session_id ? `${t('About session')} <a href="#lab~${esc(c.session_id)}">${esc(tr ? tr.name + (lay ? ' · ' + lay.name : (c.layout_id && c.layout_id !== 'custom' ? ' · ' + c.layout_id : '')) : t('open in the Lab'))}</a>` : t('General chat');
   $('aiRename').hidden = false; $('aiDelete').hidden = false; $('aiNewBox').hidden = true;
   AI.msgs = []; renderAiLog(true); renderAiLab(c.session_id || '');
   AI.msgs = (await STORE.chatMessages(c.id)).map(m => ({ role: m.role, content: m.content, at: m.created_at }));
