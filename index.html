@@ -558,6 +558,10 @@ body.onboarding #toast{z-index:50}
 .post.rich .pb{grid-template-columns:minmax(240px,44%) minmax(0,1fr)}
 .post .pv.rich{height:250px;background:var(--surface)}
 .post .pv .pv-open{position:absolute;inset:0;border-radius:12px}
+.ideal-note{margin-top:6px;font-size:12px;color:var(--muted);max-width:620px;line-height:1.35}
+#pickbar.stuck .ideal-note,#hero:fullscreen .ideal-note{display:none}
+#digest p.ideal{padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--limit) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--limit) 40%,var(--line))}
+.insp-text.ideal{background:color-mix(in srgb,var(--limit) 10%,var(--surface));border-radius:8px;padding:8px 10px}
 @media (max-width:640px){.post .pb,.post.rich .pb{grid-template-columns:1fr}.post .pv{height:120px}.post .pv.rich{height:250px}}
 .rank{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
 .rank:last-child{border-bottom:0}
@@ -1084,7 +1088,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
         <div class="pickbar">
           <div class="field"><label data-t="Session">Session</label><select id="sessSel"></select></div>
           <div class="field"><label id="refLbl"></label><select id="refSel"></select></div>
-          <div class="field auto"><label data-t="Compare">Compare</label><div class="row" style="flex-wrap:nowrap"><div class="seg"><button class="btn" id="qcNone" type="button" data-t="Off">Off</button><button class="btn" id="qcBestAvg" type="button" data-t="Best vs average">Best vs average</button><button class="btn" id="qcLap" type="button" data-t="Another lap">Another lap</button><button class="btn" id="qcOther" type="button" data-t="Another session…">Another session…</button></div></div></div>
+          <div class="field auto"><label data-t="Compare">Compare</label><div class="row" style="flex-wrap:nowrap"><div class="seg"><button class="btn" id="qcNone" type="button" data-t="Off">Off</button><button class="btn" id="qcBestAvg" type="button" data-t="Best vs average">Best vs average</button><button class="btn" id="qcIdeal" type="button" data-t="Best vs ideal">Best vs ideal</button><button class="btn" id="qcLap" type="button" data-t="Another lap">Another lap</button><button class="btn" id="qcOther" type="button" data-t="Another session…">Another session…</button></div></div><div class="hint ideal-note" id="idealNote" hidden data-t="Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.">Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.</div></div>
           <div class="field" id="cmpField" hidden><label id="cmpLbl"></label><select id="cmpSel"></select></div>
         </div>
         <div class="cmp-picker" id="cmpPicker" hidden><div class="hint" id="cmpPickerHint"></div><div class="list" id="cmpList"></div></div>
@@ -2431,7 +2435,7 @@ const DATA = (() => {
     if (f && Math.abs(f.corr) >= 0.35) s += '. ' + t('What matters most here is {f}: {rule}', { f: f.name, rule: f.unit === 'kmh' ? t('+1 km/h ≈ {s} s', { s: sg(f.slope, 3) }) : t('+1 m (later) ≈ {s} s', { s: sg(f.slope, 3) }) });
     return s + '.';
   }
-  return { MERC, applyT, parseAlfName, newFrame, distFromFrame, lapXY, lapPx, gpsLayout, sessionStats, projectLap, trackCurv, autoCorners, cornerWindows, windowMetrics, metricsText, diffs, compareWindow, buildComparison, buildCoach, coachText, avgProjection, buildComparisonP, tw, kmh };
+  return { MERC, applyT, parseAlfName, newFrame, distFromFrame, lapXY, lapPx, gpsLayout, sessionStats, projectLap, trackCurv, autoCorners, cornerWindows, windowMetrics, metricsText, diffs, compareWindow, buildComparison, buildCoach, coachText, avgProjection, buildComparisonP, tw, kmh, accelFrom };
 })();
 // @@DATA-END
 // ---------- i18n: English is the source text, Russian is a dictionary keyed by the English string ----------
@@ -2949,6 +2953,7 @@ Object.assign(I18N.RU, { 'winner': 'победа', 'podium': 'подиум' });
 Object.assign(I18N.RU, { 'Where the time is': 'Где время' });
 Object.assign(I18N.RU, { 'Preparing the link…': 'Готовлю ссылку…', 'every corner, compared with the fastest': 'каждый поворот в сравнении с лучшими' });
 Object.assign(I18N.RU, { 'Visitors today': 'Посетители сегодня', 'Yesterday': 'Вчера', 'signed in {u} · new {n} · {o} opens': 'вошли {u} · новых {n} · {o} открытий', 'Visitors, 7 days': 'Посетители, 7 дней', '{n} signed in · {m} in 30 days': '{n} вошли · {m} за 30 дней', 'Retention': 'Возвращаемость', 'came back the next day · within 7 days: {p} (of {n} new)': 'вернулись на следующий день · в течение 7 дней: {p} (из {n} новых)', 'Visitors, last 30 days': 'Посетители, 30 дней', 'Devices, 30 days': 'Устройства, 30 дней', 'Days are UTC (Dubai is +4). A visitor is a browser; a driver on a phone and a laptop counts twice.': 'Дни по UTC (Дубай +4). Посетитель — это браузер: один человек с телефона и ноутбука считается дважды.', 'Visitors and retention: run supabase/visits.sql in the SQL editor once — the numbers appear here from the next day.': 'Посетители и возвращаемость: выполни supabase/visits.sql в SQL Editor один раз — цифры появятся здесь со следующего дня.' });
+Object.assign(I18N.RU, { 'Best vs ideal': 'Лучший vs идеальный', 'ideal lap': 'идеальный круг', 'Ideal lap': 'Идеальный круг', 'best corners, approximate': 'лучшие повороты, приблизительно', 'This session needs at least two clean laps for an ideal lap.': 'Для идеального круга нужны хотя бы два чистых круга в сессии.', 'Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.': 'Идеальный круг ≈ самый быстрый проезд каждого поворота, собранный из разных кругов. Приблизительно: связки поворотов не учитываются.', 'The fastest pass through each corner, stitched from {k} different laps of this session — {d} s better than the best lap.': 'Самый быстрый проезд каждого поворота, собранный из {k} разных кругов этой сессии — на {d} с лучше лучшего круга.', 'Where another lap was faster:': 'Где другой круг был быстрее:', 'The best lap is the fastest in every corner.': 'Лучший круг — самый быстрый в каждом повороте.', 'Approximate: corners are judged one by one, combinations are not — a faster entry into one corner can be the reason for a slower next one, and this stitched lap was never driven. A ceiling, not a target.': 'Приблизительно: повороты оцениваются по одному, связки — нет: быстрый вход в один поворот может быть причиной медленного следующего, а такого круга целиком никто не проезжал. Это потолок, а не цель.', 'Your fastest pass through this corner is this very lap.': 'Твой самый быстрый проезд этого поворота — именно этот круг.', 'Your fastest pass through this corner: lap {n}, {t} s ({d} s faster than the reference lap).': 'Твой самый быстрый проезд этого поворота: круг {n}, {t} с (на {d} с быстрее опорного круга).', 'Corners are judged one by one — check the next corner of that lap too.': 'Повороты оцениваются по одному — посмотри и следующий поворот того круга.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4143,7 +4148,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v30.1';
+const APP_VERSION = 'v30.2';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -4520,6 +4525,7 @@ const LAB = {
 };
 const lapKey = (sess, L) => sess.id + '|' + L.n;
 const isAvgKey = (k) => String(k || '').startsWith('avg:');
+const isIdealKey = (k) => String(k || '').startsWith('ideal:');
 const sessOf = (id) => LAB.sessions.find(x => x.id === id) || null;
 function findLap(key) { if (!key) return null; const [sid, n] = String(key).split('|'); const sess = sessOf(sid); if (!sess) return null; const L = sess.laps.find(L => L.n === +n); return L ? { sess, L } : null; }
 function allLaps() { const out = []; for (const sess of LAB.sessions) for (const L of sess.laps) if (L.px) out.push({ sess, L }); return out; }
@@ -4534,7 +4540,27 @@ const mySession = (sess) => sess && (sess.owner === STORE.me.id || sess.owner ==
 function pickDefaultRef() { let best = null; for (const x of allLaps()) if (!best || x.L.timeMs < best.L.timeMs) best = x; return best ? lapKey(best.sess, best.L) : null; }
 function cornerAt(i) { const D = LAB.dcmp; if (!D || i < 0) return null; const N = LAB.G.track.N; return D.rows.find(r => ((i - r.w.a) % N + N) % N < r.w.len) || null; }
 function activeRow() { const D = LAB.dcmp; if (!D) return null; const h = LAB.hoverIdx >= 0 ? cornerAt(LAB.hoverIdx) : null; if (h) return h; return LAB.selN ? (D.rows.find(r => r.w.n === LAB.selN) || null) : null; }
-const cmpSessOf = (key) => { key = String(key || ''); if (!key || key === 'none' || key === 'avg') return null; return isAvgKey(key) ? sessOf(key.slice(4)) : (findLap(key) || {}).sess || null; };
+const cmpSessOf = (key) => { key = String(key || ''); if (!key || key === 'none' || key === 'avg') return null; return isAvgKey(key) ? sessOf(key.slice(4)) : (isIdealKey(key) ? sessOf(key.slice(6)) : (findLap(key) || {}).sess || null); };
+// the ideal lap of a session: in every corner window (the stretch from one speed peak to the next, so the whole lap is covered)
+// the fastest pass among the clean laps, stitched into one projection. Approximate by nature: a corner driven for its own time can
+// cost the next one, and the stitched lap never happened — a ceiling, not a target. `picks` says which lap won each corner.
+function sessIdeal(sess, R, apexes) {
+  const G = LAB.G; if (!G || !R || !apexes || apexes.length < 2) return null;
+  const laps = sess.laps.filter(L => L.clean && L.px); if (laps.length < 2) return null;
+  const tr = G.track, N = tr.N, wins = DATA.cornerWindows(tr, R, apexes, G.corners.R); if (!wins.length) return null;
+  const key = `${G.rev}|${R.key}|${wins.map(w => w.a).join(',')}`;
+  if (sess._ideal && sess._ideal.key === key) return sess._ideal.P;
+  const projs = laps.map(L => DATA.projectLap(L, tr, G.rev)).filter(Boolean); if (projs.length < 2) return null;
+  const v = new Float64Array(N), o = new Float64Array(N), g = new Float64Array(N), dt = new Float64Array(N), picks = [];
+  for (const w of wins) {
+    let best = null, bt = Infinity; for (const P of projs) { const tm = DATA.tw(P, w.b, w.a); if (tm < bt) { bt = tm; best = P; } }
+    for (let k = 0; k < w.len; k++) { const i = (w.a + k) % N; v[i] = best.v[i]; o[i] = best.o[i]; g[i] = best.g[i]; dt[i] = DATA.tw(best, (i + 1) % N, i); }
+    picks.push({ n: w.n, L: best.lap, time: bt });
+  }
+  const tt = new Float64Array(N + 1); for (let i = 0; i < N; i++) tt[i + 1] = tt[i] + dt[i];
+  const P = { key: 'ideal:' + sess.id, N, ds: tr.ds, T: tt[N], v, t: tt, o, a: DATA.accelFrom(v, N, tr.ds), g, lap: null, n: projs.length, name: t('ideal lap'), ideal: true, picks, sess, nLapsUsed: new Set(picks.map(p => p.L.n)).size };
+  sess._ideal = { key, P }; return P;
+}
 
 LAB.show = async function (sid, mode) {
   labEnsureMap();
@@ -4914,6 +4940,7 @@ function labEnsureMap() {
   $('cmpSel').addEventListener('change', () => { LAB.cmp = $('cmpSel').value; LAB.chat = []; labRender(); });
   $('qcNone').onclick = () => { LAB.cmp = 'none'; LAB.pickerOpen = false; LAB.chat = []; labRender(); };
   $('qcBestAvg').onclick = () => { const s = LAB.current; if (!s) return; LAB.ref = lapKey(s, bestLap(s)); LAB.cmp = sessAvg(s) ? 'avg:' + s.id : 'none'; if (LAB.cmp === 'none') toast(t('This session needs at least two clean laps for an average.')); LAB.pickerOpen = false; LAB.selN = 0; LAB.chat = []; labRender(); };
+  $('qcIdeal').onclick = () => { const s = LAB.current; if (!s) return; LAB.ref = lapKey(s, bestLap(s)); LAB.cmp = 'ideal:' + s.id; LAB.pickerOpen = false; LAB.selN = 0; LAB.chat = []; labRender(); if (!isIdealKey(LAB.cmp)) toast(t('This session needs at least two clean laps for an ideal lap.')); };
   $('qcLap').onclick = () => { const s = LAB.current; if (!s) return; const ref = findLap(LAB.ref); const L = ref && ref.sess === s ? ref.L : null; const nx = s.laps.filter(x => x.px && x !== L).sort((a, b) => (b.clean - a.clean) || a.timeMs - b.timeMs)[0]; if (!nx) { toast(t('No other lap in this session.')); return; } LAB.cmp = lapKey(s, nx); LAB.pickerOpen = false; LAB.chat = []; labRender(); };
   $('qcOther').onclick = () => { LAB.pickerOpen = !LAB.pickerOpen; renderCmpPicker(); };
   $('lapYou').onclick = () => { LAB.mapLap = 'you'; labRender(); }; $('lapCmp').onclick = () => { LAB.mapLap = 'cmp'; labRender(); };
@@ -4989,6 +5016,7 @@ function labRender() {
   const refName = refIsAvg ? t('average lap') : t('lap {n}', { n: L.n });
   // session switch: my sessions on this layout and whatever else is loaded
   { const opts = []; const seen = new Set(); for (const sx of LAB.sessions) { seen.add(sx.id); opts.push([sx.id, `${shortSess(sx)} · ${fmtMs(bestLap(sx).timeMs)}${mySession(sx) ? '' : ' · ' + t('published')}`, mySession(sx) ? t('My sessions') : t('Published on this layout')]); } fillSelect($('sessSel'), opts, sess.id); }
+  const base = findLap(pickDefaultRef()), apexes = GEOM.apexes(G, base ? DATA.projectLap(base.L, G.track, G.rev) : R);
   // reference laps of the current session
   { const laps = sess.laps.filter(x => x.px), cleanN = laps.filter(x => x.clean).length, av = cleanN >= 2 ? sessAvg(sess) : null; const refOpts = []; if (av) refOpts.push(['avg:' + sess.id, `${t('average clean lap')} · ${fmtLap(av.T)} (${cleanN})`]); for (const x of laps) refOpts.push([lapKey(sess, x), lapLabel(sess, x)]); fillSelect($('refSel'), refOpts, LAB.ref); }
   $('refLbl').textContent = t('Reference lap');
@@ -4996,23 +5024,26 @@ function labRender() {
   let cmp = String(LAB.cmp || 'none'); if (cmp === LAB.ref) cmp = 'none';
   let cs = cmpSessOf(cmp); if (cmp !== 'none' && !cs) cmp = 'none';
   if (cmp !== 'none' && isAvgKey(cmp) && !sessAvg(cs)) cmp = 'none';
+  if (cmp !== 'none' && isIdealKey(cmp) && !(cs === sess && !refIsAvg && sessIdeal(cs, R, apexes))) cmp = 'none';   // the ideal lap is measured against a real lap of the same session
   LAB.cmp = cmp;
   const cmpOn = cmp !== 'none';
   $('cmpField').hidden = !cmpOn; $('lapSegField').hidden = !cmpOn;
-  if (cmpOn) { const laps = cs.laps.filter(x => x.px), av = sessAvg(cs); const o = []; if (av) o.push(['avg:' + cs.id, `${t('average clean lap')} · ${fmtLap(av.T)} (${laps.filter(x => x.clean).length})`]); for (const x of laps) o.push([lapKey(cs, x), lapLabel(cs, x)]); LAB.cmp = fillSelect($('cmpSel'), o.filter(x => x[0] !== LAB.ref), cmp); $('cmpLbl').textContent = cs === sess ? t('Compare with — this session') : t('Compare with · {s}', { s: shortSess(cs) }); }
-  const lapOfSame = cmpOn && cs === sess && !isAvgKey(LAB.cmp);
-  $('qcNone').classList.toggle('active', !cmpOn); $('qcBestAvg').classList.toggle('active', cmpOn && cs === sess && isAvgKey(LAB.cmp) && !refIsAvg); $('qcLap').classList.toggle('active', lapOfSame); $('qcOther').classList.toggle('active', (cmpOn && cs !== sess) || LAB.pickerOpen);
+  if (cmpOn) { const laps = cs.laps.filter(x => x.px), av = sessAvg(cs), ide = cs === sess && !refIsAvg ? sessIdeal(cs, R, apexes) : null; const o = []; if (av) o.push(['avg:' + cs.id, `${t('average clean lap')} · ${fmtLap(av.T)} (${laps.filter(x => x.clean).length})`]); if (ide) o.push(['ideal:' + cs.id, `${t('ideal lap')} · ${fmtLap(ide.T)} (${t('best corners, approximate')})`]); for (const x of laps) o.push([lapKey(cs, x), lapLabel(cs, x)]); LAB.cmp = fillSelect($('cmpSel'), o.filter(x => x[0] !== LAB.ref), cmp); $('cmpLbl').textContent = cs === sess ? t('Compare with — this session') : t('Compare with · {s}', { s: shortSess(cs) }); }
+  const lapOfSame = cmpOn && cs === sess && !isAvgKey(LAB.cmp) && !isIdealKey(LAB.cmp);
+  $('qcNone').classList.toggle('active', !cmpOn); $('qcBestAvg').classList.toggle('active', cmpOn && cs === sess && isAvgKey(LAB.cmp) && !refIsAvg); $('qcIdeal').classList.toggle('active', cmpOn && isIdealKey(LAB.cmp)); $('qcLap').classList.toggle('active', lapOfSame); $('qcOther').classList.toggle('active', (cmpOn && cs !== sess) || LAB.pickerOpen);
   $('cmpPicker').hidden = !LAB.pickerOpen; if (LAB.pickerOpen) renderCmpPicker();
   let mode = LAB.cmp, others; const proj = (x) => DATA.projectLap(x.L, G.track, G.rev), attached = allLaps();
   if (!cmpOn) { mode = 'avg'; others = []; }
   else if (isAvgKey(mode)) { const P = sessAvg(cs); others = P ? [P] : []; mode = others.length ? 'lap' : 'avg'; }
+  else if (isIdealKey(mode)) { const P = sessIdeal(cs, R, apexes); others = P ? [P] : []; mode = others.length ? 'lap' : 'avg'; }
   else { const o = findLap(mode), P = (o && o.L.px) ? proj(o) : null; others = P ? [P] : []; mode = others.length ? 'lap' : 'avg'; }
   const nameOf = (P) => !P ? '' : (P.lap ? (P.lap._sess === sess ? t('lap {n}', { n: P.lap.n }) : `${t('lap {n}', { n: P.lap.n })} (${shortSess(P.lap._sess)})`) : (P.name || t('average lap')));
-  const base = findLap(pickDefaultRef()), apexes = GEOM.apexes(G, base ? DATA.projectLap(base.L, G.track, G.rev) : R);
   const rName = refIsAvg ? `${t('Average lap')} · ${shortSess(sess)}` : (mySession(sess) ? '' : shortSess(sess));
   const D = DATA.buildComparisonP(R, others, mode, G.track, nameOf, apexes, G.corners.R, rName || null);
   if (!D) { $('digest').innerHTML = `<p class="hint">${apexes.length < 2 ? t('No corners found on this line.') : t('Could not project this lap onto the track line.')}</p>`; $('cornersTable').querySelector('tbody').innerHTML = ''; return; }
   D.ref = { sess, L, avg: refIsAvg, name: refName, mine: mySession(sess) }; D.nameOf = nameOf; D.sess = sess; LAB.dcmp = D;
+  if (D.O && D.O.ideal) for (const r of D.rows) r.pick = D.O.picks.find(p => p.n === r.w.n) || null;   // which lap won this corner
+  $('idealNote').hidden = !(D.O && D.O.ideal);
   markCombos(D);
   LAB.coach = DATA.buildCoach(G.track, D.wins, attached.filter(x => x.L.clean).map(x => x.L), G.rev);
   LAB.corridor = null;
@@ -5341,6 +5372,8 @@ function renderDigest() {
       if (k === 'entry') return t('{hi} entry speed', { hi: hi(A.vEntry - B.vEntry) });
       return k === 'brake' ? t('a different braking point') : (k === 'pedal' ? t('different pedal work') : (k === 'lift' ? t('a different lift point') : t('a different line')));
     };
+    if (D.O.ideal) { const gainOf = (p) => { const r = D.rows.find(x => x.w.n === p.n); return r ? r.R.time - p.time : 0; }, picks = D.O.picks.filter(p => p.L !== L && gainOf(p) >= 0.01).sort((a, b) => gainOf(b) - gainOf(a));
+      P.push(`<p class="ideal"><span class="lbl">${t('Ideal lap')} · ${fmtLap(D.O.T)}</span><br>${esc(t('The fastest pass through each corner, stitched from {k} different laps of this session — {d} s better than the best lap.', { k: D.O.nLapsUsed, d: Math.max(0, D.R.T - D.O.T).toFixed(2) }))} ${picks.length ? esc(t('Where another lap was faster:')) + ' ' + picks.slice(0, 8).map(p => `${tref(p.n)} — ${t('lap {n}', { n: p.L.n })} (−${gainOf(p).toFixed(2)} ${t('s')})`).join(', ') + '.' : esc(t('The best lap is the fastest in every corner.'))}<br><b>${esc(t('Approximate: corners are judged one by one, combinations are not — a faster entry into one corner can be the reason for a slower next one, and this stitched lap was never driven. A ceiling, not a target.'))}</b></p>`); }
     const rName = D.ref.avg ? `${t('Average lap')} · ${shortSess(sess)}` : (D.ref.mine ? t('Reference lap') : `${t('Reference lap')} · ${shortSess(sess)}`);
     const head = D.total < -0.02 ? t('{r} is faster than {o} by {t} s.', { r: rName, o: oName, t: (-D.total).toFixed(2) }) : (D.total > 0.02 ? t('{r} is slower than {o} by {t} s.', { r: rName, o: oName, t: D.total.toFixed(2) }) : t('{r} and {o} are equal on time.', { r: rName, o: oName }));
     let tx = `<p><span class="lbl">${esc(rName)} vs ${esc(oName)}</span><br>${esc(head)}`;
@@ -5373,7 +5406,7 @@ function renderCornersTable() {
     const w = r.w, m = r.R, c = coachOf(w.n), tr = el('tr'); if (LAB.selN === w.n) tr.className = 'sel';
     const res = c ? Math.max(0, m.time - c.tTop) : 0, f = c && c.infl && c.infl[0];
     const main = r.cmp && Math.abs(r.cmp.dt) >= 0.04 && r.cmp.items[0] ? r.cmp.items[0].t : (f && Math.abs(f.corr) >= 0.35 ? t('what matters here is {f}', { f: f.name }) : '—');
-    const cells = [['T' + w.n, ''], [`${w.dir === 'L' ? t('left') : t('right')} · ${kindWord(m)}`, kindCls(m)], [short(m), 'txt'], [r.O ? short(r.O) : '—', 'txt'], [r.cmp ? sg(r.cmp.dt) : '—', (r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm') + ' num'], [c ? (res > 0.03 ? res.toFixed(2) + ' ' + t('s') : t('ok')) : '—', (res > 0.1 ? 'loss' : 'm') + ' num'], [main, 'txt']];
+    const cells = [['T' + w.n, ''], [`${w.dir === 'L' ? t('left') : t('right')} · ${kindWord(m)}`, kindCls(m)], [short(m), 'txt'], [r.O ? (r.pick ? t('lap {n}', { n: r.pick.L.n }) + ' · ' : '') + short(r.O) : '—', 'txt'], [r.cmp ? sg(r.cmp.dt) : '—', (r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm') + ' num'], [c ? (res > 0.03 ? res.toFixed(2) + ' ' + t('s') : t('ok')) : '—', (res > 0.1 ? 'loss' : 'm') + ' num'], [main, 'txt']];
     for (const [tx, cl] of cells) { const td = el('td'); td.textContent = tx; if (cl) td.className = cl; tr.appendChild(td); }
     tr.onclick = () => selectCorner(w.n, true); const labels = ['#', t('Type'), $('youColHead').textContent, $('cmpColHead').textContent, 'Δt', t('Reserve'), t('Main difference')]; Array.from(tr.children).forEach((td, i) => { td.dataset.label = labels[i] || ''; });
     tr.addEventListener('mouseenter', () => { LAB.hoverIdx = w.apex; LAB.map.setHover(w.apex); renderInspector(); }); tr.addEventListener('mouseleave', () => { LAB.hoverIdx = -1; LAB.map.setHover(-1); renderInspector(); });
@@ -5407,7 +5440,7 @@ function renderInspector() {
   const row = (lbl, a, b) => `<tr><td>${lbl}</td><td>${a}</td>${O ? `<td>${b}</td>` : ''}</tr>`;
   const sM = (x) => x >= 0 ? x.toFixed(0) + ' ' + t('m') : '—', K = t('km/h');
   let html = `<div class="insp-head"><b>T${w.n}</b><span class="hint">${w.dir === 'L' ? t('left') : t('right')} · R ${w.Rmin.toFixed(0)} ${t('m')} · ${t('apex {s} m from S/F', { s: R.sApex.toFixed(0) })}</span>${pill}</div>`;
-  html += `<table class="insp-table"><tr><th></th><th class="you">${esc(youHead)}</th>${O ? `<th class="cmp">${esc(oName)}</th>` : ''}</tr>`;
+  html += `<table class="insp-table"><tr><th></th><th class="you">${esc(youHead)}</th>${O ? `<th class="cmp">${esc(r.pick ? `${oName} · ${t('lap {n}', { n: r.pick.L.n })}` : oName)}</th>` : ''}</tr>`;
   html += row(t('entry'), `${kmh(R.vEntry)} ${K}`, O ? `${kmh(O.vEntry)} ${K}` : '');
   html += row(t('pedal'), pedalText(R), O ? pedalText(O) : '');
   if (R.kind === 'brake' || (O && O.kind === 'brake')) html += row(t('released'), sM(R.sRel), O ? sM(O.sRel) : '');
@@ -5416,6 +5449,7 @@ function renderInspector() {
   html += row(t('exit'), `${kmh(R.vExit)} ${K}`, O ? `${kmh(O.vExit)} ${K}` : '');
   html += row(t('lateral'), `${R.gmax.toFixed(2)} g`, O ? `${O.gmax.toFixed(2)} g` : '');
   html += row(t('time'), `${R.time.toFixed(2)} ${t('s')}`, O ? `${O.time.toFixed(2)} ${t('s')}` : '') + '</table>';
+  if (r.pick) html += `<div class="insp-text ideal">${esc(r.pick.L === D.ref.L ? t('Your fastest pass through this corner is this very lap.') : t('Your fastest pass through this corner: lap {n}, {t} s ({d} s faster than the reference lap).', { n: r.pick.L.n, t: r.pick.time.toFixed(2), d: Math.max(0, R.time - r.pick.time).toFixed(2) }))} ${esc(t('Corners are judged one by one — check the next corner of that lap too.'))}</div>`;
   if (O) { const pl = plainCorner(r, oName, refLabel); html += `<div class="insp-text"><div class="lbl">${t('In plain words')}</div>${esc(pl.what)}${pl.advice ? `<br><b>${esc(pl.advice)}</b>` : ''}</div>`; }
   if (coach) { const res = R.time - coach.tTop; html += `<div class="insp-text"><div class="lbl">${t('Coach · best passes through this corner')}</div>${esc(DATA.coachText(coach))}${res > 0.03 ? ` <b>${D.ref.mine ? t('Your reserve here ≈ {t} s.', { t: res.toFixed(2) }) : t('Reserve in this lap ≈ {t} s.', { t: res.toFixed(2) })}</b>` : ' ' + (D.ref.mine ? t('You are among the best here.') : t('This lap is among the best here.'))}</div>`; }
   html += `<canvas class="chart" id="inspChart" height="130"></canvas>`;
@@ -5529,8 +5563,8 @@ function aiContext() {
   const D = LAB.dcmp; if (!D) return '';
   const sess = D.sess, coach = LAB.coach, clean = sess.laps.filter(x => x.clean), avg = clean.reduce((s, x) => s + x.timeMs, 0) / Math.max(1, clean.length) / 1000;
   const M = (m) => m ? { pedal: pedalText(m), entry_kmh: +kmh(m.vEntry), released_m: m.sRel >= 0 ? Math.round(m.sRel) : null, apex_kmh: +kmh(m.vApex), apex_m: Math.round(m.sApex), throttle_m: m.sThr >= 0 ? Math.round(m.sThr) : null, exit_kmh: +kmh(m.vExit), lateral_g: +m.gmax.toFixed(2), time_s: +m.time.toFixed(2) } : null;
-  const corners = D.rows.map(r => { const c = coach && coach.corners.find(x => x.n === r.w.n); return { corner: 'T' + r.w.n, direction: r.w.dir === 'L' ? 'left' : 'right', radius_m: Math.round(r.w.Rmin), apex_from_sf_m: Math.round(r.R.sApex), reference: M(r.R), comparison: M(r.O), delta_s: r.cmp ? +r.cmp.dt.toFixed(2) : null, delta_text: r.cmp ? r.cmp.text : null, coach: c ? { best_passes: DATA.coachText(c), reserve_s: +Math.max(0, r.R.time - c.tTop).toFixed(2), time_spread_s: c.tStd !== undefined ? +c.tStd.toFixed(2) : null } : null }; });
-  return JSON.stringify({ track: LAB.trackName, layout: LAB.G.layout ? LAB.G.layout.name : LAB.lid, session: { name: shortSess(sess), driver: sess.driver, date: sess.date, kart: kartLabel(sess), kart_class: kartClassOf(sess), laps: sess.laps.length, clean: clean.length, best_lap: bestLap(sess).n, best_time: fmtMs(bestLap(sess).timeMs), avg_clean: fmtLap(avg), is_viewer_own: !!D.ref.mine }, reference_lap: { what: D.ref.name, time: fmtLap(D.R.T) }, comparison: D.O ? { who: D.nameOf(D.O), time: fmtLap(D.O.T), delta_s: +D.total.toFixed(2) } : null, digest: $('digest').innerText, corners });
+  const corners = D.rows.map(r => { const c = coach && coach.corners.find(x => x.n === r.w.n); return { corner: 'T' + r.w.n, direction: r.w.dir === 'L' ? 'left' : 'right', radius_m: Math.round(r.w.Rmin), apex_from_sf_m: Math.round(r.R.sApex), reference: M(r.R), comparison: M(r.O), comparison_lap: r.pick ? r.pick.L.n : undefined, delta_s: r.cmp ? +r.cmp.dt.toFixed(2) : null, delta_text: r.cmp ? r.cmp.text : null, coach: c ? { best_passes: DATA.coachText(c), reserve_s: +Math.max(0, r.R.time - c.tTop).toFixed(2), time_spread_s: c.tStd !== undefined ? +c.tStd.toFixed(2) : null } : null }; });
+  return JSON.stringify({ track: LAB.trackName, layout: LAB.G.layout ? LAB.G.layout.name : LAB.lid, session: { name: shortSess(sess), driver: sess.driver, date: sess.date, kart: kartLabel(sess), kart_class: kartClassOf(sess), laps: sess.laps.length, clean: clean.length, best_lap: bestLap(sess).n, best_time: fmtMs(bestLap(sess).timeMs), avg_clean: fmtLap(avg), is_viewer_own: !!D.ref.mine }, reference_lap: { what: D.ref.name, time: fmtLap(D.R.T) }, comparison: D.O ? Object.assign({ who: D.nameOf(D.O), time: fmtLap(D.O.T), delta_s: +D.total.toFixed(2) }, D.O.ideal ? { ideal: true, note: 'the ideal lap stitches the fastest pass through each corner from different laps of this session; approximate — corner combinations are not accounted for; each corner says which lap it came from (comparison_lap)' } : {}) : null, digest: $('digest').innerText, corners });
 }
 const AI_RULES = () => `You are a rental-karting coach (Sodi RT10, Honda GX390, up to ~80 km/h) and an Alfano telemetry analyst. Below is a JSON breakdown of one session on a track: corners T1…Tn are numbered from the start/finish line; for each one you get what the driver did on the reference lap and on the comparison lap: points in metres from S/F, speeds in km/h, corner time, plus "coach" — statistics of the best passes through that corner across all loaded laps and the reserve. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, briefly and concretely, in plain language without jargon, referring to corner numbers and the numbers in the data. If asked about something not in the data (video, a line more precise than ±1 m, kart condition), say so plainly. Never invent numbers. Plain text, no tables or headings; lists only when short.`;
 async function askAI() {
@@ -6409,7 +6443,7 @@ const ADMIN = (() => {
   try { STORE.visit(); } catch (e) {}   // visitors & retention for the admin panel (visits.sql)
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, SHARE, shareUrl, sharePageSync, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, SHARE, shareUrl, sharePageSync, aiContext, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { await NATIVE.init(); } catch (e) {}
