@@ -2947,6 +2947,7 @@ Object.assign(I18N.RU, {
 Object.assign(I18N.RU, { '— open the link to see every corner, upload yours and compare': '— открой ссылку, чтобы увидеть каждый поворот, загрузи свою и сравни', 'max': 'макс' });
 Object.assign(I18N.RU, { 'winner': 'победа', 'podium': 'подиум' });
 Object.assign(I18N.RU, { 'Where the time is': 'Где время' });
+Object.assign(I18N.RU, { 'Preparing the link…': 'Готовлю ссылку…', 'every corner, compared with the fastest': 'каждый поворот в сравнении с лучшими' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3228,6 +3229,7 @@ const STORE = (() => {
       async platformNames() { return {}; },
       async adminStats() { return must(await sb.rpc('hutka_stats')); },
       async setCard(sid, card) { return must(await sb.rpc('hutka_set_card', { sid, card })) === true; },
+      async setShare(sid, share) { return must(await sb.rpc('hutka_set_share', { sid, share })) === true; },
       addClaim: async (body) => must(await sb.from('claims').insert({ track_id: body.track, by: body.by, text: body.text || '' })),
       async listClaims() { return must(await sb.from('claims').select('*').order('created_at', { ascending: false })).map(r => ({ id: String(r.id), track: r.track_id, by: r.by, text: r.text, createdAt: new Date(r.created_at).getTime() })); },
       deleteClaim: async (id) => must(await sb.from('claims').delete().eq('id', +id)),
@@ -3350,6 +3352,12 @@ const STORE = (() => {
     try { const ok = await adapter.setCard(sid, card); if (ok) { const c = sessCache.get(sid); if (c) c.card = card; notify('sessions'); } return ok; }
     catch (e) { if (/hutka_set_card|PGRST202|42883/.test(String(e && e.message || e))) adminCardsOk = false; return false; }
   }
+  let adminShareOk;
+  async function setShareAdmin(sid, share) {
+    if (!adapter || !adapter.setShare || !me.canEdit || adminShareOk === false) return false;
+    try { const ok = await adapter.setShare(sid, share); if (ok) { const c = sessCache.get(sid); if (c) c.share = share; } return ok; }
+    catch (e) { if (/hutka_set_share|PGRST202|42883/.test(String(e && e.message || e))) adminShareOk = false; return false; }
+  }
   // drop loaded session data that nothing on the page holds (after background work): the next open fetches it again
   function trimSessions(keep) { const k = new Set(keep || []); for (const id of [...sessCache.keys()]) if (!k.has(id)) sessCache.delete(id); }
   async function deleteSession(meta) { if (adapter && meta.owner !== 'local') await adapter.deleteSession(meta.id, meta.chunks); else await LDB.del('sessions', meta.id); sessCache.delete(meta.id); notify('sessions'); }
@@ -3430,6 +3438,10 @@ const STORE = (() => {
     const r = await fetch(c.base + '/report', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': c.key, 'Authorization': 'Bearer ' + ((adapter && adapter.token && adapter.token()) || c.key) }, body: JSON.stringify(body || {}) });
     if (!r.ok) throw await errOf(r); return r.json();
   }
+  // the link preview of a published session: functions/share-page writes hutka.ai/s/<id> (title, text, the picture); the picture goes to the public bucket cards/<me>/<id>.png
+  async function sharePage(sid, remove, img) { const r = await fnCall('share-page', { id: sid, remove: !!remove, img: img || '' }); if (!r.ok) throw await errOf(r); return r.json(); }
+  async function uploadCard(sid, blob) { if (!adapter || adapter.kind !== 'supabase' || !me.id || !adapter.sb.storage) return null; const path = `${me.id}/${sid}.png`; const r = await adapter.sb.storage.from('cards').upload(path, blob, { upsert: true, contentType: 'image/png', cacheControl: '3600' }); if (r.error) { const e = new Error(r.error.message || 'upload'); e.code = r.error.statusCode || r.error.code; throw e; } return 'cards/' + path; }
+  async function removeCard(sid) { if (!adapter || adapter.kind !== 'supabase' || !me.id || !adapter.sb.storage) return; try { await adapter.sb.storage.from('cards').remove([`${me.id}/${sid}.png`]); } catch (e) {} }
   function profileSync(id) { return profiles.get(id) || null; }
   const ok = (r) => { if (r.error) { const e = new Error(r.error.message || 'db error'); e.code = r.error.code; throw e; } return r.data; };
   async function listReports() { if (!adapter || adapter.kind !== 'supabase') return []; return ok(await adapter.sb.from('reports').select('id,created_at,user_id,email,name,text,page,ua,screen,version,session_id,errors,shot,status').order('created_at', { ascending: false }).limit(200)) || []; }
@@ -3461,7 +3473,7 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, setCardAdmin, trimSessions, get adminCards() { return adminCardsOk; },
+    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, setCardAdmin, setShareAdmin, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
@@ -3880,6 +3892,32 @@ const formatName = (k) => { const f = FORMATS.find(x => x[0] === k); return f &&
 function fillFormats(sel, v) { fillSelect(sel, FORMATS.map(([k, n]) => [k, k ? t(n) : n]), v || ''); }
 // "Ironman · P3 / 50" — from the fields, or from the linked SWS result
 function resultText(m) { if (!m) return ''; if (m.sws && (m.sws.race || m.sws.pos)) return [m.sws.race, m.sws.pos ? 'P' + String(m.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · '); const bits = []; if (m.format) bits.push(formatName(m.format)); if (m.pos) bits.push('P' + m.pos + (m.drivers ? ' / ' + m.drivers : '')); else if (m.drivers) bits.push(t('{n} drivers', { n: m.drivers })); return bits.join(' · '); }
+// ---------- the link preview of a published session ----------
+// hutka.ai is one page with hash routes, so a messenger showed the same generic card for every link. A published session gets its own
+// static page hutka.ai/s/<id> (functions/share-page writes it to the site repo) with its title, numbers and the picture the Lab drew;
+// the page sends people on to #lab~<id>. meta.share = { key, img, imgKey, page, url, at } remembers what was built, so nothing is rebuilt twice.
+const SHARE_V = 1, shareKey = (s) => [SHARE_V, s.label || s.name || '', s.bestMs, s.pos || 0, s.drivers || 0, s.format || '', s.kart || '', s.track || '', s.layout || '', s.date || '', s.avgMs, s.nLaps].join('|');
+const shareStale = (s) => !(s && s.share && s.share.page && s.share.key === shareKey(s) && s.share.imgKey === s.share.key);   // page or picture missing / behind the session
+const shareUrl = (s) => s && s.owner !== 'local' ? (s.share && s.share.page ? 'https://hutka.ai/s/' + s.id : 'https://hutka.ai/#lab~' + s.id) : 'https://hutka.ai/';
+async function sharePageSync(meta, img) {
+  const own = !!meta && meta.owner === STORE.me.id;
+  if (!STORE.hasAuth || !STORE.canWrite() || !meta || meta.owner === 'local' || !(own || STORE.isAdmin())) return null;
+  if (!own && STORE.adminShare === false) return null;   // share.sql not run: an admin builds nothing for others, or every visit would rebuild it
+  const persist = async (share) => { if (own) await STORE.updateSession(meta.id, { share }); else if (!(await STORE.setShareAdmin(meta.id, share))) throw new Error('no admin share'); meta.share = share; };
+  if (!meta.published) {   // unpublished: the page and the picture go, the link falls back to #lab~<id> (owner only)
+    if (meta.share) { try { await STORE.sharePage(meta.id, true); } catch (e) {} if (own) STORE.removeCard(meta.id); try { await persist(null); } catch (e) {} meta.share = null; }
+    return null;
+  }
+  const key = shareKey(meta), cur = meta.share || {};
+  if (!img && cur.key === key && cur.page) return cur;
+  const share = { key, img: img || cur.img || '', imgKey: img ? key : (cur.imgKey || ''), page: false, url: '', at: Date.now() };
+  if (sharePageSync.off) return null;   // the function is not deployed / configured: checked once per visit
+  try { const r = await STORE.sharePage(meta.id, false, share.img); share.page = true; share.url = r.url || ''; } catch (e) { if (e && e.code === 'not_configured') { sharePageSync.off = true; return null; } }
+  try { await persist(share); } catch (e) {}
+  return share;
+}
+// publish / unpublish from a list (profile, track page): the flag, then the share page in the background
+async function setPublished(meta, on) { await STORE.updateSession(meta.id, { published: on }); meta.published = on; sharePageSync(meta).catch(() => {}); }
 // ---------- kart categories ----------
 // Every session is driven in one category: a rental kart model of the track (Sodi RT8, Birel N35…) or a sport class (Rotax Senior, X30,
 // KZ2…). Rankings, hot laps, personal bests and the Lab's comparisons never mix categories — a 270 cc rental and a KZ2 are different sports.
@@ -4094,7 +4132,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v29.9b';
+const APP_VERSION = 'v30';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -4288,7 +4326,7 @@ async function renderTrackPage(tid, lid) {
   const mineBox = $('tMine'); mineBox.innerHTML = ''; $('tMineCard').hidden = !mine.length; $('tMineSub').textContent = mine.length ? String(mine.length) : '';
   if (mine.length) {
     const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Session')}</th><th>${t('Layout')}</th><th>${t('Date')}</th><th>${t('Best')}</th><th>${t('Visibility')}</th><th></th></tr></thead>`; const body = el('tbody');
-    for (const m of mine) { const r = el('tr'); const l = layouts.find(x => x.id === m.layout); r.innerHTML = `<td style="font-weight:600;white-space:normal">${esc(m.label || m.name)}</td><td>${esc(l ? l.name : t('Custom'))}</td><td>${esc(fmtDate(m.date))}</td><td class="num">${fmtMs(m.bestMs)}</td><td>${m.published ? `<span class="pill ok">${t('Published')}</span>` : `<span class="pill off">${t('Private')}</span>`}</td><td></td>`; const acts = el('div', 'row'); const open = el('a', 'btn xs', t('Open')); open.href = '#lab~' + m.id; acts.appendChild(open); if (STORE.canWrite() && m.owner !== 'local') { const pub = el('button', 'btn xs' + (m.published ? '' : ' primary'), m.published ? t('Unpublish') : t('Publish')); pub.type = 'button'; pub.onclick = async () => { try { await STORE.updateSession(m.id, { published: !m.published }); renderTrackPage(tid); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); } }; acts.appendChild(pub); } r.lastElementChild.appendChild(acts); body.appendChild(r); }
+    for (const m of mine) { const r = el('tr'); const l = layouts.find(x => x.id === m.layout); r.innerHTML = `<td style="font-weight:600;white-space:normal">${esc(m.label || m.name)}</td><td>${esc(l ? l.name : t('Custom'))}</td><td>${esc(fmtDate(m.date))}</td><td class="num">${fmtMs(m.bestMs)}</td><td>${m.published ? `<span class="pill ok">${t('Published')}</span>` : `<span class="pill off">${t('Private')}</span>`}</td><td></td>`; const acts = el('div', 'row'); const open = el('a', 'btn xs', t('Open')); open.href = '#lab~' + m.id; acts.appendChild(open); if (STORE.canWrite() && m.owner !== 'local') { const pub = el('button', 'btn xs' + (m.published ? '' : ' primary'), m.published ? t('Unpublish') : t('Publish')); pub.type = 'button'; pub.onclick = async () => { try { await setPublished(m, !m.published); renderTrackPage(tid); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); } }; acts.appendChild(pub); } r.lastElementChild.appendChild(acts); body.appendChild(r); }
     tb.appendChild(body); respTable(tb); wrap.appendChild(tb); mineBox.appendChild(wrap);
     if (mine.some(m => !m.published)) mineBox.appendChild(el('div', 'hint', t('Private sessions are only in your library. Publish one to put it on this page and in the hot laps.')));
   }
@@ -4528,7 +4566,7 @@ function analyseFor(G, sess, sessions) {
   return { D, coach: DATA.buildCoach(G.track, D.wins, laps, G.rev), R };
 }
 // the card for a session that is not open in the Lab (older uploads): loads it, the layout's reference, the owner's and the published sessions on the layout — like LAB.open does
-LAB.cardFor = async function (meta, mine) {
+LAB.analyseMeta = async function (meta, mine) {
   const sess = await STORE.loadSession(meta); const tid = meta.track || '', lid = meta.layout || 'custom';
   const G = await GEOM.build(tid, lid, sess, { noMedia: true }); if (!G) return null;   // no pictures for background work
   const list = [], add = (s) => { if (list.some(x => x.id === s.id)) return; const r = GEOM.attach(s, G); if (r.ok) list.push(s); };
@@ -4538,8 +4576,9 @@ LAB.cardFor = async function (meta, mine) {
   const own = (sess.owner === STORE.me.id && mine ? mine : []).filter(m => m.id !== sess.id && m.track === tid && (m.layout || 'custom') === lid && same(m));
   for (const m of own.slice(0, 12)) { try { add(await STORE.loadSession(m)); } catch (e) {} }
   if (tid) { const pubs = (await STORE.sessionsFor(tid, lid)).filter(m => !list.some(x => x.id === m.id) && !(G.refSess && m.id === G.refSess.id) && same(m)); for (const m of pubs.slice(-10)) { try { add(await STORE.loadSession(m)); } catch (e) {} } }
-  const A = analyseFor(G, sess, list); return A ? cardFrom(A.D, G, A.coach) : null;
+  const A = analyseFor(G, sess, list); return A ? { sess, G, A, tid, lid } : null;
 };
+LAB.cardFor = async function (meta, mine) { const an = await LAB.analyseMeta(meta, mine); return an ? cardFrom(an.A.D, an.G, an.A.coach) : null; };
 // older sessions get their feed card here, in the background: my own always; every published one when I am an admin (cards.sql);
 // a session without clean GPS laps is remembered as {none} so it is not retried on every visit
 const CARDS = {
@@ -4547,16 +4586,23 @@ const CARDS = {
   async run() {
     if (CARDS.busy || !STORE.hasDb || !STORE.hasIdentity || !STORE.canWrite()) return; CARDS.busy = true;
     try {
-      const mine = await STORE.mySessions(), need = (m) => m && m.track && m.owner !== 'local' && !(m.card && m.card.v === CARD_V) && !CARDS.tried.has(m.id);
+      const mine = await STORE.mySessions(), me = STORE.me.id;
+      const noCard = (m) => !(m.card && m.card.v === CARD_V), noPage = (m) => m.published && shareStale(m) && STORE.aiOn;
+      const need = (m) => m && m.track && m.owner !== 'local' && !CARDS.tried.has(m.id) && (noCard(m) || noPage(m));
       const want = mine.filter(need);
-      if (STORE.isAdmin() && STORE.adminCards !== false) for (const m of await STORE.recentPublished(30)) if (need(m) && !want.some(x => x.id === m.id)) want.push(m);
+      if (STORE.isAdmin()) for (const m of await STORE.recentPublished(30)) if (need(m) && !want.some(x => x.id === m.id) && (STORE.adminCards !== false || noPage(m))) want.push(m);
       for (const m of want) {
         if (APP.route === 'lab' && LAB.loaded) break;   // not while the Lab works with the same session objects
         CARDS.tried.add(m.id);
-        let card = null; try { card = await LAB.cardFor(m, mine); } catch (e) { continue; }   // could not load: try again next time
-        const body = card || { v: CARD_V, none: true };
-        try { if (m.owner === STORE.me.id) await STORE.updateSession(m.id, { card: body }); else if (!(await STORE.setCardAdmin(m.id, body))) continue; } catch (e) { continue; }
-        m.card = body; CARDS.written++; if (card && typeof HOME !== 'undefined') HOME.refreshPost(m.id, body);
+        const own = m.owner === me, needPic = own && m.published && STORE.aiOn && !(m.share && m.share.imgKey === shareKey(m));
+        let an = null; if (noCard(m) || needPic) { try { an = await LAB.analyseMeta(m, mine); } catch (e) { continue; } }   // could not load: try again next time
+        if (noCard(m)) {
+          const card = an ? cardFrom(an.A.D, an.G, an.A.coach) : null, body = card || { v: CARD_V, none: true };
+          let saved = false; try { if (own) { await STORE.updateSession(m.id, { card: body }); saved = true; } else saved = await STORE.setCardAdmin(m.id, body); } catch (e) {}
+          if (saved) { m.card = body; CARDS.written++; if (card && typeof HOME !== 'undefined') HOME.refreshPost(m.id, body); }
+        }
+        // the link preview page (and, for my own sessions, its picture) of a published session that has none yet
+        if (noPage(m)) { let img = ''; if (needPic && an) { try { const names = await STORE.names([m.owner]); const b = await SHARE.ogBlob({ sess: an.sess, G: an.G, D: an.A.D, coach: an.A.coach, names, tid: an.tid, lid: an.lid }); if (b) img = (await STORE.uploadCard(m.id, b)) || ''; } catch (e) {} } try { await sharePageSync(m, img); } catch (e) {} }
         STORE.trimSessions(LAB.sessions.map(s => s.id)); await new Promise(r => setTimeout(r, 120));
       }
     } catch (e) {} finally { CARDS.busy = false; }
@@ -4612,6 +4658,8 @@ LAB.open = async function (meta, asCmp) {
   if (mySession(sess) && !sess.preview && sess.owner !== 'local' && STORE.canWrite()) { try { const pv = STORE.previewOf(sess); if (pv) { await STORE.updateSession(sess.id, { preview: pv }); } } catch (e) {} }
   // and the analysis card (the lap line with brake / lift / apex / throttle points, corner numbers, the biggest reserves): computed once, drawn in the feed for everyone
   if (mySession(sess) && sess.owner !== 'local' && STORE.canWrite() && !(sess.card && sess.card.v === CARD_V && !sess.card.none)) { try { const card = LAB.cardOf(); if (card) { await STORE.updateSession(sess.id, { card }); } } catch (e) {} }
+  // and the link preview (hutka.ai/s/<id>): the picture and the page, when they are missing or stale
+  if (mySession(sess) && sess.published && sess.owner !== 'local' && STORE.canWrite() && shareStale(sess)) SHARE.sync(sess);
 };
 // load one more session into the lab (as a comparison candidate) by its meta
 LAB.load = async function (meta) {
@@ -5072,7 +5120,7 @@ async function postComment() {
 const fmtWhen = (ms) => { if (!ms) return ''; const d = new Date(ms), diff = (Date.now() - ms) / 60000; if (diff < 1) return t('just now'); if (diff < 60) return t('{n} min ago', { n: Math.round(diff) }); if (diff < 60 * 24) return t('{n} h ago', { n: Math.round(diff / 60) }); return d.toLocaleDateString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short' }); };
 // ----- share: a 1080×1350 card drawn from the open session (the lap line coloured by speed, the corners, the numbers) + the link
 const SHARE = {
-  url() { const s = LAB.current; return s && s.owner !== 'local' ? 'https://hutka.ai/#lab~' + s.id : 'https://hutka.ai/'; },
+  url() { return shareUrl(LAB.current); },
   async draw() {
     const cv = $('shareCv'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height, sess = LAB.current, G = LAB.G, D = LAB.dcmp; if (!sess || !G) return;
     const tr = G.track, R = D ? D.R : null, best = bestLap(sess), clean = sess.laps.filter(l => l.clean), avg = clean.length ? clean.reduce((a, l) => a + l.timeMs, 0) / clean.length / 1000 : null;
@@ -5134,6 +5182,62 @@ const SHARE = {
     { let lx = 64; const ly = H - 108; ctx.font = `500 22px ${F}`; ctx.textBaseline = 'middle'; for (const [col, ink, label] of [[C.brake, '#fff', t('brake')], [C.lift, '#555', t('lift')], [C.limit, '#fff', t('brake released')], ['#fff', '#333', t('apex')], [C.throttle, '#fff', t('throttle')]]) { ctx.beginPath(); ctx.arc(lx + 9, ly, 9, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = ink; ctx.stroke(); ctx.fillStyle = '#5f6b84'; ctx.fillText(label, lx + 28, ly); lx += 28 + ctx.measureText(label).width + 30; } }
     ctx.font = `700 30px ${F}`; ctx.fillStyle = '#2f6bf0'; ctx.fillText('hutka.ai', 64, H - 60); ctx.font = `500 26px ${F}`; ctx.fillStyle = '#5f6b84'; ctx.fillText(t('— open the link to see every corner, upload yours and compare'), 64 + ctx.measureText('hutka.ai ').width + 30, H - 60);
   },
+  // the 1200×630 card behind the link preview (messengers crop tall pictures): the numbers on the left, the lap with the Lab's points on the right
+  async drawOg(cv, S) {
+    S = S || { sess: LAB.current, G: LAB.G, D: LAB.dcmp, coach: LAB.coach, names: LAB.names, tid: LAB.tid, lid: LAB.lid };
+    const ctx = cv.getContext('2d'), W = cv.width, H = cv.height, sess = S.sess, G = S.G, D = S.D, coach = S.coach; if (!sess || !G) return false;
+    const tr = G.track, R = D ? D.R : null, best = bestLap(sess), clean = sess.laps.filter(l => l.clean), avg = clean.length ? clean.reduce((a, l) => a + l.timeMs, 0) / clean.length / 1000 : null;
+    const trk = STORE.getTrack(S.tid), lay = G.layout ? G.layout.name : (S.lid === 'custom' ? t('custom layout') : S.lid), who = S.names && S.names[sess.owner] ? S.names[sess.owner] : null;
+    const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#f6f7fa'); g.addColorStop(1, '#eceef3'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    const F = '"Inter","Segoe UI",system-ui,sans-serif', M = '"JetBrains Mono",ui-monospace,Menlo,monospace', L = 56, colW = 560;
+    const logo = await new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = 'logo.png?v=2'; });
+    ctx.textBaseline = 'middle'; if (logo) ctx.drawImage(logo, L, 44, Math.round(logo.width * 44 / logo.height), 44);
+    ctx.fillStyle = '#1a2237'; ctx.font = `700 32px ${F}`; ctx.fillText('Hutka', L + (logo ? Math.round(logo.width * 44 / logo.height) + 12 : 0), 66);
+    ctx.font = `500 20px ${F}`; ctx.fillStyle = '#5f6b84'; ctx.fillText(fmtDate(sess.date), L + (logo ? Math.round(logo.width * 44 / logo.height) + 12 : 0) + ctx.measureText('Hutka').width + 60, 68);
+    const name = (who && who.name) ? who.name : (sess.driver && !/^driver[_ ]?\d*$/i.test(sess.driver) ? sess.driver : '');
+    let y = 150; if (who && who.avatar) { const av = await new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = who.avatar; }); if (av) { ctx.save(); ctx.beginPath(); ctx.arc(L + 30, y, 30, 0, Math.PI * 2); ctx.clip(); ctx.drawImage(av, L, y - 30, 60, 60); ctx.restore(); } }
+    const nx = who && who.avatar ? L + 60 + 16 : L; ctx.fillStyle = '#1a2237'; ctx.font = `700 30px ${F}`; ctx.fillText(name, nx, y - 12);
+    { const sub = [trk ? trk.name : (sess.trackName || t('Custom track')), lay, kartLabel(sess)].filter(Boolean).join(' · '); let fs = 20; ctx.fillStyle = '#5f6b84'; do { ctx.font = `400 ${fs}px ${F}`; fs -= 1; } while (ctx.measureText(sub).width > colW - (nx - L) && fs > 13); ctx.fillText(sub, nx, y + 18); }
+    const pos = +sess.pos || (sess.sws && +String(sess.sws.pos || '').replace(/^P/i, '')) || 0, fmtN = sess.format ? formatName(sess.format) : (sess.sws && sess.sws.race ? String(sess.sws.race) : '');
+    y = 250; ctx.fillStyle = '#5f6b84'; ctx.font = `600 18px ${F}`; ctx.fillText(t('BEST LAP'), L, y); ctx.fillStyle = '#1a2237'; ctx.font = `700 96px ${M}`; ctx.fillText(fmtMs(best.timeMs), L - 6, y + 74);
+    y = 372; if (pos) { const podium = pos === 1 ? ['#f5c842', '#7a5a00'] : pos === 2 ? ['#d7dce6', '#3b4660'] : pos === 3 ? ['#e3a56f', '#5a3410'] : ['#1f2b48', '#ffffff']; const big = 'P' + pos, small = (sess.drivers ? `/ ${sess.drivers}` : '') + (fmtN ? (sess.drivers ? ' · ' : '') + fmtN : '');
+      ctx.font = `700 40px ${M}`; const bw = ctx.measureText(big).width; ctx.font = `600 20px ${F}`; const sw = small ? ctx.measureText(small).width : 0; const w = 24 + bw + (small ? 10 + sw : 0) + 24, h = 62;
+      ctx.fillStyle = podium[0]; ctx.beginPath(); ctx.roundRect(L, y, w, h, 16); ctx.fill(); ctx.fillStyle = podium[1]; ctx.font = `700 40px ${M}`; ctx.fillText(big, L + 24, y + h / 2 + 1); if (small) { ctx.font = `600 20px ${F}`; ctx.fillText(small, L + 24 + bw + 10, y + h / 2 + 2); } y += h + 26; } else y += 8;
+    ctx.font = `500 21px ${F}`; ctx.fillStyle = '#5f6b84'; const bits = [avg ? `${t('avg clean')} ${fmtLap(avg)}` : '', `${sess.laps.length} ${t('laps')} (${clean.length} ${t('clean')})`, R ? `${t('max')} ${Math.round(Math.max(...R.v) * 3.6)} ${t('km/h')}` : ''].filter(Boolean); let ly = y; for (const b of bits) { ctx.fillText(b, L, ly); ly += 30; }
+    ctx.font = `700 24px ${F}`; ctx.fillStyle = '#2f6bf0'; ctx.fillText('hutka.ai', L, H - 48); ctx.font = `500 19px ${F}`; ctx.fillStyle = '#5f6b84'; ctx.fillText(t('every corner, compared with the fastest'), L + ctx.measureText('hutka.ai ').width + 36, H - 48);
+    // the map on the right
+    const mx0 = L + colW + 24, mx1 = W - 40, my0 = 36, my1 = H - 36, pad = 44; let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (let i = 0; i < tr.N; i++) { x0 = Math.min(x0, tr.cx[i]); x1 = Math.max(x1, tr.cx[i]); y0 = Math.min(y0, tr.cy[i]); y1 = Math.max(y1, tr.cy[i]); }
+    const sc = Math.min((mx1 - mx0 - 2 * pad) / Math.max(1, x1 - x0), (my1 - my0 - 2 * pad) / Math.max(1, y1 - y0)), ox = mx0 + (mx1 - mx0 - sc * (x1 - x0)) / 2, oy = my0 + (my1 - my0 - sc * (y1 - y0)) / 2;
+    const P = (i) => [ox + sc * (tr.cx[i] - x0), oy + sc * (tr.cy[i] - y0)], LP = (i) => [ox + sc * (tr.cx[i] + (R ? R.o[i] : 0) * tr.nx[i] - x0), oy + sc * (tr.cy[i] + (R ? R.o[i] : 0) * tr.ny[i] - y0)];
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round'; const bandPx = Math.max(10, (G.widthM || 8) * sc * 0.9);
+    ctx.strokeStyle = 'rgba(26,34,55,.09)'; ctx.lineWidth = bandPx; ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, yy] = P(i); i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.closePath(); ctx.stroke();
+    ctx.strokeStyle = 'rgba(26,34,55,.22)'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 7]); ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, yy] = P(i); i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.closePath(); ctx.stroke(); ctx.setLineDash([]);
+    const lw = Math.max(4, Math.min(8, sc * 0.5)); ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, yy] = LP(i); i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.closePath(); ctx.lineWidth = lw + 3; ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.stroke(); ctx.lineWidth = lw; ctx.strokeStyle = '#1f6fe0'; ctx.stroke();
+    { const [x, yy] = P(0); ctx.fillStyle = '#1a2237'; ctx.save(); ctx.translate(x, yy); ctx.rotate(Math.atan2(tr.ny[0], tr.nx[0])); ctx.fillRect(-3, -16, 6, 32); ctx.restore(); }
+    const C = { brake: '#e5484d', limit: '#ff8c2e', lift: '#d9a300', throttle: '#2fb563' }, rs = Math.max(0.8, Math.min(1.5, sc * 0.1));
+    const mk = (i, r, col, ink) => { const [x, yy] = LP(i); ctx.beginPath(); ctx.arc(x, yy, r, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = ink || '#fff'; ctx.stroke(); };
+    if (D) {
+      for (const r of D.rows) { const w0 = r.w, m = r.R; if (!m) continue; const at = (k) => ((w0.a + k) % tr.N + tr.N) % tr.N;
+        if (m.tk >= 0) mk(at(m.tk), 7 * rs, C.throttle); if (m.rk >= 0) mk(at(m.rk), 5.5 * rs, C.limit); mk(at(m.apK), 5.5 * rs, '#fff', '#333');
+        if (m.kind === 'brake' && !m.inherited) mk(at(m.bk), 8.5 * rs, C.brake); else if (m.kind === 'lift') mk(at(m.lk), 8.5 * rs, C.lift, '#555'); else if (m.kind === 'ease') mk(at(m.ek), 7 * rs, C.lift, '#555'); }
+      ctx.font = `700 15px ${M}`; ctx.textAlign = 'center';
+      for (const r of D.rows) { const [x, yy] = P(r.w.apex); const nx2 = tr.nx[r.w.apex], ny2 = tr.ny[r.w.apex], side = r.w.dir === 'L' ? 1 : -1, bx = x + nx2 * side * (bandPx / 2 + 19), by = yy + ny2 * side * (bandPx / 2 + 19); const c = coach && coach.corners.find(q => q.n === r.w.n), res = c ? Math.max(0, r.R.time - c.tTop) : 0; ctx.beginPath(); ctx.arc(bx, by, 14, 0, Math.PI * 2); ctx.fillStyle = res >= 0.2 ? C.brake : res >= 0.1 ? C.limit : '#1a2237'; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.fillText(String(r.w.n), bx, by + 1); }
+      ctx.textAlign = 'left';
+    }
+    return true;
+  },
+  async ogBlob(S) { const cv = document.createElement('canvas'); cv.width = 1200; cv.height = 630; if (!(await SHARE.drawOg(cv, S))) return null; return new Promise((res) => cv.toBlob(res, 'image/png')); },
+  // the link preview of the open session: the owner draws and uploads the picture when it changed, then the page is (re)built
+  async sync(sess, opts) {
+    sess = sess || LAB.current; if (!sess || !sess.published || sess.owner === 'local' || !STORE.hasAuth || !STORE.canWrite()) return null;
+    if (SHARE.syncing === sess.id) return null; SHARE.syncing = sess.id;
+    try {
+      let img = '';
+      if (mySession(sess) && LAB.current && LAB.current.id === sess.id && LAB.G && (!(sess.share && sess.share.imgKey === shareKey(sess)) || (opts && opts.force))) { try { const b = await SHARE.ogBlob(); if (b) img = (await STORE.uploadCard(sess.id, b)) || ''; } catch (e) {} }
+      return await sharePageSync(sess, img);
+    } catch (e) { return null; } finally { SHARE.syncing = null; }
+  },
   async open() {
     const sess = LAB.current; if (!sess) return; await SHARE.draw();
     const own = mySession(sess), pub = !!sess.published, local = sess.owner === 'local';
@@ -5147,6 +5251,8 @@ const SHARE = {
   async go() {
     const sess = LAB.current; if (!sess) return; const own = mySession(sess), local = sess.owner === 'local';
     if (own && !sess.published && !local) { try { await STORE.updateSession(sess.id, { published: true }); sess.published = true; labRender(); toast(t('Published — it is now on the track page.')); } catch (e) { setStatus('shareStatus', t('Could not publish. Sharing the picture only.'), 'warn'); } }
+    // the link preview: a page of its own for this session (built once; a few seconds the first time)
+    if (sess.published && !local && shareStale(sess)) { setStatus('shareStatus', t('Preparing the link…')); await Promise.race([SHARE.sync(sess), new Promise(r => setTimeout(r, 9000))]); setStatus('shareStatus', ''); }
     const url = local ? null : SHARE.url(), text = SHARE.text() + (url ? '\n' + url : '');
     try { const b = await SHARE.blob(); const file = new File([b], 'hutka-' + (sess.id || 'session') + '.png', { type: 'image/png' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share(Object.assign({ files: [file], title: 'Hutka', text }, url ? { url } : {})); return; }
@@ -5165,7 +5271,7 @@ async function labTogglePublish() {
   const on = !sess.published;
   if (on) { const ok = await confirmDlg(t('Publish this session?'), t('It appears on the track page and in the hot laps; other drivers can compare their laps with it. You can unpublish at any time.'), t('Publish')); if (!ok) return; }
   const pb = $('btnPublish'); pb.classList.add('busy');
-  try { await STORE.updateSession(sess.id, { published: on }); sess.published = on; toast(on ? t('Published — it is now on the track page.') : t('Unpublished.')); labRender(); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); }
+  try { await STORE.updateSession(sess.id, { published: on }); sess.published = on; toast(on ? t('Published — it is now on the track page.') : t('Unpublished.')); labRender(); if (on) SHARE.sync(sess); else sharePageSync(sess).catch(() => {}); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); }
   pb.classList.remove('busy');
 }
 
@@ -6035,7 +6141,7 @@ async function renderMySessionsTable(box, opts) {
     const acts = el('div', 'row'); acts.style.flexWrap = 'nowrap';
     const open = el('a', 'btn xs primary', t('Open')); open.href = '#lab~' + m.id; acts.appendChild(open);
     const ed = el('button', 'btn xs', t('Edit')); ed.type = 'button'; ed.onclick = () => SESSEDIT.open(m, () => { LAB.invalidate(m.id); renderMySessionsTable(box, opts); }); acts.appendChild(ed);
-    if (STORE.canWrite() && m.owner !== 'local') { const pub = el('button', 'btn xs', m.published ? t('Unpublish') : t('Publish')); pub.type = 'button'; pub.disabled = !m.track; pub.title = m.track ? '' : t('Assign a track first (Edit).'); pub.onclick = async () => { pub.classList.add('busy'); try { await STORE.updateSession(m.id, { published: !m.published }); m.published = !m.published; renderMySessionsTable(box, opts); } catch (e) { pub.classList.remove('busy'); toast(t('Could not save. Check your access to the Hutka page.')); } }; acts.appendChild(pub); }
+    if (STORE.canWrite() && m.owner !== 'local') { const pub = el('button', 'btn xs', m.published ? t('Unpublish') : t('Publish')); pub.type = 'button'; pub.disabled = !m.track; pub.title = m.track ? '' : t('Assign a track first (Edit).'); pub.onclick = async () => { pub.classList.add('busy'); try { await setPublished(m, !m.published); renderMySessionsTable(box, opts); } catch (e) { pub.classList.remove('busy'); toast(t('Could not save. Check your access to the Hutka page.')); } }; acts.appendChild(pub); }
     const del = el('button', 'btn xs danger', '×'); del.type = 'button'; del.title = t('Delete'); del.onclick = async () => { if (!(await confirmDlg(t('Delete this session?'), t('The file data is removed from your library and from the track page.'), t('Delete')))) return; try { await STORE.deleteSession(m); LAB.invalidate(m.id); } catch (e) {} renderMySessionsTable(box, opts); }; acts.appendChild(del);
     tr.lastElementChild.appendChild(acts); body.appendChild(tr);
   }
@@ -6072,7 +6178,7 @@ const SESSEDIT = (() => {
     if (!$('sePubField').hidden) patch.published = $('sePublish').checked && !!tid;
     if (!$('seSws').disabled) { const i = $('seSws').value; if (i === '') patch.sws = null; else { const prof = await STORE.profile(STORE.me.id) || {}; const r = (prof.swsResults && prof.swsResults.results || [])[+i]; if (r) patch.sws = { i: +i, date: r.date, race: r.race || r.cat, track: r.track, pos: r.pos, best: r.best }; } }
     const b = $('seSave'); b.classList.add('busy'); setStatus('seStatus', t('Saving…'));
-    try { await STORE.updateSession(cur.id, patch); Object.assign(cur, patch); close(); toast(t('Session updated.')); if (done) done(cur); } catch (e) { setStatus('seStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
+    try { await STORE.updateSession(cur.id, patch); Object.assign(cur, patch); if (cur.published && !(LAB.current && LAB.current.id === cur.id)) sharePageSync(cur).catch(() => {}); /* from the Lab the reopen redraws the picture too */ close(); toast(t('Session updated.')); if (done) done(cur); } catch (e) { setStatus('seStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');
   };
   return { open, close };
@@ -6279,7 +6385,7 @@ const ADMIN = (() => {
   try { await STORE.init(); } catch (e) {}
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, SHARE, shareUrl, sharePageSync, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { await NATIVE.init(); } catch (e) {}

@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hutka — racing AI for karting</title>
+<meta name="description" content="Upload a karting session — every corner, compared with the fastest on the same layout.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Hutka"><meta property="og:title" content="Hutka — racing AI for karting"><meta property="og:description" content="Upload a session: every braking point, apex and throttle point, compared with the fastest drivers on the same layout."><meta property="og:image" content="https://hutka.ai/og.png?v=1"><meta property="og:url" content="https://hutka.ai/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico">
+<style>body{margin:0;font:16px/1.5 Inter,system-ui,sans-serif;background:#f6f7fa;color:#1a2237;display:grid;place-items:center;min-height:100vh}main{text-align:center;padding:24px}a{color:#2f6bf0}</style>
+<script>
+// a session link whose page is not built yet (hutka.ai/s/<id>) opens the session in the app; anything else goes home
+(function () { var m = /^\/s\/([a-z0-9]{4,40})/i.exec(location.pathname); location.replace(m ? '/#lab~' + m[1] : '/'); })();
+</script>
+</head><body><main><p>Opening Hutka…</p><p><a href="/">hutka.ai</a></p></main></body></html>
