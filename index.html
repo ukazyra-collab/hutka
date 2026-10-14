@@ -2948,6 +2948,7 @@ Object.assign(I18N.RU, { '— open the link to see every corner, upload yours an
 Object.assign(I18N.RU, { 'winner': 'победа', 'podium': 'подиум' });
 Object.assign(I18N.RU, { 'Where the time is': 'Где время' });
 Object.assign(I18N.RU, { 'Preparing the link…': 'Готовлю ссылку…', 'every corner, compared with the fastest': 'каждый поворот в сравнении с лучшими' });
+Object.assign(I18N.RU, { 'Visitors today': 'Посетители сегодня', 'Yesterday': 'Вчера', 'signed in {u} · new {n} · {o} opens': 'вошли {u} · новых {n} · {o} открытий', 'Visitors, 7 days': 'Посетители, 7 дней', '{n} signed in · {m} in 30 days': '{n} вошли · {m} за 30 дней', 'Retention': 'Возвращаемость', 'came back the next day · within 7 days: {p} (of {n} new)': 'вернулись на следующий день · в течение 7 дней: {p} (из {n} новых)', 'Visitors, last 30 days': 'Посетители, 30 дней', 'Devices, 30 days': 'Устройства, 30 дней', 'Days are UTC (Dubai is +4). A visitor is a browser; a driver on a phone and a laptop counts twice.': 'Дни по UTC (Дубай +4). Посетитель — это браузер: один человек с телефона и ноутбука считается дважды.', 'Visitors and retention: run supabase/visits.sql in the SQL editor once — the numbers appear here from the next day.': 'Посетители и возвращаемость: выполни supabase/visits.sql в SQL Editor один раз — цифры появятся здесь со следующего дня.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3228,6 +3229,8 @@ const STORE = (() => {
       async allProfiles() { return must(await sb.from('profiles').select('*').limit(1000)).map(r => ({ id: r.id, racingName: r.racing_name || '', firstName: r.first_name || '', lastName: r.last_name || '', country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', coach: !!r.coach })); },
       async platformNames() { return {}; },
       async adminStats() { return must(await sb.rpc('hutka_stats')); },
+      async adminVisits() { return must(await sb.rpc('hutka_visits')); },
+      async visit(vid, dev) { return must(await sb.rpc('hutka_visit', { vid, dev })); },
       async setCard(sid, card) { return must(await sb.rpc('hutka_set_card', { sid, card })) === true; },
       async setShare(sid, share) { return must(await sb.rpc('hutka_set_share', { sid, share })) === true; },
       addClaim: async (body) => must(await sb.from('claims').insert({ track_id: body.track, by: body.by, text: body.text || '' })),
@@ -3438,6 +3441,14 @@ const STORE = (() => {
     const r = await fetch(c.base + '/report', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': c.key, 'Authorization': 'Bearer ' + ((adapter && adapter.token && adapter.token()) || c.key) }, body: JSON.stringify(body || {}) });
     if (!r.ok) throw await errOf(r); return r.json();
   }
+  // one ping per open (visits.sql): a random id the browser keeps, the device, the signed-in user when there is one — the admin's visitors & retention
+  function visit() {
+    if (!adapter || adapter.kind !== 'supabase' || !adapter.visit) return; let vid = '';
+    try { vid = localStorage.getItem('hutka.vid') || ''; if (!/^[A-Za-z0-9_-]{8,64}$/.test(vid)) { vid = 'v' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36); localStorage.setItem('hutka.vid', vid); } } catch (e) { return; }
+    const dev = ((window.NATIVE && window.NATIVE.on) ? 'app ' : '') + (window.innerWidth < 700 ? 'phone' : window.innerWidth < 1100 ? 'tablet' : 'desktop');
+    adapter.visit(vid, dev).catch(() => {});
+  }
+  async function adminVisits() { if (!adapter || !adapter.adminVisits || !me.canEdit) return null; return adapter.adminVisits(); }
   // the link preview of a published session: functions/share-page writes hutka.ai/s/<id> (title, text, the picture); the picture goes to the public bucket cards/<me>/<id>.png
   async function sharePage(sid, remove, img) { const r = await fnCall('share-page', { id: sid, remove: !!remove, img: img || '' }); if (!r.ok) throw await errOf(r); return r.json(); }
   async function uploadCard(sid, blob) { if (!adapter || adapter.kind !== 'supabase' || !me.id || !adapter.sb.storage) return null; const path = `${me.id}/${sid}.png`; const r = await adapter.sb.storage.from('cards').upload(path, blob, { upsert: true, contentType: 'image/png', cacheControl: '3600' }); if (r.error) { const e = new Error(r.error.message || 'upload'); e.code = r.error.statusCode || r.error.code; throw e; } return 'cards/' + path; }
@@ -3473,7 +3484,7 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, setCardAdmin, setShareAdmin, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard,
+    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, setCardAdmin, setShareAdmin, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
@@ -4132,7 +4143,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v30';
+const APP_VERSION = 'v30.1';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -6228,7 +6239,19 @@ const ADMIN = (() => {
     for (const [title, rows] of [[t('Sign-ups, last 30 days'), S.signups_by_day || []], [t('Uploads, last 30 days'), S.uploads_by_day || []]]) { const w = el('div', 'stat-chart'); w.appendChild(el('div', 'lbl', title + ' · ' + rows.reduce((a, r) => a + (r.n || 0), 0))); const cv = document.createElement('canvas'); w.appendChild(cv); charts.appendChild(w); requestAnimationFrame(() => drawDays(cv, rows)); }
     box.appendChild(charts);
     if (S.top_tracks && S.top_tracks.length) { const l = el('div', 'list'); l.style.marginTop = '12px'; for (const r of S.top_tracks) { const tr = STORE.getTrack(r.track); const a = el('a', 'item'); a.href = '#track~' + esc(r.track); a.append(el('span', 'name', tr ? tr.name : r.track), el('span', 'meta', tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n))); l.appendChild(a); } box.appendChild(el('div', 'lbl', t('Tracks by sessions'))); box.appendChild(l); }
-    box.appendChild(el('div', 'hint', t('Visits and devices: Google Analytics (analytics.google.com), when the measurement ID is in config.js.')));
+    // visitors & retention (visits.sql): today / yesterday / 7 days, D1 and D7 of the cohorts, visitors by day
+    let V = null; try { V = await STORE.adminVisits(); } catch (e) { V = null; }
+    if (V && V.today) {
+      const ty = V.today, ye = V.yesterday || {}, coh = V.cohorts || [], today = (V.at ? new Date(V.at) : new Date()).toISOString().slice(0, 10), age = (d) => Math.round((Date.parse(today) - Date.parse(String(d).slice(0, 10))) / 864e5);
+      const sum = (f, min) => coh.filter(c => age(c.d) >= min).reduce((a, c) => a + (+c[f] || 0), 0), s1 = sum('size', 1), r1 = sum('d1', 1), s7 = sum('size', 7), r7 = sum('d7', 7), pct = (r, s) => s ? Math.round(100 * r / s) + '%' : '—';
+      const vt = el('div', 'tiles'); vt.style.marginTop = '12px';
+      for (const [k, v, sub] of [[t('Visitors today'), ty.visitors || 0, t('signed in {u} · new {n} · {o} opens', { u: ty.users || 0, n: ty.new || 0, o: ty.opens || 0 })], [t('Yesterday'), ye.visitors || 0, t('signed in {u} · new {n} · {o} opens', { u: ye.users || 0, n: ye.new || 0, o: ye.opens || 0 })], [t('Visitors, 7 days'), V.wau || 0, t('{n} signed in · {m} in 30 days', { n: V.users_7d || 0, m: V.mau || 0 })], [t('Retention'), pct(r1, s1), t('came back the next day · within 7 days: {p} (of {n} new)', { p: pct(r7, s7), n: s7 })]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${esc(String(v))}</div>${sub ? `<div class="hint">${esc(sub)}</div>` : ''}`; vt.appendChild(d); }
+      box.appendChild(vt);
+      const vc = el('div', 'stat-charts'); { const w = el('div', 'stat-chart'); w.appendChild(el('div', 'lbl', t('Visitors, last 30 days') + ' · ' + (V.days || []).reduce((a, r) => a + (r.n || 0), 0))); const cv = document.createElement('canvas'); w.appendChild(cv); vc.appendChild(w); requestAnimationFrame(() => drawDays(cv, V.days || [])); }
+      if (V.devices && V.devices.length) { const w = el('div', 'stat-chart'); w.appendChild(el('div', 'lbl', t('Devices, 30 days'))); w.appendChild(el('div', 'hint', V.devices.map(d => `${d.device || '?'} ${d.n}`).join(' · '))); vc.appendChild(w); }
+      box.appendChild(vc);
+      box.appendChild(el('div', 'hint', t('Days are UTC (Dubai is +4). A visitor is a browser; a driver on a phone and a laptop counts twice.')));
+    } else box.appendChild(el('div', 'hint', t('Visitors and retention: run supabase/visits.sql in the SQL editor once — the numbers appear here from the next day.')));
   }
   function drawDays(cv, rows) {
     const box = cv.parentElement, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = box.clientWidth || 300, h = 72; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); cv.style.width = w + 'px'; cv.style.height = h + 'px';
@@ -6383,6 +6406,7 @@ const ADMIN = (() => {
   I18N.applyStatic();
   $('q').placeholder = t('Search tracks, drivers...');
   try { await STORE.init(); } catch (e) {}
+  try { STORE.visit(); } catch (e) {}   // visitors & retention for the admin panel (visits.sql)
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
   window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, SHARE, shareUrl, sharePageSync, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
