@@ -2941,6 +2941,7 @@ Object.assign(I18N.RU, {
   'Could not publish. Sharing the picture only.': 'Не удалось опубликовать. Делимся только картинкой.', 'Picture saved, link copied — paste it anywhere.': 'Картинка сохранена, ссылка скопирована — вставь куда угодно.', 'Picture saved. Link: {url}': 'Картинка сохранена. Ссылка: {url}', 'Picture saved.': 'Картинка сохранена.', 'Link copied.': 'Ссылка скопирована.'
 });
 Object.assign(I18N.RU, { '— open the link to see every corner, upload yours and compare': '— открой ссылку, чтобы увидеть каждый поворот, загрузи свою и сравни', 'max': 'макс' });
+Object.assign(I18N.RU, { 'winner': 'победа', 'podium': 'подиум' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4992,8 +4993,19 @@ const SHARE = {
     if (who && who.avatar) { const av = await new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = who.avatar; }); if (av) { ctx.save(); ctx.beginPath(); ctx.arc(64 + 36, y, 36, 0, Math.PI * 2); ctx.clip(); ctx.drawImage(av, 64, y - 36, 72, 72); ctx.restore(); } }
     ctx.fillStyle = '#1a2237'; ctx.font = `700 34px ${F}`; ctx.fillText(name, who && who.avatar ? 64 + 72 + 18 : 64, y - 14);
     { const sub = [trk ? trk.name : (sess.trackName || t('Custom track')), lay, kartLabel(sess)].filter(Boolean).join(' · '), sx = who && who.avatar ? 64 + 72 + 18 : 64; let fs = 26; ctx.fillStyle = '#5f6b84'; do { ctx.font = `400 ${fs}px ${F}`; fs -= 1; } while (ctx.measureText(sub).width > W - 64 - sx && fs > 16); ctx.fillText(sub, sx, y + 24); }
-    // the big number
+    // the result, when the driver entered one: P3 / 50 · Ironman — a badge next to the big number, gold / silver / bronze for a podium
+    const pos = +sess.pos || (sess.sws && +String(sess.sws.pos || '').replace(/^P/i, '')) || 0, fmtN = sess.format ? formatName(sess.format) : (sess.sws && sess.sws.race ? String(sess.sws.race) : '');
     y = 300; ctx.fillStyle = '#5f6b84'; ctx.font = `600 22px ${F}`; ctx.fillText(t('BEST LAP'), 64, y); ctx.fillStyle = '#1a2237'; ctx.font = `700 120px ${M}`; ctx.fillText(fmtMs(best.timeMs), 56, y + 86);
+    if (pos) {
+      const podium = pos === 1 ? ['#f5c842', '#7a5a00'] : pos === 2 ? ['#d7dce6', '#3b4660'] : pos === 3 ? ['#e3a56f', '#5a3410'] : ['#1f2b48', '#ffffff'];
+      const big = 'P' + pos, small = (sess.drivers ? `/ ${sess.drivers}` : '') + (fmtN ? (sess.drivers ? ' · ' : '') + fmtN : '');
+      ctx.font = `700 64px ${M}`; const bw = ctx.measureText(big).width; ctx.font = `600 26px ${F}`; const sw = small ? ctx.measureText(small).width : 0;
+      const w = 36 + bw + (small ? 14 + sw : 0) + 36, h = 96, bx = W - 64 - w, by = y + 2;
+      ctx.fillStyle = podium[0]; ctx.beginPath(); ctx.roundRect(bx, by, w, h, 22); ctx.fill();
+      ctx.fillStyle = podium[1]; ctx.textBaseline = 'middle'; ctx.font = `700 64px ${M}`; ctx.fillText(big, bx + 36, by + h / 2 + 2);
+      if (small) { ctx.font = `600 26px ${F}`; ctx.fillText(small, bx + 36 + bw + 14, by + h / 2 + 4); }
+      if (pos <= 3) { ctx.font = `600 20px ${F}`; ctx.fillStyle = '#5f6b84'; ctx.textAlign = 'right'; ctx.fillText(pos === 1 ? t('winner') : t('podium'), W - 64, by + h + 26); ctx.textAlign = 'left'; }
+    }
     ctx.font = `500 26px ${F}`; ctx.fillStyle = '#5f6b84'; const bits = [avg ? `${t('avg clean')} ${fmtLap(avg)}` : '', `${sess.laps.length} ${t('laps')} (${clean.length} ${t('clean')})`, R ? `${t('max')} ${Math.round(Math.max(...R.v) * 3.6)} ${t('km/h')}` : ''].filter(Boolean); ctx.fillText(bits.join('   ·   '), 64, y + 150);
     // the map: the track in grey, the best lap's real line on it, the Lab's points — brake / lift / released / apex / throttle — and the corner numbers
     const top = 520, bottom = H - 150, pad = 70; let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -5034,7 +5046,7 @@ const SHARE = {
   },
   close() { $('shareModal').hidden = true; },
   async blob() { return new Promise((res) => $('shareCv').toBlob(res, 'image/png')); },
-  text() { const s = LAB.current, trk = STORE.getTrack(LAB.tid); return `${fmtMs(bestLap(s).timeMs)} — ${trk ? trk.name : (s.trackName || '')}${LAB.G && LAB.G.layout ? ' · ' + LAB.G.layout.name : ''}`; },
+  text() { const s = LAB.current, trk = STORE.getTrack(LAB.tid), res = resultText(s); return `${res ? res + ' · ' : ''}${fmtMs(bestLap(s).timeMs)} — ${trk ? trk.name : (s.trackName || '')}${LAB.G && LAB.G.layout ? ' · ' + LAB.G.layout.name : ''}`; },
   async go() {
     const sess = LAB.current; if (!sess) return; const own = mySession(sess), local = sess.owner === 'local';
     if (own && !sess.published && !local) { try { await STORE.updateSession(sess.id, { published: true }); sess.published = true; labRender(); toast(t('Published — it is now on the track page.')); } catch (e) { setStatus('shareStatus', t('Could not publish. Sharing the picture only.'), 'warn'); } }
