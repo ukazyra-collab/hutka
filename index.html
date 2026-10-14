@@ -4033,7 +4033,7 @@ $('authEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('au
 function renderHelpPage() {
   $('helpSub').textContent = t('Three minutes the first time, thirty seconds after that.');
   const box = $('helpBody'); box.innerHTML = '';
-  const step = (n, title, text, img, alt) => { const d = el('div', 'hstep'); const tx = el('div', 'tx'); tx.innerHTML = `<div class="n">${n}</div><h3>${esc(title)}</h3><p>${text}</p>`; d.appendChild(tx); if (img) { const im = new Image(); im.src = 'help/' + img; im.alt = alt || ''; im.loading = 'lazy'; const w = el('div', 'pic'); w.appendChild(im); d.appendChild(w); } return d; };
+  const step = (n, title, text, img, alt) => { const d = el('div', 'hstep'); const tx = el('div', 'tx'); tx.innerHTML = `<div class="n">${n}</div><h3>${esc(title)}</h3><p>${text}</p>`; d.appendChild(tx); if (img) { const im = new Image(); im.src = 'help/' + img + '?v=' + encodeURIComponent(APP_VERSION); im.alt = alt || ''; im.loading = 'lazy'; const w = el('div', 'pic'); w.appendChild(im); d.appendChild(w); } return d; };
   const card = (title, sub) => { const c = el('div', 'card hcard'); c.innerHTML = `<h2>${esc(title)}</h2>${sub ? `<p class="hint">${esc(sub)}</p>` : ''}`; return c; };
   // Alfano 7 — the ADA app on the phone
   const a = card(t('Alfano 7 — the ADA app on your phone'), t('The app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.'));
@@ -4051,7 +4051,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v29.4';
+const APP_VERSION = 'v29.6b';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
