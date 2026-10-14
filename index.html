@@ -664,7 +664,9 @@ body.onboarding #toast{z-index:50}
 @media (max-width:760px){.hstep{grid-template-columns:1fr}.hstep .pic{max-width:360px}}
 #shareModal{z-index:70}
 .share-pv{display:flex;justify-content:center;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px}
-.share-pv canvas{width:min(100%,300px);height:auto;border-radius:8px;box-shadow:0 6px 20px rgba(16,22,48,.18)}
+.share-pv canvas{width:min(100%,300px);height:auto;border-radius:8px;box-shadow:0 6px 20px rgba(16,22,48,.18);cursor:zoom-in}
+.zoom{position:fixed;inset:0;z-index:80;background:rgba(10,14,24,.88);display:grid;place-items:center;padding:16px;cursor:zoom-out;overflow:auto}
+.zoom img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .bugbtn{position:fixed;right:14px;bottom:14px;z-index:28;width:38px;height:38px;border-radius:50%;border:1px solid var(--line-2);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px);color:var(--muted);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(16,22,48,.12);opacity:.75;transition:opacity .15s,transform .15s}
 .bugbtn:hover{opacity:1;transform:translateY(-1px);color:var(--fg)}
 .bugbtn svg{width:18px;height:18px}
@@ -1374,11 +1376,12 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
 <button class="bugbtn" id="bugBtn" type="button" title="Report a problem" aria-label="Report a problem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l1.9 1.9M16 2l-1.9 1.9M9 7h6a3 3 0 0 1 3 3v5a6 6 0 0 1-12 0v-5a3 3 0 0 1 3-3zM3 13h3M18 13h3M4 20l3-2M20 20l-3-2M12 10v10"/></svg></button>
 <div class="modal" id="shareModal" hidden><div class="box" style="width:min(520px,100%)">
   <h3 data-t="Share this session">Share this session</h3>
-  <div class="share-pv"><canvas id="shareCv" width="1080" height="1350"></canvas></div>
+  <div class="share-pv"><canvas id="shareCv" width="1080" height="1350" title="Tap to view full size"></canvas></div>
   <div class="hint" id="shareNote"></div>
   <div class="row" style="flex-wrap:wrap"><button class="btn primary" id="shareGo" type="button"><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="shareCopy" type="button" data-t="Copy link">Copy link</button><button class="btn" id="shareSave" type="button" data-t="Save image">Save image</button><button class="btn ghost" id="shareClose" type="button" data-t="Close">Close</button></div>
   <div class="status" id="shareStatus"></div>
 </div></div>
+<div class="zoom" id="shareZoom" hidden><img id="shareZoomImg" alt=""></div>
 <div class="modal" id="bugModal" hidden><div class="box" style="width:min(520px,100%)">
   <h3 data-t="Report a problem">Report a problem</h3>
   <p class="hint" data-t="What went wrong, what you expected, which track or session. The page address, device and recent errors are attached automatically.">What went wrong, what you expected, which track or session. The page address, device and recent errors are attached automatically.</p>
@@ -2937,6 +2940,7 @@ Object.assign(I18N.RU, {
   'The session is private: the link works for you only. Publish it and the link opens for everyone.': 'Сессия приватная: ссылка работает только у тебя. Опубликуй — и она откроется для всех.', 'The link opens this session in the Lab.': 'Ссылка открывает эту сессию в Lab.', 'Publish & share': 'Опубликовать и поделиться',
   'Could not publish. Sharing the picture only.': 'Не удалось опубликовать. Делимся только картинкой.', 'Picture saved, link copied — paste it anywhere.': 'Картинка сохранена, ссылка скопирована — вставь куда угодно.', 'Picture saved. Link: {url}': 'Картинка сохранена. Ссылка: {url}', 'Picture saved.': 'Картинка сохранена.', 'Link copied.': 'Ссылка скопирована.'
 });
+Object.assign(I18N.RU, { '— open the link to see every corner, upload yours and compare': '— открой ссылку, чтобы увидеть каждый поворот, загрузи свою и сравни', 'max': 'макс' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4990,23 +4994,36 @@ const SHARE = {
     { const sub = [trk ? trk.name : (sess.trackName || t('Custom track')), lay, kartLabel(sess)].filter(Boolean).join(' · '), sx = who && who.avatar ? 64 + 72 + 18 : 64; let fs = 26; ctx.fillStyle = '#5f6b84'; do { ctx.font = `400 ${fs}px ${F}`; fs -= 1; } while (ctx.measureText(sub).width > W - 64 - sx && fs > 16); ctx.fillText(sub, sx, y + 24); }
     // the big number
     y = 300; ctx.fillStyle = '#5f6b84'; ctx.font = `600 22px ${F}`; ctx.fillText(t('BEST LAP'), 64, y); ctx.fillStyle = '#1a2237'; ctx.font = `700 120px ${M}`; ctx.fillText(fmtMs(best.timeMs), 56, y + 86);
-    ctx.font = `500 26px ${F}`; ctx.fillStyle = '#5f6b84'; const bits = [avg ? `${t('avg clean')} ${fmtLap(avg)}` : '', `${sess.laps.length} ${t('laps')} (${clean.length} ${t('clean')})`, D && LAB.coach ? `${t('reserve')} ${D.rows.reduce((a, r) => { const c = LAB.coach.corners.find(x => x.n === r.w.n); return a + (c ? Math.max(0, r.R.time - c.tTop) : 0); }, 0).toFixed(2)} s` : ''].filter(Boolean); ctx.fillText(bits.join('   ·   '), 64, y + 150);
-    // the map: the layout line coloured by the reference lap's speed, corner badges by reserve
+    ctx.font = `500 26px ${F}`; ctx.fillStyle = '#5f6b84'; const bits = [avg ? `${t('avg clean')} ${fmtLap(avg)}` : '', `${sess.laps.length} ${t('laps')} (${clean.length} ${t('clean')})`, R ? `${t('max')} ${Math.round(Math.max(...R.v) * 3.6)} ${t('km/h')}` : ''].filter(Boolean); ctx.fillText(bits.join('   ·   '), 64, y + 150);
+    // the map: the track in grey, the best lap's real line on it, the Lab's points — brake / lift / released / apex / throttle — and the corner numbers
     const top = 520, bottom = H - 150, pad = 70; let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (let i = 0; i < tr.N; i++) { x0 = Math.min(x0, tr.cx[i]); x1 = Math.max(x1, tr.cx[i]); y0 = Math.min(y0, tr.cy[i]); y1 = Math.max(y1, tr.cy[i]); }
-    const sc = Math.min((W - 2 * pad) / Math.max(1, x1 - x0), (bottom - top - 2 * pad) / Math.max(1, y1 - y0)), ox = (W - sc * (x1 - x0)) / 2, oy = top + (bottom - top - sc * (y1 - y0)) / 2, P = (i) => [ox + sc * (tr.cx[i] - x0), oy + sc * (tr.cy[i] - y0)];
+    const sc = Math.min((W - 2 * pad) / Math.max(1, x1 - x0), (bottom - top - 2 * pad) / Math.max(1, y1 - y0)), ox = (W - sc * (x1 - x0)) / 2, oy = top + (bottom - top - sc * (y1 - y0)) / 2;
+    const P = (i) => [ox + sc * (tr.cx[i] - x0), oy + sc * (tr.cy[i] - y0)], LP = (i) => [ox + sc * (tr.cx[i] + (R ? R.o[i] : 0) * tr.nx[i] - x0), oy + sc * (tr.cy[i] + (R ? R.o[i] : 0) * tr.ny[i] - y0)];
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-    ctx.strokeStyle = 'rgba(26,34,55,.10)'; ctx.lineWidth = 34; ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, yy] = P(i); i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.closePath(); ctx.stroke();
-    if (R && R.v) { let vmin = Infinity, vmax = -Infinity; for (let i = 0; i < tr.N; i++) { vmin = Math.min(vmin, R.v[i]); vmax = Math.max(vmax, R.v[i]); } const col = (v) => { const f = Math.max(0, Math.min(1, (v - vmin) / Math.max(0.1, vmax - vmin))); const h = 0 + 120 * f; return `hsl(${h} 78% 46%)`; };
-      ctx.lineWidth = 12; for (let i = 0; i < tr.N; i++) { const [xa, ya] = P(i), [xb, yb] = P((i + 1) % tr.N); ctx.strokeStyle = col(R.v[i]); ctx.beginPath(); ctx.moveTo(xa, ya); ctx.lineTo(xb, yb); ctx.stroke(); } }
-    else { ctx.strokeStyle = '#2f6bf0'; ctx.lineWidth = 12; ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, yy] = P(i); i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.closePath(); ctx.stroke(); }
+    const bandPx = Math.max(14, (G.widthM || 8) * sc * 0.9);
+    ctx.strokeStyle = 'rgba(26,34,55,.09)'; ctx.lineWidth = bandPx; ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, yy] = P(i); i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.closePath(); ctx.stroke();
+    ctx.strokeStyle = 'rgba(26,34,55,.22)'; ctx.lineWidth = 2; ctx.setLineDash([6, 8]); ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, yy] = P(i); i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.closePath(); ctx.stroke(); ctx.setLineDash([]);
+    // the lap
+    const lw = Math.max(6, Math.min(10, sc * 0.6));
+    ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, yy] = LP(i); i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.closePath();
+    ctx.lineWidth = lw + 4; ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.stroke(); ctx.lineWidth = lw; ctx.strokeStyle = '#1f6fe0'; ctx.stroke();
     // S/F
-    { const [x, yy] = P(0); ctx.fillStyle = '#1a2237'; ctx.save(); ctx.translate(x, yy); const a = Math.atan2(tr.ny[0], tr.nx[0]); ctx.rotate(a); ctx.fillRect(-4, -22, 8, 44); ctx.restore(); }
-    // corners
-    if (D) { ctx.font = `700 22px ${M}`; ctx.textAlign = 'center'; for (const r of D.rows) { const c = LAB.coach && LAB.coach.corners.find(x => x.n === r.w.n), res = c ? Math.max(0, r.R.time - c.tTop) : 0; const [x, yy] = P(r.w.apex); const bg = res > 0.25 ? '#e23d3d' : res > 0.1 ? '#e9a23b' : '#1f2b48'; ctx.beginPath(); ctx.arc(x, yy, 22, 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.fillText(String(r.w.n), x, yy + 1); } ctx.textAlign = 'left'; }
+    { const [x, yy] = P(0); ctx.fillStyle = '#1a2237'; ctx.save(); ctx.translate(x, yy); ctx.rotate(Math.atan2(tr.ny[0], tr.nx[0])); ctx.fillRect(-4, -22, 8, 44); ctx.restore(); }
+    // the points, as in the Lab (colours from the site), then the corner numbers
+    const C = { brake: '#e5484d', limit: '#ff8c2e', lift: '#d9a300', throttle: '#2fb563' }, rs = Math.max(1, Math.min(1.9, sc * 0.11));
+    const mk = (i, r, col, ink) => { const [x, yy] = LP(i); ctx.beginPath(); ctx.arc(x, yy, r, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = ink || '#fff'; ctx.stroke(); };
+    if (D) {
+      for (const r of D.rows) { const w0 = r.w, m = r.R; if (!m) continue; const at = (k) => ((w0.a + k) % tr.N + tr.N) % tr.N;
+        if (m.tk >= 0) mk(at(m.tk), 9 * rs, C.throttle); if (m.rk >= 0) mk(at(m.rk), 7 * rs, C.limit); mk(at(m.apK), 7 * rs, '#fff', '#333');
+        if (m.kind === 'brake' && !m.inherited) mk(at(m.bk), 11 * rs, C.brake); else if (m.kind === 'lift') mk(at(m.lk), 11 * rs, C.lift, '#555'); else if (m.kind === 'ease') mk(at(m.ek), 9 * rs, C.lift, '#555'); }
+      ctx.font = `700 20px ${M}`; ctx.textAlign = 'center';
+      for (const r of D.rows) { const [x, yy] = P(r.w.apex); const nx = tr.nx[r.w.apex], ny = tr.ny[r.w.apex], side = r.w.dir === 'L' ? 1 : -1, bx = x + nx * side * (bandPx / 2 + 26), by = yy + ny * side * (bandPx / 2 + 26); ctx.beginPath(); ctx.arc(bx, by, 20, 0, Math.PI * 2); ctx.fillStyle = '#1a2237'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.fillText(String(r.w.n), bx, by + 1); }
+      ctx.textAlign = 'left';
+    }
     // legend + footer
-    ctx.font = `500 22px ${F}`; ctx.fillStyle = '#5f6b84'; ctx.fillText(t('line colour = speed (red slow → green fast) · red corners = biggest reserve'), 64, H - 108);
-    ctx.font = `700 30px ${F}`; ctx.fillStyle = '#2f6bf0'; ctx.fillText('hutka.ai', 64, H - 60); ctx.font = `500 26px ${F}`; ctx.fillStyle = '#5f6b84'; ctx.fillText(t('— upload yours and compare corner by corner'), 64 + ctx.measureText('hutka.ai ').width + 30, H - 60);
+    { let lx = 64; const ly = H - 108; ctx.font = `500 22px ${F}`; ctx.textBaseline = 'middle'; for (const [col, ink, label] of [[C.brake, '#fff', t('brake')], [C.lift, '#555', t('lift')], [C.limit, '#fff', t('brake released')], ['#fff', '#333', t('apex')], [C.throttle, '#fff', t('throttle')]]) { ctx.beginPath(); ctx.arc(lx + 9, ly, 9, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = ink; ctx.stroke(); ctx.fillStyle = '#5f6b84'; ctx.fillText(label, lx + 28, ly); lx += 28 + ctx.measureText(label).width + 30; } }
+    ctx.font = `700 30px ${F}`; ctx.fillStyle = '#2f6bf0'; ctx.fillText('hutka.ai', 64, H - 60); ctx.font = `500 26px ${F}`; ctx.fillStyle = '#5f6b84'; ctx.fillText(t('— open the link to see every corner, upload yours and compare'), 64 + ctx.measureText('hutka.ai ').width + 30, H - 60);
   },
   async open() {
     const sess = LAB.current; if (!sess) return; await SHARE.draw();
@@ -5032,7 +5049,8 @@ const SHARE = {
   async save() { const b = await SHARE.blob(); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'hutka-' + (LAB.current && LAB.current.id || 'session') + '.png'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); },
   async copy() { const url = SHARE.url(); try { await navigator.clipboard.writeText(url); setStatus('shareStatus', t('Link copied.'), 'ok'); } catch (e) { setStatus('shareStatus', url, 'ok'); } }
 };
-$('btnShare').onclick = () => SHARE.open(); $('lmShare').onclick = () => SHARE.open(); $('ckShare').onclick = () => SHARE.open(); $('shareClose').onclick = SHARE.close; $('shareGo').onclick = () => SHARE.go(); $('shareSave').onclick = () => SHARE.save(); $('shareCopy').onclick = () => SHARE.copy(); $('shareModal').addEventListener('click', (e) => { if (e.target === $('shareModal')) SHARE.close(); });
+$('btnShare').onclick = () => SHARE.open(); $('lmShare').onclick = () => SHARE.open(); $('ckShare').onclick = () => SHARE.open();
+$('shareCv').onclick = () => { const z = $('shareZoom'); $('shareZoomImg').src = $('shareCv').toDataURL('image/png'); z.hidden = false; }; $('shareZoom').onclick = () => { $('shareZoom').hidden = true; }; $('shareClose').onclick = SHARE.close; $('shareGo').onclick = () => SHARE.go(); $('shareSave').onclick = () => SHARE.save(); $('shareCopy').onclick = () => SHARE.copy(); $('shareModal').addEventListener('click', (e) => { if (e.target === $('shareModal')) SHARE.close(); });
 async function labTogglePublish() {
   const sess = LAB.current; if (!sess || !mySession(sess)) return;
   const on = !sess.published;
