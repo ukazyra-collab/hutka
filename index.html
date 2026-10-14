@@ -544,8 +544,8 @@ body.onboarding #toast{z-index:50}
 .post .ph .who b a{color:inherit;text-decoration:none}
 .post .ph .who span{color:var(--muted);font-size:12.5px}
 .post .ph .who span a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--line-2)}
-.post .pb{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px;padding:0 16px 14px;align-items:center}
-.post .pv{height:150px;background:var(--surface-2);border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.post .pb{display:grid;grid-template-columns:240px minmax(0,1fr);gap:18px;padding:0 16px 14px;align-items:center}
+.post .pv{position:relative;height:150px;background:var(--surface-2);border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
 .post .pv canvas{width:100%;height:100%;display:block}
 .post .pv svg{width:40px;height:40px;stroke:var(--faint);fill:none;stroke-width:1.6}
 .post .big{font:600 34px/1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
@@ -555,7 +555,17 @@ body.onboarding #toast{z-index:50}
 .post .pf .btn.sm{margin-left:4px}
 .post .pf .sp{flex:1}
 .post .pf .cnt{color:var(--muted);font-size:13px;display:inline-flex;align-items:center;gap:5px}
-@media (max-width:640px){.post .pb{grid-template-columns:1fr}.post .pv{height:120px}}
+.post.rich .pb{grid-template-columns:minmax(240px,44%) minmax(0,1fr)}
+.post .pv.rich{height:250px;background:var(--surface)}
+.post .pv .pv-open{position:absolute;inset:0;border-radius:12px}
+.post .where{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px}
+.post .where .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-right:2px}
+.post .where .tc{display:inline-flex;gap:5px;align-items:center;padding:3px 9px;border-radius:999px;font:500 12.5px var(--mono);text-decoration:none;color:var(--fg);border:1px solid var(--line);background:var(--surface-2)}
+.post .where .tc b{font-weight:700}
+.post .where .tc.warm{border-color:color-mix(in srgb,var(--limit) 55%,var(--line));background:color-mix(in srgb,var(--limit) 12%,var(--surface))}
+.post .where .tc.hot{border-color:color-mix(in srgb,var(--brake) 55%,var(--line));background:color-mix(in srgb,var(--brake) 12%,var(--surface))}
+.post .where .tc:hover{border-color:var(--accent)}
+@media (max-width:640px){.post .pb,.post.rich .pb{grid-template-columns:1fr}.post .pv{height:120px}.post .pv.rich{height:250px}}
 .rank{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
 .rank:last-child{border-bottom:0}
 .rank .n{width:20px;color:var(--muted);font-family:var(--mono);font-size:12px}
@@ -719,11 +729,12 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .home-hero h1{font-size:24px}
   .home-hero p{font-size:14px}
   .post .ph{padding:10px 12px}
-  .post .pb{padding:0 12px 12px;gap:10px;grid-template-columns:1fr}
+  .post .pb,.post.rich .pb{padding:0 12px 12px;gap:10px;grid-template-columns:1fr}
   .post .pv{height:130px}
   .post .big{font-size:30px}
   .post .pf{padding:4px 8px 6px 4px;gap:2px}
   .post .pv{height:170px}
+  .post .pv.rich{height:250px}
   .post .pf .btn.sm{height:34px;padding:0 10px;font-size:13px}
   .tracks-grid{grid-template-columns:1fr}
   .cover{height:150px;margin:0 -12px}
@@ -2942,6 +2953,7 @@ Object.assign(I18N.RU, {
 });
 Object.assign(I18N.RU, { '— open the link to see every corner, upload yours and compare': '— открой ссылку, чтобы увидеть каждый поворот, загрузи свою и сравни', 'max': 'макс' });
 Object.assign(I18N.RU, { 'winner': 'победа', 'podium': 'подиум' });
+Object.assign(I18N.RU, { 'Where the time is': 'Где время' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4077,7 +4089,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v29.6b';
+const APP_VERSION = 'v29.8';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -4487,6 +4499,28 @@ LAB.show = async function (sid, mode) {
   labRender(); showDiscuss();
   if (!LAB.current) renderLabStart();
 };
+// the feed card: the best lap's real line (normalised), the Lab's points, the corner badges and the biggest reserves — ~3 KB
+const CARD_V = 1;
+LAB.cardOf = function () {
+  const D = LAB.dcmp, G = LAB.G, sess = LAB.current; if (!D || !G || !sess || !D.R || !D.ref || D.ref.avg) return null;
+  const tr = G.track, R = D.R, N = tr.N; let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const lp = (i) => [tr.cx[i] + R.o[i] * tr.nx[i], tr.cy[i] + R.o[i] * tr.ny[i]];
+  for (let i = 0; i < N; i++) { const [x, y] = lp(i); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  const pad = (G.widthM || 8) * 2.2; x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
+  const sc = Math.max(x1 - x0, y1 - y0) || 1, nx = (x) => Math.round((x - x0) / sc * 1000) / 1000, ny = (y) => Math.round((y - y0) / sc * 1000) / 1000;
+  const n = Math.min(220, N), pts = []; for (let k = 0; k < n; k++) { const i = Math.floor(k * N / n), [x, y] = lp(i); pts.push([nx(x), ny(y)]); }
+  const marks = [], corners = [], at = (w0, k) => ((w0.a + k) % N + N) % N;
+  for (const r of D.rows) { const w0 = r.w, m = r.R; if (!m) continue;
+    if (m.tk >= 0) { const [x, y] = lp(at(w0, m.tk)); marks.push([nx(x), ny(y), 't']); }
+    if (m.rk >= 0) { const [x, y] = lp(at(w0, m.rk)); marks.push([nx(x), ny(y), 'r']); }
+    { const [x, y] = lp(at(w0, m.apK)); marks.push([nx(x), ny(y), 'a']); }
+    if (m.kind === 'brake' && !m.inherited) { const [x, y] = lp(at(w0, m.bk)); marks.push([nx(x), ny(y), 'b']); } else if (m.kind === 'lift') { const [x, y] = lp(at(w0, m.lk)); marks.push([nx(x), ny(y), 'l']); } else if (m.kind === 'ease') { const [x, y] = lp(at(w0, m.ek)); marks.push([nx(x), ny(y), 'e']); }
+    const i = w0.apex, side = w0.dir === 'L' ? 1 : -1, off = (G.widthM || 8) * 1.6, bx = tr.cx[i] + tr.nx[i] * side * off, by = tr.cy[i] + tr.ny[i] * side * off;
+    const c = LAB.coach && LAB.coach.corners.find(x => x.n === w0.n), res = c ? Math.max(0, r.R.time - c.tTop) : 0;
+    corners.push([nx(bx), ny(by), w0.n, Math.round(res * 100) / 100]); }
+  const top = corners.filter(c => c[3] >= 0.05).sort((a, b) => b[3] - a[3]).slice(0, 3).map(c => [c[2], c[3]]), total = Math.round(corners.reduce((a, c) => a + c[3], 0) * 100) / 100;
+  return { v: CARD_V, w: Math.round((x1 - x0) / sc * 1000) / 1000, h: Math.round((y1 - y0) / sc * 1000) / 1000, pts, marks, corners, top, total, vmax: Math.round(Math.max(...R.v) * 3.6) };
+};
 // back to the start page: the session stays in memory, the Lab shows the library again
 LAB.close = function () { if (fsOn()) { if (document.fullscreenElement) { try { document.exitFullscreen(); } catch (e) {} } else $('hero').classList.remove('fs-fallback'); } LAB.current = null; LAB.sessions = []; LAB.G = null; LAB.dcmp = null; LAB.coach = null; LAB.loaded = false; LAB.selN = 0; if (location.hash !== '#lab') history.replaceState(null, '', '#lab'); labRender(); renderLabStart(); window.scrollTo({ top: 0 }); };
 // open a session as the reference (or as the comparison against my latest session on the same layout)
@@ -4515,6 +4549,8 @@ LAB.open = async function (meta, asCmp) {
   setStatus('labStatus', G.fitNote || '', 'ok');
   // older sessions have no shape preview for the feed: add one the first time the owner opens them
   if (mySession(sess) && !sess.preview && sess.owner !== 'local' && STORE.canWrite()) { try { const pv = STORE.previewOf(sess); if (pv) { await STORE.updateSession(sess.id, { preview: pv }); } } catch (e) {} }
+  // and the analysis card (the lap line with brake / lift / apex / throttle points, corner numbers, the biggest reserves): computed once, drawn in the feed for everyone
+  if (mySession(sess) && sess.owner !== 'local' && STORE.canWrite() && !(sess.card && sess.card.v === CARD_V)) { try { const card = LAB.cardOf(); if (card) { await STORE.updateSession(sess.id, { card }); } } catch (e) {} }
 };
 // load one more session into the lab (as a comparison candidate) by its meta
 LAB.load = async function (meta) {
@@ -5456,7 +5492,27 @@ const UPLOAD = (() => {
 })();
 const fileDate = (f) => { try { const d = new Date(f.lastModified || Date.now()); return d.toISOString().slice(0, 16).replace('T', ' '); } catch (e) { return ''; } };
 // ---------- home: the feed of published sessions, where people drive, who is fastest ----------
+// the analysis card from the session meta (LAB.cardOf): the lap line, the Lab's points, the corner numbers — y grows downwards
+function drawCard(cv, c) {
+  if (!cv || !c || !c.pts || c.pts.length < 3) return false;
+  const box = cv.parentElement, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = (box && box.clientWidth) || cv.clientWidth || 200, h = (box && box.clientHeight) || cv.clientHeight || 150; if (w < 20 || h < 20) return false;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const pad = 10, s = Math.min((w - 2 * pad) / Math.max(c.w || 1, 0.05), (h - 2 * pad) / Math.max(c.h || 1, 0.05)), ox = (w - (c.w || 1) * s) / 2, oy = (h - (c.h || 1) * s) / 2, X = (p) => ox + p[0] * s, Y = (p) => oy + p[1] * s;
+  const cs = getComputedStyle(document.documentElement), col = (n, d) => cs.getPropertyValue(n).trim() || d, small = w < 300;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  const path = () => { ctx.beginPath(); c.pts.forEach((p, i) => { i ? ctx.lineTo(X(p), Y(p)) : ctx.moveTo(X(p), Y(p)); }); ctx.closePath(); };
+  path(); ctx.strokeStyle = 'rgba(0,0,0,0.07)'; ctx.lineWidth = small ? 9 : 12; ctx.stroke();
+  path(); ctx.strokeStyle = col('--actual', '#1f6fe0'); ctx.lineWidth = small ? 2.4 : 3; ctx.stroke();
+  const C = { b: col('--brake', '#e5484d'), l: col('--lift', '#d9a300'), e: col('--lift', '#d9a300'), r: col('--limit', '#ff8c2e'), t: col('--throttle', '#2fb563'), a: '#fff' }, rad = { b: 4.2, l: 4.2, e: 3.6, r: 3, t: 3.4, a: 2.8 }, k = small ? 0.8 : 1;
+  for (const m of c.marks || []) { ctx.beginPath(); ctx.arc(X(m), Y(m), (rad[m[2]] || 3) * k, 0, Math.PI * 2); ctx.fillStyle = C[m[2]] || '#999'; ctx.fill(); ctx.lineWidth = 1.2; ctx.strokeStyle = m[2] === 'a' ? '#333' : (m[2] === 'l' || m[2] === 'e' ? '#555' : '#fff'); ctx.stroke(); }
+  // corner numbers: the corners with a reserve stand out (red ≥ 0.2 s, orange ≥ 0.1 s), the rest stay small and quiet
+  if (!small || h >= 150) { ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; const mono = col('--mono', 'monospace');
+    for (const q of (c.corners || []).slice().sort((a, b) => a[3] - b[3])) { const hot = q[3] >= 0.2, warm = q[3] >= 0.1, big = hot || warm, r = big ? (small ? 7.5 : 8.5) : (small ? 5.5 : 6.5); ctx.font = `700 ${big ? (small ? 8.5 : 9.5) : (small ? 7 : 8)}px ${mono}`; ctx.beginPath(); ctx.arc(X(q), Y(q), r, 0, Math.PI * 2); ctx.fillStyle = hot ? col('--brake', '#e5484d') : warm ? col('--limit', '#ff8c2e') : 'rgba(26,34,55,0.62)'; ctx.fill(); ctx.lineWidth = big ? 1.5 : 1; ctx.strokeStyle = col('--surface', '#fff'); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.fillText(String(q[2]), X(q), Y(q) + 0.5); } }
+  const p0 = c.pts[0]; ctx.beginPath(); ctx.arc(X(p0), Y(p0), 3, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#111'; ctx.lineWidth = 1.5; ctx.stroke();
+  return true;
+}
 function drawPreview(cv, pv, color) {
+  if (pv && pv.v && pv.marks) return drawCard(cv, pv);
   if (!cv || !pv || !pv.pts || pv.pts.length < 3) return false;
   const box = cv.parentElement, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = (box && box.clientWidth) || cv.clientWidth || 200, h = (box && box.clientHeight) || cv.clientHeight || 150; if (w < 20 || h < 20) return false;
   cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -5509,11 +5565,15 @@ function postCard(s, names, cnt) {
   const who = el('div', 'who'); who.innerHTML = `<b><a href="#driver~${esc(s.owner)}">${esc(nm.name || t('Driver'))}</a>${nm.country ? ' ' + flag(nm.country) : ''}</b><span>${tr ? `<a href="#track~${esc(tr.id)}">${esc(tr.name)}</a>` : esc(s.trackName || t('Custom track'))}${s.layout && s.layout !== 'custom' ? ` · <a href="#track~${esc(s.track)}~${esc(s.layout)}">${esc(layoutName(s.track, s.layout))}</a>` : ''} · ${esc(fmtDate(s.date))}</span>`;
   ph.append(im, who);
   const pb = el('div', 'pb'); const pv = el('div', 'pv');
-  if (s.preview && s.preview.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); requestAnimationFrame(() => drawPreview(cv, s.preview)); if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (cv.isConnected) drawPreview(cv, s.preview); }); ro.observe(pv); } } else pv.appendChild(svgUse('i-track'));
+  const pic = (s.card && s.card.v) ? s.card : s.preview; if (pic && pic.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); if (s.card && s.card.v) { pv.classList.add('rich'); d.classList.add('rich'); const a = el('a', 'pv-open'); a.href = '#lab~' + esc(s.id); a.title = t('Open analysis'); pv.appendChild(a); } requestAnimationFrame(() => drawPreview(cv, pic)); if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (cv.isConnected) drawPreview(cv, pic); }); ro.observe(pv); } } else pv.appendChild(svgUse('i-track'));
   const info = el('div'); info.innerHTML = `<div class="lbl">${t('best lap')}</div><div class="big">${fmtMs(s.bestMs)}</div><div class="nm">${esc(s.label || s.name)}${resultText(s) ? ` <span class="res">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</div>`;
   const chips = el('div', 'chips'); const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
-  chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`); if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
-  info.appendChild(chips); pb.append(pv, info);
+  chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`);
+  if (s.card && s.card.v) { if (s.card.vmax) chip(t('max'), `${s.card.vmax} ${t('km/h')}`); if (s.card.total) chip(t('reserve'), `${s.card.total.toFixed(2)} s`); } if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
+  info.appendChild(chips);
+  if (s.card && s.card.v && s.card.top && s.card.top.length) { const row = el('div', 'where'); row.appendChild(el('span', 'k', t('Where the time is')));
+    for (const [n, res] of s.card.top) { const a = el('a', 'tc' + (res >= 0.2 ? ' hot' : ' warm')); a.href = `#lab~${esc(s.id)}~t${n}`; a.innerHTML = `<b>T${n}</b> −${res.toFixed(2)} s`; a.title = t('Open T{n} in the Lab', { n }); row.appendChild(a); } info.appendChild(row); }
+  pb.append(pv, info);
   const pf = el('div', 'pf');
   const like = voteButtons(s.id, cnt, (r) => { d.classList.toggle('low', STORE.lowRated(r)); lowTag.hidden = !STORE.lowRated(r); });
   const lowTag = el('span', 'soon', t('rated not helpful')); lowTag.hidden = !STORE.lowRated(cnt); if (STORE.socialOn) ph.appendChild(lowTag);
