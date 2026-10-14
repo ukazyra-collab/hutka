@@ -3,7 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Hutka — rental karting tracks, Alfano session analysis and hot laps">
+<meta name="description" content="Racing AI for karting: upload a session — every braking point, apex and throttle point, compared with the fastest drivers on the same layout. Corner guides for 25 tracks, an AI coach, hot laps.">
+<link rel="canonical" href="https://hutka.ai/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hutka">
+<meta property="og:title" content="Hutka — racing AI for karting">
+<meta property="og:description" content="Upload a session — every braking point, apex and throttle point, compared with the fastest drivers on the same layout. Corner guides for 25 tracks, an AI coach, hot laps.">
+<meta property="og:url" content="https://hutka.ai/">
+<meta property="og:image" content="https://hutka.ai/og.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Hutka — see where the time is">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hutka — racing AI for karting">
+<meta name="twitter:description" content="Upload a session — every corner, compared with the fastest on the same layout.">
+<meta name="twitter:image" content="https://hutka.ai/og.png?v=1">
 <meta name="theme-color" content="#1b2340">
 <meta http-equiv="Content-Security-Policy" content="object-src none; base-uri self">
 <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -20,7 +34,7 @@
 <script src="supabase.js"></script>
 </head>
 <body>
-<title>Hutka</title>
+<title>Hutka — racing AI for karting</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -630,6 +644,20 @@ body.onboarding #toast{z-index:50}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35) rotate(-8deg)}70%{transform:scale(.95)}100%{transform:scale(1)}}
 .post.low{opacity:.72}
 .post.low .pv{filter:grayscale(1)}
+.bugbtn{position:fixed;right:14px;bottom:14px;z-index:28;width:38px;height:38px;border-radius:50%;border:1px solid var(--line-2);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px);color:var(--muted);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(16,22,48,.12);opacity:.75;transition:opacity .15s,transform .15s}
+.bugbtn:hover{opacity:1;transform:translateY(-1px);color:var(--fg)}
+.bugbtn svg{width:18px;height:18px}
+@media (max-width:900px){.bugbtn{bottom:calc(66px + env(safe-area-inset-bottom,0px));right:10px;width:34px;height:34px;opacity:.6}}
+body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:none}
+.rep{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.rep:last-child{border-bottom:0}
+.rep .who{font-size:12px;color:var(--muted)}
+.rep .tx{white-space:pre-wrap;font-size:13.5px;line-height:1.45}
+.rep .meta{font-size:11.5px;color:var(--faint);word-break:break-all}
+.rep .meta pre{white-space:pre-wrap;margin:4px 0 0;font-size:11px;color:var(--muted)}
+.rep img{max-width:160px;max-height:120px;border-radius:8px;border:1px solid var(--line);cursor:zoom-in;margin-top:6px;display:block}
+.rep.done{opacity:.55}
+.rep .acts{display:flex;gap:6px;align-items:flex-start}
 .stat-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:14px}
 .stat-chart .lbl{margin-bottom:4px}
 .stat-chart canvas{display:block;width:100%}
@@ -1220,6 +1248,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
               <div class="map-wrap"><div class="map-bar"><div class="seg"><button class="btn" id="eRotL" type="button">↺</button><button class="btn" id="eRotR" type="button">↻</button></div><div class="seg"><button class="btn" id="eZoomOut" type="button">−</button><button class="btn" id="eZoomIn" type="button">+</button><button class="btn" id="eZoomFit" type="button">⌂</button></div></div><div style="position:relative"><canvas id="emap"></canvas><div class="readout" id="eReadout" hidden></div></div></div>
             </div>
           </div>
+        <div class="card" id="admReportsCard" hidden><h2><svg><use href="#i-info"/></svg><span data-t="Bug reports">Bug reports</span><span class="sub" id="admReportsSub"></span></h2><div class="list" id="admReports"></div><div class="hint" id="admReportsHint" style="margin-top:8px"></div></div>
         <div class="card" id="admStatsCard" hidden><h2><svg><use href="#i-speed"/></svg><span data-t="Statistics">Statistics</span><span class="sub" id="admStatsSub"></span></h2><div id="admStats"></div></div>
         <div class="card" id="admAiCard" hidden><h2><svg><use href="#i-spark"/></svg><span data-t="AI coach · usage and cost">AI coach · usage and cost</span></h2><div id="admAiUsage"></div></div>
         </div>
@@ -1312,6 +1341,15 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
 </div></div>
 <!-- confirm modal -->
 <div class="modal" id="cfModal" hidden><div class="box" style="width:min(440px,100%)"><h3 id="cfTitle"></h3><p class="hint" id="cfText"></p><div class="row" style="justify-content:flex-end"><button class="btn" id="cfNo" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="cfYes" type="button"></button></div></div></div>
+<button class="bugbtn" id="bugBtn" type="button" title="Report a problem" aria-label="Report a problem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l1.9 1.9M16 2l-1.9 1.9M9 7h6a3 3 0 0 1 3 3v5a6 6 0 0 1-12 0v-5a3 3 0 0 1 3-3zM3 13h3M18 13h3M4 20l3-2M20 20l-3-2M12 10v10"/></svg></button>
+<div class="modal" id="bugModal" hidden><div class="box" style="width:min(520px,100%)">
+  <h3 data-t="Report a problem">Report a problem</h3>
+  <p class="hint" data-t="What went wrong, what you expected, which track or session. The page address, device and recent errors are attached automatically.">What went wrong, what you expected, which track or session. The page address, device and recent errors are attached automatically.</p>
+  <div class="field"><textarea id="bugText" rows="5" maxlength="4000" placeholder="e.g. the map does not turn when I rotate the phone on the Lab page"></textarea></div>
+  <div class="field" id="bugEmailField"><label data-t="Your email (so we can reply)">Your email (so we can reply)</label><input type="text" id="bugEmail" autocomplete="email" placeholder="you@example.com"></div>
+  <div class="row" style="align-items:center;gap:10px"><label class="btn sm filebtn"><span data-t="Attach a screenshot">Attach a screenshot</span><input type="file" id="bugShot" accept="image/*"></label><span class="hint" id="bugShotName"></span></div>
+  <div class="row"><button class="btn primary" id="bugSend" type="button" data-t="Send">Send</button><button class="btn ghost" id="bugCancel" type="button" data-t="Cancel">Cancel</button><span class="status" id="bugStatus"></span></div>
+</div></div>
 <div class="toast" id="toast" hidden></div>
 <script>
 // @@CORE-START
@@ -2829,6 +2867,13 @@ Object.assign(I18N.RU, {
 });
 Object.assign(I18N.RU, { 'Upload a session — every corner, compared with the fastest on the same layout.': 'Загрузи сессию — каждый поворот в сравнении с самыми быстрыми на этом лейауте.' });
 Object.assign(I18N.RU, { 'Tap a corner to open it in the Lab': 'Нажми на поворот — откроется в Lab', 'Open T{n} in the Lab': 'Открыть T{n} в Lab', 'The answer was cut short — continue': 'Ответ оборвался — продолжить', 'Continue exactly where you stopped, briefly.': 'Продолжи ровно с того места, где остановился, коротко.' });
+Object.assign(I18N.RU, {
+  'Report a problem': 'Сообщить о проблеме', 'What went wrong, what you expected, which track or session. The page address, device and recent errors are attached automatically.': 'Что пошло не так, что ожидал, какая трасса или сессия. Адрес страницы, устройство и последние ошибки прикрепятся сами.',
+  'Your email (so we can reply)': 'Твоя почта (чтобы ответить)', 'Attach a screenshot': 'Приложить скриншот', 'Send': 'Отправить', 'Describe the problem in a few words.': 'Опиши проблему в паре слов.', 'Sending…': 'Отправляю…',
+  'Thank you — the report went straight to the Hutka team.': 'Спасибо — сообщение ушло команде Hutka.', 'Too many reports from this network today — try tomorrow.': 'Слишком много сообщений с этой сети за сегодня — попробуй завтра.', 'Could not send ({e}). Email us: hello@hutka.ai': 'Не отправилось ({e}). Напиши нам: hello@hutka.ai',
+  'Bug reports': 'Сообщения о проблемах', 'Run supabase/reports.sql and deploy the `report` function — reports appear here and in your inbox.': 'Запусти supabase/reports.sql и задеплой функцию `report` — сообщения появятся здесь и в почте.', 'New reports also arrive by email (REPORT_TO secret).': 'Новые сообщения приходят и на почту (секрет REPORT_TO).',
+  'No reports yet. The button in the corner of every page sends them here and to your inbox.': 'Сообщений пока нет. Кнопка в углу каждой страницы шлёт их сюда и на почту.', 'guest': 'гость', 'session': 'сессия', 'Reopen': 'Открыть заново', 'Done': 'Готово', 'Delete this report?': 'Удалить это сообщение?'
+});
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3296,6 +3341,17 @@ const STORE = (() => {
   async function deleteChat(id) { if (!aiCfg()) return; await adapter.sb.from('chats').delete().eq('id', id); }
   async function renameChat(id, title) { if (!aiCfg()) return; await adapter.sb.from('chats').update({ title: String(title || '').slice(0, 80) }).eq('id', id); }
   // one question → streamed answer; resolves with the full text, the chat id and the remaining credits
+  // a bug report: through the `report` function (guests too); the function stores it and emails the owner
+  async function report(body) {
+    const c = aiCfg(); if (!c) { const e = new Error('not configured'); e.code = 'not_configured'; throw e; }
+    const r = await fetch(c.base + '/report', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': c.key, 'Authorization': 'Bearer ' + ((adapter && adapter.token && adapter.token()) || c.key) }, body: JSON.stringify(body || {}) });
+    if (!r.ok) throw await errOf(r); return r.json();
+  }
+  function profileSync(id) { return profiles.get(id) || null; }
+  const ok = (r) => { if (r.error) { const e = new Error(r.error.message || 'db error'); e.code = r.error.code; throw e; } return r.data; };
+  async function listReports() { if (!adapter || adapter.kind !== 'supabase') return []; return ok(await adapter.sb.from('reports').select('id,created_at,user_id,email,name,text,page,ua,screen,version,session_id,errors,shot,status').order('created_at', { ascending: false }).limit(200)) || []; }
+  async function setReport(id, status) { ok(await adapter.sb.from('reports').update({ status }).eq('id', id)); }
+  async function deleteReport(id) { ok(await adapter.sb.from('reports').delete().eq('id', id)); }
   async function ask(o) {
     const r = await fnCall('ask', { chat_id: o.chatId || undefined, session_id: o.sessionId || undefined, track_id: o.trackId || undefined, layout_id: o.layoutId || undefined, title: o.title || undefined, system: o.system || '', text: o.text, lang: I18N.lang }, { signal: o.signal });
     if (!r.ok) throw await errOf(r);
@@ -3325,7 +3381,7 @@ const STORE = (() => {
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
-    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal };
+    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
 // optional model line, and (for the admin editor) the traced control points. Pan, smooth zoom, rotation, hover and click. ----------
@@ -3930,6 +3986,25 @@ $('authPassBtn').onclick = async () => { const email = $('authEmail').value.trim
 $('authPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authPassBtn').click(); });
 $('authEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authEmailBtn').click(); });
 
+// ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
+const APP_VERSION = 'v29.4';
+const BUG = { errors: [], shot: null,
+  note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
+  open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
+  close() { $('bugModal').hidden = true; },
+  context() { const sid = (window.LAB && LAB.current && APP.route === 'lab') ? LAB.current.id : ''; let prof = null; try { prof = STORE.hasIdentity ? STORE.profileSync(STORE.me.id) : null; } catch (e) {} return { page: location.href, ua: navigator.userAgent.slice(0, 300), screen: `${window.innerWidth}x${window.innerHeight}@${window.devicePixelRatio || 1}${window.NATIVE && NATIVE.on ? ' app' : ''} ${I18N.lang}`, errors: BUG.errors.slice(), version: APP_VERSION, name: (prof && prof.racingName) || (STORE.hasIdentity ? STORE.me.name : ''), session: sid }; },
+  async send() {
+    const text = $('bugText').value.trim(); if (text.length < 3) { setStatus('bugStatus', t('Describe the problem in a few words.'), 'warn'); $('bugText').focus(); return; }
+    const email = $('bugEmail').value.trim(); if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setStatus('bugStatus', t('Enter a valid email.'), 'warn'); return; }
+    const b = $('bugSend'); b.classList.add('busy'); setStatus('bugStatus', t('Sending…'));
+    try { await STORE.report(Object.assign({ text, email, shot: BUG.shot }, BUG.context())); BUG.close(); toast(t('Thank you — the report went straight to the Hutka team.')); }
+    catch (e) { const code = e && e.code; setStatus('bugStatus', code === 'rate_limited' ? t('Too many reports from this network today — try tomorrow.') : t('Could not send ({e}). Email us: hello@hutka.ai', { e: code || (e && e.message) || 'error' }), 'warn'); }
+    b.classList.remove('busy');
+  } };
+window.addEventListener('error', (e) => { BUG.note((e.message || 'error') + (e.filename ? ` @${String(e.filename).split('/').pop()}:${e.lineno}` : '')); });
+window.addEventListener('unhandledrejection', (e) => { const r = e.reason; BUG.note('promise: ' + (r && (r.message || r.code) || String(r)).slice(0, 200)); });
+$('bugBtn').onclick = BUG.open; $('bugCancel').onclick = BUG.close; $('bugSend').onclick = BUG.send; $('bugModal').addEventListener('click', (e) => { if (e.target === $('bugModal')) BUG.close(); });
+$('bugShot').onchange = async (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; try { BUG.shot = await imageToDataUrl(f, 1400, 600000); $('bugShotName').textContent = f.name.slice(0, 40); } catch (err) { BUG.shot = null; setStatus('bugStatus', t('Could not read the image.'), 'warn'); } e.target.value = ''; };
 // ---------- visits: Google Analytics when config.js names a measurement id (not a secret) ----------
 (() => { const cfg = window.HUTKA_CONFIG || {}, id = cfg.analytics || cfg.gaId; if (!id || !/^G-[A-Z0-9]+$/.test(id) || location.protocol !== 'https:') return; try { if (navigator.doNotTrack === '1') return; } catch (e) {} const sc = document.createElement('script'); sc.async = true; sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + id; document.head.appendChild(sc); window.dataLayer = window.dataLayer || []; window.gtag = function () { window.dataLayer.push(arguments); }; gtag('js', new Date()); gtag('config', id, { anonymize_ip: true, send_page_view: true }); addEventListener('hashchange', () => gtag('event', 'page_view', { page_location: location.href, page_path: location.pathname + location.hash })); })();
 // ---------- search ----------
@@ -5699,11 +5774,27 @@ const ADMIN = (() => {
     await renderTrackList(); if (admin) await renderClaims();
     $('admAiCard').hidden = !(admin && STORE.aiOn); if (admin && STORE.aiOn) renderAiUsage($('admAiUsage'));
     $('admStatsCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderSiteStats();
+    $('admReportsCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderReports();
     $('admImportCard').hidden = !admin; if (admin && !$('osmCountry').options.length) { fillCountries($('osmCountry'), false); $('osmCountry').value = 'AE'; }
     if (tid && STORE.getTrack(tid)) { A.tid = tid; A.lid = lid || null; await renderTrackForm(); await renderLayouts(); if (lid) await renderLayoutEditor(); else $('admLayoutCard').hidden = true; }
     else { A.tid = null; A.lid = null; $('admEmpty').hidden = false; $('admTrackCard').hidden = true; $('admLayoutsCard').hidden = true; $('admLayoutCard').hidden = true; }
   }
   async function addTrack() { const id = await STORE.saveTrack({ name: t('New track'), city: '', country: 'AE', lat: 25.2, lon: 55.3, createdAt: Date.now() }); go('admin~' + id); }
+  // bug reports (reports.sql + the `report` function)
+  async function renderReports() {
+    const box = $('admReports'); box.innerHTML = ''; let list = [];
+    try { list = await STORE.listReports(); } catch (e) { $('admReportsHint').textContent = /relation|does not exist|42P01/i.test(String(e && e.message || e)) ? t('Run supabase/reports.sql and deploy the `report` function — reports appear here and in your inbox.') : t('Could not load: {e}', { e: e && e.message || e }); return; }
+    const open = list.filter(r => r.status !== 'done'); $('admReportsSub').textContent = open.length ? String(open.length) : ''; $('admReportsHint').textContent = list.length ? t('New reports also arrive by email (REPORT_TO secret).') : t('No reports yet. The button in the corner of every page sends them here and to your inbox.');
+    for (const r of list.slice(0, 60)) {
+      const d = el('div', 'rep' + (r.status === 'done' ? ' done' : '')), who = [r.name, r.email, r.user_id ? '' : t('guest')].filter(Boolean).join(' · ');
+      const meta = el('div', 'meta'); meta.innerHTML = `${esc(fmtDate(r.created_at))} ${esc(new Date(r.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))} · <a href="${esc(safeUrl(r.page) || '#')}">${esc((r.page || '').replace(/^https?:\/\/[^/]+\//, '/').slice(0, 60))}</a>${r.session_id ? ` · <a href="#lab~${esc(r.session_id)}">${t('session')}</a>` : ''} · ${esc(r.screen)} · ${esc(r.version)}<br>${esc((r.ua || '').slice(0, 120))}${Array.isArray(r.errors) && r.errors.length ? `<pre>${esc(r.errors.join('\n'))}</pre>` : ''}`;
+      const left = el('div'); left.append(el('div', 'who', who), el('div', 'tx', r.text), meta);
+      if (r.shot) { const im = new Image(); im.src = r.shot; im.alt = ''; im.onclick = () => { const w = window.open(); if (w) { w.document.write(`<img src="${r.shot}" style="max-width:100%">`); } }; left.appendChild(im); }
+      const acts = el('div', 'acts'); const done = el('button', 'btn xs', r.status === 'done' ? t('Reopen') : t('Done')); done.type = 'button'; done.onclick = async () => { try { await STORE.setReport(r.id, r.status === 'done' ? 'new' : 'done'); renderReports(); } catch (e) { toast(t('Could not save.')); } };
+      const del = el('button', 'btn xs ghost danger', '×'); del.type = 'button'; del.onclick = async () => { if (!confirm(t('Delete this report?'))) return; try { await STORE.deleteReport(r.id); renderReports(); } catch (e) { toast(t('Could not save.')); } };
+      acts.append(done, del); d.append(left, acts); box.appendChild(d);
+    }
+  }
   // site statistics (hutka_stats(): stats.sql)
   async function renderSiteStats() {
     const box = $('admStats'); box.innerHTML = ''; $('admStatsSub').textContent = ''; let S = null;
