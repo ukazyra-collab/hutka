@@ -3234,6 +3234,7 @@ const STORE = (() => {
       async allProfiles() { return must(await sb.from('profiles').select('*').limit(1000)).map(r => ({ id: r.id, racingName: r.racing_name || '', firstName: r.first_name || '', lastName: r.last_name || '', country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', coach: !!r.coach })); },
       async platformNames() { return {}; },
       async adminStats() { return must(await sb.rpc('hutka_stats')); },
+      async setCard(sid, card) { return must(await sb.rpc('hutka_set_card', { sid, card })) === true; },
       addClaim: async (body) => must(await sb.from('claims').insert({ track_id: body.track, by: body.by, text: body.text || '' })),
       async listClaims() { return must(await sb.from('claims').select('*').order('created_at', { ascending: false })).map(r => ({ id: String(r.id), track: r.track_id, by: r.by, text: r.text, createdAt: new Date(r.created_at).getTime() })); },
       deleteClaim: async (id) => must(await sb.from('claims').delete().eq('id', +id)),
@@ -3349,6 +3350,15 @@ const STORE = (() => {
     else { const rec = await LDB.get('sessions', sid); if (rec) { Object.assign(rec.meta, patch, { updatedAt: Date.now() }); await LDB.put('sessions', rec); } }
     if (cached) Object.assign(cached, patch); notify('sessions');
   }
+  // an admin writes the feed card of someone else's published session (cards.sql); false when the function is not installed
+  let adminCardsOk;
+  async function setCardAdmin(sid, card) {
+    if (!adapter || !adapter.setCard || !me.canEdit || adminCardsOk === false) return false;
+    try { const ok = await adapter.setCard(sid, card); if (ok) { const c = sessCache.get(sid); if (c) c.card = card; notify('sessions'); } return ok; }
+    catch (e) { if (/hutka_set_card|PGRST202|42883/.test(String(e && e.message || e))) adminCardsOk = false; return false; }
+  }
+  // drop loaded session data that nothing on the page holds (after background work): the next open fetches it again
+  function trimSessions(keep) { const k = new Set(keep || []); for (const id of [...sessCache.keys()]) if (!k.has(id)) sessCache.delete(id); }
   async function deleteSession(meta) { if (adapter && meta.owner !== 'local') await adapter.deleteSession(meta.id, meta.chunks); else await LDB.del('sessions', meta.id); sessCache.delete(meta.id); notify('sessions'); }
 
   // ----- people -----
@@ -3458,7 +3468,7 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta,
+    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, setCardAdmin, trimSessions, get adminCards() { return adminCardsOk; },
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
@@ -4089,7 +4099,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v29.8';
+const APP_VERSION = 'v29.9';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -4135,7 +4145,13 @@ const GEOM = (() => {
   function traceTrack(trc, lengthM, startU, reverse) { try { const tr = KLL.buildTrack(trc.pts.map(p => ({ x: +p.x, y: +p.y })), lengthM || trc.lengthM, startU === undefined ? (trc.startU || 0) : startU, reverse === undefined ? !!trc.reverse : reverse); return (isFinite(tr.mpp) && tr.mpp > 0) ? tr : null; } catch (e) { return null; } }
   function lapsCanvas(laps, g) { const c = document.createElement('canvas'); c.width = g.W; c.height = g.H; const ctx = c.getContext('2d'); ctx.strokeStyle = 'rgba(150,160,178,0.35)'; ctx.lineWidth = 1.5; ctx.lineJoin = 'round'; for (const L of laps) { ctx.beginPath(); L.xy.forEach((p, i) => { const q = DATA.applyT(g.T, [p[0], -p[1]]); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); ctx.stroke(); } return c; }
   // Build the geometry. `pref` is an already loaded session to use as the reference when the layout has none of its own.
-  async function build(tid, lid, pref) {
+  // the layout's pictures (drawn trace, aerial photo) — skipped for background work (opts.noMedia) and fetched when the Lab or a track page needs the geometry
+  async function media(G) {
+    G.mediaPending = false; const { tid, lid, layout } = G;
+    if (G.wantTrace) { const img = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/trace`); if (img) { try { const im = await loadImg(img); G.image = { src: im, w: im.naturalWidth, h: im.naturalHeight, alpha: G.wantTrace.alpha }; } catch (e) {} } }
+    if (layout && layout.aerial && G.frame && G.frame.merc) { const src = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/aerial`); if (src) { try { const im = await loadImg(src); G.aerial = Object.assign({}, layout.aerial, { src: im }); } catch (e) {} } }
+  }
+  async function build(tid, lid, pref, opts) {
     const layout = await layoutDoc(tid, lid);
     let refSess = null, refMeta = null;
     if (layout) {
@@ -4146,7 +4162,7 @@ const GEOM = (() => {
     if (!refSess && pref) refSess = pref;
     const trace = layout && layout.trace && layout.trace.closed && Array.isArray(layout.trace.pts) && layout.trace.pts.length >= 3 ? layout.trace : null;
     const key = `${tid}|${lid}|${refSess ? refSess.id : '-'}|${layout ? layout.updatedAt || 0 : 0}`;
-    if (cache.has(key)) return cache.get(key);
+    if (cache.has(key)) { const G0 = cache.get(key); if (G0.mediaPending && !(opts && opts.noMedia)) await media(G0); return G0; }
     if (!refSess && !trace) return null;
     const G = { key, rev: 'g' + (++revN), tid, lid, layout, refSess, widthM: (layout && +layout.widthM) || 8, corners: { R: (layout && +layout.cornerR) || 110, add: (layout && layout.cornersAdd) || [], del: (layout && layout.cornersDel) || [] }, source: '', image: null, aerial: null };
     if (refSess) {
@@ -4155,13 +4171,13 @@ const GEOM = (() => {
       if (trace) {
         const tr0 = traceTrack(trace, trace.lengthM);
         if (tr0) { const mean = ALF.meanLine(refSess.laps, 600); const fit = mean ? ALF.registerLoops(mean.map(p => [p[0], -p[1]]), tr0.raw) : null; const rmsM = fit ? fit.rmsPx / fit.T.s : Infinity;
-          if (rmsM <= 8) { F.T = fit.T; const lengthM = Math.round(trace.lengthM / tr0.mpp / fit.T.s); const tr = traceTrack(trace, lengthM, fit.startFrac, fit.dir < 0); if (tr) { G.track = tr; G.W = trace.w || 1600; G.H = trace.h || 1000; G.source = 'trace+gps'; G.fitNote = t('GPS matched to the layout drawing ({r} m residual)', { r: rmsM.toFixed(1) }); done = true; const img = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/trace`); if (img) { try { const im = await loadImg(img); G.image = { src: im, w: im.naturalWidth, h: im.naturalHeight, alpha: 0.9 }; } catch (e) {} } } } }
+          if (rmsM <= 8) { F.T = fit.T; const lengthM = Math.round(trace.lengthM / tr0.mpp / fit.T.s); const tr = traceTrack(trace, lengthM, fit.startFrac, fit.dir < 0); if (tr) { G.track = tr; G.W = trace.w || 1600; G.H = trace.h || 1000; G.source = 'trace+gps'; G.fitNote = t('GPS matched to the layout drawing ({r} m residual)', { r: rmsM.toFixed(1) }); done = true; G.wantTrace = { alpha: 0.9 }; } } }
       }
       if (!done) { const g = DATA.gpsLayout(refSess.laps, 600, F); if (!g) return null; F.T = g.T; F.merc = g.merc; const tr = KLL.buildTrack(g.pts, g.lengthM, 0, false); if (!(isFinite(tr.mpp) && tr.mpp > 0)) return null; G.track = tr; G.W = g.W; G.H = g.H; G.source = 'gps'; G.lengthM = g.lengthM; G.image = { src: lapsCanvas(laps, g), w: g.W, h: g.H, alpha: 1 }; }
       G.frame = F; DATA.lapPx(refSess, F.T); for (const L of refSess.laps) delete L._proj; refSess._attached = G.rev;
       G.sat = layout && layout.sat ? { dx: +layout.sat.dx || 0, dy: +layout.sat.dy || 0 } : { dx: 0, dy: 0 };
-      if (layout && layout.aerial && F.merc) { const src = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/aerial`); if (src) { try { const im = await loadImg(src); G.aerial = Object.assign({}, layout.aerial, { src: im }); } catch (e) {} } }
-    } else { const tr = traceTrack(trace, trace.lengthM); if (!tr) return null; G.track = tr; G.W = trace.w || 1600; G.H = trace.h || 1000; G.source = 'trace'; G.frame = null; const img = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/trace`); if (img) { try { const im = await loadImg(img); G.image = { src: im, w: im.naturalWidth, h: im.naturalHeight, alpha: 1 }; } catch (e) {} } }
+    } else { const tr = traceTrack(trace, trace.lengthM); if (!tr) return null; G.track = tr; G.W = trace.w || 1600; G.H = trace.h || 1000; G.source = 'trace'; G.frame = null; G.wantTrace = { alpha: 1 }; }
+    if (opts && opts.noMedia) G.mediaPending = true; else await media(G);
     cache.set(key, G); return G;
   }
   function attach(sess, G) {
@@ -4499,10 +4515,60 @@ LAB.show = async function (sid, mode) {
   labRender(); showDiscuss();
   if (!LAB.current) renderLabStart();
 };
-// the feed card: the best lap's real line (normalised), the Lab's points, the corner badges and the biggest reserves — ~3 KB
+// the feed card: the best lap's real line (normalised), the Lab's points, the corner badges and the biggest reserves — ~4 KB
 const CARD_V = 1;
-LAB.cardOf = function () {
-  const D = LAB.dcmp, G = LAB.G, sess = LAB.current; if (!D || !G || !sess || !D.R || !D.ref || D.ref.avg) return null;
+LAB.cardOf = function () { const D = LAB.dcmp, G = LAB.G; if (!D || !G || !LAB.current) return null; return cardFrom(D, G, LAB.coach); };
+// the same analysis without the Lab's state: the best lap against the session average, the coach fed with the laps of `sessions` (attached to G)
+function analyseFor(G, sess, sessions) {
+  const L = bestLap(sess); if (!L || !L.px) return null;
+  const R = DATA.projectLap(L, G.track, G.rev); if (!R) return null;
+  const clean = sess.laps.filter(x => x.clean && x.px);
+  const avg = clean.length >= 2 ? DATA.avgProjection(clean.map(x => DATA.projectLap(x, G.track, G.rev)).filter(Boolean), G.track, t('average lap')) : null;
+  let base = null; for (const s of sessions) for (const x of s.laps) if (x.px && (!base || x.timeMs < base.timeMs)) base = x;
+  const apexes = GEOM.apexes(G, base && base !== L ? (DATA.projectLap(base, G.track, G.rev) || R) : R);
+  const D = DATA.buildComparisonP(R, avg ? [avg] : [], avg ? 'lap' : 'avg', G.track, (P) => P && P.lap ? t('lap {n}', { n: P.lap.n }) : t('average lap'), apexes, G.corners.R);
+  if (!D) return null;
+  D.ref = { sess, L, avg: false, name: t('lap {n}', { n: L.n }), mine: mySession(sess) }; D.sess = sess;
+  const laps = []; for (const s of sessions) for (const x of s.laps) if (x.px && x.clean) laps.push(x);
+  return { D, coach: DATA.buildCoach(G.track, D.wins, laps, G.rev), R };
+}
+// the card for a session that is not open in the Lab (older uploads): loads it, the layout's reference, the owner's and the published sessions on the layout — like LAB.open does
+LAB.cardFor = async function (meta, mine) {
+  const sess = await STORE.loadSession(meta); const tid = meta.track || '', lid = meta.layout || 'custom';
+  const G = await GEOM.build(tid, lid, sess, { noMedia: true }); if (!G) return null;   // no pictures for background work
+  const list = [], add = (s) => { if (list.some(x => x.id === s.id)) return; const r = GEOM.attach(s, G); if (r.ok) list.push(s); };
+  add(sess); if (!list.length) return null;
+  const same = (m) => kartCompatible(m, sess);
+  if (G.refSess && same(G.refSess)) add(G.refSess);
+  const own = (sess.owner === STORE.me.id && mine ? mine : []).filter(m => m.id !== sess.id && m.track === tid && (m.layout || 'custom') === lid && same(m));
+  for (const m of own.slice(0, 12)) { try { add(await STORE.loadSession(m)); } catch (e) {} }
+  if (tid) { const pubs = (await STORE.sessionsFor(tid, lid)).filter(m => !list.some(x => x.id === m.id) && !(G.refSess && m.id === G.refSess.id) && same(m)); for (const m of pubs.slice(-10)) { try { add(await STORE.loadSession(m)); } catch (e) {} } }
+  const A = analyseFor(G, sess, list); return A ? cardFrom(A.D, G, A.coach) : null;
+};
+// older sessions get their feed card here, in the background: my own always; every published one when I am an admin (cards.sql);
+// a session without clean GPS laps is remembered as {none} so it is not retried on every visit
+const CARDS = {
+  busy: false, tried: new Set(), written: 0,
+  async run() {
+    if (CARDS.busy || !STORE.hasDb || !STORE.hasIdentity || !STORE.canWrite()) return; CARDS.busy = true;
+    try {
+      const mine = await STORE.mySessions(), need = (m) => m && m.track && m.owner !== 'local' && !(m.card && m.card.v === CARD_V) && !CARDS.tried.has(m.id);
+      const want = mine.filter(need);
+      if (STORE.isAdmin() && STORE.adminCards !== false) for (const m of await STORE.recentPublished(30)) if (need(m) && !want.some(x => x.id === m.id)) want.push(m);
+      for (const m of want) {
+        if (APP.route === 'lab' && LAB.loaded) break;   // not while the Lab works with the same session objects
+        CARDS.tried.add(m.id);
+        let card = null; try { card = await LAB.cardFor(m, mine); } catch (e) { continue; }   // could not load: try again next time
+        const body = card || { v: CARD_V, none: true };
+        try { if (m.owner === STORE.me.id) await STORE.updateSession(m.id, { card: body }); else if (!(await STORE.setCardAdmin(m.id, body))) continue; } catch (e) { continue; }
+        m.card = body; CARDS.written++; if (card && typeof HOME !== 'undefined') HOME.refreshPost(m.id, body);
+        STORE.trimSessions(LAB.sessions.map(s => s.id)); await new Promise(r => setTimeout(r, 120));
+      }
+    } catch (e) {} finally { CARDS.busy = false; }
+  }
+};
+function cardFrom(D, G, coach) {
+  if (!D || !G || !D.R || !D.ref || D.ref.avg) return null;
   const tr = G.track, R = D.R, N = tr.N; let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   const lp = (i) => [tr.cx[i] + R.o[i] * tr.nx[i], tr.cy[i] + R.o[i] * tr.ny[i]];
   for (let i = 0; i < N; i++) { const [x, y] = lp(i); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
@@ -4516,11 +4582,11 @@ LAB.cardOf = function () {
     { const [x, y] = lp(at(w0, m.apK)); marks.push([nx(x), ny(y), 'a']); }
     if (m.kind === 'brake' && !m.inherited) { const [x, y] = lp(at(w0, m.bk)); marks.push([nx(x), ny(y), 'b']); } else if (m.kind === 'lift') { const [x, y] = lp(at(w0, m.lk)); marks.push([nx(x), ny(y), 'l']); } else if (m.kind === 'ease') { const [x, y] = lp(at(w0, m.ek)); marks.push([nx(x), ny(y), 'e']); }
     const i = w0.apex, side = w0.dir === 'L' ? 1 : -1, off = (G.widthM || 8) * 1.6, bx = tr.cx[i] + tr.nx[i] * side * off, by = tr.cy[i] + tr.ny[i] * side * off;
-    const c = LAB.coach && LAB.coach.corners.find(x => x.n === w0.n), res = c ? Math.max(0, r.R.time - c.tTop) : 0;
+    const c = coach && coach.corners.find(x => x.n === w0.n), res = c ? Math.max(0, r.R.time - c.tTop) : 0;
     corners.push([nx(bx), ny(by), w0.n, Math.round(res * 100) / 100]); }
   const top = corners.filter(c => c[3] >= 0.05).sort((a, b) => b[3] - a[3]).slice(0, 3).map(c => [c[2], c[3]]), total = Math.round(corners.reduce((a, c) => a + c[3], 0) * 100) / 100;
   return { v: CARD_V, w: Math.round((x1 - x0) / sc * 1000) / 1000, h: Math.round((y1 - y0) / sc * 1000) / 1000, pts, marks, corners, top, total, vmax: Math.round(Math.max(...R.v) * 3.6) };
-};
+}
 // back to the start page: the session stays in memory, the Lab shows the library again
 LAB.close = function () { if (fsOn()) { if (document.fullscreenElement) { try { document.exitFullscreen(); } catch (e) {} } else $('hero').classList.remove('fs-fallback'); } LAB.current = null; LAB.sessions = []; LAB.G = null; LAB.dcmp = null; LAB.coach = null; LAB.loaded = false; LAB.selN = 0; if (location.hash !== '#lab') history.replaceState(null, '', '#lab'); labRender(); renderLabStart(); window.scrollTo({ top: 0 }); };
 // open a session as the reference (or as the comparison against my latest session on the same layout)
@@ -4550,7 +4616,7 @@ LAB.open = async function (meta, asCmp) {
   // older sessions have no shape preview for the feed: add one the first time the owner opens them
   if (mySession(sess) && !sess.preview && sess.owner !== 'local' && STORE.canWrite()) { try { const pv = STORE.previewOf(sess); if (pv) { await STORE.updateSession(sess.id, { preview: pv }); } } catch (e) {} }
   // and the analysis card (the lap line with brake / lift / apex / throttle points, corner numbers, the biggest reserves): computed once, drawn in the feed for everyone
-  if (mySession(sess) && sess.owner !== 'local' && STORE.canWrite() && !(sess.card && sess.card.v === CARD_V)) { try { const card = LAB.cardOf(); if (card) { await STORE.updateSession(sess.id, { card }); } } catch (e) {} }
+  if (mySession(sess) && sess.owner !== 'local' && STORE.canWrite() && !(sess.card && sess.card.v === CARD_V && !sess.card.none)) { try { const card = LAB.cardOf(); if (card) { await STORE.updateSession(sess.id, { card }); } } catch (e) {} }
 };
 // load one more session into the lab (as a comparison candidate) by its meta
 LAB.load = async function (meta) {
@@ -5524,6 +5590,9 @@ function drawPreview(cv, pv, color) {
   const p0 = pv.pts[0]; ctx.beginPath(); ctx.arc(ox + p0[0] * s, h - (oy + p0[1] * s), 3.5, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#111'; ctx.lineWidth = 1.5; ctx.stroke();
   return true;
 }
+// the last feed render, so a card computed in the background (CARDS.run) can refresh its post in place
+const HOME = { last: null,
+  refreshPost(id, card) { const L = HOME.last; if (!L || APP.route !== 'home') return; const pub = L.pubs.find(s => s.id === id), old = document.querySelector(`#homeFeed .post[data-sid="${CSS.escape(id)}"]`); if (!pub || !old) return; pub.card = card; old.replaceWith(postCard(pub, L.names, L.counts[id])); } };
 async function renderHomePage() {
   $('homeSub').textContent = t('Upload a session — every corner, compared with the fastest on the same layout.');
   $('homeUpload').onclick = () => UPLOAD.open({});
@@ -5541,6 +5610,7 @@ async function renderHomePage() {
   // sessions several drivers marked as not helpful sink to the bottom of the feed
   const order = pubs.slice().sort((a, b) => (STORE.lowRated(counts[a.id]) - STORE.lowRated(counts[b.id])) || (b.createdAt || 0) - (a.createdAt || 0));
   for (const s of order) feed.appendChild(postCard(s, names, counts[s.id]));
+  HOME.last = { pubs, names, counts }; if (typeof CARDS !== 'undefined') setTimeout(() => CARDS.run(), 600);   // older sessions get their analysis card in the background
   $('feedHint').textContent = pubs.length ? t('Sessions appear here when drivers publish them. Open one to see the corner-by-corner breakdown, or compare it with your own.') : '';
   // where people drive: layouts by number of sessions in the last 60 days
   { const box = $('homeActive'); box.innerHTML = ''; const by = new Map(); const cut = Date.now() - 60 * 86400000; for (const s of pubs) { if (!s.track) continue; const k = s.track + '~' + (s.layout || 'custom'); const o = by.get(k) || { track: s.track, layout: s.layout, n: 0, recent: 0, best: Infinity }; o.n++; if ((s.createdAt || 0) > cut) o.recent++; o.best = Math.min(o.best, s.bestMs || Infinity); by.set(k, o); }
@@ -5560,18 +5630,18 @@ async function renderHomePage() {
 }
 function postCard(s, names, cnt) {
   const tr = STORE.getTrack(s.track), nm = names[s.owner] || {}, mine = s.owner === STORE.me.id;
-  const d = el('div', 'post' + (STORE.lowRated(cnt) ? ' low' : ''));
+  const d = el('div', 'post' + (STORE.lowRated(cnt) ? ' low' : '')); d.dataset.sid = s.id;
   const ph = el('div', 'ph'); const im = new Image(); im.src = nm.avatar || GENERIC_AVATAR; im.alt = '';
   const who = el('div', 'who'); who.innerHTML = `<b><a href="#driver~${esc(s.owner)}">${esc(nm.name || t('Driver'))}</a>${nm.country ? ' ' + flag(nm.country) : ''}</b><span>${tr ? `<a href="#track~${esc(tr.id)}">${esc(tr.name)}</a>` : esc(s.trackName || t('Custom track'))}${s.layout && s.layout !== 'custom' ? ` · <a href="#track~${esc(s.track)}~${esc(s.layout)}">${esc(layoutName(s.track, s.layout))}</a>` : ''} · ${esc(fmtDate(s.date))}</span>`;
   ph.append(im, who);
   const pb = el('div', 'pb'); const pv = el('div', 'pv');
-  const pic = (s.card && s.card.v) ? s.card : s.preview; if (pic && pic.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); if (s.card && s.card.v) { pv.classList.add('rich'); d.classList.add('rich'); const a = el('a', 'pv-open'); a.href = '#lab~' + esc(s.id); a.title = t('Open analysis'); pv.appendChild(a); } requestAnimationFrame(() => drawPreview(cv, pic)); if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (cv.isConnected) drawPreview(cv, pic); }); ro.observe(pv); } } else pv.appendChild(svgUse('i-track'));
+  const rich = !!(s.card && s.card.v && s.card.pts), pic = rich ? s.card : s.preview; if (pic && pic.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); if (rich) { pv.classList.add('rich'); d.classList.add('rich'); const a = el('a', 'pv-open'); a.href = '#lab~' + esc(s.id); a.title = t('Open analysis'); pv.appendChild(a); } requestAnimationFrame(() => drawPreview(cv, pic)); if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (cv.isConnected) drawPreview(cv, pic); }); ro.observe(pv); } } else pv.appendChild(svgUse('i-track'));
   const info = el('div'); info.innerHTML = `<div class="lbl">${t('best lap')}</div><div class="big">${fmtMs(s.bestMs)}</div><div class="nm">${esc(s.label || s.name)}${resultText(s) ? ` <span class="res">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</div>`;
   const chips = el('div', 'chips'); const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
   chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`);
-  if (s.card && s.card.v) { if (s.card.vmax) chip(t('max'), `${s.card.vmax} ${t('km/h')}`); if (s.card.total) chip(t('reserve'), `${s.card.total.toFixed(2)} s`); } if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
+  if (rich) { if (s.card.vmax) chip(t('max'), `${s.card.vmax} ${t('km/h')}`); if (s.card.total) chip(t('reserve'), `${s.card.total.toFixed(2)} s`); } if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
   info.appendChild(chips);
-  if (s.card && s.card.v && s.card.top && s.card.top.length) { const row = el('div', 'where'); row.appendChild(el('span', 'k', t('Where the time is')));
+  if (rich && s.card.top && s.card.top.length) { const row = el('div', 'where'); row.appendChild(el('span', 'k', t('Where the time is')));
     for (const [n, res] of s.card.top) { const a = el('a', 'tc' + (res >= 0.2 ? ' hot' : ' warm')); a.href = `#lab~${esc(s.id)}~t${n}`; a.innerHTML = `<b>T${n}</b> −${res.toFixed(2)} s`; a.title = t('Open T{n} in the Lab', { n }); row.appendChild(a); } info.appendChild(row); }
   pb.append(pv, info);
   const pf = el('div', 'pf');
@@ -6216,7 +6286,7 @@ const ADMIN = (() => {
   try { await STORE.init(); } catch (e) {}
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { await NATIVE.init(); } catch (e) {}
