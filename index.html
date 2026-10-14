@@ -662,6 +662,9 @@ body.onboarding #toast{z-index:50}
 .hstep .pic img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:var(--surface-2)}
 .hlist{margin:10px 0 0 18px;line-height:1.7;font-size:14px}
 @media (max-width:760px){.hstep{grid-template-columns:1fr}.hstep .pic{max-width:360px}}
+#shareModal{z-index:70}
+.share-pv{display:flex;justify-content:center;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px}
+.share-pv canvas{width:min(100%,300px);height:auto;border-radius:8px;box-shadow:0 6px 20px rgba(16,22,48,.18)}
 .bugbtn{position:fixed;right:14px;bottom:14px;z-index:28;width:38px;height:38px;border-radius:50%;border:1px solid var(--line-2);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px);color:var(--muted);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(16,22,48,.12);opacity:.75;transition:opacity .15s,transform .15s}
 .bugbtn:hover{opacity:1;transform:translateY(-1px);color:var(--fg)}
 .bugbtn svg{width:18px;height:18px}
@@ -924,6 +927,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17.5v.5"/></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V4M8 8l4-4 4 4M5 13v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6"/></symbol>
     <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.4M12 17v.5"/></symbol>
     <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2 4 2 4H5"/></symbol>
     <symbol id="i-ig" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.5"/><circle cx="17" cy="7" r=".8" fill="currentColor"/></symbol>
@@ -1059,14 +1063,14 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     <!-- ========== LAYOUT ========== -->
     <!-- ========== LAB ========== -->
     <section class="page" id="pg-lab" hidden>
-      <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
+      <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnShare" type="button" hidden><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
       <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div><button class="btn primary sm" id="labSignIn" style="margin-left:auto;flex:none" hidden data-t="Sign in">Sign in</button></div>
       <div id="labStart" hidden>
         <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="labMineSub"></span></h2><div id="labMine"></div><div class="hint" id="labMineHint"></div></div>
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
         <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><div class="row" style="margin-top:10px"><button class="btn primary" id="labUpload2" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#help"><span data-t="How to get the file — step by step">How to get the file — step by step</span></a></div></div>
       </div>
-      <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner">›</button></div><button class="btn sm" id="lmCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
+      <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
       <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close">×</button></div>
       <div id="pickSentinel" style="height:1px;margin:-1px 0 0" hidden></div>
       <div class="card" id="pickbar" hidden>
@@ -1110,7 +1114,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
             <button class="ck-rb" id="ckList" type="button" title="Corners" aria-label="Corners"><svg><use href="#i-corner"/></svg></button>
             <button class="ck-rb" id="ckChart" type="button" title="Chart" aria-label="Chart"><svg><use href="#i-speed"/></svg></button>
             <button class="ck-rb" id="ckCoach" type="button" title="Coach" aria-label="Coach"><svg><use href="#i-spark"/></svg></button>
-            <button class="ck-rb" id="ckMore" type="button" title="More" aria-label="More">⋯</button>
+            <button class="ck-rb" id="ckShare" type="button" title="Share" aria-label="Share"><svg><use href="#i-share"/></svg></button><button class="ck-rb" id="ckMore" type="button" title="More" aria-label="More">⋯</button>
           </div>
           <div class="ck-scrub" id="ckScrub" hidden><div class="ck-step"><button type="button" id="ckPrev" aria-label="Previous corner">‹</button><button type="button" class="ck-ct" id="ckStepBtn"><b id="ckStepT">T1</b><span id="ckStepX"></span></button><button type="button" id="ckNext" aria-label="Next corner">›</button></div><canvas id="ckScrubC"></canvas></div></div>
           <div class="legend" id="legendData"></div>
@@ -1368,6 +1372,13 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
 <!-- confirm modal -->
 <div class="modal" id="cfModal" hidden><div class="box" style="width:min(440px,100%)"><h3 id="cfTitle"></h3><p class="hint" id="cfText"></p><div class="row" style="justify-content:flex-end"><button class="btn" id="cfNo" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="cfYes" type="button"></button></div></div></div>
 <button class="bugbtn" id="bugBtn" type="button" title="Report a problem" aria-label="Report a problem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l1.9 1.9M16 2l-1.9 1.9M9 7h6a3 3 0 0 1 3 3v5a6 6 0 0 1-12 0v-5a3 3 0 0 1 3-3zM3 13h3M18 13h3M4 20l3-2M20 20l-3-2M12 10v10"/></svg></button>
+<div class="modal" id="shareModal" hidden><div class="box" style="width:min(520px,100%)">
+  <h3 data-t="Share this session">Share this session</h3>
+  <div class="share-pv"><canvas id="shareCv" width="1080" height="1350"></canvas></div>
+  <div class="hint" id="shareNote"></div>
+  <div class="row" style="flex-wrap:wrap"><button class="btn primary" id="shareGo" type="button"><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="shareCopy" type="button" data-t="Copy link">Copy link</button><button class="btn" id="shareSave" type="button" data-t="Save image">Save image</button><button class="btn ghost" id="shareClose" type="button" data-t="Close">Close</button></div>
+  <div class="status" id="shareStatus"></div>
+</div></div>
 <div class="modal" id="bugModal" hidden><div class="box" style="width:min(520px,100%)">
   <h3 data-t="Report a problem">Report a problem</h3>
   <p class="hint" data-t="What went wrong, what you expected, which track or session. The page address, device and recent errors are attached automatically.">What went wrong, what you expected, which track or session. The page address, device and recent errors are attached automatically.</p>
@@ -2919,6 +2930,13 @@ Object.assign(I18N.RU, {
 });
 Object.assign(I18N.RU, { 'Tap the paper plane': 'Нажми бумажный самолётик', 'The paper-plane icon in the bottom row (2 on the picture) — that is “send the session out of the app”. The phone’s share sheet opens. (The box-with-arrow icon on the far right is import — not that one.)': 'Иконка бумажного самолётика в нижнем ряду (2 на картинке) — это «отправить сессию из приложения». Откроется меню «Поделиться». (Коробка со стрелкой справа — это импорт, не она.)' });
 Object.assign(I18N.RU, { 'Help': 'Помощь' });
+Object.assign(I18N.RU, {
+  'Share': 'Поделиться', 'Share this session': 'Поделиться сессией', 'Copy link': 'Скопировать ссылку', 'Save image': 'Сохранить картинку', 'Close': 'Закрыть', 'BEST LAP': 'ЛУЧШИЙ КРУГ', 'clean': 'чистых',
+  'line colour = speed (red slow → green fast) · red corners = biggest reserve': 'цвет линии = скорость (красный медленно → зелёный быстро) · красные повороты = самый большой резерв', '— upload yours and compare corner by corner': '— загрузи свою и сравни по поворотам',
+  'A guest session lives in this browser only — share the picture; sign in and publish to share a link.': 'Гостевая сессия живёт только в этом браузере — делись картинкой; войди и опубликуй, чтобы делиться ссылкой.', 'The link opens this session in the Lab for anyone.': 'Ссылка открывает эту сессию в Lab для всех.',
+  'The session is private: the link works for you only. Publish it and the link opens for everyone.': 'Сессия приватная: ссылка работает только у тебя. Опубликуй — и она откроется для всех.', 'The link opens this session in the Lab.': 'Ссылка открывает эту сессию в Lab.', 'Publish & share': 'Опубликовать и поделиться',
+  'Could not publish. Sharing the picture only.': 'Не удалось опубликовать. Делимся только картинкой.', 'Picture saved, link copied — paste it anywhere.': 'Картинка сохранена, ссылка скопирована — вставь куда угодно.', 'Picture saved. Link: {url}': 'Картинка сохранена. Ссылка: {url}', 'Picture saved.': 'Картинка сохранена.', 'Link copied.': 'Ссылка скопирована.'
+});
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4794,7 +4812,7 @@ async function renderLabStart() {
 
 function labRender() {
   const G = LAB.G, has = !!(G && LAB.sessions.length && allLaps().length && LAB.current);
-  $('labStart').hidden = has; $('labBack').hidden = !has; for (const id of ['pickbar', 'pickSentinel', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open', 'peek'); }
+  $('labStart').hidden = has; $('labBack').hidden = !has; if (!has) $('btnShare').hidden = true; for (const id of ['pickbar', 'pickSentinel', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open', 'peek'); }
   $('labEmptyText').textContent = t('Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.');
   $('labSub').textContent = has ? `${LAB.trackName}${G.layout ? ' · ' + G.layout.name : (LAB.lid === 'custom' ? ' · ' + t('custom layout') : '')}` : t('Session analysis');
   $('hero').classList.toggle('with-insp', has); $('pg-lab').classList.toggle('has', has); syncLand();
@@ -4859,7 +4877,7 @@ function labRender() {
   $('dataSub').textContent = `${t('Speed and time delta')} · ${t('{n} corners from the S/F line', { n: D.wins.length })}`;
   $('youColHead').textContent = D.ref.mine && !refIsAvg ? t('You') : refName; $('cmpColHead').textContent = D.O ? nameOf(D.O) : t('Comparison');
   // this session: publish, edit, like
-  const pb = $('btnPublish'); pb.hidden = !(STORE.canWrite() && mySession(sess) && sess.owner !== 'local');
+  const pb = $('btnPublish'); pb.hidden = !(STORE.canWrite() && mySession(sess) && sess.owner !== 'local'); $('btnShare').hidden = false;
   if (!pb.hidden) { pb.textContent = sess.published ? t('Unpublish') : t('Publish to track page'); pb.classList.toggle('active', !!sess.published); pb.disabled = !sess.track; pb.title = sess.track ? '' : t('Assign a track first (Edit).'); }
   $('btnEditSess').hidden = !mySession(sess);
   STORE.socialAvailable().then(on => { if (LAB.current !== sess) return; $('voteBox').hidden = !(on && STORE.hasDb && sess.owner !== 'local'); if ($('voteBox').hidden) $('lowRated').hidden = true; $('discussPanel').hidden = !on; if (on) { renderSocialBits(); renderDiscussion(); } renderOwnerRow(); });
@@ -4950,6 +4968,71 @@ async function postComment() {
   b.classList.remove('busy');
 }
 const fmtWhen = (ms) => { if (!ms) return ''; const d = new Date(ms), diff = (Date.now() - ms) / 60000; if (diff < 1) return t('just now'); if (diff < 60) return t('{n} min ago', { n: Math.round(diff) }); if (diff < 60 * 24) return t('{n} h ago', { n: Math.round(diff / 60) }); return d.toLocaleDateString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short' }); };
+// ----- share: a 1080×1350 card drawn from the open session (the lap line coloured by speed, the corners, the numbers) + the link
+const SHARE = {
+  url() { const s = LAB.current; return s && s.owner !== 'local' ? 'https://hutka.ai/#lab~' + s.id : 'https://hutka.ai/'; },
+  async draw() {
+    const cv = $('shareCv'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height, sess = LAB.current, G = LAB.G, D = LAB.dcmp; if (!sess || !G) return;
+    const tr = G.track, R = D ? D.R : null, best = bestLap(sess), clean = sess.laps.filter(l => l.clean), avg = clean.length ? clean.reduce((a, l) => a + l.timeMs, 0) / clean.length / 1000 : null;
+    const trk = STORE.getTrack(LAB.tid), lay = G.layout ? G.layout.name : (LAB.lid === 'custom' ? t('custom layout') : LAB.lid), who = LAB.names && LAB.names[sess.owner] ? LAB.names[sess.owner] : null;
+    // background
+    const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#f6f7fa'); g.addColorStop(1, '#eceef3'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    const F = '"Inter","Segoe UI",system-ui,sans-serif', M = '"JetBrains Mono",ui-monospace,Menlo,monospace';
+    // header: logo + name
+    const logo = await new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = 'logo.png?v=2'; });
+    if (logo) ctx.drawImage(logo, 64, 56, Math.round(logo.width * 56 / logo.height), 56);
+    ctx.fillStyle = '#1a2237'; ctx.font = `700 40px ${F}`; ctx.textBaseline = 'middle'; ctx.fillText('Hutka', 64 + (logo ? Math.round(logo.width * 56 / logo.height) + 16 : 0), 84);
+    ctx.textAlign = 'right'; ctx.font = `500 26px ${F}`; ctx.fillStyle = '#5f6b84'; ctx.fillText(fmtDate(sess.date), W - 64, 84); ctx.textAlign = 'left';
+    // driver
+    let y = 170; const name = (who && who.name && !who.isMe) ? who.name : (STORE.hasIdentity && who && who.name ? who.name : (sess.driver && !/^driver[_ ]?\d*$/i.test(sess.driver) ? sess.driver : (who && who.name) || ''));
+    if (who && who.avatar) { const av = await new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = who.avatar; }); if (av) { ctx.save(); ctx.beginPath(); ctx.arc(64 + 36, y, 36, 0, Math.PI * 2); ctx.clip(); ctx.drawImage(av, 64, y - 36, 72, 72); ctx.restore(); } }
+    ctx.fillStyle = '#1a2237'; ctx.font = `700 34px ${F}`; ctx.fillText(name, who && who.avatar ? 64 + 72 + 18 : 64, y - 14);
+    { const sub = [trk ? trk.name : (sess.trackName || t('Custom track')), lay, kartLabel(sess)].filter(Boolean).join(' · '), sx = who && who.avatar ? 64 + 72 + 18 : 64; let fs = 26; ctx.fillStyle = '#5f6b84'; do { ctx.font = `400 ${fs}px ${F}`; fs -= 1; } while (ctx.measureText(sub).width > W - 64 - sx && fs > 16); ctx.fillText(sub, sx, y + 24); }
+    // the big number
+    y = 300; ctx.fillStyle = '#5f6b84'; ctx.font = `600 22px ${F}`; ctx.fillText(t('BEST LAP'), 64, y); ctx.fillStyle = '#1a2237'; ctx.font = `700 120px ${M}`; ctx.fillText(fmtMs(best.timeMs), 56, y + 86);
+    ctx.font = `500 26px ${F}`; ctx.fillStyle = '#5f6b84'; const bits = [avg ? `${t('avg clean')} ${fmtLap(avg)}` : '', `${sess.laps.length} ${t('laps')} (${clean.length} ${t('clean')})`, D && LAB.coach ? `${t('reserve')} ${D.rows.reduce((a, r) => { const c = LAB.coach.corners.find(x => x.n === r.w.n); return a + (c ? Math.max(0, r.R.time - c.tTop) : 0); }, 0).toFixed(2)} s` : ''].filter(Boolean); ctx.fillText(bits.join('   ·   '), 64, y + 150);
+    // the map: the layout line coloured by the reference lap's speed, corner badges by reserve
+    const top = 520, bottom = H - 150, pad = 70; let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (let i = 0; i < tr.N; i++) { x0 = Math.min(x0, tr.cx[i]); x1 = Math.max(x1, tr.cx[i]); y0 = Math.min(y0, tr.cy[i]); y1 = Math.max(y1, tr.cy[i]); }
+    const sc = Math.min((W - 2 * pad) / Math.max(1, x1 - x0), (bottom - top - 2 * pad) / Math.max(1, y1 - y0)), ox = (W - sc * (x1 - x0)) / 2, oy = top + (bottom - top - sc * (y1 - y0)) / 2, P = (i) => [ox + sc * (tr.cx[i] - x0), oy + sc * (tr.cy[i] - y0)];
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(26,34,55,.10)'; ctx.lineWidth = 34; ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, yy] = P(i); i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.closePath(); ctx.stroke();
+    if (R && R.v) { let vmin = Infinity, vmax = -Infinity; for (let i = 0; i < tr.N; i++) { vmin = Math.min(vmin, R.v[i]); vmax = Math.max(vmax, R.v[i]); } const col = (v) => { const f = Math.max(0, Math.min(1, (v - vmin) / Math.max(0.1, vmax - vmin))); const h = 0 + 120 * f; return `hsl(${h} 78% 46%)`; };
+      ctx.lineWidth = 12; for (let i = 0; i < tr.N; i++) { const [xa, ya] = P(i), [xb, yb] = P((i + 1) % tr.N); ctx.strokeStyle = col(R.v[i]); ctx.beginPath(); ctx.moveTo(xa, ya); ctx.lineTo(xb, yb); ctx.stroke(); } }
+    else { ctx.strokeStyle = '#2f6bf0'; ctx.lineWidth = 12; ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, yy] = P(i); i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.closePath(); ctx.stroke(); }
+    // S/F
+    { const [x, yy] = P(0); ctx.fillStyle = '#1a2237'; ctx.save(); ctx.translate(x, yy); const a = Math.atan2(tr.ny[0], tr.nx[0]); ctx.rotate(a); ctx.fillRect(-4, -22, 8, 44); ctx.restore(); }
+    // corners
+    if (D) { ctx.font = `700 22px ${M}`; ctx.textAlign = 'center'; for (const r of D.rows) { const c = LAB.coach && LAB.coach.corners.find(x => x.n === r.w.n), res = c ? Math.max(0, r.R.time - c.tTop) : 0; const [x, yy] = P(r.w.apex); const bg = res > 0.25 ? '#e23d3d' : res > 0.1 ? '#e9a23b' : '#1f2b48'; ctx.beginPath(); ctx.arc(x, yy, 22, 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.fillText(String(r.w.n), x, yy + 1); } ctx.textAlign = 'left'; }
+    // legend + footer
+    ctx.font = `500 22px ${F}`; ctx.fillStyle = '#5f6b84'; ctx.fillText(t('line colour = speed (red slow → green fast) · red corners = biggest reserve'), 64, H - 108);
+    ctx.font = `700 30px ${F}`; ctx.fillStyle = '#2f6bf0'; ctx.fillText('hutka.ai', 64, H - 60); ctx.font = `500 26px ${F}`; ctx.fillStyle = '#5f6b84'; ctx.fillText(t('— upload yours and compare corner by corner'), 64 + ctx.measureText('hutka.ai ').width + 30, H - 60);
+  },
+  async open() {
+    const sess = LAB.current; if (!sess) return; await SHARE.draw();
+    const own = mySession(sess), pub = !!sess.published, local = sess.owner === 'local';
+    $('shareNote').textContent = local ? t('A guest session lives in this browser only — share the picture; sign in and publish to share a link.') : (pub ? t('The link opens this session in the Lab for anyone.') : (own ? t('The session is private: the link works for you only. Publish it and the link opens for everyone.') : t('The link opens this session in the Lab.')));
+    $('shareCopy').hidden = local; $('shareGo').textContent = ''; $('shareGo').innerHTML = `<svg><use href="#i-share"/></svg><span>${esc(own && !pub && !local ? t('Publish & share') : t('Share'))}</span>`;
+    setStatus('shareStatus', ''); $('shareModal').hidden = false;
+  },
+  close() { $('shareModal').hidden = true; },
+  async blob() { return new Promise((res) => $('shareCv').toBlob(res, 'image/png')); },
+  text() { const s = LAB.current, trk = STORE.getTrack(LAB.tid); return `${fmtMs(bestLap(s).timeMs)} — ${trk ? trk.name : (s.trackName || '')}${LAB.G && LAB.G.layout ? ' · ' + LAB.G.layout.name : ''}`; },
+  async go() {
+    const sess = LAB.current; if (!sess) return; const own = mySession(sess), local = sess.owner === 'local';
+    if (own && !sess.published && !local) { try { await STORE.updateSession(sess.id, { published: true }); sess.published = true; labRender(); toast(t('Published — it is now on the track page.')); } catch (e) { setStatus('shareStatus', t('Could not publish. Sharing the picture only.'), 'warn'); } }
+    const url = local ? null : SHARE.url(), text = SHARE.text() + (url ? '\n' + url : '');
+    try { const b = await SHARE.blob(); const file = new File([b], 'hutka-' + (sess.id || 'session') + '.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share(Object.assign({ files: [file], title: 'Hutka', text }, url ? { url } : {})); return; }
+      if (navigator.share && url) { await navigator.share({ title: 'Hutka', text: SHARE.text(), url }); return; }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    // no share sheet here (desktop): save the picture, copy the link
+    await SHARE.save(); if (url) { try { await navigator.clipboard.writeText(url); setStatus('shareStatus', t('Picture saved, link copied — paste it anywhere.'), 'ok'); } catch (e) { setStatus('shareStatus', t('Picture saved. Link: {url}', { url }), 'ok'); } } else setStatus('shareStatus', t('Picture saved.'), 'ok');
+  },
+  async save() { const b = await SHARE.blob(); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'hutka-' + (LAB.current && LAB.current.id || 'session') + '.png'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); },
+  async copy() { const url = SHARE.url(); try { await navigator.clipboard.writeText(url); setStatus('shareStatus', t('Link copied.'), 'ok'); } catch (e) { setStatus('shareStatus', url, 'ok'); } }
+};
+$('btnShare').onclick = () => SHARE.open(); $('lmShare').onclick = () => SHARE.open(); $('ckShare').onclick = () => SHARE.open(); $('shareClose').onclick = SHARE.close; $('shareGo').onclick = () => SHARE.go(); $('shareSave').onclick = () => SHARE.save(); $('shareCopy').onclick = () => SHARE.copy(); $('shareModal').addEventListener('click', (e) => { if (e.target === $('shareModal')) SHARE.close(); });
 async function labTogglePublish() {
   const sess = LAB.current; if (!sess || !mySession(sess)) return;
   const on = !sess.published;
