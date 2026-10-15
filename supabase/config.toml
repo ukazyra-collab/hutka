@@ -1,5 +1,4 @@
-# Supabase CLI / GitHub-integration project config: the edge functions are deployed from supabase/functions on every push to main.
-# Every function checks the user's token itself, so the gateway's JWT check stays off (new signing keys would otherwise reject calls).
+# Supabase CLI project config (used by .github/workflows/supabase-ops.yml to deploy the edge functions)
 project_id = "tqixfqrludqpxqxypiia"
 
 [functions.ask]

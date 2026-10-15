@@ -46,7 +46,7 @@
   --fg:#1a2237; --muted:#5f6b84; --faint:#98a1b3;
   --btn:#1f2b48; --btn-ink:#ffffff; --accent:#2f6bf0; --accent-ink:#ffffff; --accent-soft:#e9f0ff;
   --ok:#2fb563; --ok-soft:#e4f6ea; --warn:#d99400; --warn-soft:#fff5d6; --danger:#e5484d; --danger-soft:#fde8e9;
-  --brake:#e5484d; --limit:#ff8c2e; --lift:#d9a300; --throttle:#2fb563; --turnin:#2f6bf0; --apex:#1a2237; --actual:#1f6fe0; --cmp:#d63f9a; --cmp2:#0f9d9d;
+  --brake:#e5484d; --limit:#ff8c2e; --lift:#d9a300; --throttle:#2fb563; --turnin:#2f6bf0; --apex:#1a2237; --actual:#1f6fe0; --cmp:#d63f9a; --cmp2:#0f9d9d; --shift-up:#f2c94c; --shift-down:#8b5cf6;
   --map-water:#d8e7f5; --map-land:#f2f1ec; --map-coast:#b7c5d6; --map-border:#d8a0ad; --map-label:#5f6b84;
   --shadow:0 1px 2px rgba(20,30,60,.06),0 8px 24px -12px rgba(20,30,60,.18);
   --body:"Inter","Segoe UI",system-ui,-apple-system,Arial,sans-serif;
@@ -60,7 +60,7 @@
     --fg:#e8ebf3; --muted:#9aa4ba; --faint:#6b7590;
     --btn:#e8ebf3; --btn-ink:#0f1420; --accent:#6c9cff; --accent-ink:#0f1420; --accent-soft:#1d2a47;
     --ok:#3fcb74; --ok-soft:#153324; --warn:#f0b429; --warn-soft:#3a2f10; --danger:#ff6b70; --danger-soft:#3d1f22;
-    --brake:#ff6b70; --limit:#ff9f47; --lift:#f2c53d; --throttle:#3fcb74; --turnin:#6c9cff; --apex:#ffffff; --actual:#5ea2ff; --cmp:#ff7ad9; --cmp2:#3fd2e8;
+    --brake:#ff6b70; --limit:#ff9f47; --lift:#f2c53d; --throttle:#3fcb74; --turnin:#6c9cff; --apex:#ffffff; --actual:#5ea2ff; --cmp:#ff7ad9; --cmp2:#3fd2e8; --shift-up:#ffd866; --shift-down:#a78bfa;
     --map-water:#0e1a2c; --map-land:#1c2436; --map-coast:#34435c; --map-border:#6b3f4d; --map-label:#9aa4ba;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
     color-scheme:dark;
@@ -72,7 +72,7 @@
   --fg:#e8ebf3; --muted:#9aa4ba; --faint:#6b7590;
   --btn:#e8ebf3; --btn-ink:#0f1420; --accent:#6c9cff; --accent-ink:#0f1420; --accent-soft:#1d2a47;
   --ok:#3fcb74; --ok-soft:#153324; --warn:#f0b429; --warn-soft:#3a2f10; --danger:#ff6b70; --danger-soft:#3d1f22;
-  --brake:#ff6b70; --limit:#ff9f47; --lift:#f2c53d; --throttle:#3fcb74; --turnin:#6c9cff; --apex:#ffffff; --actual:#5ea2ff; --cmp:#ff7ad9; --cmp2:#3fd2e8;
+  --brake:#ff6b70; --limit:#ff9f47; --lift:#f2c53d; --throttle:#3fcb74; --turnin:#6c9cff; --apex:#ffffff; --actual:#5ea2ff; --cmp:#ff7ad9; --cmp2:#3fd2e8; --shift-up:#ffd866; --shift-down:#a78bfa;
   --map-water:#0e1a2c; --map-land:#1c2436; --map-coast:#34435c; --map-border:#6b3f4d; --map-label:#9aa4ba;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
   color-scheme:dark;
@@ -440,6 +440,8 @@ body.onboarding #toast{z-index:50}
 .legend{display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding:7px 12px;font-size:12px;color:var(--muted);background:var(--surface)}
 .legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:5px;border:2px solid #fff;box-sizing:border-box;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
 .legend i{display:inline-block;width:14px;height:4px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.legend .dot.tri{width:0;height:0;border-radius:0;border:0;box-shadow:none;border-left:6px solid transparent;border-right:6px solid transparent;filter:drop-shadow(0 0 1px rgba(0,0,0,.5))}
+.legend .dot.tri.up{border-bottom:10px solid var(--shift-up)}.legend .dot.tri.down{border-top:10px solid var(--shift-down)}
 .inspector{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;min-width:0;display:flex;flex-direction:column;gap:10px;max-height:min(84vh,1000px);overflow:auto}
 .insp-empty{color:var(--muted);font-size:13.5px;line-height:1.5}
 .insp-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -892,6 +894,7 @@ body.cockpit .sat-pill .btn.xs{height:26px;padding:0 9px;font-size:11.5px}
 body.cockpit #hero .charts.under{display:none}
 body.cockpit.ck-chart #hero .charts.under{display:block;position:absolute;left:var(--sl);right:calc(var(--sr) + 48px);bottom:calc(var(--sb) + 68px);z-index:5;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(10px);padding:2px 6px 4px;max-height:calc(100% - 150px);overflow:hidden}
 body.cockpit.ck-chart #dataSub{display:none}
+body.cockpit #chDataRpm{display:none}
 /* the HUD: lap rows — colour, lap time, then the speed, time and distance at the scrub position (and Δt against the comparison) */
 body.cockpit .ck-hud{display:flex;position:absolute;left:var(--sl);top:var(--st);align-items:flex-start;gap:8px;z-index:4;max-width:calc(100% - var(--sl) - var(--sr) - 48px)}
 .ck-rb{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(10,14,24,.7);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;font:600 22px/1 var(--body);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25);padding:0;flex:none;-webkit-tap-highlight-color:transparent}
@@ -899,6 +902,7 @@ body.cockpit .ck-hud{display:flex;position:absolute;left:var(--sl);top:var(--st)
 .ck-rb.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .ck-rb[hidden]{display:none}
 .ck-panel{background:rgba(10,14,24,.7);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:5px 10px;color:#fff;display:grid;grid-template-columns:12px minmax(40px,1fr) auto auto auto auto;gap:3px 9px;align-items:baseline;min-width:0;box-shadow:0 2px 10px rgba(0,0,0,.25);font:11px/1.25 var(--mono);white-space:nowrap;cursor:pointer}
+.ck-panel.eng{grid-template-columns:12px minmax(40px,1fr) auto auto auto auto auto}
 .ck-panel > span{min-width:0;opacity:.68}
 .ck-panel > span.on{opacity:1}
 .ck-panel .sw{align-self:center}
@@ -1183,7 +1187,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
           <div class="ck-scrub" id="ckScrub" hidden><div class="ck-step"><button type="button" id="ckPrev" aria-label="Previous corner">‹</button><button type="button" class="ck-ct" id="ckStepBtn"><b id="ckStepT">T1</b><span id="ckStepX"></span></button><button type="button" id="ckNext" aria-label="Next corner">›</button></div><canvas id="ckScrubC"></canvas></div></div>
           <div class="replay" id="replay" hidden><button class="btn sm rp-play" id="rpPlay" type="button" title="Play the lap" aria-label="Play">&#9654;</button><input type="range" id="rpRange" min="0" max="1000" value="0" aria-label="Lap position"><span class="rp-t" id="rpTime">0.00 s</span><div class="rp-laps" id="rpLaps"></div></div>
           <div class="legend" id="legendData"></div>
-          <div class="charts under" id="dataPanel"><div class="hint" id="dataSub" style="margin:8px 0 4px"></div><canvas class="chart" id="chDataSpeed" height="150"></canvas><canvas class="chart" id="chDataDelta" height="84"></canvas></div>
+          <div class="charts under" id="dataPanel"><div class="hint" id="dataSub" style="margin:8px 0 4px"></div><canvas class="chart" id="chDataSpeed" height="150"></canvas><canvas class="chart" id="chDataRpm" height="112" hidden></canvas><canvas class="chart" id="chDataDelta" height="84"></canvas></div>
         </div>
         <div class="inspector" id="inspector"><button class="insp-close" id="inspClose" type="button" aria-label="Close">×</button><div class="insp-nav mobile-only" id="inspNav"><button class="btn sm" id="inspPrev" type="button" aria-label="Previous corner">‹</button><span id="inspNavLbl"></span><button class="btn sm" id="inspNext" type="button" aria-label="Next corner">›</button></div><div class="insp-empty" id="inspEmpty"></div><div id="inspBody" hidden></div></div>
       </div>
@@ -1365,7 +1369,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
 <div class="modal" id="uplModal" hidden>
   <div class="box">
     <h3 data-t="Upload session">Upload session</h3>
-    <div class="upl-drop" id="uplDrop"><div><b data-t="Choose session files">Choose session files</b></div><div class="hint" data-t="Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.">Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.</div><input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden></div>
+    <div class="upl-drop" id="uplDrop"><div><b data-t="Choose session files">Choose session files</b></div><div class="hint" data-t="Alfano .alf2 (the reference) or an Alfano 6 export (.zip, with revs and temperatures on sport karts), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.">Alfano .alf2 (the reference) or an Alfano 6 export (.zip, with revs and temperatures on sport karts), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.</div><input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden></div>
     <div class="hint" style="margin-top:-4px"><a href="#help" id="uplHelpLink" data-t="How do I get the file from my Alfano? — step by step">How do I get the file from my Alfano? — step by step</a></div>
     <div class="status" id="uplStatus"></div>
     <div id="uplForm" hidden>
@@ -1894,6 +1898,123 @@ const KLL = (() => {
   return { splineClosed, resampleClosed, buildTrack, curvAt, curvAll, makeProfileCtx, velocityProfile, wheelForce, gxTorque, resistDecel, engineBrake, prepP, minCurvature, makeApexPlacer, makeTimeOptimizer, finishResult, fitGripMultiplier, clamp };
 })();
 // @@CORE-END
+// ---------- engine channels of a logger (Alfano 6 and alike): RPM, temperatures, and the gearbox read out of them ----------
+// A session's laps carry {rpm, t1, t2} on their points when the logger had them. From the ratio speed/rpm the session's gear
+// levels are found (a DD2 has two, a KZ up to six, a direct-drive Rotax MAX or X30 one — then there are no shifts, only the
+// rev trace), every point gets its gear, and every change of gear backed by a jump of the revs becomes a shift event.
+// Pure functions: no DOM, no state beyond what is cached on the laps.
+const GEAR = (() => {
+  const LAG_MAX = 6;                      // GPS speed trails the revs by a few samples (≈0.3 s on an Alfano 6)
+  const CH = ['rpm', 't1', 't2'];
+  // which engine channels this set of laps really has (a channel that is zero nearly everywhere is a sensor that was not plugged in)
+  function channelsOf(laps) {
+    const out = {}; for (const c of CH) { let n = 0, has = 0; for (const L of laps || []) for (const p of L.pts) { n++; if (p[c] > 0) has++; } out[c] = n > 0 && has >= n * 0.6; }
+    return out;
+  }
+  // gearbox size from the kart category (sport class id or the typed kart name); 0 = unknown, decide from the data
+  function gearsOfKart(cat, name) {
+    const x = `${cat || ''} ${name || ''}`.toLowerCase();
+    if (/dd2/.test(x)) return 2;
+    if (/\bkz|shifter|\bshift\b|kz2|125 ?cc ?(gear|box)/.test(x)) return 6;
+    if (/rotax|max\b|x30|iame|ka100|\brok\b|vortex|\bok\b|okj|ok-n|lo206|briggs|honda|comer|prokart|tkm|bambino|mini ?60|cadet|swift/.test(x)) return 1;
+    return 0;
+  }
+  const lagOf = (laps) => {
+    let best = 3, bc = -Infinity;
+    for (let lag = 0; lag <= LAG_MAX; lag++) {
+      let n = 0, sa = 0, sb = 0, saa = 0, sbb = 0, sab = 0;
+      for (const L of laps) { const P = L.pts, M = P.length; for (let j = 0; j + lag < M; j++) { const a = P[j].rpm, b = P[j + lag].v; if (!(a > 0)) continue; n++; sa += a; sb += b; saa += a * a; sbb += b * b; sab += a * b; } }
+      if (n < 50) continue; const c = (n * sab - sa * sb) / Math.sqrt(Math.max(1e-9, (n * saa - sa * sa) * (n * sbb - sb * sb)));
+      if (c > bc) { bc = c; best = lag; }
+    }
+    return best;
+  };
+  // log(ratio) of a point: km/h per 1000 rpm, speed taken `lag` samples later; NaN when the engine is not driving the wheels cleanly
+  const logRatio = (P, j, lag, rpmMax) => { const r = P[j].rpm, q = P[Math.min(P.length - 1, j + lag)]; if (!(r >= rpmMax * 0.45) || !(q.v >= 8)) return NaN; return Math.log(q.v * 3.6 / (r / 1000)); };
+  // The gearbox of a session: levels of speed/rpm shared by all clean laps. Returns null when the laps carry no revs.
+  function analyse(laps, kartCat, kartName) {
+    const use = (laps || []).filter(L => L.pts && L.pts.length > 50 && L.pts.some(p => p.rpm > 0));
+    if (!use.length) return null;
+    const clean = use.filter(L => L.clean).length ? use.filter(L => L.clean) : use;
+    let rpmMax = 0; for (const L of use) for (const p of L.pts) if (p.rpm > rpmMax) rpmMax = p.rpm;
+    const lag = lagOf(clean), want = gearsOfKart(kartCat, kartName);
+    // histogram of log ratio, 1 % bins, ±2 bins smoothing
+    const BW = 0.01, H = new Map(); let total = 0;
+    for (const L of clean) { const P = L.pts; for (let j = 0; j < P.length; j++) { const lr = logRatio(P, j, lag, rpmMax); if (!isFinite(lr)) continue; const b = Math.round(lr / BW); H.set(b, (H.get(b) || 0) + 1); total++; } }
+    if (total < 100) return { kind: want === 1 ? 'single' : 'none', gears: want || 1, levels: [], lag, rpmMax, gearOf: () => 1 };
+    const keys = [...H.keys()]; const lo = Math.min(...keys) - 3, hi = Math.max(...keys) + 3, n = hi - lo + 1, raw = new Float64Array(n), sm = new Float64Array(n);
+    for (const [b, c] of H) raw[b - lo] = c;
+    for (let i = 0; i < n; i++) { let s = 0; for (let q = -2; q <= 2; q++) if (i + q >= 0 && i + q < n) s += raw[i + q]; sm[i] = s; }
+    // peaks: local maxima, at least 3 % of the mass within ±4 bins, then merged when closer than 7 %
+    let peaks = [];
+    for (let i = 1; i < n - 1; i++) if (sm[i] >= sm[i - 1] && sm[i] > sm[i + 1]) { let mass = 0; for (let q = -4; q <= 4; q++) if (i + q >= 0 && i + q < n) mass += raw[i + q]; if (mass >= total * 0.03) peaks.push({ i, h: sm[i], mass }); }
+    peaks.sort((a, b) => b.h - a.h);
+    const kept = []; for (const p of peaks) if (!kept.some(k => Math.abs(k.i - p.i) < 7)) kept.push(p);
+    // level centre: mass-weighted mean within ±4 bins
+    let levels = kept.map(p => { let s = 0, w = 0; for (let q = -4; q <= 4; q++) { const i = p.i + q; if (i < 0 || i >= n) continue; s += raw[i] * (lo + i) * BW; w += raw[i]; } return { lr: w ? s / w : (lo + p.i) * BW, mass: p.mass }; });
+    if (want === 1) levels = levels.slice(0, 1);
+    else if (want > 1 && levels.length > want) levels = levels.sort((a, b) => b.mass - a.mass).slice(0, want);
+    levels.sort((a, b) => a.lr - b.lr);
+    const gears = want || (levels.length <= 1 ? 1 : (levels.length === 2 ? 2 : 6));
+    // gear number of each level: the top level is the top gear; a wide gap between neighbours is a gear the driver skipped
+    const num = new Array(levels.length); if (levels.length) { num[levels.length - 1] = gears; for (let k = levels.length - 2; k >= 0; k--) { const step = levels[k + 1].lr - levels[k].lr; num[k] = Math.max(1, num[k + 1] - Math.max(1, Math.round(step / Math.log(1.18)))); } }
+    if (gears === 2 && levels.length === 2) { num[0] = 1; num[1] = 2; }
+    if (levels.length === gears) for (let k = 0; k < levels.length; k++) num[k] = k + 1;
+    const kind = levels.length <= 1 || gears <= 1 ? 'single' : (gears === 2 ? 'dd2' : 'shifter');
+    return { kind, gears, levels: levels.map((l, k) => ({ ratio: Math.exp(l.lr), lr: l.lr, gear: num[k], mass: l.mass })), lag, rpmMax, gearOf: (k) => num[k] };
+  }
+  // Gear per point and the shifts of one lap. gear[j] = level index (0-based) or -1 before the first clean reading; a shift is a
+  // change of level confirmed by the revs: up = the revs fall ≥ 5 % within 0.3 s, down = they rise ≥ 5 %. Cached on the lap.
+  function lapShifts(L, box) {
+    if (!box || !L || !L.pts || !L.pts.length) return null;
+    if (L._gear && L._gear.box === box) return L._gear;
+    const P = L.pts, M = P.length, gear = new Int8Array(M).fill(-1), out = { box, gear, shifts: [], rpmMax: 0, rpmMin: Infinity };
+    for (const p of P) { if (p.rpm > out.rpmMax) out.rpmMax = p.rpm; if (p.rpm > 0 && p.rpm < out.rpmMin) out.rpmMin = p.rpm; }
+    if (!isFinite(out.rpmMin)) out.rpmMin = 0;
+    L._gear = out;
+    if (box.kind === 'single' || box.kind === 'none' || box.levels.length < 2) { gear.fill(0); return out; }
+    const lv = box.levels, tol = Math.min(0.05, (lv[1].lr - lv[0].lr) * 0.4);
+    for (let j = 0; j < M; j++) { const lr = logRatio(P, j, box.lag, box.rpmMax); if (!isFinite(lr)) continue; let bk = -1, bd = tol; for (let k = 0; k < lv.length; k++) { const d = Math.abs(lr - lv[k].lr); if (d < bd) { bd = d; bk = k; } } gear[j] = bk; }
+    const seen = Int8Array.from(gear);   // the direct readings, before the gaps are filled
+    // carry the last known gear over the unknown stretches, the first known one backwards; then a width-5 median
+    let last = -1; for (let j = 0; j < M; j++) { if (gear[j] >= 0) last = gear[j]; else gear[j] = last; }
+    let first = -1; for (let j = 0; j < M; j++) if (gear[j] >= 0) { first = gear[j]; break; } for (let j = 0; j < M && gear[j] < 0; j++) gear[j] = first;
+    const med = new Int8Array(M); for (let j = 0; j < M; j++) { const w = []; for (let q = -2; q <= 2; q++) w.push(gear[Math.max(0, Math.min(M - 1, j + q))]); w.sort((a, b) => a - b); med[j] = w[2]; }
+    gear.set(med);
+    // transitions → shifts confirmed by a jump of the ratio (revs against the lagged speed) within ±0.4 s: up = the ratio climbs
+    // by at least half the gap between the two levels over 0.3 s, down = it falls; the event sits where the jump starts
+    const W = 4, dt = L.timeMs / 1000 / M, lr = new Float64Array(M);
+    for (let j = 0; j < M; j++) { const r = P[j].rpm, q = P[Math.min(M - 1, j + box.lag)]; lr[j] = r > 0 && q.v > 2 ? Math.log(q.v * 3.6 / (r / 1000)) : NaN; }
+    for (let j = 1; j < M; j++) {
+      if (gear[j] === gear[j - 1] || gear[j] < 0 || gear[j - 1] < 0) continue;
+      const up = gear[j] > gear[j - 1], gap = Math.abs(lv[gear[j]].lr - lv[gear[j - 1]].lr); let bi = -1, bv = 0;
+      // the jump may sit well before the transition: under hard braking the lagged ratio wanders between the levels for a while
+      let k0 = j - 1; while (k0 > 0 && seen[k0] !== gear[j - 1] && j - k0 < 25) k0--;
+      for (let k = Math.max(1, k0 - 1); k <= Math.min(M - 4, j + W); k++) { if (!isFinite(lr[k])) continue; let d = 0; for (let q = 1; q <= 3; q++) if (isFinite(lr[k + q])) d = Math.max(d, up ? lr[k + q] - lr[k] : lr[k] - lr[k + q]); if (d > bv) { bv = d; bi = k; } }
+      if (bi < 0 || bv < gap * 0.5) continue;
+      const prev = out.shifts[out.shifts.length - 1]; if (prev && Math.abs(prev.j - bi) <= 2) continue;
+      out.shifts.push({ j: bi, t: bi * dt, kind: up ? 'up' : 'down', from: lv[gear[j - 1]].gear, to: lv[gear[j]].gear, rpm: P[bi].rpm, rpmAfter: P[Math.min(M - 1, bi + 3)].rpm, v: P[Math.min(M - 1, bi + box.lag)].v });
+    }
+    const ups = out.shifts.filter(s => s.kind === 'up'), dns = out.shifts.filter(s => s.kind === 'down');
+    out.upRpm = ups.length ? ups.reduce((a, s) => a + s.rpm, 0) / ups.length : 0; out.downV = dns.length ? dns.reduce((a, s) => a + s.v, 0) / dns.length : 0;
+    return out;
+  }
+  // temperatures of a lap / a session: min, max, last
+  function tempStats(laps, ch) { let mn = Infinity, mx = -Infinity, last = NaN; for (const L of laps || []) for (const p of L.pts) { const x = p[ch]; if (!(x > 0)) continue; if (x < mn) mn = x; if (x > mx) mx = x; last = x; } return isFinite(mn) ? { min: mn, max: mx, last } : null; }
+  // everything the Lab needs for a session, cached on the session by the kart it was driven in
+  function prepare(sess) {
+    if (!sess || !sess.laps) return null;
+    const key = `${sess.kartCat || ''}|${sess.kart || ''}`; if (sess._box && sess._box.key === key) return sess._box.box;
+    const ch = channelsOf(sess.laps); let box = null;
+    if (ch.rpm) { box = analyse(sess.laps, sess.kartCat, sess.kart); if (box) { box.ch = ch; for (const L of sess.laps) lapShifts(L, box); box.t1 = ch.t1 ? tempStats(sess.laps, 't1') : null; box.t2 = ch.t2 ? tempStats(sess.laps, 't2') : null; } }
+    // the gears changed (first run, or the kart was edited): projections and the stitched laps carry the gear, so they go stale
+    if (sess._box) { for (const L of sess.laps) delete L._proj; delete sess._avg; delete sess._ideal; }
+    sess._box = { key, box }; sess.channels = ch; return box;
+  }
+  const gearName = (g) => g === 1 ? '1st' : g === 2 ? '2nd' : g === 3 ? '3rd' : `${g}th`;
+  return { channelsOf, gearsOfKart, analyse, lapShifts, tempStats, prepare, gearName, CH };
+})();
+if (typeof module !== 'undefined') module.exports = GEAR;
 const ALF = (() => {
   async function inflate(comp) {
     const ds = new DecompressionStream('deflate-raw'), w = ds.writable.getWriter();
@@ -1925,13 +2046,19 @@ const ALF = (() => {
     const lines = text.split(/\r?\n/).filter(l => l.trim()), head = lines[0].split(',').map(h => h.trim());
     const ci = (name) => head.findIndex(h => h.toLowerCase() === name.toLowerCase());
     const iv = ci('Speed GPS'), ila = ci('Lat.'), ilo = ci('Lon.'), ih = ci('Orientation'), igx = ci('Gf. X'), igy = ci('Gf. Y');
+    // engine channels of an Alfano 6 / a sport kart: revs and the temperature sensors (tenths of °C); zero columns are dropped later
+    const irpm = ci('RPM'), it1 = ci('T1'), it2 = ci('T2');
     if (iv < 0 || ila < 0 || ilo < 0) return null;
     const pts = [];
     for (let i = 1; i < lines.length; i++) {
       const c = lines[i].split(','); if (c.length < head.length) continue;
       const lat = parseFloat(c[ila]) / 1e6, lon = parseFloat(c[ilo]) / 1e6, v = parseFloat(c[iv]) / 36;
       if (!isFinite(lat) || !isFinite(lon) || !isFinite(v) || Math.abs(lat) < 0.01) continue;
-      pts.push({ lat, lon, v, hdg: ih >= 0 ? parseFloat(c[ih]) / 100 : 0, gx: igx >= 0 ? (parseFloat(c[igx]) - 1000) / 100 : 0, gy: igy >= 0 ? (1000 - parseFloat(c[igy])) / 100 : 0 });
+      const p = { lat, lon, v, hdg: ih >= 0 ? parseFloat(c[ih]) / 100 : 0, gx: igx >= 0 ? (parseFloat(c[igx]) - 1000) / 100 : 0, gy: igy >= 0 ? (1000 - parseFloat(c[igy])) / 100 : 0 };
+      if (irpm >= 0) { const r = parseInt(c[irpm], 10); p.rpm = isFinite(r) && r > 0 ? r : 0; }
+      if (it1 >= 0) { const x = parseInt(c[it1], 10); p.t1 = isFinite(x) && x > 0 ? x / 10 : 0; }
+      if (it2 >= 0) { const x = parseInt(c[it2], 10); p.t2 = isFinite(x) && x > 0 ? x / 10 : 0; }
+      pts.push(p);
     }
     return pts.length > 50 ? pts : null;
   }
@@ -1949,6 +2076,8 @@ const ALF = (() => {
     }
     laps.sort((a, b) => a.n - b.n);
     if (!laps.length) throw new Error('В файле нет кругов с GPS.');
+    // channels the logger did not really have (a rental Alfano 7 writes RPM 0) are dropped, so a rental session stays as it was
+    if (typeof GEAR !== 'undefined') { const ch = GEAR.channelsOf(laps); for (const c of GEAR.CH) if (!ch[c]) for (const L of laps) for (const p of L.pts) delete p[c]; }
     const lat0 = laps[0].pts[0].lat, lon0 = laps[0].pts[0].lon, kx = 111320 * Math.cos(lat0 * Math.PI / 180), ky = 110574;
     for (const L of laps) { L.xy = L.pts.map(p => [(p.lon - lon0) * kx, (p.lat - lat0) * ky]); L.len = 0; for (let i = 1; i < L.xy.length; i++) L.len += Math.hypot(L.xy[i][0] - L.xy[i - 1][0], L.xy[i][1] - L.xy[i - 1][1]); }
     const bestT = Math.min(...laps.map(L => L.timeMs));
@@ -2029,7 +2158,7 @@ const ALF = (() => {
     }
     return { T, rmsPx: rms, dir: best.dir, startFrac: best.k / M, apply: (p) => apply(T, p) };
   }
-  return { importFile, meanLine, resample, fitSimilarity, registerLoops };
+  return { importFile, meanLine, resample, fitSimilarity, registerLoops, parseLap, readZip };
 })();
 
 // ---------- universal import: other loggers and apps besides Alfano (AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX, generic GPS CSV) ----------
@@ -2245,8 +2374,11 @@ const DATA = (() => {
   function projectLap(L, tr, key) {
     if (!L || !L.px) return null;
     if (L._proj && L._proj.key === key) return L._proj;
+    if (L._sess && !L._sess._box && typeof GEAR !== 'undefined' && L.pts.length && L.pts[0].rpm !== undefined) GEAR.prepare(L._sess);   // gears before the first projection
     const N = tr.N, ds = tr.ds, mpp = tr.mpp, M = L.px.length, T = L.timeMs / 1000, dtS = T / M;
     const sum = new Float64Array(N), cnt = new Float64Array(N), tsum = new Float64Array(N), osum = new Float64Array(N), gsum = new Float64Array(N);
+    // engine channels (a sport kart with an Alfano 6): revs, temperature and the gear of every station, plus the station of every sample
+    const eng = M > 0 && L.pts[0].rpm !== undefined, rsum = eng ? new Float64Array(N) : null, t1sum = eng && L.pts[0].t1 !== undefined ? new Float64Array(N) : null, gearAt = eng ? new Int8Array(N).fill(-1) : null, gl = eng && L._gear ? L._gear.gear : null, pj = new Int32Array(M).fill(-1);
     const back = Math.round(12 / ds), fwd = Math.round(60 / ds);
     let prev = 0;
     for (let j = 0; j < M; j++) {
@@ -2256,20 +2388,32 @@ const DATA = (() => {
       prev = bi;
       if (bd > 400) continue;                       // > 20 m from the centreline: GPS glitch
       if (j > M * 0.8 && bi < N * 0.1) continue;    // closing samples back at the S/F belong to the lap end, not to station 0
+      pj[j] = bi;
       sum[bi] += L.pts[j].v; cnt[bi] += 1; tsum[bi] += j * dtS; osum[bi] += (x - tr.cx[bi]) * tr.nx[bi] + (y - tr.cy[bi]) * tr.ny[bi]; gsum[bi] += Math.abs(L.pts[j].gx || 0);
+      if (eng) { rsum[bi] += L.pts[j].rpm || 0; if (t1sum) t1sum[bi] += L.pts[j].t1 || 0; if (gl && gl[j] >= 0) gearAt[bi] = gl[j]; }
     }
     const v = new Float64Array(N), t = new Float64Array(N + 1), o = new Float64Array(N), g = new Float64Array(N), idx = [];
-    for (let i = 0; i < N; i++) if (cnt[i]) { idx.push(i); v[i] = sum[i] / cnt[i]; t[i] = tsum[i] / cnt[i]; o[i] = osum[i] / cnt[i]; g[i] = gsum[i] / cnt[i]; }
+    const rpm = eng ? new Float64Array(N) : null, t1 = t1sum ? new Float64Array(N) : null;
+    for (let i = 0; i < N; i++) if (cnt[i]) { idx.push(i); v[i] = sum[i] / cnt[i]; t[i] = tsum[i] / cnt[i]; o[i] = osum[i] / cnt[i]; g[i] = gsum[i] / cnt[i]; if (eng) { rpm[i] = rsum[i] / cnt[i]; if (t1) t1[i] = t1sum[i] / cnt[i]; } }
     if (idx.length < 20) return null;
     for (let k = 0; k < idx.length; k++) {
       const a = idx[k], b = idx[(k + 1) % idx.length], span = ((b - a) % N + N) % N || N, tb = k + 1 < idx.length ? t[b] : T + t[b];
-      for (let q = 1; q < span; q++) { const i = (a + q) % N, f = q / span; v[i] = v[a] + (v[b] - v[a]) * f; o[i] = o[a] + (o[b] - o[a]) * f; g[i] = g[a] + (g[b] - g[a]) * f; let tt = t[a] + (tb - t[a]) * f; if (i < a) tt -= T; t[i] = tt; }
+      for (let q = 1; q < span; q++) { const i = (a + q) % N, f = q / span; v[i] = v[a] + (v[b] - v[a]) * f; o[i] = o[a] + (o[b] - o[a]) * f; g[i] = g[a] + (g[b] - g[a]) * f; let tt = t[a] + (tb - t[a]) * f; if (i < a) tt -= T; t[i] = tt; if (eng) { rpm[i] = rpm[a] + (rpm[b] - rpm[a]) * f; if (t1) t1[i] = t1[a] + (t1[b] - t1[a]) * f; if (gearAt) gearAt[i] = gearAt[a]; } }
     }
     for (let i = 1; i < N; i++) if (t[i] < t[i - 1]) t[i] = t[i - 1];
     t[N] = T;
     const vs = smooth(v, N, Math.max(1, Math.round(2 / ds))), os = smooth(o, N, Math.max(1, Math.round(4 / ds))), gs = smooth(g, N, Math.max(1, Math.round(3 / ds)));
-    const P = { key, N, ds, T, v: vs, t, o: os, a: accelFrom(vs, N, ds), g: gs, lap: L };
+    const P = { key, N, ds, T, v: vs, t, o: os, a: accelFrom(vs, N, ds), g: gs, lap: L, pj };
+    if (eng) { P.rpm = smooth(rpm, N, Math.max(1, Math.round(2 / ds))); if (t1) P.t1 = t1; if (gearAt) { for (let i = 0; i < N; i++) if (gearAt[i] < 0) gearAt[i] = gearAt[(i - 1 + N) % N]; P.gear = gearAt; } P.shifts = shiftsOnTrack(L, pj, N); }
     L._proj = P; return P;
+  }
+  // the shifts of a lap (GEAR.lapShifts) placed on the track: station of each, with the nearest projected sample when the
+  // shift's own sample was a glitch
+  function shiftsOnTrack(L, pj, N) {
+    if (!L._gear || !L._gear.shifts.length) return [];
+    const M = pj.length, out = [];
+    for (const s of L._gear.shifts) { let st = -1; for (let o = 0; o < 6 && st < 0; o++) { if (s.j + o < M && pj[s.j + o] >= 0) st = pj[s.j + o]; else if (s.j - o >= 0 && pj[s.j - o] >= 0) st = pj[s.j - o]; } if (st < 0) continue; out.push(Object.assign({ st }, s)); }
+    return out;
   }
   // time from station a forward to station i (wrap-aware)
   const tw = (P, i, a) => P.t[i] - P.t[a] + (i < a ? P.T : 0);
@@ -2423,7 +2567,19 @@ const DATA = (() => {
   function avgProjection(projs, tr, name) {
     const N = tr.N, v = new Float64Array(N), t = new Float64Array(N + 1), o = new Float64Array(N), g = new Float64Array(N), n = projs.length;
     for (const P of projs) { for (let i = 0; i < N; i++) { v[i] += P.v[i] / n; o[i] += P.o[i] / n; g[i] += P.g[i] / n; t[i] += P.t[i] / n; } t[N] += P.T / n; }
-    return { key: 'avg', N, ds: tr.ds, T: t[N], v, t, o, a: accelFrom(v, N, tr.ds), g, lap: null, n, name: name || null };
+    const out = { key: 'avg', N, ds: tr.ds, T: t[N], v, t, o, a: accelFrom(v, N, tr.ds), g, lap: null, n, name: name || null };
+    // engine channels averaged too (revs, temperature); the gear of the average is the most common one at each station
+    if (projs.every(P => P.rpm)) { const rpm = new Float64Array(N); for (const P of projs) for (let i = 0; i < N; i++) rpm[i] += P.rpm[i] / n; out.rpm = rpm; }
+    if (projs.every(P => P.t1)) { const t1 = new Float64Array(N); for (const P of projs) for (let i = 0; i < N; i++) t1[i] += P.t1[i] / n; out.t1 = t1; }
+    if (projs.every(P => P.gear)) { const gear = new Int8Array(N); for (let i = 0; i < N; i++) { const c = new Map(); for (const P of projs) c.set(P.gear[i], (c.get(P.gear[i]) || 0) + 1); let bg = -1, bc = 0; for (const [k, m] of c) if (m > bc) { bc = m; bg = k; } gear[i] = bg; } out.gear = gear; }
+    if (projs.every(P => P.shifts)) {
+      // typical shifts: the laps' shifts clustered by kind and place (within 40 m), a cluster that at least half the laps share becomes one averaged shift
+      const all = []; projs.forEach((P, k) => { for (const s of P.shifts) all.push(Object.assign({ k }, s)); }); all.sort((a, b) => a.st - b.st);
+      const win = Math.round(40 / tr.ds), used = new Set(), res = [];
+      for (let i = 0; i < all.length; i++) { if (used.has(i)) continue; const a = all[i], grp = [i]; for (let j = i + 1; j < all.length; j++) { if (used.has(j) || all[j].kind !== a.kind || all[j].st - a.st > win) continue; if (grp.some(g => all[g].k === all[j].k)) continue; grp.push(j); } if (grp.length * 2 < n) continue; grp.forEach(g => used.add(g)); const m = (f) => grp.reduce((s0, g) => s0 + f(all[g]), 0) / grp.length; const modeOf = (f) => { const c = new Map(); for (const g of grp) c.set(f(all[g]), (c.get(f(all[g])) || 0) + 1); return [...c.entries()].sort((p, q) => q[1] - p[1])[0][0]; }; res.push({ st: Math.round(m(x => x.st)) % N, kind: a.kind, from: modeOf(x => x.from), to: modeOf(x => x.to), rpm: m(x => x.rpm), rpmAfter: m(x => x.rpmAfter), v: m(x => x.v), n: grp.length }); }
+      out.shifts = res.sort((p, q) => p.st - q.st);
+    }
+    return out;
   }
   // ref lap vs one lap ('lap') or the mean of the others ('avg'), per corner window
   // the reference R and the others are projections (a lap or a session average); mode 'avg' averages the others, 'lap' takes the first
@@ -3017,6 +3173,18 @@ Object.assign(I18N.RU, { '(dashed)': '(пунктир)' });
 Object.assign(I18N.RU, { 'E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)': 'Писать мне на почту, когда мои сессии лайкают или комментируют (не чаще раза в час)' });
 Object.assign(I18N.RU, { 'Also uploaded — the fastest is above': 'Ещё загрузил — быстрейшая выше', 'Show all {n}': 'Показать все {n}', 'Hide': 'Скрыть', "Hide from the public (admins): the session stays in its owner's library, unpublished.": 'Скрыть от всех (админы): сессия остаётся у владельца, снятая с публикации.', 'Hide this session from the public?': 'Скрыть эту сессию от всех?', 'It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again from the Lab.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется снятой с публикации, опубликовать заново он не сможет; вернуть её можно из Lab.', 'It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again here.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется снятой с публикации, опубликовать заново он не сможет; вернуть её можно здесь.', 'Hidden from the public.': 'Скрыто от всех.', 'Shown again.': 'Снова видна.', 'Run supabase/moderate.sql in the SQL editor once — then admins can hide sessions.': 'Выполни supabase/moderate.sql в SQL Editor один раз — тогда админы смогут скрывать сессии.', 'Could not hide: {e}': 'Не удалось скрыть: {e}', 'Hide from public': 'Скрыть от всех', 'Show again': 'Показать снова', 'Unpublished by owner': 'Снята владельцем', 'Hidden by admins': 'Скрыта админами', 'The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine, or ask them.': 'Админы сайта скрыли эту сессию от всех (битая запись или не тот лейаут). Если с данными всё в порядке — загрузи заново или напиши им.', 'The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.': 'Админы сайта скрыли эту сессию от всех (битая запись или не тот лейаут) — опубликовать её заново нельзя. Если с данными всё в порядке — загрузи заново.', 'Admins: hide a broken or wrongly placed session from the feed and the track page — its owner keeps it.': 'Админам: скрыть битую или не туда положенную сессию из ленты и со страницы трассы — у владельца она остаётся.' });
 Object.assign(I18N.RU, { 'Hidden sessions': 'Скрытые сессии', 'hidden by admins — the owners keep them': 'скрыты админами — у владельцев остаются', 'Run supabase/moderate.sql in the SQL editor once — then admins can hide broken sessions from the feed (the Hide button on a post or in the Lab).': 'Выполни supabase/moderate.sql в SQL Editor один раз — тогда админы смогут скрывать битые сессии из ленты (кнопка «Скрыть» на посте или в Lab).', 'Nothing hidden. A broken or wrongly placed session can be hidden from the feed with the Hide button on its post (or in the Lab).': 'Скрытых нет. Битую или не туда положенную сессию можно убрать из ленты кнопкой «Скрыть» на её посте (или в Lab).' });
+// v32 — sport karts with an Alfano 6: revs, gears, shifts, water temperature
+Object.assign(I18N.RU, {
+  'upshift': 'вверх', 'downshift': 'вниз', 'rpm': 'об/мин', 'rpm max': 'обороты max', 'gears': 'передач', 'shifts': 'переключений', 'water': 'вода', 'gear': 'передача', 'revs': 'обороты', 'Engine': 'Двигатель', 'shifter': 'коробка',
+  '{m} m before apex': '{m} м до апекса', '{m} m after apex': '{m} м после апекса', 'at the apex': 'в апексе', 'water °C (dotted, right)': 'вода °C (пунктир, справа)', 'bands — gear': 'полосы — передача',
+  'Revs recorded, no gearbox ({k}): {lo}–{hi} rpm on this lap.': 'Обороты записаны, коробки нет ({k}): {lo}–{hi} об/мин на этом круге.',
+  '{g} gears ({k}): {u} upshifts and {d} downshifts on this lap.': '{g} передачи ({k}): {u} переключений вверх и {d} вниз на этом круге.',
+  'Upshifts at {lo}–{hi} rpm (the session peak is {max}).': 'Вверх — на {lo}–{hi} об/мин (пик за сессию {max}).',
+  'Downshifts at {lo}–{hi} km/h; the revs drop to {min} at the slowest point.': 'Вниз — на {lo}–{hi} км/ч; минимум оборотов на круге {min}.',
+  'Corners taken with a downshift': 'Повороты с переключением вниз', '{m} m later': 'на {m} м позже', '{m} m earlier': 'на {m} м раньше', '{o} downshifts': '{o} — переключения вниз',
+  'Water {lo}–{hi} °C over the session.': 'Вода {lo}–{hi} °C за сессию.'
+});
+Object.assign(I18N.RU, { "Alfano .alf2 (the reference) or an Alfano 6 export (.zip, with revs and temperatures on sport karts), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.": 'Alfano .alf2 (эталон) или экспорт Alfano 6 (.zip, с оборотами и температурой на спортивном карте), AiM, RaceChrono, TrackAddict, Harry\'s LapTimer, VBOX, GPX — один файл на сессию; можно несколько сразу.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3166,19 +3334,38 @@ const STORE = (() => {
   const B64 = { enc: (u8) => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }, dec: (s) => { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; } };
   async function deflate(u8) { if (typeof CompressionStream === 'undefined') return { enc: 'raw', data: u8 }; const cs = new CompressionStream('deflate-raw'), w = cs.writable.getWriter(); const done = w.write(u8).then(() => w.close()); const buf = await new Response(cs.readable).arrayBuffer(); await done; return { enc: 'deflate', data: new Uint8Array(buf) }; }
   async function inflate(u8, enc) { if (enc !== 'deflate') return u8; const ds = new DecompressionStream('deflate-raw'), w = ds.writable.getWriter(); const done = w.write(u8).then(() => w.close()); const buf = await new Response(ds.readable).arrayBuffer(); await done; return new Uint8Array(buf); }
+  // v1: lat, lon, v, gx, gy per point as zigzag varint deltas. v2 (sessions with engine channels): the header lists the extra
+  // channels of each lap — rpm (revs) and t1/t2 (temperatures, tenths of °C) — appended to every point in that order.
+  const CH_SCALE = { rpm: 1, t1: 10, t2: 10 };
   function packLaps(laps) {
     const bytes = []; const zz = (n) => n >= 0 ? n * 2 : -n * 2 - 1;
     const varint = (n) => { n = zz(Math.round(n)); do { let b = n % 128; n = Math.floor(n / 128); if (n) b += 128; bytes.push(b); } while (n); };
-    const head = new TextEncoder().encode(JSON.stringify({ v: 1, laps: laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: !!L.clean, count: L.pts.length })) }));
+    const chOf = (L) => Object.keys(CH_SCALE).filter(c => L.pts.length && L.pts[0][c] !== undefined);
+    const anyCh = laps.some(L => chOf(L).length);
+    const head = new TextEncoder().encode(JSON.stringify({ v: anyCh ? 2 : 1, laps: laps.map(L => { const h = { n: L.n, timeMs: L.timeMs, clean: !!L.clean, count: L.pts.length }; const ch = chOf(L); if (ch.length) h.ch = ch; return h; }) }));
     varint(head.length); for (const b of head) bytes.push(b);
-    for (const L of laps) { let alat = 0, alon = 0, av = 0, agx = 0, agy = 0; for (const p of L.pts) { const la = Math.round(p.lat * 1e7), lo = Math.round(p.lon * 1e7), v = Math.round(p.v * 100), gx = Math.round((p.gx || 0) * 1000), gy = Math.round((p.gy || 0) * 1000); varint(la - alat); varint(lo - alon); varint(v - av); varint(gx - agx); varint(gy - agy); alat = la; alon = lo; av = v; agx = gx; agy = gy; } }
+    for (const L of laps) {
+      const ch = chOf(L), acc = ch.map(() => 0); let alat = 0, alon = 0, av = 0, agx = 0, agy = 0;
+      for (const p of L.pts) {
+        const la = Math.round(p.lat * 1e7), lo = Math.round(p.lon * 1e7), v = Math.round(p.v * 100), gx = Math.round((p.gx || 0) * 1000), gy = Math.round((p.gy || 0) * 1000); varint(la - alat); varint(lo - alon); varint(v - av); varint(gx - agx); varint(gy - agy); alat = la; alon = lo; av = v; agx = gx; agy = gy;
+        for (let k = 0; k < ch.length; k++) { const x = Math.round((p[ch[k]] || 0) * CH_SCALE[ch[k]]); varint(x - acc[k]); acc[k] = x; }
+      }
+    }
     return Uint8Array.from(bytes);
   }
   function unpackLaps(u8) {
     let p = 0; const varint = () => { let n = 0, sh = 1; while (true) { const x = u8[p++]; n += (x & 127) * sh; if (!(x & 128)) break; sh *= 128; } return (n % 2) ? -(n + 1) / 2 : n / 2; };
     const hl = varint(); const head = JSON.parse(new TextDecoder().decode(u8.subarray(p, p + hl))); p += hl;
     const laps = [];
-    for (const h of head.laps) { const pts = []; let alat = 0, alon = 0, av = 0, agx = 0, agy = 0; for (let i = 0; i < h.count; i++) { alat += varint(); alon += varint(); av += varint(); agx += varint(); agy += varint(); pts.push({ lat: alat / 1e7, lon: alon / 1e7, v: av / 100, gx: agx / 1000, gy: agy / 1000 }); } laps.push({ n: h.n, timeMs: h.timeMs, clean: !!h.clean, pts }); }
+    for (const h of head.laps) {
+      const pts = [], ch = Array.isArray(h.ch) ? h.ch.filter(c => CH_SCALE[c]) : [], acc = ch.map(() => 0); let alat = 0, alon = 0, av = 0, agx = 0, agy = 0;
+      for (let i = 0; i < h.count; i++) {
+        alat += varint(); alon += varint(); av += varint(); agx += varint(); agy += varint(); const pt = { lat: alat / 1e7, lon: alon / 1e7, v: av / 100, gx: agx / 1000, gy: agy / 1000 };
+        for (let k = 0; k < ch.length; k++) { acc[k] += varint(); pt[ch[k]] = acc[k] / CH_SCALE[ch[k]]; }
+        pts.push(pt);
+      }
+      laps.push({ n: h.n, timeMs: h.timeMs, clean: !!h.clean, pts });
+    }
     return laps;
   }
   async function packSession(sess) { const raw = packLaps(sess.laps), { enc, data } = await deflate(raw); const b64 = B64.enc(data), chunks = []; for (let i = 0; i < b64.length; i += 180000) chunks.push(b64.slice(i, i + 180000)); return { enc, chunks, bytes: data.length }; }
@@ -3195,7 +3382,17 @@ const STORE = (() => {
   function sessionMeta(sess) {
     const clean = sess.laps.filter(L => L.clean), best = sess.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a), avg = clean.length ? clean.reduce((s, L) => s + L.timeMs, 0) / clean.length : best.timeMs;
     let la = 0, lo = 0, n = 0; for (const L of clean.length ? clean : sess.laps) for (let i = 0; i < L.pts.length; i += 5) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
-    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', kart: sess.kart || '', kartClass: sess.kartClass || (sess.kart ? 'rental' : ''), kartCat: sess.kartCat || '', format: sess.format || '', pos: +sess.pos || 0, drivers: +sess.drivers || 0, nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
+    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', kart: sess.kart || '', kartClass: sess.kartClass || (sess.kart ? 'rental' : ''), kartCat: sess.kartCat || '', format: sess.format || '', pos: +sess.pos || 0, drivers: +sess.drivers || 0, nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, ch: channelsMeta(sess), createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
+  }
+  // what the logger recorded besides GPS (an Alfano 6 on a sport kart): which channels, the gearbox read out of them, rev and
+  // temperature extremes — enough for the feed and the lists without loading the laps
+  function channelsMeta(sess) {
+    if (typeof GEAR === 'undefined' || !sess.laps || !sess.laps.some(L => L.pts.length && L.pts[0].rpm !== undefined)) return null;
+    const box = GEAR.prepare(sess); if (!box) return null;
+    const out = { rpm: !!box.ch.rpm, t1: !!box.ch.t1, t2: !!box.ch.t2, kind: box.kind, gears: box.gears, rpmMax: box.rpmMax };
+    if (box.t1) out.t1Max = box.t1.max; if (box.t2) out.t2Max = box.t2.max;
+    const cl = sess.laps.filter(L => L.clean && L._gear); if (cl.length && box.kind !== 'single') out.shifts = Math.round(cl.reduce((a, L) => a + L._gear.shifts.length, 0) / cl.length);
+    return out;
   }
 
   // ===== backend: claude.ai artifact (db + user capabilities) =====
@@ -3405,6 +3602,7 @@ const STORE = (() => {
     if (!chunks.length) throw new Error('no data');
     const laps = await unpackSession(meta, chunks);
     const sess = Object.assign({}, meta, { laps }); for (const L of laps) L._sess = sess;
+    if (typeof GEAR !== 'undefined') GEAR.prepare(sess);   // engine channels → gears and shifts (no-op for a GPS-only session)
     sessCache.set(meta.id, sess); return sess;
   }
   async function saveSession(sess) {
@@ -3563,7 +3761,7 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits,
+    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
@@ -3574,7 +3772,7 @@ function createMapView(canvas, host) {
   const V = { s: 1, tx: 0, ty: 0, rot: 0, auto: true, ts: 1, anchor: null };
   const M = { view: V, hoverIdx: -1, dragIdx: -1, selIdx: -1, panning: null, spaceDown: false, tool: 'pan', badges: [] };
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-  function tokens() { const cs = getComputedStyle(document.documentElement), g = (n) => cs.getPropertyValue(n).trim(); return { bg: g('--bg'), surface: g('--surface'), surface2: g('--surface-2'), line: g('--line'), line2: g('--line-2'), fg: g('--fg'), muted: g('--muted'), faint: g('--faint'), accent: g('--accent'), accentInk: g('--accent-ink'), brake: g('--brake'), limit: g('--limit'), lift: g('--lift'), throttle: g('--throttle'), turnin: g('--turnin'), actual: g('--actual'), cmp: g('--cmp'), cmp2: g('--cmp2') || '#17a2b8', mono: g('--mono') || 'monospace', body: g('--body') || 'sans-serif' }; }
+  function tokens() { const cs = getComputedStyle(document.documentElement), g = (n) => cs.getPropertyValue(n).trim(); return { bg: g('--bg'), surface: g('--surface'), surface2: g('--surface-2'), line: g('--line'), line2: g('--line-2'), fg: g('--fg'), muted: g('--muted'), faint: g('--faint'), accent: g('--accent'), accentInk: g('--accent-ink'), brake: g('--brake'), limit: g('--limit'), lift: g('--lift'), throttle: g('--throttle'), turnin: g('--turnin'), actual: g('--actual'), cmp: g('--cmp'), cmp2: g('--cmp2') || '#17a2b8', shiftUp: g('--shift-up') || '#f2c94c', shiftDown: g('--shift-down') || '#8b5cf6', mono: g('--mono') || 'monospace', body: g('--body') || 'sans-serif' }; }
   function setup() { const w = canvas.clientWidth || canvas.parentElement.clientWidth || 600, h = host.height ? host.height(w) : Math.round(clamp(w * 0.7, 420, 900)); const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1, Math.sqrt(3.2e6 / Math.max(1, w * h)))); if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); canvas.style.height = h + 'px'; } const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, w, h }; }
   const imgSize = () => { const fs = host.getFrameSize ? host.getFrameSize() : null; if (fs) return fs; const im = host.getImage ? host.getImage() : null; return im ? [im.w, im.h] : [1600, 1000]; };
   const toS = (x, y) => { const c = Math.cos(V.rot), si = Math.sin(V.rot); return [V.tx + V.s * (c * x - si * y), V.ty + V.s * (si * x + c * y)]; };
@@ -3762,6 +3960,19 @@ function createMapView(canvas, host) {
       const placed = [], labels = [], rsz = clamp(0.75 + pxm * 0.06, 0.75, 1.25), K = t('km/h');
       // the other laps keep their own braking / lift points: small rings in the lap colour, on their own lines
       for (const l of laps) { if (l === mainL) continue; for (const r of D.rows) { const m = l.m(r); if (!m) continue; const k = m.kind === 'brake' && !m.inherited ? m.bk : (m.kind === 'lift' ? m.lk : -1); if (k < 0) continue; const i = ((r.w.a + k) % N + N) % N, [px, py] = lapPos(tr, l.P, i), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, 3 * rsz, 0, Math.PI * 2); ctx.globalAlpha = 0.85; ctx.fillStyle = m.kind === 'brake' ? C.brake : C.lift; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = l.col; ctx.stroke(); ctx.globalAlpha = 1; } }
+      // gear shifts of a sport kart (an Alfano 6 with revs): ▲ up / ▼ down on each lap's line, the new gear written on the chosen lap's
+      const tri = (x, y, r, up, fill, stroke, lwS) => { ctx.beginPath(); if (up) { ctx.moveTo(x, y - r); ctx.lineTo(x + r * 0.95, y + r * 0.7); ctx.lineTo(x - r * 0.95, y + r * 0.7); } else { ctx.moveTo(x, y + r); ctx.lineTo(x + r * 0.95, y - r * 0.7); ctx.lineTo(x - r * 0.95, y - r * 0.7); } ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = lwS || 1.1; ctx.strokeStyle = stroke; ctx.stroke(); };
+      for (const l of laps) { if (l === mainL || !l.P.shifts || !l.P.shifts.length) continue; for (const s of l.P.shifts) { const [px, py] = lapPos(tr, l.P, s.st), [x, y] = T(px, py); ctx.globalAlpha = 0.85; tri(x, y, 3.6 * rsz, s.kind === 'up', s.kind === 'up' ? C.shiftUp : C.shiftDown, l.col, 1.4); ctx.globalAlpha = 1; } }
+      if (main.shifts && main.shifts.length) {
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        for (const s of main.shifts) {
+          const up = s.kind === 'up', [px, py] = lapPos(tr, main, s.st), [x, y] = T(px, py), r = 4.6 * rsz;
+          ctx.globalAlpha = 0.95; tri(x, y, r, up, up ? C.shiftUp : C.shiftDown, 'rgba(0,0,0,0.6)'); ctx.globalAlpha = 1;
+          if (pxm >= 1.2) { const [snx, sny] = RN(tr.nx[s.st], tr.ny[s.st]); const lx = x - snx * (r + 7), ly = y - sny * (r + 7); ctx.font = `700 9.5px ${C.mono}`; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.75)'; ctx.strokeText(String(s.to), lx, ly + 0.5); ctx.fillStyle = up ? C.shiftUp : C.shiftDown; ctx.fillText(String(s.to), lx, ly + 0.5); }
+          if (hiRow || showAll) { const row = D.rows.find(r0 => ((s.st - r0.w.a) % N + N) % N < r0.w.len); if (row && (showAll || (hiRow && hiRow.w.n === row.w.n))) labels.push({ i: s.st, text: up ? `${t('upshift')} → ${s.to} · ${Math.round(s.rpm / 10) * 10} ${t('rpm')}` : `${t('downshift')} → ${s.to} · ${DATA.kmh(s.v)} ${K}`, col: up ? C.shiftUp : C.shiftDown, dir: row.w.dir }); }
+        }
+        ctx.textBaseline = 'alphabetic';
+      }
       for (const r of D.rows) {
         const w0 = r.w, m = mOf(r); if (!m) continue; const at = (k) => ((w0.a + k) % N + N) % N, hi = hiRow && hiRow.w.n === w0.n;
         if (m.tk >= 0) mk(at(m.tk), 3.4 * rsz, C.throttle);
@@ -4232,7 +4443,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v31.2';
+const APP_VERSION = 'v32';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -4640,6 +4851,18 @@ function stationAt(P, tau) { const N = P.N, tt = P.t; if (tau <= 0) return 0; if
 const replayTmax = (D) => Math.max(...lapList(D).map(l => l.P.T));
 // the kart markers for the map: at the hovered station for every lap, otherwise at the replay time — each on its own line
 function labMarks() { const D = LAB.dcmp; if (!D) return null; const laps = lapList(D), role = roleNow(); if (LAB.hoverIdx >= 0) return laps.map(l => ({ P: l.P, i: LAB.hoverIdx, col: cssColor(l.col), n: l.n, main: l.role === role })); return laps.map(l => ({ P: l.P, i: stationAt(l.P, LAB.scrubT || 0), col: cssColor(l.col), n: l.n, main: l.role === role })); }
+const fmtRpm = (r) => String(Math.round(r)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009');
+// ----- engine channels of a projection (sport karts with an Alfano 6): the gearbox it was read with, the gear at a station, a corner's revs and shifts -----
+const boxOf = (P) => { const s = P && (P.sess || (P.lap && P.lap._sess)); return s && s._box ? s._box.box : null; };
+const gearAt = (P, i) => { if (!P || !P.gear || P.gear[i] < 0) return 0; const box = boxOf(P); return box && box.levels[P.gear[i]] ? box.levels[P.gear[i]].gear : P.gear[i] + 1; };
+function engWin(P, w) {
+  if (!P || !P.rpm) return null; const N = P.N, ds = P.ds; let rmin = Infinity, rmax = 0, imin = w.apex; const gears = [];
+  for (let k = 0; k < w.len; k++) { const i = (w.a + k) % N, r = P.rpm[i]; if (r < rmin) { rmin = r; imin = i; } if (r > rmax) rmax = r; const g = gearAt(P, i); if (g && (!gears.length || gears[gears.length - 1] !== g)) gears.push(g); }
+  const sh = (P.shifts || []).filter(x => ((x.st - w.a) % N + N) % N < w.len), rel = (x) => ((x.st - w.apex) % N + N) % N, where = (x) => { let d = rel(x); if (d > N / 2) d -= N; return d * ds; };
+  return { rmin, rmax, imin, gears, down: sh.filter(x => x.kind === 'down'), up: sh.filter(x => x.kind === 'up'), where, t1: P.t1 ? P.t1[w.apex] : NaN, apexGear: gearAt(P, w.apex) };
+}
+const whereText = (m) => m <= -2 ? t('{m} m before apex', { m: (-m).toFixed(0) }) : m >= 2 ? t('{m} m after apex', { m: m.toFixed(0) }) : t('at the apex');
+function shiftText(list, where, up) { if (!list.length) return '—'; const s = list[0], hops = list.map(x => `${x.from}→${x.to}`).join(', '); return `${hops} · ${whereText(where(s))} · ${up ? `${fmtRpm(s.rpm)} ${t('rpm')}` : `${kmh(s.v)} ${t('km/h')}`}`; }
 function cssColor(v) { const m = /^var\((--[\w-]+)\)$/.exec(v); return m ? (getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim() || '#888') : v; }
 // the ideal lap of a session: in every corner window (the stretch from one speed peak to the next, so the whole lap is covered)
 // the fastest pass among the clean laps, stitched into one projection. Approximate by nature: a corner driven for its own time can
@@ -4652,13 +4875,16 @@ function sessIdeal(sess, R, apexes) {
   if (sess._ideal && sess._ideal.key === key) return sess._ideal.P;
   const projs = laps.map(L => DATA.projectLap(L, tr, G.rev)).filter(Boolean); if (projs.length < 2) return null;
   const v = new Float64Array(N), o = new Float64Array(N), g = new Float64Array(N), dt = new Float64Array(N), picks = [];
+  const eng = projs.every(P => P.rpm), rpm = eng ? new Float64Array(N) : null, gear = eng && projs.every(P => P.gear) ? new Int8Array(N) : null, shifts = [];
   for (const w of wins) {
     const ranked = projs.map(P => ({ P, L: P.lap, time: DATA.tw(P, w.b, w.a) })).sort((a, b) => a.time - b.time), best = ranked[0].P, bt = ranked[0].time;
-    for (let k = 0; k < w.len; k++) { const i = (w.a + k) % N; v[i] = best.v[i]; o[i] = best.o[i]; g[i] = best.g[i]; dt[i] = DATA.tw(best, (i + 1) % N, i); }
+    for (let k = 0; k < w.len; k++) { const i = (w.a + k) % N; v[i] = best.v[i]; o[i] = best.o[i]; g[i] = best.g[i]; dt[i] = DATA.tw(best, (i + 1) % N, i); if (rpm) rpm[i] = best.rpm[i]; if (gear) gear[i] = best.gear[i]; }
+    if (eng && best.shifts) for (const sh of best.shifts) { const off = ((sh.st - w.a) % N + N) % N; if (off < w.len) shifts.push(sh); }
     picks.push({ n: w.n, L: best.lap, time: bt, top: ranked.slice(0, 3).map(x => ({ L: x.L, time: x.time })) });
   }
   const tt = new Float64Array(N + 1); for (let i = 0; i < N; i++) tt[i + 1] = tt[i] + dt[i];
   const P = { key: 'ideal:' + sess.id, N, ds: tr.ds, T: tt[N], v, t: tt, o, a: DATA.accelFrom(v, N, tr.ds), g, lap: null, n: projs.length, name: t('ideal lap'), ideal: true, picks, sess, nLapsUsed: new Set(picks.map(p => p.L.n)).size };
+  if (rpm) { P.rpm = rpm; if (gear) P.gear = gear; P.shifts = shifts.sort((a, b) => a.st - b.st); }
   sess._ideal = { key, P }; return P;
 }
 
@@ -4911,18 +5137,20 @@ function renderHud() {
   const hov = LAB.hoverIdx >= 0, iR = hov ? LAB.hoverIdx : stationAt(D.R, LAB.scrubT || 0), ds = G.track.ds, onRole = roleNow();
   const rows = lapList(D).map(l => ({ role: l.role, P: l.P, name: l.name, c: l.col, n: l.n }));
   const key = rows.map(r => r.role + '~' + r.name + '~' + fmtLap(r.P.T)).join('|') + '~' + onRole;
+  const eng = rows.some(r => r.P.rpm); box.classList.toggle('eng', eng);
   if (box.dataset.key !== key) {
     box.dataset.key = key; box.innerHTML = '';
     for (const r of rows) {
       const cell = (cls, html) => { const e = el('span', cls); e.innerHTML = html; e.dataset.role = r.role; if (r.role === onRole) e.classList.add('on'); e.style.setProperty('--c', r.c); e.onclick = () => { if (!D.O) return; LAB.mapLap = r.role === 'ref' ? 'you' : r.role; labRender(); }; box.appendChild(e); return e; };
       cell('sw' + (r.role === 'cmp' ? ' dash' : ''), `<i></i><em>${r.n}</em>`);
       cell('nm', `<b>${esc(fmtLap(r.P.T))}</b>${esc(r.name)}`);
-      cell('v', `<b data-k="v"></b> ${t('km/h')}`); cell('v', `<b data-k="t"></b> ${t('s')}`); cell('v', `<b data-k="s"></b> ${t('m')}`);
+      cell('v', `<b data-k="v"></b> ${t('km/h')}`); if (eng) cell('v eng', r.P.rpm ? `<b data-k="r"></b>${r.P.gear ? ` · <b data-k="g"></b>` : ''} ${t('rpm')}` : ''); cell('v', `<b data-k="t"></b> ${t('s')}`); cell('v', `<b data-k="s"></b> ${t('m')}`);
       cell('v dt', r.role !== 'ref' ? '<b data-k="d"></b>' : '');
     }
   }
   const q = (role, k) => box.querySelector(`[data-role="${role}"] [data-k="${k}"]`);
   for (const r of rows) { const P = r.P, i = hov ? iR : stationAt(P, LAB.scrubT || 0); q(r.role, 'v').textContent = kmh(P.v[i]); q(r.role, 't').textContent = (hov ? P.t[i] : (LAB.scrubT || 0)).toFixed(2); q(r.role, 's').textContent = (i * ds).toFixed(0);
+    if (P.rpm) { const e = q(r.role, 'r'); if (e) e.textContent = fmtRpm(P.rpm[i]); const g = q(r.role, 'g'); if (g) g.textContent = gearAt(P, i) ? GEAR.gearName(gearAt(P, i)) : '·'; }
     if (r.role !== 'ref') { const d = D.R.t[iR] - P.t[iR], e = q(r.role, 'd'); e.textContent = sg(d); const dt = e.parentElement; dt.classList.toggle('loss', d >= 0.04); dt.classList.toggle('gain', d <= -0.04); } }
 }
 // the step label in the scrub bar: the corner under the marker (or the selected one) and its headline number
@@ -4968,7 +5196,7 @@ function renderReplay(full) {
   const box = $('rpLaps'), key = laps.map(l => l.role + l.name).join('|') + role;
   if (full || box.dataset.key !== key) { box.dataset.key = key; box.innerHTML = ''; for (const l of laps) { const b = el('button', 'rp-lap' + (l.role === role ? ' on' : '')); b.type = 'button'; b.style.setProperty('--c', l.col); b.dataset.role = l.role; b.innerHTML = `<i></i><b>${l.n}</b><span class="nm">${esc(l.name)} · ${esc(fmtLap(l.P.T))}</span><span class="live"></span>`; b.title = t('Show this lap\'s points on the map'); b.onclick = () => { LAB.mapLap = l.role === 'ref' ? 'you' : l.role; labRender(); }; box.appendChild(b); } }
   const iR = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(D.R, tau), ds = LAB.G.track.ds;
-  for (const l of laps) { const e = box.querySelector(`[data-role="${l.role}"] .live`); if (!e) continue; const i = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(l.P, tau); const gap = l.role === 'ref' ? '' : ` · <b class="${D.R.t[iR] - l.P.t[iR] >= 0.04 ? 'loss' : (D.R.t[iR] - l.P.t[iR] <= -0.04 ? 'gain' : '')}">Δ ${sg(D.R.t[iR] - l.P.t[iR])}</b>`; e.innerHTML = `${(i * ds).toFixed(0)} ${t('m')} · ${kmh(l.P.v[i])} ${t('km/h')}${gap}`; }
+  for (const l of laps) { const e = box.querySelector(`[data-role="${l.role}"] .live`); if (!e) continue; const i = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(l.P, tau); const gap = l.role === 'ref' ? '' : ` · <b class="${D.R.t[iR] - l.P.t[iR] >= 0.04 ? 'loss' : (D.R.t[iR] - l.P.t[iR] <= -0.04 ? 'gain' : '')}">Δ ${sg(D.R.t[iR] - l.P.t[iR])}</b>`; e.innerHTML = `${(i * ds).toFixed(0)} ${t('m')} · ${kmh(l.P.v[i])} ${t('km/h')}${l.P.rpm ? ` · ${fmtRpm(l.P.rpm[i])}${gearAt(l.P, i) ? ' · ' + GEAR.gearName(gearAt(l.P, i)) : ''}` : ''}${gap}`; }
 }
 function replayPlay(on) {
   if (on === LAB.playing) return; LAB.playing = on; const b = $('rpPlay'); if (b) { b.innerHTML = on ? '&#10074;&#10074;' : '&#9654;'; b.classList.toggle('active', on); }
@@ -5053,7 +5281,7 @@ function labEnsureMap() {
     window.addEventListener('resize', () => document.documentElement.style.setProperty('--topH', topH() + 'px')); }
   window.addEventListener('resize', () => { if (APP.route === 'lab' && LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (LAB.dcmp) { renderInspector(); if (isCockpit()) { renderHud(); drawScrub(); } } } });
   window.addEventListener('keydown', (e) => { if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if (APP.route !== 'lab') return; if (e.key === 'Escape' && LAB.selN) { LAB.selN = 0; afterSelect(true); } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { if (LAB.dcmp) { e.preventDefault(); stepCorner(e.key === 'ArrowRight' ? 1 : -1); } } else if (e.key === 'q' || e.key === 'Q') LAB.map.rotateBy(-Math.PI / 24); else if (e.key === 'e' || e.key === 'E') LAB.map.rotateBy(Math.PI / 24); else if (e.key === 'f' || e.key === 'F') $('btnFull').click(); });
-  for (const c of [$('chDataSpeed'), $('chDataDelta')]) { c.addEventListener('pointermove', (e) => { const G = LAB.G; if (!G || !LAB.dcmp) return; const r = c.getBoundingClientRect(), x = e.clientX - r.left; const s = (x - PAD.l) / (r.width - PAD.l - PAD.r) * G.track.lengthM, i = Math.round(s / G.track.ds), ni = (i >= 0 && i < G.track.N) ? i : -1; if (ni !== LAB.hoverIdx) { LAB.hoverIdx = ni; if (isCockpit() && ni >= 0) LAB.scrubIdx = ni; LAB.map.setHover(ni); hoverChanged(); } }); c.addEventListener('pointerleave', () => { if (LAB.hoverIdx >= 0) { hoverOff(); if (!isCockpit()) renderInspector(); } }); }
+  for (const c of [$('chDataSpeed'), $('chDataRpm'), $('chDataDelta')]) { c.addEventListener('pointermove', (e) => { const G = LAB.G; if (!G || !LAB.dcmp) return; const r = c.getBoundingClientRect(), x = e.clientX - r.left; const s = (x - PAD.l) / (r.width - PAD.l - PAD.r) * G.track.lengthM, i = Math.round(s / G.track.ds), ni = (i >= 0 && i < G.track.N) ? i : -1; if (ni !== LAB.hoverIdx) { LAB.hoverIdx = ni; if (isCockpit() && ni >= 0) LAB.scrubIdx = ni; LAB.map.setHover(ni); hoverChanged(); } }); c.addEventListener('pointerleave', () => { if (LAB.hoverIdx >= 0) { hoverOff(); if (!isCockpit()) renderInspector(); } }); }
   // session switch, reference lap, comparison
   $('sessSel').addEventListener('change', async () => { const id = $('sessSel').value; if (!id || (LAB.current && id === LAB.current.id)) return; const loaded = sessOf(id); if (loaded) { LAB.current = loaded; LAB.ref = lapKey(loaded, bestLap(loaded)); LAB.cmp = sessAvg(loaded) ? 'avg:' + loaded.id : 'none'; LAB.selN = 0; LAB.chat = []; LAB.social = null; labRender(); } else { const meta = await STORE.getSessionMeta(id); if (meta) { go('lab~' + id); } } });
   $('refSel').addEventListener('change', () => { LAB.ref = $('refSel').value; if (LAB.cmp === LAB.ref) LAB.cmp = 'none'; LAB.selN = 0; LAB.chat = []; labRender(); });
@@ -5132,7 +5360,7 @@ function labRender() {
   LAB.dcmp = null; LAB.coach = null;
   if (!has) return;
   if (LAB.map.V.auto || LAB.needFit) { LAB.map.fit(true); LAB.needFit = false; }   // the map is only measurable once the hero is visible
-  const sess = LAB.current;
+  const sess = LAB.current, box = typeof GEAR !== 'undefined' ? GEAR.prepare(sess) : null;   // engine channels → gears (cached; recomputed when the kart was edited)
   // reference: a lap ('sid|n') or the session average ('avg:sid') of the current session
   const refOk = isAvgKey(LAB.ref) ? (LAB.ref.slice(4) === sess.id && !!sessAvg(sess)) : !!(findLap(LAB.ref) && findLap(LAB.ref).sess === sess && findLap(LAB.ref).L.px);
   if (!refOk) LAB.ref = sess.laps.some(L => L.px) ? lapKey(sess, bestLap(sess)) : pickDefaultRef();
@@ -5195,6 +5423,7 @@ function labRender() {
   if (D.O) chip(t('comparison'), fmtLap(D.O.T) + ' · ' + sg(D.total)); if (D.P3) chip(t('third lap'), fmtLap(D.P3.T) + ' · ' + sg(D.R.T - D.P3.T));
   if (sess.source && sess.source.app !== 'alfano') chip(t('source'), sourceLabel(sess.source));
   if (sess.kart || sess.kartClass === 'sport') chip(t('kart'), kartLabel(sess));
+  if (box) { chip(t('rpm max'), fmtRpm(box.rpmMax)); if (box.kind !== 'single') chip(t('gears'), `${box.gears}${box.kind === 'dd2' ? ' · DD2' : ''}`); const lg = L && L._gear; if (lg && box.kind !== 'single') chip(t('shifts'), `${lg.shifts.filter(x => x.kind === 'up').length} ▲ · ${lg.shifts.filter(x => x.kind === 'down').length} ▼`); if (box.t1) chip(t('water'), `${box.t1.min.toFixed(0)}–${box.t1.max.toFixed(0)} °C`); }
   if (!sess.sws && resultText(sess)) chip(t('session'), resultText(sess));
   if (sess.sws) chip('SWS', [sess.sws.race, sess.sws.pos ? 'P' + String(sess.sws.pos).replace(/^P/i, '') : '', sess.sws.best].filter(Boolean).join(' · '));
   if (LAB.coach) { const res = D.rows.reduce((s, r) => { const c = LAB.coach.corners.find(x => x.n === r.w.n); return s + (c ? Math.max(0, r.R.time - c.tTop) : 0); }, 0); chip(t('reserve'), res.toFixed(2) + ' ' + t('s')); }
@@ -5208,7 +5437,7 @@ function labRender() {
   { const mod = $('btnModerate'); mod.hidden = !(STORE.isAdmin() && STORE.hasDb && !mySession(sess) && sess.owner !== 'local'); if (!mod.hidden) { mod.textContent = sess.published ? t('Hide from public') : (sess.moderated ? t('Show again') : t('Unpublished by owner')); mod.disabled = !sess.published && !sess.moderated; mod.classList.toggle('active', !!sess.moderated); mod.title = t('Admins: hide a broken or wrongly placed session from the feed and the track page — its owner keeps it.'); } }
   $('btnEditSess').hidden = !mySession(sess);
   STORE.socialAvailable().then(on => { if (LAB.current !== sess) return; $('voteBox').hidden = !(on && STORE.hasDb && sess.owner !== 'local'); if ($('voteBox').hidden) $('lowRated').hidden = true; $('discussPanel').hidden = !on; if (on) { renderSocialBits(); renderDiscussion(); } renderOwnerRow(); });
-  $('legendData').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span>${lapList(D).map(l => `<span class="lapkey"><i style="background:${l.col}"></i><b style="color:${l.col}">${l.n}</b> ${esc(l.name)}</span>`).join('')}<span>${t('number — corner from the S/F line')}</span>`;
+  $('legendData').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span>${box && box.kind !== 'single' ? `<span><span class="dot tri up"></span>${t('upshift')}</span><span><span class="dot tri down"></span>${t('downshift')}</span>` : ''}${lapList(D).map(l => `<span class="lapkey"><i style="background:${l.col}"></i><b style="color:${l.col}">${l.n}</b> ${esc(l.name)}</span>`).join('')}<span>${t('number — corner from the S/F line')}</span>`;
   $('mapNote').hidden = true;
   syncOpts(); renderDigest(); renderCornersTable(); renderInspector(); renderCornerNav(); renderAskState(); showReadout(); drawDataCharts(); renderHud(); drawScrub(); renderReplay(true);
 }
@@ -5494,6 +5723,20 @@ function renderDigest() {
   const P = [];
   if (sess.source && sess.source.app !== 'alfano') P.push(`<p class="hint"><span class="lbl">${t('Data source')}</span><br>${esc(t('{s}. Alfano at 10 Hz is the reference; at {hz} Hz braking, release and throttle points are accurate to about ±{m} m and apex speeds are smoothed. Treat small differences with care.', { s: sourceLabel(sess.source), hz: sess.source.hz, m: sess.source.hz >= 9 ? 2 : (sess.source.hz >= 4 ? 4 : 10) }))}</p>`);
   P.push(`<p><span class="lbl">${t('Session')}</span><br>${esc(shortSess(sess))}: ${t('{n} laps, {c} of them clean (no slower than the best by 4 %)', { n: sess.laps.length, c: clean.length })}. ${t('Best — lap {n}, {t}', { n: bestLap(sess).n, t: fmtMs(bestLap(sess).timeMs) })}. ${t('Average clean lap — {t}', { t: fmtLap(avg) })}. ${t('Five fastest: {list}', { list: fastest.map(x => `${x.n} (${fmtMs(x.timeMs)})`).join(', ') })}.${D.ref.avg ? ' ' + t('The reference now is the average clean lap of this session, {t}: its points are a “typical” pass.', { t: fmtLap(D.R.T) }) : (L !== bestLap(sess) ? ' ' + t('The reference now is lap {n}, {t}.', { n: L.n, t: fmtLap(D.R.T) }) : '')}</p>`);
+  // engine channels (a sport kart with an Alfano 6): the gearbox, where the shifts are, the revs, the water
+  { const box = sess._box && sess._box.box; if (box) {
+      const lg = L && L._gear, parts = [];
+      if (box.kind === 'single') parts.push(t('Revs recorded, no gearbox ({k}): {lo}–{hi} rpm on this lap.', { k: kartLabel(sess), lo: fmtRpm(lg ? lg.rpmMin : box.rpmMax), hi: fmtRpm(lg ? lg.rpmMax : box.rpmMax) }));
+      else if (lg) { const ups = lg.shifts.filter(x => x.kind === 'up'), dns = lg.shifts.filter(x => x.kind === 'down');
+        parts.push(t('{g} gears ({k}): {u} upshifts and {d} downshifts on this lap.', { g: box.gears, k: box.kind === 'dd2' ? 'DD2' : t('shifter'), u: ups.length, d: dns.length }));
+        if (ups.length) { const mn = Math.min(...ups.map(x => x.rpm)), mx = Math.max(...ups.map(x => x.rpm)); parts.push(t('Upshifts at {lo}–{hi} rpm (the session peak is {max}).', { lo: fmtRpm(mn), hi: fmtRpm(mx), max: fmtRpm(box.rpmMax) })); }
+        if (dns.length) parts.push(t('Downshifts at {lo}–{hi} km/h; the revs drop to {min} at the slowest point.', { lo: kmh(Math.min(...dns.map(x => x.v))), hi: kmh(Math.max(...dns.map(x => x.v))), min: fmtRpm(lg.rpmMin) }));
+        if (D.R.shifts && D.R.shifts.length) { const N = LAB.G.track.N, inC = D.rows.filter(r => D.R.shifts.some(x => x.kind === 'down' && ((x.st - r.w.a) % N + N) % N < r.w.len)).map(r => tref(r.w.n)); if (inC.length) parts.push(`${t('Corners taken with a downshift')}: ${inC.join(', ')}.`); }
+        if (D.O && D.O.shifts && D.R.shifts) { const N = LAB.G.track.N, ds = LAB.G.track.ds, diffs = []; for (const r of D.rows) { const a = D.R.shifts.find(x => x.kind === 'down' && ((x.st - r.w.a) % N + N) % N < r.w.len), b = D.O.shifts.find(x => x.kind === 'down' && ((x.st - r.w.a) % N + N) % N < r.w.len); if (a && b) { let d = ((b.st - a.st) % N + N) % N; if (d > N / 2) d -= N; if (Math.abs(d * ds) >= 5) diffs.push(`${tref(r.w.n)} ${d > 0 ? t('{m} m later', { m: (d * ds).toFixed(0) }) : t('{m} m earlier', { m: (-d * ds).toFixed(0) })}`); } } if (diffs.length) parts.push(`${t('{o} downshifts', { o: esc(D.nameOf(D.O)) })}: ${diffs.join(', ')}.`); }
+      }
+      if (box.t1) parts.push(t('Water {lo}–{hi} °C over the session.', { lo: box.t1.min.toFixed(0), hi: box.t1.max.toFixed(0) }));
+      if (parts.length) P.push(`<p><span class="lbl">${t('Engine')}</span><br>${parts.join(' ')}</p>`);
+  } }
   if (D.O) {
     const oName = D.nameOf(D.O), rows = D.rows.filter(r => r.cmp), gains = rows.filter(r => r.cmp.dt <= -0.04).sort((a, b) => a.cmp.dt - b.cmp.dt), losses = rows.filter(r => r.cmp.dt >= 0.04).sort((a, b) => b.cmp.dt - a.cmp.dt);
     const wdL = (a, b, LL) => { LL = LL || 1e9; return (((a - b) + LL / 2) % LL + LL) % LL - LL / 2; };
@@ -5602,6 +5845,16 @@ function renderInspector() {
   html += row(t('throttle from'), sM(R.sThr), O ? sM(O.sThr) : '', O3 ? sM(O3.sThr) : '');
   html += row(t('exit'), `${kmh(R.vExit)} ${K}`, O ? `${kmh(O.vExit)} ${K}` : '', O3 ? `${kmh(O3.vExit)} ${K}` : '');
   html += row(t('lateral'), `${R.gmax.toFixed(2)} g`, O ? `${O.gmax.toFixed(2)} g` : '', O3 ? `${O3.gmax.toFixed(2)} g` : '');
+  // engine rows (sport karts with revs): gears through the corner, the downshift and the upshift, the revs, water temperature
+  { const E = engWin(D.R, w), EO = O ? engWin(D.O, w) : null, E3 = O3 ? engWin(D.P3, w) : null; const dash = '—';
+    if (E || EO || E3) {
+      const gt = (e) => e ? (e.gears.length ? e.gears.join(' → ') : dash) : dash, any = (f) => (E && f(E)) || (EO && f(EO)) || (E3 && f(E3));
+      if (any(e => e.gears.length > 1 || e.down.length || e.up.length)) { html += row(t('gear'), gt(E), gt(EO), E3 ? gt(E3) : '');
+        html += row(t('downshift'), E ? shiftText(E.down, E.where, false) : dash, EO ? shiftText(EO.down, EO.where, false) : dash, E3 ? shiftText(E3.down, E3.where, false) : '');
+        html += row(t('upshift'), E ? shiftText(E.up, E.where, true) : dash, EO ? shiftText(EO.up, EO.where, true) : dash, E3 ? shiftText(E3.up, E3.where, true) : ''); }
+      const rt = (e) => e ? `${fmtRpm(e.rmin)}–${fmtRpm(e.rmax)}` : dash; html += row(t('revs'), rt(E), rt(EO), E3 ? rt(E3) : '');
+      if (any(e => isFinite(e.t1))) { const tt = (e) => e && isFinite(e.t1) ? `${e.t1.toFixed(1)} °C` : dash; html += row(t('water'), tt(E), tt(EO), E3 ? tt(E3) : ''); }
+    } }
   html += row(t('time'), `${R.time.toFixed(2)} ${t('s')}`, O ? `${O.time.toFixed(2)} ${t('s')}` : '', O3 ? `${O3.time.toFixed(2)} ${t('s')} <span class="hint">${sg(R.time - O3.time)}</span>` : '') + '</table>';
   if (r.pick) html += `<div class="insp-text ideal">${esc(r.pick.L === D.ref.L ? t('Your fastest pass through this corner is this very lap.') : t('Your fastest pass through this corner: lap {n}, {t} s ({d} s faster than the reference lap).', { n: r.pick.L.n, t: r.pick.time.toFixed(2), d: Math.max(0, R.time - r.pick.time).toFixed(2) }))} ${esc(t('Corners are judged one by one — check the next corner of that lap too.'))}</div>`;
   if (O) { const pl = plainCorner(r, oName, refLabel); html += `<div class="insp-text"><div class="lbl">${t('In plain words')}</div>${esc(pl.what)}${pl.advice ? `<br><b>${esc(pl.advice)}</b>` : ''}</div>`; }
@@ -5645,6 +5898,26 @@ function drawDataCharts() {
     // the karts: at the hovered station, or each at its own distance at the replay time
     { const marks = labMarks(); if (marks) { const iR = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(D.R, LAB.scrubT || 0), x0 = X(iR * tr.ds); ctx.strokeStyle = C.fg; ctx.lineWidth = 1; ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.moveTo(x0, PAD.t); ctx.lineTo(x0, h - PAD.b); ctx.stroke(); ctx.globalAlpha = 1; for (const mk0 of marks) { const x = X(mk0.i * tr.ds); ctx.beginPath(); ctx.arc(x, Y(mk0.P.v[mk0.i]), mk0.main ? 4.5 : 3.5, 0, Math.PI * 2); ctx.fillStyle = mk0.col; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = '#fff'; ctx.stroke(); } } }
   }
+  // engine panel (a sport kart with revs): the rev trace of every lap, the reference lap's gears as bands, its shifts as ▲/▼, water temperature on the right
+  { const chR = $('chDataRpm'), eng = !ck && (D.R.rpm || (D.O && D.O.rpm) || (D.P3 && D.P3.rpm)); chR.hidden = !eng;
+    if (eng) { const { ctx, w, h } = setupCanvas(chR, 112);
+      ctx.fillStyle = C.surface; ctx.fillRect(0, 0, w, h);
+      const withRpm = lapList(D).filter(l => l.P.rpm); let rmax = 0, rmin = Infinity; for (const l of withRpm) for (let i = 0; i < N; i++) { rmax = Math.max(rmax, l.P.rpm[i]); rmin = Math.min(rmin, l.P.rpm[i]); }
+      const ymax = Math.ceil((rmax + 300) / 1000) * 1000, ymin = Math.max(0, Math.floor((rmin - 300) / 1000) * 1000), Y = (r) => PAD.t + (h - PAD.t - PAD.b) * (1 - (r - ymin) / (ymax - ymin));
+      // gears of the reference lap as alternating bands with the gear number
+      const gl = D.R.gear; if (gl) { const box = D.sess._box && D.sess._box.box, lv = box ? box.levels : null; let i = 0; while (i < N) { const g = gl[i]; let j = i; while (j < N && gl[j] === g) j++; if (g >= 0 && lv && lv[g]) { ctx.fillStyle = g % 2 ? C.actual : C.muted; ctx.globalAlpha = g % 2 ? 0.09 : 0.06; ctx.fillRect(X(i * tr.ds), PAD.t, Math.max(1, X(j * tr.ds) - X(i * tr.ds)), h - PAD.t - PAD.b); ctx.globalAlpha = 1; if ((j - i) * tr.ds > 25) { ctx.fillStyle = C.muted; ctx.font = `600 10px ${C.mono}`; ctx.textAlign = 'center'; ctx.fillText(String(lv[g].gear), (X(i * tr.ds) + X(j * tr.ds)) / 2, h - PAD.b - 5); } } i = j; } }
+      const act = activeRow(); if (act) { const a = act.w.a * tr.ds, b = a + act.w.len * tr.ds; ctx.fillStyle = C.accent; ctx.globalAlpha = 0.12; ctx.fillRect(X(a), PAD.t, Math.max(1, X(Math.min(L, b)) - X(a)), h - PAD.t - PAD.b); if (b > L) ctx.fillRect(X(0), PAD.t, X(b - L) - X(0), h - PAD.t - PAD.b); ctx.globalAlpha = 1; }
+      ctx.strokeStyle = C.line; ctx.lineWidth = 1; ctx.font = `10px ${C.mono}`; ctx.fillStyle = C.muted; ctx.textAlign = 'right';
+      const step = (ymax - ymin) > 6000 ? 2000 : 1000; for (let r = ymin; r <= ymax; r += step) { const y = Math.round(Y(r)) + .5; ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(w - PAD.r, y); ctx.stroke(); ctx.fillText(String(r / 1000), PAD.l - 6, y + 3); }
+      const line = (P, col, lw, dash) => { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash || []); ctx.beginPath(); for (let i = 0; i <= N; i++) { const y = Y(P.rpm[i % N]); i ? ctx.lineTo(X(i * tr.ds), y) : ctx.moveTo(X(0), y); } ctx.stroke(); ctx.setLineDash([]); };
+      if (D.P3 && D.P3.rpm) line(D.P3, C.cmp2, 1.3); if (D.O && D.O.rpm) line(D.O, C.cmp, 1.4, [5, 3]); if (D.R.rpm) line(D.R, C.actual, 1.8);
+      // water temperature of the reference lap on the right axis (thin, dotted)
+      if (D.R.t1) { let tmin = Infinity, tmax = -Infinity; for (let i = 0; i < N; i++) { tmin = Math.min(tmin, D.R.t1[i]); tmax = Math.max(tmax, D.R.t1[i]); } if (tmax > tmin) { const lo = Math.floor(tmin - 0.5), hi = Math.ceil(tmax + 0.5), YT = (x) => PAD.t + (h - PAD.t - PAD.b) * (1 - (x - lo) / (hi - lo)); ctx.strokeStyle = C.muted; ctx.lineWidth = 1; ctx.setLineDash([2, 3]); ctx.beginPath(); for (let i = 0; i <= N; i++) { const y = YT(D.R.t1[i % N]); i ? ctx.lineTo(X(i * tr.ds), y) : ctx.moveTo(X(0), y); } ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = C.muted; ctx.textAlign = 'left'; ctx.fillText(`${hi}°`, w - PAD.r + 2, YT(hi) + 8); ctx.fillText(`${lo}°`, w - PAD.r + 2, YT(lo) - 1); } }
+      // the reference lap's shifts
+      if (D.R.shifts) { for (const sh of D.R.shifts) { const x = X(sh.st * tr.ds), y = Y(D.R.rpm[sh.st]), up = sh.kind === 'up', r = 4.5; ctx.beginPath(); if (up) { ctx.moveTo(x, y - r); ctx.lineTo(x + r, y + r * 0.7); ctx.lineTo(x - r, y + r * 0.7); } else { ctx.moveTo(x, y + r); ctx.lineTo(x + r, y - r * 0.7); ctx.lineTo(x - r, y - r * 0.7); } ctx.closePath(); ctx.fillStyle = up ? C.shiftUp : C.shiftDown; ctx.fill(); ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.stroke(); } }
+      ctx.textAlign = 'left'; ctx.fillStyle = C.muted; ctx.font = `10px ${C.mono}`; ctx.fillText(`${t('rpm')} ×1000${D.R.t1 ? ' · ' + t('water °C (dotted, right)') : ''}${D.R.gear ? ' · ' + t('bands — gear') : ''}`, PAD.l + 6, PAD.t - 6);
+      { const marks = labMarks(); if (marks) { const iR = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(D.R, LAB.scrubT || 0), x0 = X(iR * tr.ds); ctx.strokeStyle = C.fg; ctx.lineWidth = 1; ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.moveTo(x0, PAD.t); ctx.lineTo(x0, h - PAD.b); ctx.stroke(); ctx.globalAlpha = 1; for (const mk0 of marks) { if (!mk0.P.rpm) continue; const x = X(mk0.i * tr.ds); ctx.beginPath(); ctx.arc(x, Y(mk0.P.rpm[mk0.i]), mk0.main ? 4.5 : 3.5, 0, Math.PI * 2); ctx.fillStyle = mk0.col; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = '#fff'; ctx.stroke(); } } }
+    } }
   { const { ctx, w, h } = setupCanvas(chDD, 84);
     ctx.fillStyle = C.surface; ctx.fillRect(0, 0, w, h);
     if (!D.O) { ctx.fillStyle = C.muted; ctx.font = `12px ${C.body}`; ctx.fillText(t('Δt appears once a comparison is on (Best vs average, another lap or another session).'), PAD.l, h / 2); return; }
@@ -5719,11 +5992,13 @@ function renderAskState() {
 function aiContext() {
   const D = LAB.dcmp; if (!D) return '';
   const sess = D.sess, coach = LAB.coach, clean = sess.laps.filter(x => x.clean), avg = clean.reduce((s, x) => s + x.timeMs, 0) / Math.max(1, clean.length) / 1000;
-  const M = (m) => m ? { pedal: pedalText(m), entry_kmh: +kmh(m.vEntry), released_m: m.sRel >= 0 ? Math.round(m.sRel) : null, apex_kmh: +kmh(m.vApex), apex_m: Math.round(m.sApex), throttle_m: m.sThr >= 0 ? Math.round(m.sThr) : null, exit_kmh: +kmh(m.vExit), lateral_g: +m.gmax.toFixed(2), time_s: +m.time.toFixed(2) } : null;
-  const corners = D.rows.map(r => { const c = coach && coach.corners.find(x => x.n === r.w.n); return { corner: 'T' + r.w.n, direction: r.w.dir === 'L' ? 'left' : 'right', radius_m: Math.round(r.w.Rmin), apex_from_sf_m: Math.round(r.R.sApex), reference: M(r.R), comparison: M(r.O), comparison_lap: r.pick ? r.pick.L.n : undefined, third_time: r.M3 ? +r.M3.time.toFixed(2) : undefined, delta_s: r.cmp ? +r.cmp.dt.toFixed(2) : null, delta_text: r.cmp ? r.cmp.text : null, coach: c ? { best_passes: DATA.coachText(c), reserve_s: +Math.max(0, r.R.time - c.tTop).toFixed(2), time_spread_s: c.tStd !== undefined ? +c.tStd.toFixed(2) : null } : null }; });
-  return JSON.stringify({ track: LAB.trackName, layout: LAB.G.layout ? LAB.G.layout.name : LAB.lid, session: { name: shortSess(sess), driver: sess.driver, date: sess.date, kart: kartLabel(sess), kart_class: kartClassOf(sess), laps: sess.laps.length, clean: clean.length, best_lap: bestLap(sess).n, best_time: fmtMs(bestLap(sess).timeMs), avg_clean: fmtLap(avg), is_viewer_own: !!D.ref.mine }, reference_lap: { what: D.ref.name, time: fmtLap(D.R.T) }, third_lap: D.P3 ? { who: D.name3, time: fmtLap(D.P3.T), delta_s: +(D.R.T - D.P3.T).toFixed(2), note: 'a third lap on the screen for visual comparison; per corner: third_time' } : undefined, comparison: D.O ? Object.assign({ who: D.nameOf(D.O), time: fmtLap(D.O.T), delta_s: +D.total.toFixed(2) }, D.O.ideal ? { ideal: true, note: 'the ideal lap stitches the fastest pass through each corner from different laps of this session; approximate — corner combinations are not accounted for; each corner says which lap it came from (comparison_lap)' } : {}) : null, digest: $('digest').innerText, corners });
+  const E = (P, w) => { const e = engWin(P, w); if (!e) return {}; const o = { revs_min: Math.round(e.rmin), revs_max: Math.round(e.rmax) }; if (e.gears.length) o.gears = e.gears.join('>'); if (e.down.length) o.downshift = { to_gear: e.down[0].to, where_m_from_apex: Math.round(e.where(e.down[0])), kmh: +kmh(e.down[0].v) }; if (e.up.length) o.upshift = { to_gear: e.up[0].to, where_m_from_apex: Math.round(e.where(e.up[0])), rpm: Math.round(e.up[0].rpm) }; if (isFinite(e.t1)) o.water_c = +e.t1.toFixed(1); return o; };
+  const M = (m, P, w) => m ? Object.assign({ pedal: pedalText(m), entry_kmh: +kmh(m.vEntry), released_m: m.sRel >= 0 ? Math.round(m.sRel) : null, apex_kmh: +kmh(m.vApex), apex_m: Math.round(m.sApex), throttle_m: m.sThr >= 0 ? Math.round(m.sThr) : null, exit_kmh: +kmh(m.vExit), lateral_g: +m.gmax.toFixed(2), time_s: +m.time.toFixed(2) }, P ? E(P, w) : {}) : null;
+  const box = sess._box && sess._box.box, engine = box ? { channels: Object.keys(box.ch).filter(k => box.ch[k]), gearbox: box.kind === 'single' ? 'none (direct drive)' : `${box.gears} gears${box.kind === 'dd2' ? ' (Rotax DD2)' : ''}`, revs_peak: Math.round(box.rpmMax), water_c: box.t1 ? { min: +box.t1.min.toFixed(1), max: +box.t1.max.toFixed(1) } : undefined, note: 'shift points are read from the revs against the GPS speed (±0.3 s); gears are numbered from the ratio levels seen in the session' } : undefined;
+  const corners = D.rows.map(r => { const c = coach && coach.corners.find(x => x.n === r.w.n); return { corner: 'T' + r.w.n, direction: r.w.dir === 'L' ? 'left' : 'right', radius_m: Math.round(r.w.Rmin), apex_from_sf_m: Math.round(r.R.sApex), reference: M(r.R, D.R, r.w), comparison: M(r.O, D.O, r.w), comparison_lap: r.pick ? r.pick.L.n : undefined, third_time: r.M3 ? +r.M3.time.toFixed(2) : undefined, delta_s: r.cmp ? +r.cmp.dt.toFixed(2) : null, delta_text: r.cmp ? r.cmp.text : null, coach: c ? { best_passes: DATA.coachText(c), reserve_s: +Math.max(0, r.R.time - c.tTop).toFixed(2), time_spread_s: c.tStd !== undefined ? +c.tStd.toFixed(2) : null } : null }; });
+  return JSON.stringify({ track: LAB.trackName, layout: LAB.G.layout ? LAB.G.layout.name : LAB.lid, session: { name: shortSess(sess), driver: sess.driver, date: sess.date, kart: kartLabel(sess), kart_class: kartClassOf(sess), laps: sess.laps.length, clean: clean.length, best_lap: bestLap(sess).n, best_time: fmtMs(bestLap(sess).timeMs), avg_clean: fmtLap(avg), is_viewer_own: !!D.ref.mine }, engine, reference_lap: { what: D.ref.name, time: fmtLap(D.R.T) }, third_lap: D.P3 ? { who: D.name3, time: fmtLap(D.P3.T), delta_s: +(D.R.T - D.P3.T).toFixed(2), note: 'a third lap on the screen for visual comparison; per corner: third_time' } : undefined, comparison: D.O ? Object.assign({ who: D.nameOf(D.O), time: fmtLap(D.O.T), delta_s: +D.total.toFixed(2) }, D.O.ideal ? { ideal: true, note: 'the ideal lap stitches the fastest pass through each corner from different laps of this session; approximate — corner combinations are not accounted for; each corner says which lap it came from (comparison_lap)' } : {}) : null, digest: $('digest').innerText, corners });
 }
-const AI_RULES = () => `You are a rental-karting coach (Sodi RT10, Honda GX390, up to ~80 km/h) and an Alfano telemetry analyst. Below is a JSON breakdown of one session on a track: corners T1…Tn are numbered from the start/finish line; for each one you get what the driver did on the reference lap and on the comparison lap: points in metres from S/F, speeds in km/h, corner time, plus "coach" — statistics of the best passes through that corner across all loaded laps and the reserve. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, briefly and concretely, in plain language without jargon, referring to corner numbers and the numbers in the data. If asked about something not in the data (video, a line more precise than ±1 m, kart condition), say so plainly. Never invent numbers. Plain text, no tables or headings; lists only when short.`;
+const AI_RULES = () => `You are a karting coach — rental karts (Sodi RT10, Honda GX390, up to ~80 km/h) and sport karts (Rotax, X30, DD2, KZ; when the session has an "engine" block, use the revs, gears and shift points too) — and an Alfano telemetry analyst. Below is a JSON breakdown of one session on a track: corners T1…Tn are numbered from the start/finish line; for each one you get what the driver did on the reference lap and on the comparison lap: points in metres from S/F, speeds in km/h, corner time, plus "coach" — statistics of the best passes through that corner across all loaded laps and the reserve. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, briefly and concretely, in plain language without jargon, referring to corner numbers and the numbers in the data. If asked about something not in the data (video, a line more precise than ±1 m, kart condition), say so plainly. Never invent numbers. Plain text, no tables or headings; lists only when short.`;
 async function askAI() {
   if (STORE.aiOn) return askCoachInline();
   const q = $('askInput').value.trim(); if (!q || !sampleFn || !LAB.dcmp) return;
@@ -5945,7 +6220,7 @@ function postCard(s, names, cnt, opts) {
   const info = el('div'); info.innerHTML = `<div class="lbl">${t('best lap')}</div><div class="big">${fmtMs(s.bestMs)}</div><div class="nm">${esc(s.label || s.name)}${resultText(s) ? ` <span class="res">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</div>`;
   const chips = el('div', 'chips'); const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
   chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`);
-  if (rich) { if (s.card.vmax) chip(t('max'), `${s.card.vmax} ${t('km/h')}`); if (s.card.total) chip(t('reserve'), `${s.card.total.toFixed(2)} s`); } if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
+  if (rich) { if (s.card.vmax) chip(t('max'), `${s.card.vmax} ${t('km/h')}`); if (s.card.total) chip(t('reserve'), `${s.card.total.toFixed(2)} s`); } if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.ch && s.ch.rpm) { chip(t('rpm max'), String(Math.round(s.ch.rpmMax || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009')); if (s.ch.kind && s.ch.kind !== 'single' && s.ch.shifts) chip(t('shifts'), `${s.ch.shifts} / ${t('lap')}`); if (s.ch.t1Max) chip(t('water'), `${Math.round(s.ch.t1Max)} °C`); } if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
   info.appendChild(chips);
   pb.append(pv, info);
   // the rest of a driver's batch: one compact row each, three shown, the others behind "show all"
@@ -6388,6 +6663,8 @@ const SESSEDIT = (() => {
     if (!$('sePubField').hidden) patch.published = $('sePublish').checked && !!tid;
     if (!$('seSws').disabled) { const i = $('seSws').value; if (i === '') patch.sws = null; else { const prof = await STORE.profile(STORE.me.id) || {}; const r = (prof.swsResults && prof.swsResults.results || [])[+i]; if (r) patch.sws = { i: +i, date: r.date, race: r.race || r.cat, track: r.track, pos: r.pos, best: r.best }; } }
     const b = $('seSave'); b.classList.add('busy'); setStatus('seStatus', t('Saving…'));
+    // a sport kart with revs: the gearbox is read from the kart class, so the channel summary follows the kart
+    { const loaded = STORE.sessionLoaded ? STORE.sessionLoaded(cur.id) : null; if (loaded && loaded.laps && typeof GEAR !== 'undefined' && loaded.laps.some(L => L.pts.length && L.pts[0].rpm !== undefined)) { Object.assign(loaded, { kart: patch.kart, kartClass: patch.kartClass, kartCat: patch.kartCat }); patch.ch = STORE.channelsMeta(loaded); } }
     try { await STORE.updateSession(cur.id, patch); Object.assign(cur, patch); if (cur.published && !(LAB.current && LAB.current.id === cur.id)) sharePageSync(cur).catch(() => {}); /* from the Lab the reopen redraws the picture too */ close(); toast(t('Session updated.')); if (done) done(cur); } catch (e) { setStatus('seStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');
   };
