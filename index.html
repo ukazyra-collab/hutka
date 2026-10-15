@@ -451,6 +451,9 @@ body.onboarding #toast{z-index:50}
 .insp-table th.you{color:var(--actual)}.insp-table th.cmp{color:var(--cmp)}
 .insp-table td{padding:3px 6px;border-top:1px solid var(--line);font-family:var(--mono);font-size:12px;white-space:nowrap}
 .insp-table td:first-child{font-family:var(--body);color:var(--muted)}
+/* three laps side by side: the table may be wider than the panel — it scrolls sideways instead of being cut, and cells wrap */
+.insp-wrap{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.insp-table.three td{white-space:normal;font-size:11.5px;padding:3px 4px}.insp-table.three th{padding:2px 4px 4px;font-size:10px}.insp-table.three td:first-child{white-space:nowrap}
 #inspBody{display:flex;flex-direction:column;gap:10px}
 .insp-text{font-size:13.5px;line-height:1.5;border-top:1px solid var(--line);padding-top:8px}
 .insp-text .lbl{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;font-weight:600}
@@ -4443,7 +4446,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v32';
+const APP_VERSION = 'v32.1';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -5837,7 +5840,7 @@ function renderInspector() {
   const O3 = D.P3 ? r.M3 : null, row = (lbl, a, b, c) => `<tr><td>${lbl}</td><td>${a}</td>${O ? `<td>${b}</td>` : ''}${O3 ? `<td class="third">${c === undefined ? '' : c}</td>` : ''}</tr>`;
   const sM = (x) => x >= 0 ? x.toFixed(0) + ' ' + t('m') : '—', K = t('km/h');
   let html = `<div class="insp-head"><b>T${w.n}</b><span class="hint">${w.dir === 'L' ? t('left') : t('right')} · R ${w.Rmin.toFixed(0)} ${t('m')} · ${t('apex {s} m from S/F', { s: R.sApex.toFixed(0) })}</span>${pill}</div>`;
-  html += `<table class="insp-table"><tr><th></th><th class="you">1 · ${esc(youHead)}</th>${O ? `<th class="cmp">2 · ${esc(r.pick ? `${oName} · ${t('lap {n}', { n: r.pick.L.n })}` : oName)}</th>` : ''}${O3 ? `<th class="third">3 · ${esc(D.name3)}</th>` : ''}</tr>`;
+  html += `<div class="insp-wrap"><table class="insp-table${O3 ? ' three' : ''}"><tr><th></th><th class="you">1 · ${esc(youHead)}</th>${O ? `<th class="cmp">2 · ${esc(r.pick ? `${oName} · ${t('lap {n}', { n: r.pick.L.n })}` : oName)}</th>` : ''}${O3 ? `<th class="third">3 · ${esc(D.name3)}</th>` : ''}</tr>`;
   html += row(t('entry'), `${kmh(R.vEntry)} ${K}`, O ? `${kmh(O.vEntry)} ${K}` : '', O3 ? `${kmh(O3.vEntry)} ${K}` : '');
   html += row(t('pedal'), pedalText(R), O ? pedalText(O) : '', O3 ? pedalText(O3) : '');
   if (R.kind === 'brake' || (O && O.kind === 'brake') || (O3 && O3.kind === 'brake')) html += row(t('released'), sM(R.sRel), O ? sM(O.sRel) : '', O3 ? sM(O3.sRel) : '');
@@ -5855,7 +5858,7 @@ function renderInspector() {
       const rt = (e) => e ? `${fmtRpm(e.rmin)}–${fmtRpm(e.rmax)}` : dash; html += row(t('revs'), rt(E), rt(EO), E3 ? rt(E3) : '');
       if (any(e => isFinite(e.t1))) { const tt = (e) => e && isFinite(e.t1) ? `${e.t1.toFixed(1)} °C` : dash; html += row(t('water'), tt(E), tt(EO), E3 ? tt(E3) : ''); }
     } }
-  html += row(t('time'), `${R.time.toFixed(2)} ${t('s')}`, O ? `${O.time.toFixed(2)} ${t('s')}` : '', O3 ? `${O3.time.toFixed(2)} ${t('s')} <span class="hint">${sg(R.time - O3.time)}</span>` : '') + '</table>';
+  html += row(t('time'), `${R.time.toFixed(2)} ${t('s')}`, O ? `${O.time.toFixed(2)} ${t('s')}` : '', O3 ? `${O3.time.toFixed(2)} ${t('s')} <span class="hint">${sg(R.time - O3.time)}</span>` : '') + '</table></div>';
   if (r.pick) html += `<div class="insp-text ideal">${esc(r.pick.L === D.ref.L ? t('Your fastest pass through this corner is this very lap.') : t('Your fastest pass through this corner: lap {n}, {t} s ({d} s faster than the reference lap).', { n: r.pick.L.n, t: r.pick.time.toFixed(2), d: Math.max(0, R.time - r.pick.time).toFixed(2) }))} ${esc(t('Corners are judged one by one — check the next corner of that lap too.'))}</div>`;
   if (O) { const pl = plainCorner(r, oName, refLabel); html += `<div class="insp-text"><div class="lbl">${t('In plain words')}</div>${esc(pl.what)}${pl.advice ? `<br><b>${esc(pl.advice)}</b>` : ''}</div>`; }
   if (coach) { const res = R.time - coach.tTop; html += `<div class="insp-text"><div class="lbl">${t('Coach · best passes through this corner')}</div>${esc(DATA.coachText(coach))}${res > 0.03 ? ` <b>${D.ref.mine ? t('Your reserve here ≈ {t} s.', { t: res.toFixed(2) }) : t('Reserve in this lap ≈ {t} s.', { t: res.toFixed(2) })}</b>` : ' ' + (D.ref.mine ? t('You are among the best here.') : t('This lap is among the best here.'))}</div>`; }
