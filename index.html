@@ -4593,7 +4593,7 @@ const NATIVE = window.NATIVE = {
     if (/^(file|content):/i.test(url)) { try { const f = await this.readFile(url); if (f) { if (APP.route !== 'lab') go('lab'); setTimeout(() => UPLOAD.withFiles([f]), 400); } } catch (e) { toast(t('Could not open the file: {e}', { e: e && e.message || e })); } }
   }
 };
-if (NATIVE.on) document.documentElement.classList.add('native');   // the app shell's look (the glass bars) from the first paint
+if (NATIVE.on || /[?&]app=1\b/.test(location.search)) document.documentElement.classList.add('native');   // the app shell's look (the glass bars) from the first paint; hutka.ai/?app=1 previews it in a browser
 // the Activity list: what happened to my sessions (push.sql hutka_activity) — the bell in the top bar carries the unread count, the page lists it
 const ACTIVITY = {
   unread: 0, at: 0,
@@ -4666,7 +4666,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v33';
+const APP_VERSION = 'v33.1';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
