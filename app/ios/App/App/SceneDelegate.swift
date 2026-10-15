@@ -14,12 +14,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // no rubber band at the ends of the page: the site's own top bar and tab bar stay put instead of riding with the bounce
         bridgeVC.loadViewIfNeeded()
         bridgeVC.webView?.scrollView.bounces = false
+        bridgeVC.webView?.scrollView.showsVerticalScrollIndicator = false   // the page has its own bars; the web view's scroll indicator looked like a stray status bar
+        bridgeVC.webView?.scrollView.showsHorizontalScrollIndicator = false
 
         SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
-        (window?.rootViewController as? CAPBridgeViewController)?.webView?.scrollView.bounces = false
+        if let sv = (window?.rootViewController as? CAPBridgeViewController)?.webView?.scrollView { sv.bounces = false; sv.showsVerticalScrollIndicator = false; sv.showsHorizontalScrollIndicator = false }
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
