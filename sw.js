@@ -1,5 +1,5 @@
 // Hutka service worker: offline app shell + "share to Hutka" from the Alfano app (Web Share Target)
-const V = 'hutka-shell-v70';
+const V = 'hutka-shell-v71';
 const SHELL = ['./', './index.html', './config.js', './geo.txt', './supabase.js', './manifest.webmanifest'];
 self.addEventListener('install', (e) => { e.waitUntil((async () => { const c = await caches.open(V); for (const u of SHELL) { try { await c.add(new Request(u, { cache: 'reload' })); } catch (err) {} } self.skipWaiting(); })()); });
 self.addEventListener('activate', (e) => { e.waitUntil((async () => { for (const k of await caches.keys()) if (k !== V && k !== 'hutka-share') await caches.delete(k); await self.clients.claim(); })()); });
