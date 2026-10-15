@@ -3520,6 +3520,7 @@ const STORE = (() => {
       async adminStats() { return must(await sb.rpc('hutka_stats')); },
       async adminVisits() { return must(await sb.rpc('hutka_visits')); },
       async visit(vid, dev) { return must(await sb.rpc('hutka_visit', { vid, dev })); },
+      async counts() { return must(await sb.rpc('hutka_counts')); },
       async event(vid, visit, name, props, dev) { return must(await sb.rpc('hutka_event', { vid, visit, name, props: props || {}, dev })); },
       async adminAnalytics(days) { return must(await sb.rpc('hutka_analytics', { days })); },
       async setCard(sid, card) { return must(await sb.rpc('hutka_set_card', { sid, card })) === true; },
@@ -3723,6 +3724,13 @@ const STORE = (() => {
   async function toggleFollow(uid) { if (!adapter || !me.id) throw new Error('sign in'); if (uid === me.id) return followInfo(uid); const cur = await followInfo(uid); if (cur.iFollow) await adapter.unfollow(me.id, uid); else await adapter.follow(me.id, uid); followCache.clear(); return followInfo(uid, true); }
   async function followingIds() { if (!adapter || !me.id) return []; try { return await adapter.followingOf(me.id); } catch (e) { return []; } }
   async function feed() { const ids = await followingIds(); if (!ids.length) return []; try { return (await adapter.sessionsByOwners(ids)).sort(byDate).slice(0, 30); } catch (e) { return []; } }
+  // the home-page counter: site-wide totals (hutka_counts, public); null when the function is not there yet — the page then counts what it has
+  let countsAt = 0, countsV = null;
+  async function siteCounts() {
+    if (!adapter || !adapter.counts) return null;
+    if (countsV && Date.now() - countsAt < 60000) return countsV;
+    try { const c = await adapter.counts(); if (!c || typeof c.sessions !== 'number') return null; countsV = c; countsAt = Date.now(); return c; } catch (e) { return null; }
+  }
   async function recentPublished(n) { if (!adapter) return []; try { return (await adapter.recentPublished(n || 30)).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); } catch (e) { return []; } }
   async function socialCounts(ids) { const empty = () => { const o = {}; for (const id of ids) o[id] = { likes: 0, down: 0, comments: 0, liked: false, mine: 0 }; return o; }; if (!adapter || !ids.length) return empty(); try { return await adapter.socialCounts(ids, me.id); } catch (e) { return empty(); } }
   async function refreshProfile() { if (adapter && me.id) { try { const p = await adapter.getProfile(me.id); profiles.set(me.id, p); return p; } catch (e) {} } return profiles.get(me.id) || null; }
@@ -3809,7 +3817,7 @@ const STORE = (() => {
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits, track, adminAnalytics,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
-    sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
+    sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
@@ -4491,7 +4499,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v32.4';
+const APP_VERSION = 'v32.5';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6279,20 +6287,23 @@ async function renderHomePage() {
   $('homeSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity); $('homeSignIn').onclick = () => AUTH.open();
   const feed = $('homeFeed'); feed.innerHTML = '';
   for (let i = 0; i < 3; i++) { const sk = el('div', 'post skel'); sk.style.height = '220px'; feed.appendChild(sk); }
-  const pubs = STORE.hasDb ? await STORE.recentPublished(30) : [];
+  // 100 most recent published sessions — one driver uploading 30 files in a row must not push everyone else out of the feed (they fold into one post below)
+  const pubs = STORE.hasDb ? await STORE.recentPublished(100) : [];
+  const C = STORE.hasDb ? await STORE.siteCounts() : null;
   await STORE.socialAvailable();
   const names = await STORE.names(pubs.map(s => s.owner)), counts = await STORE.socialCounts(pubs.map(s => s.id));
   for (const tid of new Set(pubs.map(s => s.track).filter(Boolean))) await STORE.getLayouts(tid);
   // hero stats
-  { const st = $('homeStats'); st.innerHTML = ''; const drivers = new Set(pubs.map(s => s.owner)).size, laps = pubs.reduce((a, s) => a + (s.nLaps || 0), 0); for (const [k, v] of [[t('Tracks'), STORE.getTracks().length], [t('Sessions'), pubs.length], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="v">${v}</div><div class="k">${esc(k)}</div>`; st.appendChild(d); } }
-  feed.innerHTML = ''; $('feedSub').textContent = pubs.length ? t('{n} published', { n: pubs.length }) : '';
+  // site-wide totals from hutka_counts; without the function (older database) — what the feed slice shows
+  { const st = $('homeStats'); st.innerHTML = ''; const drivers = C ? C.drivers : new Set(pubs.map(s => s.owner)).size, laps = C ? C.laps : pubs.reduce((a, s) => a + (s.nLaps || 0), 0), nSess = C ? C.sessions : pubs.length; for (const [k, v] of [[t('Tracks'), C ? C.tracks : STORE.getTracks().length], [t('Sessions'), nSess], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="v">${v}</div><div class="k">${esc(k)}</div>`; st.appendChild(d); } }
+  feed.innerHTML = ''; $('feedSub').textContent = pubs.length ? t('{n} published', { n: C && C.published ? C.published : pubs.length }) : '';
   if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); e.appendChild(el('div', 't', STORE.hasDb ? t('No sessions published yet') : t('Sign in to see the feed'))); e.appendChild(el('div', '', STORE.hasDb ? t('Be the first: upload your session and publish it on the track page.') : t('The shared library needs a connection. Browse tracks meanwhile.'))); feed.appendChild(e); }
   // sessions several drivers marked as not helpful sink to the bottom of the feed
   const order = pubs.slice().sort((a, b) => (STORE.lowRated(counts[a.id]) - STORE.lowRated(counts[b.id])) || (b.createdAt || 0) - (a.createdAt || 0));
   // several uploads in a row by one driver fold into a single post: the fastest session with its card, the others as a short list (no flood)
   const groups = []; for (const s of order) { const g = groups[groups.length - 1]; if (g && g.owner === s.owner && g.items.length < 20) g.items.push(s); else groups.push({ owner: s.owner, items: [s] }); }
   const groupOf = {};
-  for (const g of groups) { if (g.items.length === 1) { feed.appendChild(postCard(g.items[0], names, counts[g.items[0].id])); continue; } const best = g.items.slice().sort((a, b) => (a.bestMs || 1e12) - (b.bestMs || 1e12))[0], rest = g.items.filter(s => s !== best); groupOf[best.id] = rest; feed.appendChild(postCard(best, names, counts[best.id], { group: rest })); }
+  for (const g of groups.slice(0, 30)) { if (g.items.length === 1) { feed.appendChild(postCard(g.items[0], names, counts[g.items[0].id])); continue; } const best = g.items.slice().sort((a, b) => (a.bestMs || 1e12) - (b.bestMs || 1e12))[0], rest = g.items.filter(s => s !== best); groupOf[best.id] = rest; feed.appendChild(postCard(best, names, counts[best.id], { group: rest })); }
   HOME.last = { pubs, names, counts, groupOf }; if (typeof CARDS !== 'undefined') setTimeout(() => CARDS.run(), 600);   // older sessions get their analysis card in the background
   $('feedHint').textContent = pubs.length ? t('Sessions appear here when drivers publish them. Open one to see the corner-by-corner breakdown, or compare it with your own.') : '';
   // where people drive: layouts by number of sessions in the last 60 days
