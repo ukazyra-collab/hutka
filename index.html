@@ -427,6 +427,7 @@ body.onboarding #toast{z-index:50}
 .rp-lap .live{font:500 12px var(--mono);white-space:nowrap;font-variant-numeric:tabular-nums}
 .rp-lap .live b{font-weight:700}.rp-lap .live b.loss{color:var(--brake)}.rp-lap .live b.gain{color:var(--throttle)}
 .rp-lap.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,var(--surface))}
+.legend .lapkey b{font:700 11px var(--mono);margin-right:2px}
 .insp-table th.third,.insp-table td.third{color:var(--cmp2)}
 .insp-table td.third .hint{font-size:11px}
 .tbl.corners td.num.two{white-space:pre-line;line-height:1.25}
@@ -581,6 +582,17 @@ body.onboarding #toast{z-index:50}
 .post.rich .pb{grid-template-columns:minmax(240px,44%) minmax(0,1fr)}
 .post .pv.rich{height:250px;background:var(--surface)}
 .post .pv .pv-open{position:absolute;inset:0;border-radius:12px}
+.post .gbadge{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-size:11px;font-weight:600;color:var(--muted);vertical-align:middle}
+.post .more{padding:0 16px 12px}
+.post .more .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:6px}
+.post .mlist{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.post .mrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);text-decoration:none;color:var(--fg);font-size:13px}
+.post .mrow b{font:600 14px var(--mono)}
+.post .mrow span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.post .mrow .hint{font-size:12px}
+.post .mrow:hover{border-color:var(--accent)}
+.post .pf .btn.mod{color:var(--muted)}
+@media (max-width:640px){.post .more{padding:0 12px 10px}.post .mrow{grid-template-columns:auto minmax(0,1fr);font-size:12.5px}.post .mrow .hint{display:none}}
 .ideal-break{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .ideal-break .ib-head{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-bottom:8px}
 .ideal-break .ib-head b{font-size:15px}
@@ -1114,7 +1126,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     <!-- ========== LAYOUT ========== -->
     <!-- ========== LAB ========== -->
     <section class="page" id="pg-lab" hidden>
-      <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnShare" type="button" hidden><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
+      <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnShare" type="button" hidden><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="btnModerate" type="button" hidden></button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
       <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div><button class="btn primary sm" id="labSignIn" style="margin-left:auto;flex:none" hidden data-t="Sign in">Sign in</button></div>
       <div id="labStart" hidden>
         <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="labMineSub"></span></h2><div id="labMine"></div><div class="hint" id="labMineHint"></div></div>
@@ -1227,6 +1239,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
             <div class="field"><label>Instagram</label><input type="text" id="profIg" maxlength="80" placeholder="@name"></div>
             <div class="field"><label data-t="Contact link (Telegram / WhatsApp)">Contact link (Telegram / WhatsApp)</label><input type="text" id="profContact" maxlength="160" placeholder="https://t.me/name"></div>
             <div class="field wide"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profCoach" style="width:18px;height:18px"><span data-t="I coach — show “Book a training” on my page (uses the contact link)">I coach — show “Book a training” on my page (uses the contact link)</span></label></div>
+            <div class="field wide"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profNotify" style="width:18px;height:18px" checked><span data-t="E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)">E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)</span></label></div>
             <div class="field wide" id="profSwsField" hidden><label data-t="SWS (Sodi World Series) profile link">SWS (Sodi World Series) profile link</label><div class="row"><input type="url" id="profSws" class="grow" placeholder="https://www.sodiwseries.com/en-gb/drivers/…"><button class="btn sm" id="profSwsImport" type="button" data-t="Import SWS results">Import SWS results</button></div><div class="hint" id="profSwsHint"></div></div>
           </div>
           <div class="row" style="margin-top:12px"><button class="btn primary" id="profSave" type="button" data-t="Save">Save</button><button class="btn ghost" id="profSignOut" type="button" hidden data-t="Sign out">Sign out</button><span class="status" id="profStatus"></span></div>
@@ -1330,6 +1343,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
               <div class="map-wrap"><div class="map-bar"><div class="seg"><button class="btn" id="eRotL" type="button">↺</button><button class="btn" id="eRotR" type="button">↻</button></div><div class="seg"><button class="btn" id="eZoomOut" type="button">−</button><button class="btn" id="eZoomIn" type="button">+</button><button class="btn" id="eZoomFit" type="button">⌂</button></div></div><div style="position:relative"><canvas id="emap"></canvas><div class="readout" id="eReadout" hidden></div></div></div>
             </div>
           </div>
+        <div class="card" id="admModCard" hidden><h2><svg><use href="#i-info"/></svg><span data-t="Hidden sessions">Hidden sessions</span><span class="sub" data-t="hidden by admins — the owners keep them">hidden by admins — the owners keep them</span></h2><div class="list" id="admMod"></div></div>
         <div class="card" id="admReportsCard" hidden><h2><svg><use href="#i-info"/></svg><span data-t="Bug reports">Bug reports</span><span class="sub" id="admReportsSub"></span></h2><div class="list" id="admReports"></div><div class="hint" id="admReportsHint" style="margin-top:8px"></div></div>
         <div class="card" id="admStatsCard" hidden><h2><svg><use href="#i-speed"/></svg><span data-t="Statistics">Statistics</span><span class="sub" id="admStatsSub"></span></h2><div id="admStats"></div></div>
         <div class="card" id="admAiCard" hidden><h2><svg><use href="#i-spark"/></svg><span data-t="AI coach · usage and cost">AI coach · usage and cost</span></h2><div id="admAiUsage"></div></div>
@@ -2999,6 +3013,10 @@ Object.assign(I18N.RU, { 'Visitors today': 'Посетители сегодня'
 Object.assign(I18N.RU, { 'Best vs ideal': 'Лучший vs идеальный', 'ideal lap': 'идеальный круг', 'Ideal lap': 'Идеальный круг', 'best corners, approximate': 'лучшие повороты, приблизительно', 'This session needs at least two clean laps for an ideal lap.': 'Для идеального круга нужны хотя бы два чистых круга в сессии.', 'Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.': 'Идеальный круг ≈ самый быстрый проезд каждого поворота, собранный из разных кругов. Приблизительно: связки поворотов не учитываются.', 'The fastest pass through each corner, stitched from {k} different laps of this session — {d} s better than the best lap.': 'Самый быстрый проезд каждого поворота, собранный из {k} разных кругов этой сессии — на {d} с лучше лучшего круга.', 'Where another lap was faster:': 'Где другой круг был быстрее:', 'The best lap is the fastest in every corner.': 'Лучший круг — самый быстрый в каждом повороте.', 'Approximate: corners are judged one by one, combinations are not — a faster entry into one corner can be the reason for a slower next one, and this stitched lap was never driven. A ceiling, not a target.': 'Приблизительно: повороты оцениваются по одному, связки — нет: быстрый вход в один поворот может быть причиной медленного следующего, а такого круга целиком никто не проезжал. Это потолок, а не цель.', 'Your fastest pass through this corner is this very lap.': 'Твой самый быстрый проезд этого поворота — именно этот круг.', 'Your fastest pass through this corner: lap {n}, {t} s ({d} s faster than the reference lap).': 'Твой самый быстрый проезд этого поворота: круг {n}, {t} с (на {d} с быстрее опорного круга).', 'Corners are judged one by one — check the next corner of that lap too.': 'Повороты оцениваются по одному — посмотри и следующий поворот того круга.' });
 Object.assign(I18N.RU, { 'Ideal lap breakdown': 'Из чего состоит идеальный круг', '{t} = the fastest pass through each corner · stitched from {k} laps · best lap {b}': '{t} = самый быстрый проезд каждого поворота · собрано из {k} кругов · лучший круг {b}', 'Approximate: corners are judged one by one, combinations are not — a faster entry into one corner can be the reason for a slower next one. Tap a lap to compare it with your best lap in that corner, or to find it on the camera.': 'Приблизительно: повороты оцениваются по одному, связки — нет: быстрый вход в один поворот может быть причиной медленного следующего. Нажми на круг, чтобы сравнить его с лучшим кругом в этом повороте или найти на камере.', 'Fastest laps in this corner': 'Самые быстрые круги в этом повороте', 'Best lap': 'Лучший круг', 'your best lap': 'твой лучший круг', 'Compare the best lap with lap {n} in T{c}': 'Сравнить лучший круг с кругом {n} в T{c}', 'Σ fastest corners = {t}': 'Σ лучших поворотов = {t}' });
 Object.assign(I18N.RU, { 'Third lap (optional)': 'Третий круг (необязательно)', '— no third lap —': '— без третьего круга —', 'Third lap': 'Третий круг', 'third lap': 'третий круг', 'Play the lap': 'Проиграть круг', 'Pause': 'Пауза', "Show this lap's points on the map": 'Показать точки этого круга на карте' });
+Object.assign(I18N.RU, { '(dashed)': '(пунктир)' });
+Object.assign(I18N.RU, { 'E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)': 'Писать мне на почту, когда мои сессии лайкают или комментируют (не чаще раза в час)' });
+Object.assign(I18N.RU, { 'Also uploaded — the fastest is above': 'Ещё загрузил — быстрейшая выше', 'Show all {n}': 'Показать все {n}', 'Hide': 'Скрыть', "Hide from the public (admins): the session stays in its owner's library, unpublished.": 'Скрыть от всех (админы): сессия остаётся у владельца, снятая с публикации.', 'Hide this session from the public?': 'Скрыть эту сессию от всех?', 'It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again from the Lab.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется снятой с публикации, опубликовать заново он не сможет; вернуть её можно из Lab.', 'It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again here.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется снятой с публикации, опубликовать заново он не сможет; вернуть её можно здесь.', 'Hidden from the public.': 'Скрыто от всех.', 'Shown again.': 'Снова видна.', 'Run supabase/moderate.sql in the SQL editor once — then admins can hide sessions.': 'Выполни supabase/moderate.sql в SQL Editor один раз — тогда админы смогут скрывать сессии.', 'Could not hide: {e}': 'Не удалось скрыть: {e}', 'Hide from public': 'Скрыть от всех', 'Show again': 'Показать снова', 'Unpublished by owner': 'Снята владельцем', 'Hidden by admins': 'Скрыта админами', 'The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine, or ask them.': 'Админы сайта скрыли эту сессию от всех (битая запись или не тот лейаут). Если с данными всё в порядке — загрузи заново или напиши им.', 'The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.': 'Админы сайта скрыли эту сессию от всех (битая запись или не тот лейаут) — опубликовать её заново нельзя. Если с данными всё в порядке — загрузи заново.', 'Admins: hide a broken or wrongly placed session from the feed and the track page — its owner keeps it.': 'Админам: скрыть битую или не туда положенную сессию из ленты и со страницы трассы — у владельца она остаётся.' });
+Object.assign(I18N.RU, { 'Hidden sessions': 'Скрытые сессии', 'hidden by admins — the owners keep them': 'скрыты админами — у владельцев остаются', 'Run supabase/moderate.sql in the SQL editor once — then admins can hide broken sessions from the feed (the Hide button on a post or in the Lab).': 'Выполни supabase/moderate.sql в SQL Editor один раз — тогда админы смогут скрывать битые сессии из ленты (кнопка «Скрыть» на посте или в Lab).', 'Nothing hidden. A broken or wrongly placed session can be hidden from the feed with the Hide button on its post (or in the Lab).': 'Скрытых нет. Битую или не туда положенную сессию можно убрать из ленты кнопкой «Скрыть» на её посте (или в Lab).' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3262,7 +3280,7 @@ const STORE = (() => {
       async saveSession(sid, meta, chunks) { must(await sb.from('sessions').upsert({ id: sid, owner: meta.owner, track_id: meta.track || '', layout_id: meta.layout || 'custom', published: !!meta.published, best_ms: meta.bestMs, meta, updated_at: new Date().toISOString() })); must(await sb.from('session_data').upsert({ id: sid, enc: meta.enc, data: chunks.join('') })); },
       async updateSession(sid, patch) { const cur = await A.getSessionMeta(sid); if (!cur) throw new Error('missing'); const meta = Object.assign(cur, patch, { updatedAt: Date.now() }); delete meta.id; must(await sb.from('sessions').update({ meta, published: !!meta.published, track_id: meta.track || '', layout_id: meta.layout || 'custom', updated_at: new Date().toISOString() }).eq('id', sid)); },
       deleteSession: async (sid) => must(await sb.from('sessions').delete().eq('id', sid)),
-      async getProfile(id) { const rows = must(await sb.from('profiles').select('*').eq('id', id).limit(1)); if (!rows.length) return null; const r = rows[0]; A.profilePerson = ('first_name' in r); return { racingName: r.racing_name || '', firstName: r.first_name || '', lastName: r.last_name || '', birthYear: r.birth_year || null, weightKg: r.weight_kg || null, country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', sws: r.sws_url || '', swsResults: r.sws_results || null, instagram: r.instagram || '', contact: r.contact || '', coach: !!r.coach, bio: r.bio || '', updatedAt: r.updated_at }; },
+      async getProfile(id) { const rows = must(await sb.from('profiles').select('*').eq('id', id).limit(1)); if (!rows.length) return null; const r = rows[0]; A.profilePerson = ('first_name' in r); return { racingName: r.racing_name || '', firstName: r.first_name || '', lastName: r.last_name || '', birthYear: r.birth_year || null, weightKg: r.weight_kg || null, country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', sws: r.sws_url || '', swsResults: r.sws_results || null, instagram: r.instagram || '', contact: r.contact || '', coach: !!r.coach, bio: r.bio || '', notify: r.notify !== false, updatedAt: r.updated_at }; },
       async saveProfile(id, body) {
         const base = { id, racing_name: body.racingName || '', country: body.country || '', home_track: body.homeTrack || '', avatar: body.avatar || '', updated_at: new Date().toISOString() };
         const extra = { sws_url: body.sws || '', sws_results: body.swsResults || null, instagram: body.instagram || '', contact: body.contact || '', coach: !!body.coach, bio: body.bio || '' };
@@ -3273,7 +3291,9 @@ const STORE = (() => {
           const row = Object.assign({}, base, tier >= 2 ? extra : {}, tier >= 3 ? person : {});
           const r = await sb.from('profiles').upsert(row);
           if (r.error && tier > 1 && noCol(r.error)) { if (tier === 3) A.profilePerson = false; else A.profileExtras = false; continue; }
-          return must(r);
+          must(r);
+          if (body.notify !== undefined) { try { await sb.from('profiles').update({ notify: !!body.notify }).eq('id', id); } catch (e) {} }   // notify.sql — absent before it runs
+          return true;
         }
       },
       async allProfiles() { return must(await sb.from('profiles').select('*').limit(1000)).map(r => ({ id: r.id, racingName: r.racing_name || '', firstName: r.first_name || '', lastName: r.last_name || '', country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', coach: !!r.coach })); },
@@ -3283,6 +3303,8 @@ const STORE = (() => {
       async visit(vid, dev) { return must(await sb.rpc('hutka_visit', { vid, dev })); },
       async setCard(sid, card) { return must(await sb.rpc('hutka_set_card', { sid, card })) === true; },
       async setShare(sid, share) { return must(await sb.rpc('hutka_set_share', { sid, share })) === true; },
+      async setPublished(sid, pub) { return must(await sb.rpc('hutka_set_published', { sid, pub })) === true; },
+      async moderated() { return must(await sb.rpc('hutka_moderated')) || []; },
       addClaim: async (body) => must(await sb.from('claims').insert({ track_id: body.track, by: body.by, text: body.text || '' })),
       async listClaims() { return must(await sb.from('claims').select('*').order('created_at', { ascending: false })).map(r => ({ id: String(r.id), track: r.track_id, by: r.by, text: r.text, createdAt: new Date(r.created_at).getTime() })); },
       deleteClaim: async (id) => must(await sb.from('claims').delete().eq('id', +id)),
@@ -3411,6 +3433,12 @@ const STORE = (() => {
     try { const ok = await adapter.setShare(sid, share); if (ok) { const c = sessCache.get(sid); if (c) c.share = share; } return ok; }
     catch (e) { if (/hutka_set_share|PGRST202|42883/.test(String(e && e.message || e))) adminShareOk = false; return false; }
   }
+  // an admin hides (or shows again) someone else's published session — moderate.sql
+  async function setPublishedAdmin(sid, pub) {
+    if (!adapter || !adapter.setPublished || !me.canEdit) { const e = new Error('admins only'); e.code = 'not_admin'; throw e; }
+    const ok = await adapter.setPublished(sid, pub); if (ok) { const c = sessCache.get(sid); if (c) { c.published = pub; if (pub) delete c.moderated; else c.moderated = true; } notify('sessions'); } return ok;
+  }
+  async function moderatedList() { if (!adapter || !adapter.moderated || !me.canEdit) return []; return adapter.moderated(); }
   // drop loaded session data that nothing on the page holds (after background work): the next open fetches it again
   function trimSessions(keep) { const k = new Set(keep || []); for (const id of [...sessCache.keys()]) if (!k.has(id)) sessCache.delete(id); }
   async function deleteSession(meta) { if (adapter && meta.owner !== 'local') await adapter.deleteSession(meta.id, meta.chunks); else await LDB.del('sessions', meta.id); sessCache.delete(meta.id); notify('sessions'); }
@@ -3497,6 +3525,7 @@ const STORE = (() => {
     try { vid = localStorage.getItem('hutka.vid') || ''; if (!/^[A-Za-z0-9_-]{8,64}$/.test(vid)) { vid = 'v' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36); localStorage.setItem('hutka.vid', vid); } } catch (e) { return; }
     const dev = ((window.NATIVE && window.NATIVE.on) ? 'app ' : '') + (window.innerWidth < 700 ? 'phone' : window.innerWidth < 1100 ? 'tablet' : 'desktop');
     adapter.visit(vid, dev).catch(() => {});
+    if (me.id && aiCfg()) fnCall('notify', {}).catch(() => {});   // the activity e-mails (functions/notify) go out when anyone opens the site
   }
   async function adminVisits() { if (!adapter || !adapter.adminVisits || !me.canEdit) return null; return adapter.adminVisits(); }
   // the link preview of a published session: functions/share-page writes hutka.ai/s/<id> (title, text, the picture); the picture goes to the public bucket cards/<me>/<id>.png
@@ -3534,7 +3563,7 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, setCardAdmin, setShareAdmin, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits,
+    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
@@ -3988,7 +4017,7 @@ async function sharePageSync(meta, img) {
   return share;
 }
 // publish / unpublish from a list (profile, track page): the flag, then the share page in the background
-async function setPublished(meta, on) { await STORE.updateSession(meta.id, { published: on }); meta.published = on; sharePageSync(meta).catch(() => {}); }
+async function setPublished(meta, on) { if (on && meta.moderated && !STORE.isAdmin()) { toast(t('The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.')); return; } await STORE.updateSession(meta.id, { published: on }); meta.published = on; sharePageSync(meta).catch(() => {}); }
 // ---------- kart categories ----------
 // Every session is driven in one category: a rental kart model of the track (Sodi RT8, Birel N35…) or a sport class (Rotax Senior, X30,
 // KZ2…). Rankings, hot laps, personal bests and the Lab's comparisons never mix categories — a 270 cc rental and a KZ2 are different sports.
@@ -4203,7 +4232,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v31.1';
+const APP_VERSION = 'v31.2';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -4585,7 +4614,12 @@ const sessOf = (id) => LAB.sessions.find(x => x.id === id) || null;
 function findLap(key) { if (!key) return null; const [sid, n] = String(key).split('|'); const sess = sessOf(sid); if (!sess) return null; const L = sess.laps.find(L => L.n === +n); return L ? { sess, L } : null; }
 function allLaps() { const out = []; for (const sess of LAB.sessions) for (const L of sess.laps) if (L.px) out.push({ sess, L }); return out; }
 const bestLap = (sess) => sess.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a);
-function shortSess(sess) { if (sess.label) return sess.label; const who = LAB.names && LAB.names[sess.owner] ? LAB.names[sess.owner].name : (sess.driver || ''); const d = sess.date ? fmtDate(sess.date) : ''; return [who, d].filter(Boolean).join(' · ') || sess.name; }
+// labels: who drove it comes first for anyone else's session (two drivers side by side must read as two drivers), then the session's own name or date
+function whoOf(sess) { const n = LAB.names && LAB.names[sess.owner] ? LAB.names[sess.owner].name : ''; return n || (sess.driver && !/^driver[_ ]?\d*$/i.test(sess.driver) ? sess.driver : ''); }
+function sessWhat(sess) { return sess.label || (sess.date ? fmtDate(sess.date) : '') || sess.name || ''; }
+function shortSess(sess) { const what = sessWhat(sess); if (mySession(sess)) return what; const who = whoOf(sess); return [who, what].filter(Boolean).join(' · ') || sess.name; }
+// the short owner tag of a lap on the screen: "you" for your own, the driver's name for anyone else's, the session name for your other sessions
+function lapWho(s2, sess) { if (!s2) return ''; if (s2 === sess) return mySession(s2) ? t('you') : (whoOf(s2) || shortSess(s2)); if (mySession(s2)) return sessWhat(s2); return whoOf(s2) || shortSess(s2); }
 function sessAvg(sess) { const G = LAB.G; if (!G) return null; const laps = sess.laps.filter(L => L.clean && L.px); if (laps.length < 2) return null; if (sess._avg && sess._avg.key === G.rev) return sess._avg.P; const P = DATA.avgProjection(laps.map(L => DATA.projectLap(L, G.track, G.rev)).filter(Boolean), G.track, `${t('average lap')} · ${shortSess(sess)}`); P.sess = sess; sess._avg = { key: G.rev, P }; return P; }
 const lapLabel = (sess, L) => `${t('lap {n}', { n: L.n })} · ${fmtMs(L.timeMs)}${L === bestLap(sess) ? ' · ' + t('best') : ''}${L.clean ? '' : ' · ' + t('dirty')}`;
 const pedalText = (m) => m.kind === 'brake' ? t('brake {s} m', { s: m.sBrake.toFixed(0) }) + (m.inherited ? ' ' + t('(already in the previous corner)') : '') : (m.kind === 'lift' ? t('lift {s} m', { s: m.sLift.toFixed(0) }) : (m.kind === 'ease' ? t('eased off {s} m', { s: m.sEase.toFixed(0) }) : t('flat out')));
@@ -4598,7 +4632,7 @@ function activeRow() { const D = LAB.dcmp; if (!D) return null; const h = LAB.ho
 const cmpSessOf = (key) => { key = String(key || ''); if (!key || key === 'none' || key === 'avg') return null; return isAvgKey(key) ? sessOf(key.slice(4)) : (isIdealKey(key) ? sessOf(key.slice(6)) : (findLap(key) || {}).sess || null); };
 // the laps on the screen: the reference (1), the comparison (2), the third lap (3) — colours, metrics per corner, the chosen one
 const LAPCOL = { ref: 'var(--actual)', cmp: 'var(--cmp)', third: 'var(--cmp2)' };
-function lapList(D) { if (!D) return []; const out = [{ P: D.R, role: 'ref', n: 1, col: LAPCOL.ref, name: D.ref.name + (D.ref.mine || D.ref.avg ? '' : ' · ' + shortSess(D.sess)), m: (r) => r.R }]; if (D.O) out.push({ P: D.O, role: 'cmp', n: 2, col: LAPCOL.cmp, name: D.nameOf(D.O), m: (r) => r.O }); if (D.P3) out.push({ P: D.P3, role: 'third', n: 3, col: LAPCOL.third, name: D.name3, m: (r) => r.M3 }); return out; }
+function lapList(D) { if (!D) return []; const out = [{ P: D.R, role: 'ref', n: 1, col: LAPCOL.ref, name: `${lapWho(D.sess, D.sess)} · ${D.ref.name}`, m: (r) => r.R }]; if (D.O) out.push({ P: D.O, role: 'cmp', n: 2, col: LAPCOL.cmp, name: D.nameOf(D.O), m: (r) => r.O }); if (D.P3) out.push({ P: D.P3, role: 'third', n: 3, col: LAPCOL.third, name: D.name3, m: (r) => r.M3 }); return out; }
 const roleNow = () => LAB.mapLap === 'cmp' ? 'cmp' : (LAB.mapLap === 'third' ? 'third' : 'ref');
 const lapOnMap = (D) => (lapList(D).find(l => l.role === roleNow()) || lapList(D)[0]);
 // the station a lap has reached at time tau (its elapsed-time array is monotone)
@@ -5029,6 +5063,7 @@ function labEnsureMap() {
   $('qcIdeal').onclick = () => { const s = LAB.current; if (!s) return; if (isIdealKey(LAB.cmp)) return; LAB.breakOpen = true; LAB.ref = lapKey(s, bestLap(s)); LAB.cmp = 'ideal:' + s.id; LAB.pickerOpen = false; LAB.chat = []; labRender(); if (!isIdealKey(LAB.cmp)) toast(t('This session needs at least two clean laps for an ideal lap.')); else toast(t('Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.'), 6000); };
   $('qcLap').onclick = () => { const s = LAB.current; if (!s) return; LAB.breakOpen = false; const ref = findLap(LAB.ref); const L = ref && ref.sess === s ? ref.L : null; const nx = s.laps.filter(x => x.px && x !== L).sort((a, b) => (b.clean - a.clean) || a.timeMs - b.timeMs)[0]; if (!nx) { toast(t('No other lap in this session.')); return; } LAB.cmp = lapKey(s, nx); LAB.pickerOpen = false; LAB.chat = []; labRender(); };
   $('qcOther').onclick = () => { LAB.breakOpen = false; LAB.pickerOpen = !LAB.pickerOpen; renderCmpPicker(); };
+  $('btnModerate').onclick = async () => { const s = LAB.current; if (!s || !STORE.isAdmin()) return; const on = !s.published; if (!on && !(await confirmDlg(t('Hide this session from the public?'), t('It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again here.'), t('Hide')))) return; const b = $('btnModerate'); b.classList.add('busy'); try { await STORE.setPublishedAdmin(s.id, on); s.published = on; if (on) delete s.moderated; else s.moderated = true; labRender(); toast(on ? t('Shown again.') : t('Hidden from the public.')); sharePageSync(s).catch(() => {}); } catch (e) { toast(/hutka_set_published|PGRST202|42883/.test(String(e && e.message || e)) ? t('Run supabase/moderate.sql in the SQL editor once — then admins can hide sessions.') : t('Could not save: {e}', { e: e && e.message || e })); } b.classList.remove('busy'); };
   $('lapYou').onclick = () => { LAB.mapLap = 'you'; labRender(); }; $('lapCmp').onclick = () => { LAB.mapLap = 'cmp'; labRender(); }; $('lapThird').onclick = () => { LAB.mapLap = 'third'; labRender(); };
   $('cmp2Sel').addEventListener('change', () => { LAB.cmp2 = $('cmp2Sel').value; if (LAB.cmp2 === 'none' && LAB.mapLap === 'third') LAB.mapLap = 'you'; labRender(); });
   // the replay bar: drag to move the karts along the lap by time, play to run the lap at real speed
@@ -5132,7 +5167,7 @@ function labRender() {
   else if (isAvgKey(mode)) { const P = sessAvg(cs); others = P ? [P] : []; mode = others.length ? 'lap' : 'avg'; }
   else if (isIdealKey(mode)) { const P = sessIdeal(cs, R, apexes); others = P ? [P] : []; mode = others.length ? 'lap' : 'avg'; }
   else { const o = findLap(mode), P = (o && o.L.px) ? proj(o) : null; others = P ? [P] : []; mode = others.length ? 'lap' : 'avg'; }
-  const nameOf = (P) => !P ? '' : (P.lap ? (P.lap._sess === sess ? t('lap {n}', { n: P.lap.n }) : `${t('lap {n}', { n: P.lap.n })} (${shortSess(P.lap._sess)})`) : (P.name || t('average lap')));
+  const nameOf = (P) => { if (!P) return ''; const s2 = P.lap ? P.lap._sess : (P.sess || null), what = P.lap ? t('lap {n}', { n: P.lap.n }) : (P.ideal ? t('ideal lap') : t('average lap')); if (!s2) return what; const who = lapWho(s2, sess); return who ? `${who} · ${what}` : what; };
   const rName = refIsAvg ? `${t('Average lap')} · ${shortSess(sess)}` : (mySession(sess) ? '' : shortSess(sess));
   const D = DATA.buildComparisonP(R, others, mode, G.track, nameOf, apexes, G.corners.R, rName || null);
   if (!D) { $('digest').innerHTML = `<p class="hint">${apexes.length < 2 ? t('No corners found on this line.') : t('Could not project this lap onto the track line.')}</p>`; $('cornersTable').querySelector('tbody').innerHTML = ''; return; }
@@ -5165,13 +5200,15 @@ function labRender() {
   if (LAB.coach) { const res = D.rows.reduce((s, r) => { const c = LAB.coach.corners.find(x => x.n === r.w.n); return s + (c ? Math.max(0, r.R.time - c.tTop) : 0); }, 0); chip(t('reserve'), res.toFixed(2) + ' ' + t('s')); }
   $('fsLbl').textContent = $('lapLbl').textContent; $('fsBig').textContent = $('lapBig').textContent; $('fsChips').innerHTML = chips.innerHTML;
   $('dataSub').textContent = `${t('Speed and time delta')} · ${t('{n} corners from the S/F line', { n: D.wins.length })}`;
-  $('youColHead').textContent = D.ref.mine && !refIsAvg ? t('You') : refName; $('cmpColHead').textContent = D.O ? nameOf(D.O) : t('Comparison');
+  $('youColHead').textContent = D.ref.mine ? (refIsAvg ? `${t('You')} · ${refName}` : t('You')) : `${whoOf(sess) || shortSess(sess)} · ${refName}`; $('cmpColHead').textContent = D.O ? nameOf(D.O) : t('Comparison');
   // this session: publish, edit, like
   const pb = $('btnPublish'); pb.hidden = !(STORE.canWrite() && mySession(sess) && sess.owner !== 'local'); $('btnShare').hidden = false;
-  if (!pb.hidden) { pb.textContent = sess.published ? t('Unpublish') : t('Publish to track page'); pb.classList.toggle('active', !!sess.published); pb.disabled = !sess.track; pb.title = sess.track ? '' : t('Assign a track first (Edit).'); }
+  if (!pb.hidden) { pb.textContent = sess.published ? t('Unpublish') : t('Publish to track page'); pb.classList.toggle('active', !!sess.published); pb.disabled = !sess.track; pb.title = sess.track ? '' : t('Assign a track first (Edit).');
+    if (sess.moderated && !sess.published && !STORE.isAdmin()) { pb.disabled = true; pb.textContent = t('Hidden by admins'); pb.title = t('The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine, or ask them.'); } }
+  { const mod = $('btnModerate'); mod.hidden = !(STORE.isAdmin() && STORE.hasDb && !mySession(sess) && sess.owner !== 'local'); if (!mod.hidden) { mod.textContent = sess.published ? t('Hide from public') : (sess.moderated ? t('Show again') : t('Unpublished by owner')); mod.disabled = !sess.published && !sess.moderated; mod.classList.toggle('active', !!sess.moderated); mod.title = t('Admins: hide a broken or wrongly placed session from the feed and the track page — its owner keeps it.'); } }
   $('btnEditSess').hidden = !mySession(sess);
   STORE.socialAvailable().then(on => { if (LAB.current !== sess) return; $('voteBox').hidden = !(on && STORE.hasDb && sess.owner !== 'local'); if ($('voteBox').hidden) $('lowRated').hidden = true; $('discussPanel').hidden = !on; if (on) { renderSocialBits(); renderDiscussion(); } renderOwnerRow(); });
-  $('legendData').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span><span><i style="background:var(--actual)"></i>${t('reference')}</span>${D.O ? `<span><i style="background:var(--cmp)"></i>${t('comparison')}</span>` : ''}${D.P3 ? `<span><i style="background:var(--cmp2)"></i>${t('third lap')}</span>` : ''}<span>${t('number — corner from the S/F line')}</span>`;
+  $('legendData').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span>${lapList(D).map(l => `<span class="lapkey"><i style="background:${l.col}"></i><b style="color:${l.col}">${l.n}</b> ${esc(l.name)}</span>`).join('')}<span>${t('number — corner from the S/F line')}</span>`;
   $('mapNote').hidden = true;
   syncOpts(); renderDigest(); renderCornersTable(); renderInspector(); renderCornerNav(); renderAskState(); showReadout(); drawDataCharts(); renderHud(); drawScrub(); renderReplay(true);
 }
@@ -5408,7 +5445,7 @@ $('btnShare').onclick = () => SHARE.open(); $('lmShare').onclick = () => SHARE.o
 $('shareCv').onclick = () => { const z = $('shareZoom'); $('shareZoomImg').src = $('shareCv').toDataURL('image/png'); z.hidden = false; }; $('shareZoom').onclick = () => { $('shareZoom').hidden = true; }; $('shareClose').onclick = SHARE.close; $('shareGo').onclick = () => SHARE.go(); $('shareSave').onclick = () => SHARE.save(); $('shareCopy').onclick = () => SHARE.copy(); $('shareModal').addEventListener('click', (e) => { if (e.target === $('shareModal')) SHARE.close(); });
 async function labTogglePublish() {
   const sess = LAB.current; if (!sess || !mySession(sess)) return;
-  const on = !sess.published;
+  const on = !sess.published; if (on && sess.moderated && !STORE.isAdmin()) { toast(t('The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.')); return; }
   if (on) { const ok = await confirmDlg(t('Publish this session?'), t('It appears on the track page and in the hot laps; other drivers can compare their laps with it. You can unpublish at any time.'), t('Publish')); if (!ok) return; }
   const pb = $('btnPublish'); pb.classList.add('busy');
   try { await STORE.updateSession(sess.id, { published: on }); sess.published = on; toast(on ? t('Published — it is now on the track page.') : t('Unpublished.')); labRender(); if (on) SHARE.sync(sess); else sharePageSync(sess).catch(() => {}); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); }
@@ -5604,7 +5641,7 @@ function drawDataCharts() {
     ctx.font = `600 10px ${C.mono}`; ctx.textAlign = 'center';
     for (const r of D.rows) { const m = r.R; ctx.fillStyle = m.kind === 'brake' ? C.brake : (m.kind === 'flat' ? C.throttle : C.lift); ctx.fillText('T' + r.w.n, X(m.sApex), PAD.t - 6); }
     ctx.textAlign = 'left'; ctx.fillStyle = C.muted; ctx.font = `10px ${C.mono}`; ctx.fillText(t('km/h'), 6, PAD.t - 6);
-    ctx.fillStyle = C.actual; ctx.fillText('1 ' + t('reference'), PAD.l + 4, h - PAD.b - 6); if (D.O) { ctx.fillStyle = C.cmp; ctx.fillText('2 ' + t('comparison (dashed)'), PAD.l + 90, h - PAD.b - 6); } if (D.P3) { ctx.fillStyle = C.cmp2; ctx.fillText('3 ' + t('third lap'), PAD.l + 240, h - PAD.b - 6); }
+    { let lx = PAD.l + 4; const cut = (x) => x.length > 26 ? x.slice(0, 25) + '…' : x; for (const l of lapList(D)) { ctx.fillStyle = cssColor(l.col); const tx = `${l.n} ${cut(l.name)}${l.role === 'cmp' ? ' ' + t('(dashed)') : ''}`; ctx.fillText(tx, lx, h - PAD.b - 6); lx += ctx.measureText(tx).width + 16; } }
     // the karts: at the hovered station, or each at its own distance at the replay time
     { const marks = labMarks(); if (marks) { const iR = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(D.R, LAB.scrubT || 0), x0 = X(iR * tr.ds); ctx.strokeStyle = C.fg; ctx.lineWidth = 1; ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.moveTo(x0, PAD.t); ctx.lineTo(x0, h - PAD.b); ctx.stroke(); ctx.globalAlpha = 1; for (const mk0 of marks) { const x = X(mk0.i * tr.ds); ctx.beginPath(); ctx.arc(x, Y(mk0.P.v[mk0.i]), mk0.main ? 4.5 : 3.5, 0, Math.PI * 2); ctx.fillStyle = mk0.col; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = '#fff'; ctx.stroke(); } } }
   }
@@ -5858,7 +5895,7 @@ function drawPreview(cv, pv, color) {
 }
 // the last feed render, so a card computed in the background (CARDS.run) can refresh its post in place
 const HOME = { last: null,
-  refreshPost(id, card) { const L = HOME.last; if (!L || APP.route !== 'home') return; const pub = L.pubs.find(s => s.id === id), old = document.querySelector(`#homeFeed .post[data-sid="${CSS.escape(id)}"]`); if (!pub || !old) return; pub.card = card; old.replaceWith(postCard(pub, L.names, L.counts[id])); } };
+  refreshPost(id, card) { const L = HOME.last; if (!L || APP.route !== 'home') return; const pub = L.pubs.find(s => s.id === id), old = document.querySelector(`#homeFeed .post[data-sid="${CSS.escape(id)}"]`); if (!pub || !old) return; pub.card = card; old.replaceWith(postCard(pub, L.names, L.counts[id], { group: (L.groupOf || {})[id] || null })); } };
 async function renderHomePage() {
   $('homeSub').textContent = t('Upload a session — every corner, compared with the fastest on the same layout.');
   $('homeUpload').onclick = () => UPLOAD.open({});
@@ -5875,8 +5912,11 @@ async function renderHomePage() {
   if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); e.appendChild(el('div', 't', STORE.hasDb ? t('No sessions published yet') : t('Sign in to see the feed'))); e.appendChild(el('div', '', STORE.hasDb ? t('Be the first: upload your session and publish it on the track page.') : t('The shared library needs a connection. Browse tracks meanwhile.'))); feed.appendChild(e); }
   // sessions several drivers marked as not helpful sink to the bottom of the feed
   const order = pubs.slice().sort((a, b) => (STORE.lowRated(counts[a.id]) - STORE.lowRated(counts[b.id])) || (b.createdAt || 0) - (a.createdAt || 0));
-  for (const s of order) feed.appendChild(postCard(s, names, counts[s.id]));
-  HOME.last = { pubs, names, counts }; if (typeof CARDS !== 'undefined') setTimeout(() => CARDS.run(), 600);   // older sessions get their analysis card in the background
+  // several uploads in a row by one driver fold into a single post: the fastest session with its card, the others as a short list (no flood)
+  const groups = []; for (const s of order) { const g = groups[groups.length - 1]; if (g && g.owner === s.owner && g.items.length < 20) g.items.push(s); else groups.push({ owner: s.owner, items: [s] }); }
+  const groupOf = {};
+  for (const g of groups) { if (g.items.length === 1) { feed.appendChild(postCard(g.items[0], names, counts[g.items[0].id])); continue; } const best = g.items.slice().sort((a, b) => (a.bestMs || 1e12) - (b.bestMs || 1e12))[0], rest = g.items.filter(s => s !== best); groupOf[best.id] = rest; feed.appendChild(postCard(best, names, counts[best.id], { group: rest })); }
+  HOME.last = { pubs, names, counts, groupOf }; if (typeof CARDS !== 'undefined') setTimeout(() => CARDS.run(), 600);   // older sessions get their analysis card in the background
   $('feedHint').textContent = pubs.length ? t('Sessions appear here when drivers publish them. Open one to see the corner-by-corner breakdown, or compare it with your own.') : '';
   // where people drive: layouts by number of sessions in the last 60 days
   { const box = $('homeActive'); box.innerHTML = ''; const by = new Map(); const cut = Date.now() - 60 * 86400000; for (const s of pubs) { if (!s.track) continue; const k = s.track + '~' + (s.layout || 'custom'); const o = by.get(k) || { track: s.track, layout: s.layout, n: 0, recent: 0, best: Infinity }; o.n++; if ((s.createdAt || 0) > cut) o.recent++; o.best = Math.min(o.best, s.bestMs || Infinity); by.set(k, o); }
@@ -5894,11 +5934,11 @@ async function renderHomePage() {
   // the drivers I follow
   { const card = $('homeFollowCard'), box = $('homeFollowing'); box.innerHTML = ''; if (!STORE.hasIdentity || !STORE.hasDb || !STORE.socialOn) { card.hidden = true; } else { const ids = await STORE.followingIds(); card.hidden = !ids.length; if (ids.length) { const nm = await STORE.names(ids); for (const id of ids.slice(0, 12)) { const a = el('a', 'item'); a.href = '#driver~' + id; const im = new Image(); im.src = (nm[id] && nm[id].avatar) || GENERIC_AVATAR; im.alt = ''; im.style.cssText = 'width:28px;height:28px;border-radius:50%;object-fit:cover'; a.append(im, el('span', 'name', (nm[id] || {}).name || t('Driver'))); box.appendChild(a); } } } }
 }
-function postCard(s, names, cnt) {
-  const tr = STORE.getTrack(s.track), nm = names[s.owner] || {}, mine = s.owner === STORE.me.id;
+function postCard(s, names, cnt, opts) {
+  const tr = STORE.getTrack(s.track), nm = names[s.owner] || {}, mine = s.owner === STORE.me.id, rest = (opts && opts.group) || null;
   const d = el('div', 'post' + (STORE.lowRated(cnt) ? ' low' : '')); d.dataset.sid = s.id;
   const ph = el('div', 'ph'); const im = new Image(); im.src = nm.avatar || GENERIC_AVATAR; im.alt = '';
-  const who = el('div', 'who'); who.innerHTML = `<b><a href="#driver~${esc(s.owner)}">${esc(nm.name || t('Driver'))}</a>${nm.country ? ' ' + flag(nm.country) : ''}</b><span>${tr ? `<a href="#track~${esc(tr.id)}">${esc(tr.name)}</a>` : esc(s.trackName || t('Custom track'))}${s.layout && s.layout !== 'custom' ? ` · <a href="#track~${esc(s.track)}~${esc(s.layout)}">${esc(layoutName(s.track, s.layout))}</a>` : ''} · ${esc(fmtDate(s.date))}</span>`;
+  const who = el('div', 'who'); who.innerHTML = `<b><a href="#driver~${esc(s.owner)}">${esc(nm.name || t('Driver'))}</a>${nm.country ? ' ' + flag(nm.country) : ''}${rest ? ` <span class="gbadge">${esc(tn(rest.length + 1, '{n} session', '{n} sessions').replace('{n}', rest.length + 1))}</span>` : ''}</b><span>${tr ? `<a href="#track~${esc(tr.id)}">${esc(tr.name)}</a>` : esc(s.trackName || t('Custom track'))}${s.layout && s.layout !== 'custom' ? ` · <a href="#track~${esc(s.track)}~${esc(s.layout)}">${esc(layoutName(s.track, s.layout))}</a>` : ''} · ${esc(fmtDate(s.date))}</span>`;
   ph.append(im, who);
   const pb = el('div', 'pb'); const pv = el('div', 'pv');
   const rich = !!(s.card && s.card.v && s.card.pts), pic = rich ? s.card : s.preview; if (pic && pic.pts) { const cv = document.createElement('canvas'); pv.appendChild(cv); if (rich) { pv.classList.add('rich'); d.classList.add('rich'); const a = el('a', 'pv-open'); a.href = '#lab~' + esc(s.id); a.title = t('Open analysis'); pv.appendChild(a); } requestAnimationFrame(() => drawPreview(cv, pic)); if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (cv.isConnected) drawPreview(cv, pic); }); ro.observe(pv); } } else pv.appendChild(svgUse('i-track'));
@@ -5908,6 +5948,9 @@ function postCard(s, names, cnt) {
   if (rich) { if (s.card.vmax) chip(t('max'), `${s.card.vmax} ${t('km/h')}`); if (s.card.total) chip(t('reserve'), `${s.card.total.toFixed(2)} s`); } if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
   info.appendChild(chips);
   pb.append(pv, info);
+  // the rest of a driver's batch: one compact row each, three shown, the others behind "show all"
+  let more = null;
+  if (rest && rest.length) { more = el('div', 'more'); more.appendChild(el('div', 'k', t('Also uploaded — the fastest is above') + ':')); const list = el('div', 'mlist'); const mrow = (x) => { const a = el('a', 'mrow'); a.href = '#lab~' + esc(x.id); const l = STORE.getLayout(x.track, x.layout); a.innerHTML = `<b>${esc(fmtMs(x.bestMs))}</b><span>${esc(l ? l.name : (x.layout && x.layout !== 'custom' ? x.layout : t('Custom')))} · ${esc(fmtDate(x.date))}</span><span class="hint">${esc(tn(x.nLaps || 0, '{n} lap', '{n} laps').replace('{n}', x.nLaps || 0))}${resultText(x) ? ' · ' + esc(resultText(x)) : ''}</span>`; return a; }; for (const x of rest.slice(0, 3)) list.appendChild(mrow(x)); more.appendChild(list); if (rest.length > 3) { const b = el('button', 'btn xs ghost', t('Show all {n}', { n: rest.length })); b.type = 'button'; b.onclick = () => { list.innerHTML = ''; for (const x of rest) list.appendChild(mrow(x)); b.remove(); }; more.appendChild(b); } }
   const pf = el('div', 'pf');
   const like = voteButtons(s.id, cnt, (r) => { d.classList.toggle('low', STORE.lowRated(r)); lowTag.hidden = !STORE.lowRated(r); });
   const lowTag = el('span', 'soon', t('rated not helpful')); lowTag.hidden = !STORE.lowRated(cnt); if (STORE.socialOn) ph.appendChild(lowTag);
@@ -5916,7 +5959,9 @@ function postCard(s, names, cnt) {
   if (STORE.socialOn) pf.append(like, cm); else { const soon = el('span', 'soon', t('votes & comments soon')); pf.appendChild(soon); } pf.appendChild(el('span', 'sp'));
   if (!mine && s.track) { const c = el('a', 'btn sm', t('Compare')); c.href = `#lab~${esc(s.id)}~cmp`; c.title = t('Compare with mine'); pf.appendChild(c); }
   pf.appendChild(open);
-  d.append(ph, pb, pf); return d;
+  // admins: hide a broken or wrongly placed session from the public (moderate.sql); its owner keeps it
+  if (!mine && STORE.isAdmin() && STORE.hasDb) { const hb = el('button', 'btn sm ghost mod', t('Hide')); hb.type = 'button'; hb.title = t('Hide from the public (admins): the session stays in its owner\'s library, unpublished.'); hb.onclick = async () => { if (!(await confirmDlg(t('Hide this session from the public?'), t('It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again from the Lab.'), t('Hide')))) return; hb.classList.add('busy'); try { await STORE.setPublishedAdmin(s.id, false); s.published = false; s.moderated = true; d.remove(); toast(t('Hidden from the public.')); sharePageSync(s).catch(() => {}); } catch (e) { hb.classList.remove('busy'); toast(/hutka_set_published|PGRST202|42883/.test(String(e && e.message || e)) ? t('Run supabase/moderate.sql in the SQL editor once — then admins can hide sessions.') : t('Could not hide: {e}', { e: e && e.message || e })); } }; pf.insertBefore(hb, open); }
+  d.append(ph, pb); if (more) d.appendChild(more); d.appendChild(pf); return d;
 }
 function layoutName(tid, lid) { const l = STORE.getLayout(tid, lid); return l ? l.name : lid; }
 $('homeUpload').onclick = () => UPLOAD.open({});
@@ -6263,14 +6308,14 @@ async function renderProfile() {
   $('profSignOut').hidden = !(STORE.hasAuth && STORE.hasIdentity);
   fillCountries($('profCountry'), true); $('profCountry').value = prof.country || '';
   const trs = STORE.getTracks(); fillSelect($('profHome'), [['', '—']].concat(trs.map(x => [x.id, x.name])), prof.homeTrack || '');
-  { const nm = splitName(prof); $('profFirst').value = nm.first; $('profLast').value = nm.last; } fillYears($('profYear'), prof.birthYear); $('profWeight').value = prof.weightKg || ''; $('profBio').value = prof.bio || ''; $('profIg').value = prof.instagram || ''; $('profContact').value = prof.contact || ''; $('profCoach').checked = !!prof.coach; $('profSws').value = prof.sws || '';
+  { const nm = splitName(prof); $('profFirst').value = nm.first; $('profLast').value = nm.last; } fillYears($('profYear'), prof.birthYear); $('profNotify').checked = prof.notify !== false; $('profWeight').value = prof.weightKg || ''; $('profBio').value = prof.bio || ''; $('profIg').value = prof.instagram || ''; $('profContact').value = prof.contact || ''; $('profCoach').checked = !!prof.coach; $('profSws').value = prof.sws || '';
   $('profSwsHint').textContent = t('Paste the link to your SWS driver page; it is shown on your public page. “Import SWS results” brings your race history here.');
   $('profSwsImport').onclick = () => SWS.open({});
   { const card = $('profSwsCard'); card.hidden = true; }   // SWS lives inside the session editor for now (less noise on the profile)
   $('profSave').onclick = async () => {
     const first = cleanName($('profFirst').value), last = cleanName($('profLast').value);
     if (!first) { setStatus('profStatus', t('Enter your first name.'), 'warn'); $('profFirst').focus(); return; }
-    const body = { firstName: first, lastName: last, racingName: [first, last].filter(Boolean).join(' ').slice(0, 40), birthYear: +$('profYear').value || null, weightKg: cleanWeight($('profWeight').value), country: $('profCountry').value, homeTrack: $('profHome').value, avatar: pendingAvatar === undefined ? (prof.avatar || '') : (pendingAvatar || ''), bio: $('profBio').value.trim().slice(0, 160), instagram: $('profIg').value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@').replace(/\/$/, '').slice(0, 80), contact: $('profContact').value.trim().slice(0, 160), coach: $('profCoach').checked, sws: $('profSws').value.trim().slice(0, 200), swsResults: prof.swsResults || null };
+    const body = { notify: $('profNotify').checked, firstName: first, lastName: last, racingName: [first, last].filter(Boolean).join(' ').slice(0, 40), birthYear: +$('profYear').value || null, weightKg: cleanWeight($('profWeight').value), country: $('profCountry').value, homeTrack: $('profHome').value, avatar: pendingAvatar === undefined ? (prof.avatar || '') : (pendingAvatar || ''), bio: $('profBio').value.trim().slice(0, 160), instagram: $('profIg').value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@').replace(/\/$/, '').slice(0, 80), contact: $('profContact').value.trim().slice(0, 160), coach: $('profCoach').checked, sws: $('profSws').value.trim().slice(0, 200), swsResults: prof.swsResults || null };
     const b = $('profSave'); b.classList.add('busy'); setStatus('profStatus', t('Saving…'));
     try {
       await STORE.saveProfile(body);
@@ -6361,12 +6406,21 @@ const ADMIN = (() => {
     $('admAiCard').hidden = !(admin && STORE.aiOn); if (admin && STORE.aiOn) renderAiUsage($('admAiUsage'));
     $('admStatsCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderSiteStats();
     $('admReportsCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderReports();
+    $('admModCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderModerated();
     $('admImportCard').hidden = !admin; if (admin && !$('osmCountry').options.length) { fillCountries($('osmCountry'), false); $('osmCountry').value = 'AE'; }
     if (tid && STORE.getTrack(tid)) { A.tid = tid; A.lid = lid || null; await renderTrackForm(); await renderLayouts(); if (lid) await renderLayoutEditor(); else $('admLayoutCard').hidden = true; }
     else { A.tid = null; A.lid = null; $('admEmpty').hidden = false; $('admTrackCard').hidden = true; $('admLayoutsCard').hidden = true; $('admLayoutCard').hidden = true; }
   }
   async function addTrack() { const id = await STORE.saveTrack({ name: t('New track'), city: '', country: 'AE', lat: 25.2, lon: 55.3, createdAt: Date.now() }); go('admin~' + id); }
   // bug reports (reports.sql + the `report` function)
+  // sessions hidden by admins (moderate.sql): show one again from here — the normal policies do not let an admin open someone's unpublished session
+  async function renderModerated() {
+    const box = $('admMod'); box.innerHTML = ''; let list = [];
+    try { list = await STORE.moderatedList(); } catch (e) { box.appendChild(el('div', 'hint', /hutka_moderated|PGRST202|42883/.test(String(e && e.message || e)) ? t('Run supabase/moderate.sql in the SQL editor once — then admins can hide broken sessions from the feed (the Hide button on a post or in the Lab).') : t('Could not load: {e}', { e: e && e.message || e }))); return; }
+    if (!list.length) { box.appendChild(el('div', 'hint', t('Nothing hidden. A broken or wrongly placed session can be hidden from the feed with the Hide button on its post (or in the Lab).'))); return; }
+    const names = await STORE.names(list.map(r => r.owner));
+    for (const r of list) { const tr = STORE.getTrack(r.track); const d = el('div', 'item'); d.innerHTML = `<span class="name">${esc((names[r.owner] || {}).name || t('Driver'))} · ${esc(r.label || '')}</span><span class="meta">${esc(tr ? tr.name : r.track || '')}${r.layout && r.layout !== 'custom' ? ' · ' + esc(layoutName(r.track, r.layout)) : ''} · ${esc(fmtMs(+r.bestMs))} · ${esc(fmtDate(r.date))}</span>`; const b = el('button', 'btn xs', t('Show again')); b.type = 'button'; b.onclick = async () => { b.classList.add('busy'); try { await STORE.setPublishedAdmin(r.id, true); toast(t('Shown again.')); renderModerated(); } catch (e) { b.classList.remove('busy'); toast(t('Could not save: {e}', { e: e && e.message || e })); } }; d.appendChild(b); box.appendChild(d); }
+  }
   async function renderReports() {
     const box = $('admReports'); box.innerHTML = ''; let list = [];
     try { list = await STORE.listReports(); } catch (e) { $('admReportsHint').textContent = /relation|does not exist|42P01/i.test(String(e && e.message || e)) ? t('Run supabase/reports.sql and deploy the `report` function — reports appear here and in your inbox.') : t('Could not load: {e}', { e: e && e.message || e }); return; }

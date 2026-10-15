@@ -88,6 +88,23 @@ npx cap open android   # откроется Android Studio
 3. **Testing → Internal testing** → Create release → загрузи `.aab` → добавь тестеров по почте → ссылка для установки. Потом **Production → Create release** → Review. Первая проверка Google — до 7 дней, обновления обычно часы.
 4. Версия: `android/app/build.gradle` → `versionCode` (+1 на каждую загрузку) и `versionName`.
 
+## 4b. Версия 1.1 (15 окт 2026) — что сдавать в магазины
+
+Приложение показывает живой сайт, так что всё новое уже в нём; в проекте подняты только номера: iOS **Version 1.1 / Build 2** (`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` в `App.xcodeproj`), Android **versionName 1.1 / versionCode 2**. На Mac: `git pull`, `cd app`, `npm install`, `sh build.sh`, `npx cap open ios` → Archive → Upload (iOS); Android Studio → Generate Signed Bundle.
+
+Текст «What's New» для App Store Connect / Play Console (EN):
+
+```
+Hutka 1.1
+• Compare up to three laps on the map — yours, a friend's and any other — each in its own colour, with a replay slider that moves the karts along the lap in real time.
+• Best vs ideal: the ideal lap stitched from your fastest pass through every corner, and the breakdown that shows which lap won each corner.
+• The feed shows the analysis itself: the lap line with braking, apex and throttle points, the biggest reserves.
+• Share a session: a card with your best lap and a link with its own preview.
+• A step-by-step guide for Alfano files, a bug-report button, e-mails about likes and comments.
+```
+
+Скриншоты для стора (6.9": 1320×2868, 3–6 штук): лента с разбором, Lab с тремя кругами и реплеем, Best vs ideal с breakdown, ИИ-тренер, страница трассы. Снимать на iPhone 16 Pro Max или в симуляторе (⌘S).
+
 ## 5. Обновления
 
 - **Сайт** (почти всё): просто деплой на GitHub Pages — приложение подхватит само.
