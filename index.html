@@ -3724,23 +3724,23 @@ function createMapView(canvas, host) {
       const laps = [{ P: D.R, col: C.actual, role: 'ref', n: 1, m: (r) => r.R }]; if (D.O) laps.push({ P: D.O, col: C.cmp, role: 'cmp', n: 2, m: (r) => r.O }); if (D.P3) laps.push({ P: D.P3, col: C.cmp2, role: 'third', n: 3, m: (r) => r.M3 });
       const mainL = laps.find(l => l.role === role) || laps[0], main = mainL.P, mainCol = mainL.col, mOf = mainL.m;
       const path = (P, a, len) => { ctx.beginPath(); if (a === undefined) { for (let i = 0; i < N; i++) { const [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } else { for (let k = 0; k <= len; k++) { const i = (a + k) % N, [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } } };
-      const lw = clamp(1.9 + sc * 1.0, 2.8, 9), pxm = sc / mpp;
-      for (const l of laps) if (l !== mainL) { path(l.P); ctx.lineWidth = Math.max(1.6, lw * 0.6) + 1.5; ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.stroke(); ctx.lineWidth = Math.max(1.6, lw * 0.6); ctx.strokeStyle = l.col; ctx.stroke(); }
-      path(main); ctx.lineWidth = lw + 3; ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.stroke(); ctx.lineWidth = lw; ctx.strokeStyle = mainCol; ctx.stroke();
+      const pxm = sc / mpp, lw = clamp(1.3 + pxm * 0.22, 1.8, 3.4);   // ≈ a wheel's width on the ground, never a fat ribbon
+      for (const l of laps) if (l !== mainL) { path(l.P); ctx.lineWidth = Math.max(1.2, lw * 0.7) + 1; ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.stroke(); ctx.lineWidth = Math.max(1.2, lw * 0.7); ctx.strokeStyle = l.col; ctx.stroke(); }
+      path(main); ctx.lineWidth = lw + 1.6; ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.stroke(); ctx.lineWidth = lw; ctx.strokeStyle = mainCol; ctx.stroke();
       const hiRow = O.hiRow || null, showAll = !!O.labelsAll;
-      if (hiRow) { path(main, hiRow.w.a, hiRow.w.len); ctx.lineWidth = lw + 7; ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.stroke(); ctx.lineWidth = lw + 1; ctx.strokeStyle = '#fff'; ctx.globalAlpha = 0.9; ctx.stroke(); ctx.globalAlpha = 1; }
-      const mk = (i, r, col, ink, lwS) => { const [px, py] = lapPos(tr, main, i), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = lwS || 1.6; ctx.strokeStyle = ink || '#fff'; ctx.stroke(); return [x, y]; };
-      const placed = [], labels = [], rsz = clamp(0.9 + sc * 0.35, 1, 1.8), K = t('km/h');
+      if (hiRow) { path(main, hiRow.w.a, hiRow.w.len); ctx.lineWidth = lw + 5; ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.stroke(); ctx.lineWidth = lw + 0.8; ctx.strokeStyle = '#fff'; ctx.globalAlpha = 0.9; ctx.stroke(); ctx.globalAlpha = 1; }
+      const mk = (i, r, col, ink, lwS) => { const [px, py] = lapPos(tr, main, i), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.globalAlpha = 0.92; ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = lwS || 1.1; ctx.strokeStyle = ink || 'rgba(255,255,255,0.9)'; ctx.stroke(); ctx.globalAlpha = 1; return [x, y]; };
+      const placed = [], labels = [], rsz = clamp(0.75 + pxm * 0.06, 0.75, 1.25), K = t('km/h');
       // the other laps keep their own braking / lift points: small rings in the lap colour, on their own lines
-      for (const l of laps) { if (l === mainL) continue; for (const r of D.rows) { const m = l.m(r); if (!m) continue; const k = m.kind === 'brake' && !m.inherited ? m.bk : (m.kind === 'lift' ? m.lk : -1); if (k < 0) continue; const i = ((r.w.a + k) % N + N) % N, [px, py] = lapPos(tr, l.P, i), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, 3.6 * rsz, 0, Math.PI * 2); ctx.fillStyle = m.kind === 'brake' ? C.brake : C.lift; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = l.col; ctx.stroke(); } }
+      for (const l of laps) { if (l === mainL) continue; for (const r of D.rows) { const m = l.m(r); if (!m) continue; const k = m.kind === 'brake' && !m.inherited ? m.bk : (m.kind === 'lift' ? m.lk : -1); if (k < 0) continue; const i = ((r.w.a + k) % N + N) % N, [px, py] = lapPos(tr, l.P, i), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, 3 * rsz, 0, Math.PI * 2); ctx.globalAlpha = 0.85; ctx.fillStyle = m.kind === 'brake' ? C.brake : C.lift; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = l.col; ctx.stroke(); ctx.globalAlpha = 1; } }
       for (const r of D.rows) {
         const w0 = r.w, m = mOf(r); if (!m) continue; const at = (k) => ((w0.a + k) % N + N) % N, hi = hiRow && hiRow.w.n === w0.n;
-        if (m.tk >= 0) mk(at(m.tk), 4.5 * rsz, C.throttle);
-        if (m.rk >= 0) mk(at(m.rk), 3.5 * rsz, C.limit);
-        mk(at(m.apK), 3.5 * rsz, '#fff', '#333');
-        if (m.kind === 'brake' && !m.inherited) mk(at(m.bk), 5.5 * rsz, C.brake);
-        else if (m.kind === 'lift') mk(at(m.lk), 5.5 * rsz, C.lift, '#555');
-        else if (m.kind === 'ease') mk(at(m.ek), 4.5 * rsz, C.lift, '#555');
+        if (m.tk >= 0) mk(at(m.tk), 3.4 * rsz, C.throttle);
+        if (m.rk >= 0) mk(at(m.rk), 2.8 * rsz, C.limit);
+        mk(at(m.apK), 2.7 * rsz, '#fff', 'rgba(0,0,0,0.6)');
+        if (m.kind === 'brake' && !m.inherited) mk(at(m.bk), 4.2 * rsz, C.brake);
+        else if (m.kind === 'lift') mk(at(m.lk), 4.2 * rsz, C.lift, 'rgba(0,0,0,0.45)');
+        else if (m.kind === 'ease') mk(at(m.ek), 3.4 * rsz, C.lift, 'rgba(0,0,0,0.45)');
         if (hi || showAll) {
           const vv = `${DATA.kmh(m.vEntry)}→${DATA.kmh(m.vApex)} ${K}`;
           if (m.kind === 'brake' && !m.inherited) labels.push({ i: at(m.bk), text: `${t('brake {s} m', { s: m.sBrake.toFixed(0) })} · ${vv}`, col: C.brake, dir: w0.dir });
@@ -3757,13 +3757,13 @@ function createMapView(canvas, host) {
       for (const r of D.rows) {
         const w0 = r.w, m = mOf(r); if (!m) continue; const i = ((w0.a + m.apK) % N + N) % N, hi = hiRow && hiRow.w.n === w0.n;
         const out = w0.dir === 'R' ? -1 : 1, [snx, sny] = RN(tr.nx[i], tr.ny[i]), [px, py] = lapPos(tr, main, i), [x, y] = T(px, py);
-        const rad = hi ? 14 : 11; let off = Math.min((widthM / 2 + 1.5) * pxm, 60) + rad + 6, bx, by, tries = 0, rect;
+        const rad = hi ? 12 : 9; let off = Math.min((widthM / 2 + 1.5) * pxm, 60) + rad + 5, bx, by, tries = 0, rect;
         do { bx = x + out * snx * off; by = y + out * sny * off; rect = [bx - rad, by - rad, 2 * rad, 2 * rad]; off += rad + 4; tries++; } while (tries < 4 && placed.some(p => rect[0] < p[0] + p[2] && rect[0] + rect[2] > p[0] && rect[1] < p[1] + p[3] && rect[1] + rect[3] > p[1]));
         placed.push(rect);
         const ring = m.kind === 'brake' ? C.brake : (m.kind === 'flat' ? C.throttle : C.lift);
-        ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(bx, by); ctx.stroke();
-        ctx.beginPath(); ctx.arc(bx, by, rad, 0, Math.PI * 2); ctx.fillStyle = hi ? ring : 'rgba(14,17,22,0.9)'; ctx.fill(); ctx.lineWidth = hi ? 3 : 2; ctx.strokeStyle = hi ? '#fff' : ring; ctx.stroke();
-        ctx.fillStyle = hi ? (m.kind === 'brake' ? '#fff' : '#111') : '#fff'; ctx.font = `700 ${hi ? 13 : 11}px ${C.mono}`; ctx.fillText(String(w0.n), bx, by + 0.5);
+        ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(bx, by); ctx.stroke();
+        ctx.beginPath(); ctx.arc(bx, by, rad, 0, Math.PI * 2); ctx.fillStyle = hi ? ring : 'rgba(14,17,22,0.72)'; ctx.fill(); ctx.lineWidth = hi ? 2.5 : 1.4; ctx.strokeStyle = hi ? '#fff' : ring; ctx.stroke();
+        ctx.fillStyle = hi ? (m.kind === 'brake' ? '#fff' : '#111') : 'rgba(255,255,255,0.95)'; ctx.font = `${hi ? 700 : 600} ${hi ? 12 : 10}px ${C.mono}`; ctx.fillText(String(w0.n), bx, by + 0.5);
         M.badges.push({ row: r, x: bx, y: by, r: rad });
       }
       for (const lb of labels) {
@@ -3781,7 +3781,7 @@ function createMapView(canvas, host) {
       // the karts: one numbered marker per lap at the replay position (or at the hovered station), the chosen lap's on top
       const marks = O.marks || null;
       if (marks && marks.length) { const ordered = marks.slice().sort((a, b) => (a.main ? 1 : 0) - (b.main ? 1 : 0)); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        for (const mk0 of ordered) { if (!(mk0.i >= 0 && mk0.i < N)) continue; const [px, py] = lapPos(tr, mk0.P, mk0.i), [x, y] = T(px, py), r = mk0.main ? 10 : 8.5; ctx.beginPath(); ctx.arc(x, y + 1.5, r + 1, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fill(); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = mk0.col; ctx.fill(); ctx.lineWidth = mk0.main ? 2.5 : 2; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = `700 ${mk0.main ? 11 : 10}px ${C.mono}`; ctx.fillText(String(mk0.n), x, y + 0.5); }
+        for (const mk0 of ordered) { if (!(mk0.i >= 0 && mk0.i < N)) continue; const [px, py] = lapPos(tr, mk0.P, mk0.i), [x, y] = T(px, py), r = mk0.main ? 7 : 6; ctx.beginPath(); ctx.arc(x, y + 1, r + 0.8, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fill(); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = mk0.col; ctx.fill(); ctx.lineWidth = mk0.main ? 1.8 : 1.4; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = `600 ${mk0.main ? 9 : 8.5}px ${C.mono}`; ctx.fillText(String(mk0.n), x, y + 0.5); }
         ctx.textBaseline = 'alphabetic'; }
       else if (M.hoverIdx >= 0 && M.hoverIdx < N && !hiRow) { const [px, py] = lapPos(tr, main, M.hoverIdx), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
     }
@@ -4203,7 +4203,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v31';
+const APP_VERSION = 'v31.1';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
