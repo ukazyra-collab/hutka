@@ -46,7 +46,7 @@
   --fg:#1a2237; --muted:#5f6b84; --faint:#98a1b3;
   --btn:#1f2b48; --btn-ink:#ffffff; --accent:#2f6bf0; --accent-ink:#ffffff; --accent-soft:#e9f0ff;
   --ok:#2fb563; --ok-soft:#e4f6ea; --warn:#d99400; --warn-soft:#fff5d6; --danger:#e5484d; --danger-soft:#fde8e9;
-  --brake:#e5484d; --limit:#ff8c2e; --lift:#d9a300; --throttle:#2fb563; --turnin:#2f6bf0; --apex:#1a2237; --actual:#1f6fe0; --cmp:#d63f9a;
+  --brake:#e5484d; --limit:#ff8c2e; --lift:#d9a300; --throttle:#2fb563; --turnin:#2f6bf0; --apex:#1a2237; --actual:#1f6fe0; --cmp:#d63f9a; --cmp2:#0f9d9d;
   --map-water:#d8e7f5; --map-land:#f2f1ec; --map-coast:#b7c5d6; --map-border:#d8a0ad; --map-label:#5f6b84;
   --shadow:0 1px 2px rgba(20,30,60,.06),0 8px 24px -12px rgba(20,30,60,.18);
   --body:"Inter","Segoe UI",system-ui,-apple-system,Arial,sans-serif;
@@ -60,7 +60,7 @@
     --fg:#e8ebf3; --muted:#9aa4ba; --faint:#6b7590;
     --btn:#e8ebf3; --btn-ink:#0f1420; --accent:#6c9cff; --accent-ink:#0f1420; --accent-soft:#1d2a47;
     --ok:#3fcb74; --ok-soft:#153324; --warn:#f0b429; --warn-soft:#3a2f10; --danger:#ff6b70; --danger-soft:#3d1f22;
-    --brake:#ff6b70; --limit:#ff9f47; --lift:#f2c53d; --throttle:#3fcb74; --turnin:#6c9cff; --apex:#ffffff; --actual:#5ea2ff; --cmp:#ff7ad9;
+    --brake:#ff6b70; --limit:#ff9f47; --lift:#f2c53d; --throttle:#3fcb74; --turnin:#6c9cff; --apex:#ffffff; --actual:#5ea2ff; --cmp:#ff7ad9; --cmp2:#3fd2e8;
     --map-water:#0e1a2c; --map-land:#1c2436; --map-coast:#34435c; --map-border:#6b3f4d; --map-label:#9aa4ba;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
     color-scheme:dark;
@@ -72,7 +72,7 @@
   --fg:#e8ebf3; --muted:#9aa4ba; --faint:#6b7590;
   --btn:#e8ebf3; --btn-ink:#0f1420; --accent:#6c9cff; --accent-ink:#0f1420; --accent-soft:#1d2a47;
   --ok:#3fcb74; --ok-soft:#153324; --warn:#f0b429; --warn-soft:#3a2f10; --danger:#ff6b70; --danger-soft:#3d1f22;
-  --brake:#ff6b70; --limit:#ff9f47; --lift:#f2c53d; --throttle:#3fcb74; --turnin:#6c9cff; --apex:#ffffff; --actual:#5ea2ff; --cmp:#ff7ad9;
+  --brake:#ff6b70; --limit:#ff9f47; --lift:#f2c53d; --throttle:#3fcb74; --turnin:#6c9cff; --apex:#ffffff; --actual:#5ea2ff; --cmp:#ff7ad9; --cmp2:#3fd2e8;
   --map-water:#0e1a2c; --map-land:#1c2436; --map-coast:#34435c; --map-border:#6b3f4d; --map-label:#9aa4ba;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
   color-scheme:dark;
@@ -388,7 +388,7 @@ body.onboarding #toast{z-index:50}
   #pickbar.stuck .pickbar{gap:8px 10px;align-items:center}
   #pickbar.stuck .pickbar .field{flex:0 1 220px}
   #pickbar.stuck .pickbar .field.auto{flex:0 0 auto}   /* the compare chips keep their width instead of sliding under the next field */
-  #pickbar.stuck #sessField{display:none}
+  #pickbar.stuck #sessField,#pickbar.stuck #cmp2Field{display:none}
   #pickbar.stuck .seg .btn{padding:0 9px;font-size:12.5px;height:32px}
   #pickbar.stuck .pickbar .field label{display:none}
   #pickbar.stuck .lapline{margin:0;flex-wrap:nowrap}
@@ -412,7 +412,27 @@ body.onboarding #toast{z-index:50}
 .map-tools .seg{background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(4px);border-radius:8px}
 .map-tools .seg .btn{height:30px;padding:0 10px;background:none}
 .map-title{position:absolute;left:10px;top:10px;max-width:calc(100% - 20px);background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-weight:600;font-size:12.5px;pointer-events:none;backdrop-filter:blur(4px);max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.map-title.ref{border-left:4px solid var(--actual)}.map-title.cmp{border-left:4px solid var(--cmp)}
+.map-title.ref{border-left:4px solid var(--actual)}.map-title.cmp{border-left:4px solid var(--cmp)}.map-title.third{border-left:4px solid var(--cmp2)}
+/* the replay bar: play, the slider by time, one chip per lap with its live numbers */
+.replay{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 12px;border-top:1px solid var(--line);background:var(--surface)}
+.replay .rp-play{width:36px;height:34px;padding:0;font-size:13px;flex:0 0 auto}
+.replay .rp-play.active{background:var(--accent-soft);color:var(--accent)}
+.replay input[type=range]{flex:1 1 180px;min-width:120px;height:28px;accent-color:var(--accent);cursor:pointer}
+.replay .rp-t{font:600 13px var(--mono);min-width:64px;text-align:right;font-variant-numeric:tabular-nums}
+.replay .rp-laps{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 100%}
+.rp-lap{display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);font:500 12.5px var(--body);color:var(--fg);cursor:pointer;max-width:100%}
+.rp-lap i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:0 0 auto;box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 30%,transparent)}
+.rp-lap b{font:700 12px var(--mono);color:var(--c)}
+.rp-lap .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;color:var(--muted)}
+.rp-lap .live{font:500 12px var(--mono);white-space:nowrap;font-variant-numeric:tabular-nums}
+.rp-lap .live b{font-weight:700}.rp-lap .live b.loss{color:var(--brake)}.rp-lap .live b.gain{color:var(--throttle)}
+.rp-lap.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,var(--surface))}
+.insp-table th.third,.insp-table td.third{color:var(--cmp2)}
+.insp-table td.third .hint{font-size:11px}
+.tbl.corners td.num.two{white-space:pre-line;line-height:1.25}
+.crow .d small{font-size:10.5px;font-weight:500;color:var(--cmp2)}
+.ck-panel .sw{display:flex;align-items:center;gap:3px}.ck-panel .sw em{font:700 9px var(--mono);color:var(--c);font-style:normal}
+@media (max-width:640px){.replay{padding:8px 10px}.replay .rp-t{min-width:52px;font-size:12px}.rp-lap .nm{max-width:120px}}
 .readout{position:absolute;left:10px;bottom:10px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:12px/1.5 var(--mono);pointer-events:none;backdrop-filter:blur(4px);white-space:nowrap}
 .readout .k{color:var(--muted)}
 .mapnote{position:absolute;right:10px;bottom:10px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--muted);pointer-events:none;max-width:70%}
@@ -843,7 +863,7 @@ body.cockpit #hero{position:fixed;inset:0;z-index:60;display:flex;flex-direction
 body.cockpit #hero .fs-head{display:none!important}
 body.cockpit #hero .map-wrap{flex:1;min-height:0;display:flex;flex-direction:column;width:100%;border:0;border-radius:0;background:var(--bg);max-height:none}
 body.cockpit #mapBox{flex:1;min-height:0;overflow:hidden}
-body.cockpit .legend,body.cockpit .map-title,body.cockpit .readout,body.cockpit .mapnote{display:none!important}
+body.cockpit .legend,body.cockpit .map-title,body.cockpit .readout,body.cockpit .mapnote,body.cockpit .replay{display:none!important}
 /* the toolbar (markers, labels, rotate, zoom, imagery) is a strip above the scrub bar, shown by the ⋯ button */
 body.cockpit #hero .map-bar{display:none;position:absolute;left:var(--sl);right:calc(var(--sr) + 48px);bottom:calc(var(--sb) + 68px);z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);backdrop-filter:blur(10px);padding:5px 6px;gap:4px;overflow-x:auto;justify-content:flex-start;flex-wrap:nowrap;scrollbar-width:none}
 body.cockpit.ck-tools #hero .map-bar{display:flex}
@@ -1111,6 +1131,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
           <div class="field"><label id="refLbl"></label><select id="refSel"></select></div>
           <div class="field auto"><label data-t="Compare">Compare</label><div class="row" style="flex-wrap:nowrap"><div class="seg"><button class="btn" id="qcNone" type="button" data-t="Off">Off</button><button class="btn" id="qcBestAvg" type="button" data-t="Best vs average">Best vs average</button><button class="btn" id="qcIdeal" type="button" data-t="Best vs ideal">Best vs ideal</button><button class="btn" id="qcLap" type="button" data-t="Another lap">Another lap</button><button class="btn" id="qcOther" type="button" data-t="Another session…">Another session…</button></div></div></div>
           <div class="field" id="cmpField" hidden><label id="cmpLbl"></label><select id="cmpSel"></select></div>
+          <div class="field" id="cmp2Field" hidden><label data-t="Third lap (optional)">Third lap (optional)</label><select id="cmp2Sel"></select></div>
         </div>
         <div class="cmp-picker" id="cmpPicker" hidden><div class="hint" id="cmpPickerHint"></div><div class="list" id="cmpList"></div></div>
         <div class="lapline" id="lapLine"><span class="lbl" id="lapLbl"></span><span class="big" id="lapBig">—</span><div class="chips" id="lapChips"></div></div>
@@ -1121,7 +1142,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
         <div class="map-wrap" id="mapWrap1">
           <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn mobile-only" id="fsCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Session &amp; compare">Session &amp; compare</span></button><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
           <div class="map-bar" id="mapBar">
-            <div class="seg" id="lapSegField" title="Show on map" hidden><button class="btn active" id="lapYou" type="button">Reference</button><button class="btn" id="lapCmp" type="button">Comparison</button></div>
+            <div class="seg" id="lapSegField" title="Show on map" hidden><button class="btn active" id="lapYou" type="button">Reference</button><button class="btn" id="lapCmp" type="button">Comparison</button><button class="btn" id="lapThird" type="button" hidden>Third lap</button></div>
             <div class="seg" id="viewSeg"><button class="btn" id="tglTiles" type="button" hidden data-t="Satellite">Satellite</button><button class="btn" id="tglAlign" type="button" hidden data-t="Align">Align</button><button class="btn" id="tglSat" type="button" data-t="Aerial">Aerial</button></div>
             <button class="btn" id="optBand" type="button" data-t="Track edges">Track edges</button>
             <button class="btn" id="optTicks" type="button" data-t="Markers">Markers</button>
@@ -1148,6 +1169,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
             <button class="ck-rb" id="ckShare" type="button" title="Share" aria-label="Share"><svg><use href="#i-share"/></svg></button><button class="ck-rb" id="ckMore" type="button" title="More" aria-label="More">⋯</button>
           </div>
           <div class="ck-scrub" id="ckScrub" hidden><div class="ck-step"><button type="button" id="ckPrev" aria-label="Previous corner">‹</button><button type="button" class="ck-ct" id="ckStepBtn"><b id="ckStepT">T1</b><span id="ckStepX"></span></button><button type="button" id="ckNext" aria-label="Next corner">›</button></div><canvas id="ckScrubC"></canvas></div></div>
+          <div class="replay" id="replay" hidden><button class="btn sm rp-play" id="rpPlay" type="button" title="Play the lap" aria-label="Play">&#9654;</button><input type="range" id="rpRange" min="0" max="1000" value="0" aria-label="Lap position"><span class="rp-t" id="rpTime">0.00 s</span><div class="rp-laps" id="rpLaps"></div></div>
           <div class="legend" id="legendData"></div>
           <div class="charts under" id="dataPanel"><div class="hint" id="dataSub" style="margin:8px 0 4px"></div><canvas class="chart" id="chDataSpeed" height="150"></canvas><canvas class="chart" id="chDataDelta" height="84"></canvas></div>
         </div>
@@ -2976,6 +2998,7 @@ Object.assign(I18N.RU, { 'Preparing the link…': 'Готовлю ссылку�
 Object.assign(I18N.RU, { 'Visitors today': 'Посетители сегодня', 'Yesterday': 'Вчера', 'signed in {u} · new {n} · {o} opens': 'вошли {u} · новых {n} · {o} открытий', 'Visitors, 7 days': 'Посетители, 7 дней', '{n} signed in · {m} in 30 days': '{n} вошли · {m} за 30 дней', 'Retention': 'Возвращаемость', 'came back the next day · within 7 days: {p} (of {n} new)': 'вернулись на следующий день · в течение 7 дней: {p} (из {n} новых)', 'Visitors, last 30 days': 'Посетители, 30 дней', 'Devices, 30 days': 'Устройства, 30 дней', 'Days are UTC (Dubai is +4). A visitor is a browser; a driver on a phone and a laptop counts twice.': 'Дни по UTC (Дубай +4). Посетитель — это браузер: один человек с телефона и ноутбука считается дважды.', 'Visitors and retention: run supabase/visits.sql in the SQL editor once — the numbers appear here from the next day.': 'Посетители и возвращаемость: выполни supabase/visits.sql в SQL Editor один раз — цифры появятся здесь со следующего дня.' });
 Object.assign(I18N.RU, { 'Best vs ideal': 'Лучший vs идеальный', 'ideal lap': 'идеальный круг', 'Ideal lap': 'Идеальный круг', 'best corners, approximate': 'лучшие повороты, приблизительно', 'This session needs at least two clean laps for an ideal lap.': 'Для идеального круга нужны хотя бы два чистых круга в сессии.', 'Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.': 'Идеальный круг ≈ самый быстрый проезд каждого поворота, собранный из разных кругов. Приблизительно: связки поворотов не учитываются.', 'The fastest pass through each corner, stitched from {k} different laps of this session — {d} s better than the best lap.': 'Самый быстрый проезд каждого поворота, собранный из {k} разных кругов этой сессии — на {d} с лучше лучшего круга.', 'Where another lap was faster:': 'Где другой круг был быстрее:', 'The best lap is the fastest in every corner.': 'Лучший круг — самый быстрый в каждом повороте.', 'Approximate: corners are judged one by one, combinations are not — a faster entry into one corner can be the reason for a slower next one, and this stitched lap was never driven. A ceiling, not a target.': 'Приблизительно: повороты оцениваются по одному, связки — нет: быстрый вход в один поворот может быть причиной медленного следующего, а такого круга целиком никто не проезжал. Это потолок, а не цель.', 'Your fastest pass through this corner is this very lap.': 'Твой самый быстрый проезд этого поворота — именно этот круг.', 'Your fastest pass through this corner: lap {n}, {t} s ({d} s faster than the reference lap).': 'Твой самый быстрый проезд этого поворота: круг {n}, {t} с (на {d} с быстрее опорного круга).', 'Corners are judged one by one — check the next corner of that lap too.': 'Повороты оцениваются по одному — посмотри и следующий поворот того круга.' });
 Object.assign(I18N.RU, { 'Ideal lap breakdown': 'Из чего состоит идеальный круг', '{t} = the fastest pass through each corner · stitched from {k} laps · best lap {b}': '{t} = самый быстрый проезд каждого поворота · собрано из {k} кругов · лучший круг {b}', 'Approximate: corners are judged one by one, combinations are not — a faster entry into one corner can be the reason for a slower next one. Tap a lap to compare it with your best lap in that corner, or to find it on the camera.': 'Приблизительно: повороты оцениваются по одному, связки — нет: быстрый вход в один поворот может быть причиной медленного следующего. Нажми на круг, чтобы сравнить его с лучшим кругом в этом повороте или найти на камере.', 'Fastest laps in this corner': 'Самые быстрые круги в этом повороте', 'Best lap': 'Лучший круг', 'your best lap': 'твой лучший круг', 'Compare the best lap with lap {n} in T{c}': 'Сравнить лучший круг с кругом {n} в T{c}', 'Σ fastest corners = {t}': 'Σ лучших поворотов = {t}' });
+Object.assign(I18N.RU, { 'Third lap (optional)': 'Третий круг (необязательно)', '— no third lap —': '— без третьего круга —', 'Third lap': 'Третий круг', 'third lap': 'третий круг', 'Play the lap': 'Проиграть круг', 'Pause': 'Пауза', "Show this lap's points on the map": 'Показать точки этого круга на карте' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3522,7 +3545,7 @@ function createMapView(canvas, host) {
   const V = { s: 1, tx: 0, ty: 0, rot: 0, auto: true, ts: 1, anchor: null };
   const M = { view: V, hoverIdx: -1, dragIdx: -1, selIdx: -1, panning: null, spaceDown: false, tool: 'pan', badges: [] };
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-  function tokens() { const cs = getComputedStyle(document.documentElement), g = (n) => cs.getPropertyValue(n).trim(); return { bg: g('--bg'), surface: g('--surface'), surface2: g('--surface-2'), line: g('--line'), line2: g('--line-2'), fg: g('--fg'), muted: g('--muted'), faint: g('--faint'), accent: g('--accent'), accentInk: g('--accent-ink'), brake: g('--brake'), limit: g('--limit'), lift: g('--lift'), throttle: g('--throttle'), turnin: g('--turnin'), actual: g('--actual'), cmp: g('--cmp'), mono: g('--mono') || 'monospace', body: g('--body') || 'sans-serif' }; }
+  function tokens() { const cs = getComputedStyle(document.documentElement), g = (n) => cs.getPropertyValue(n).trim(); return { bg: g('--bg'), surface: g('--surface'), surface2: g('--surface-2'), line: g('--line'), line2: g('--line-2'), fg: g('--fg'), muted: g('--muted'), faint: g('--faint'), accent: g('--accent'), accentInk: g('--accent-ink'), brake: g('--brake'), limit: g('--limit'), lift: g('--lift'), throttle: g('--throttle'), turnin: g('--turnin'), actual: g('--actual'), cmp: g('--cmp'), cmp2: g('--cmp2') || '#17a2b8', mono: g('--mono') || 'monospace', body: g('--body') || 'sans-serif' }; }
   function setup() { const w = canvas.clientWidth || canvas.parentElement.clientWidth || 600, h = host.height ? host.height(w) : Math.round(clamp(w * 0.7, 420, 900)); const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1, Math.sqrt(3.2e6 / Math.max(1, w * h)))); if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); canvas.style.height = h + 'px'; } const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, w, h }; }
   const imgSize = () => { const fs = host.getFrameSize ? host.getFrameSize() : null; if (fs) return fs; const im = host.getImage ? host.getImage() : null; return im ? [im.w, im.h] : [1600, 1000]; };
   const toS = (x, y) => { const c = Math.cos(V.rot), si = Math.sin(V.rot); return [V.tx + V.s * (c * x - si * y), V.ty + V.s * (si * x + c * y)]; };
@@ -3696,17 +3719,22 @@ function createMapView(canvas, host) {
     // logged laps: the chosen lap with every action point, numbered badges, the other lap as a ghost
     M.badges = [];
     if (D && tr) {
-      const N = tr.N, role = O.role || 'ref', main = role === 'cmp' && D.O ? D.O : D.R, other = role === 'cmp' ? D.R : D.O, mainCol = role === 'cmp' ? C.cmp : C.actual;
+      // up to three laps: the reference (1), the comparison (2) and a third lap (3), each in its own colour; the chosen one (role) carries every action point
+      const N = tr.N, role = O.role || 'ref';
+      const laps = [{ P: D.R, col: C.actual, role: 'ref', n: 1, m: (r) => r.R }]; if (D.O) laps.push({ P: D.O, col: C.cmp, role: 'cmp', n: 2, m: (r) => r.O }); if (D.P3) laps.push({ P: D.P3, col: C.cmp2, role: 'third', n: 3, m: (r) => r.M3 });
+      const mainL = laps.find(l => l.role === role) || laps[0], main = mainL.P, mainCol = mainL.col, mOf = mainL.m;
       const path = (P, a, len) => { ctx.beginPath(); if (a === undefined) { for (let i = 0; i < N; i++) { const [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } else { for (let k = 0; k <= len; k++) { const i = (a + k) % N, [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } } };
-      const lw = clamp(2.4 + sc * 1.2, 3.5, 11), pxm = sc / mpp;
-      if (other) { path(other); ctx.lineWidth = Math.max(1.3, lw * 0.4); ctx.strokeStyle = role === 'cmp' ? C.actual : C.cmp; ctx.globalAlpha = 0.6; ctx.setLineDash([7, 6]); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1; }
+      const lw = clamp(1.9 + sc * 1.0, 2.8, 9), pxm = sc / mpp;
+      for (const l of laps) if (l !== mainL) { path(l.P); ctx.lineWidth = Math.max(1.6, lw * 0.6) + 1.5; ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.stroke(); ctx.lineWidth = Math.max(1.6, lw * 0.6); ctx.strokeStyle = l.col; ctx.stroke(); }
       path(main); ctx.lineWidth = lw + 3; ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.stroke(); ctx.lineWidth = lw; ctx.strokeStyle = mainCol; ctx.stroke();
       const hiRow = O.hiRow || null, showAll = !!O.labelsAll;
       if (hiRow) { path(main, hiRow.w.a, hiRow.w.len); ctx.lineWidth = lw + 7; ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.stroke(); ctx.lineWidth = lw + 1; ctx.strokeStyle = '#fff'; ctx.globalAlpha = 0.9; ctx.stroke(); ctx.globalAlpha = 1; }
       const mk = (i, r, col, ink, lwS) => { const [px, py] = lapPos(tr, main, i), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = lwS || 1.6; ctx.strokeStyle = ink || '#fff'; ctx.stroke(); return [x, y]; };
       const placed = [], labels = [], rsz = clamp(0.9 + sc * 0.35, 1, 1.8), K = t('km/h');
+      // the other laps keep their own braking / lift points: small rings in the lap colour, on their own lines
+      for (const l of laps) { if (l === mainL) continue; for (const r of D.rows) { const m = l.m(r); if (!m) continue; const k = m.kind === 'brake' && !m.inherited ? m.bk : (m.kind === 'lift' ? m.lk : -1); if (k < 0) continue; const i = ((r.w.a + k) % N + N) % N, [px, py] = lapPos(tr, l.P, i), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, 3.6 * rsz, 0, Math.PI * 2); ctx.fillStyle = m.kind === 'brake' ? C.brake : C.lift; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = l.col; ctx.stroke(); } }
       for (const r of D.rows) {
-        const w0 = r.w, m = role === 'cmp' ? r.O : r.R; if (!m) continue; const at = (k) => ((w0.a + k) % N + N) % N, hi = hiRow && hiRow.w.n === w0.n;
+        const w0 = r.w, m = mOf(r); if (!m) continue; const at = (k) => ((w0.a + k) % N + N) % N, hi = hiRow && hiRow.w.n === w0.n;
         if (m.tk >= 0) mk(at(m.tk), 4.5 * rsz, C.throttle);
         if (m.rk >= 0) mk(at(m.rk), 3.5 * rsz, C.limit);
         mk(at(m.apK), 3.5 * rsz, '#fff', '#333');
@@ -3727,7 +3755,7 @@ function createMapView(canvas, host) {
       }
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       for (const r of D.rows) {
-        const w0 = r.w, m = role === 'cmp' ? r.O : r.R; if (!m) continue; const i = ((w0.a + m.apK) % N + N) % N, hi = hiRow && hiRow.w.n === w0.n;
+        const w0 = r.w, m = mOf(r); if (!m) continue; const i = ((w0.a + m.apK) % N + N) % N, hi = hiRow && hiRow.w.n === w0.n;
         const out = w0.dir === 'R' ? -1 : 1, [snx, sny] = RN(tr.nx[i], tr.ny[i]), [px, py] = lapPos(tr, main, i), [x, y] = T(px, py);
         const rad = hi ? 14 : 11; let off = Math.min((widthM / 2 + 1.5) * pxm, 60) + rad + 6, bx, by, tries = 0, rect;
         do { bx = x + out * snx * off; by = y + out * sny * off; rect = [bx - rad, by - rad, 2 * rad, 2 * rad]; off += rad + 4; tries++; } while (tries < 4 && placed.some(p => rect[0] < p[0] + p[2] && rect[0] + rect[2] > p[0] && rect[1] < p[1] + p[3] && rect[1] + rect[3] > p[1]));
@@ -3750,7 +3778,12 @@ function createMapView(canvas, host) {
         ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(lb.text, lx, ly + 0.5);
       }
       ctx.textBaseline = 'alphabetic';
-      if (M.hoverIdx >= 0 && M.hoverIdx < N && !hiRow) { const [px, py] = lapPos(tr, main, M.hoverIdx), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
+      // the karts: one numbered marker per lap at the replay position (or at the hovered station), the chosen lap's on top
+      const marks = O.marks || null;
+      if (marks && marks.length) { const ordered = marks.slice().sort((a, b) => (a.main ? 1 : 0) - (b.main ? 1 : 0)); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        for (const mk0 of ordered) { if (!(mk0.i >= 0 && mk0.i < N)) continue; const [px, py] = lapPos(tr, mk0.P, mk0.i), [x, y] = T(px, py), r = mk0.main ? 10 : 8.5; ctx.beginPath(); ctx.arc(x, y + 1.5, r + 1, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fill(); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = mk0.col; ctx.fill(); ctx.lineWidth = mk0.main ? 2.5 : 2; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = `700 ${mk0.main ? 11 : 10}px ${C.mono}`; ctx.fillText(String(mk0.n), x, y + 0.5); }
+        ctx.textBaseline = 'alphabetic'; }
+      else if (M.hoverIdx >= 0 && M.hoverIdx < N && !hiRow) { const [px, py] = lapPos(tr, main, M.hoverIdx), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
     }
     // corner apexes while editing (numbered diamonds) and plain numbered markers on a layout page without laps
     if (tr && (O.showApexes || M.tool === 'corner') && O.apexes) {
@@ -3777,7 +3810,7 @@ function createMapView(canvas, host) {
   function badgeAt(sx, sy) { for (const b of M.badges) if (Math.hypot(sx - b.x, sy - b.y) <= b.r + 3) return b.row; return null; }
   function nearestLineIdx(sx, sy) {
     const tr = host.getTrack ? host.getTrack() : null, O = host.getOverlay ? host.getOverlay() : {}; if (!tr) return -1; let best = -1, bd = 40;
-    if (O.D) { const b = badgeAt(sx, sy); if (b) return b.w.apex; const P = O.role === 'cmp' && O.D.O ? O.D.O : O.D.R; for (let i = 0; i < tr.N; i++) { const [px, py] = lapPos(tr, P, i), [x, y] = toS(px, py), d = Math.hypot(x - sx, y - sy); if (d < bd) { bd = d; best = i; } } }
+    if (O.D) { const b = badgeAt(sx, sy); if (b) return b.w.apex; const P = O.role === 'cmp' && O.D.O ? O.D.O : (O.role === 'third' && O.D.P3 ? O.D.P3 : O.D.R); for (let i = 0; i < tr.N; i++) { const [px, py] = lapPos(tr, P, i), [x, y] = toS(px, py), d = Math.hypot(x - sx, y - sy); if (d < bd) { bd = d; best = i; } } }
     else if (O.model && O.model.N === tr.N && O.modelOn) { for (let i = 0; i < tr.N; i++) { const [x, y] = toS(O.model.qx[i] / tr.mpp, O.model.qy[i] / tr.mpp), d = Math.hypot(x - sx, y - sy); if (d < bd) { bd = d; best = i; } } }
     else { for (let i = 0; i < tr.N; i++) { const [x, y] = toS(tr.cx[i] / tr.mpp, tr.cy[i] / tr.mpp), d = Math.hypot(x - sx, y - sy); if (d < bd) { bd = d; best = i; } } }
     return best;
@@ -4170,7 +4203,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v30.3';
+const APP_VERSION = 'v31';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -4542,7 +4575,7 @@ async function renderSessionsTable(box, pubs, subEl) {
 // ---------- the Lab ----------
 // One session is the reference; a comparison (another lap, the session average, or another session on the same layout) is optional.
 const LAB = {
-  tid: '', lid: '', G: null, sessions: [], ref: null, cmp: 'none', mapLap: 'you', selN: 0, hoverIdx: -1, chat: [], dcmp: null, coach: null, map: null, loaded: false, social: null, pickerOpen: false,
+  tid: '', lid: '', G: null, sessions: [], ref: null, cmp: 'none', cmp2: 'none', mapLap: 'you', selN: 0, hoverIdx: -1, scrubT: 0, playing: false, chat: [], dcmp: null, coach: null, map: null, loaded: false, social: null, pickerOpen: false,
   opts: { band: false, ticks: true, labelsAll: false, aerial: true, tiles: SAT.pref() }
 };
 const lapKey = (sess, L) => sess.id + '|' + L.n;
@@ -4563,6 +4596,17 @@ function pickDefaultRef() { let best = null; for (const x of allLaps()) if (!bes
 function cornerAt(i) { const D = LAB.dcmp; if (!D || i < 0) return null; const N = LAB.G.track.N; return D.rows.find(r => ((i - r.w.a) % N + N) % N < r.w.len) || null; }
 function activeRow() { const D = LAB.dcmp; if (!D) return null; const h = LAB.hoverIdx >= 0 ? cornerAt(LAB.hoverIdx) : null; if (h) return h; return LAB.selN ? (D.rows.find(r => r.w.n === LAB.selN) || null) : null; }
 const cmpSessOf = (key) => { key = String(key || ''); if (!key || key === 'none' || key === 'avg') return null; return isAvgKey(key) ? sessOf(key.slice(4)) : (isIdealKey(key) ? sessOf(key.slice(6)) : (findLap(key) || {}).sess || null); };
+// the laps on the screen: the reference (1), the comparison (2), the third lap (3) — colours, metrics per corner, the chosen one
+const LAPCOL = { ref: 'var(--actual)', cmp: 'var(--cmp)', third: 'var(--cmp2)' };
+function lapList(D) { if (!D) return []; const out = [{ P: D.R, role: 'ref', n: 1, col: LAPCOL.ref, name: D.ref.name + (D.ref.mine || D.ref.avg ? '' : ' · ' + shortSess(D.sess)), m: (r) => r.R }]; if (D.O) out.push({ P: D.O, role: 'cmp', n: 2, col: LAPCOL.cmp, name: D.nameOf(D.O), m: (r) => r.O }); if (D.P3) out.push({ P: D.P3, role: 'third', n: 3, col: LAPCOL.third, name: D.name3, m: (r) => r.M3 }); return out; }
+const roleNow = () => LAB.mapLap === 'cmp' ? 'cmp' : (LAB.mapLap === 'third' ? 'third' : 'ref');
+const lapOnMap = (D) => (lapList(D).find(l => l.role === roleNow()) || lapList(D)[0]);
+// the station a lap has reached at time tau (its elapsed-time array is monotone)
+function stationAt(P, tau) { const N = P.N, tt = P.t; if (tau <= 0) return 0; if (tau >= P.T) return N - 1; let lo = 0, hi = N - 1; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (tt[mid] <= tau) lo = mid; else hi = mid - 1; } return lo; }
+const replayTmax = (D) => Math.max(...lapList(D).map(l => l.P.T));
+// the kart markers for the map: at the hovered station for every lap, otherwise at the replay time — each on its own line
+function labMarks() { const D = LAB.dcmp; if (!D) return null; const laps = lapList(D), role = roleNow(); if (LAB.hoverIdx >= 0) return laps.map(l => ({ P: l.P, i: LAB.hoverIdx, col: cssColor(l.col), n: l.n, main: l.role === role })); return laps.map(l => ({ P: l.P, i: stationAt(l.P, LAB.scrubT || 0), col: cssColor(l.col), n: l.n, main: l.role === role })); }
+function cssColor(v) { const m = /^var\((--[\w-]+)\)$/.exec(v); return m ? (getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim() || '#888') : v; }
 // the ideal lap of a session: in every corner window (the stretch from one speed peak to the next, so the whole lap is covered)
 // the fastest pass among the clean laps, stitched into one projection. Approximate by nature: a corner driven for its own time can
 // cost the next one, and the stitched lap never happened — a ceiling, not a target. `picks` says which lap won each corner.
@@ -4688,7 +4732,7 @@ function cardFrom(D, G, coach) {
   return { v: CARD_V, w: Math.round((x1 - x0) / sc * 1000) / 1000, h: Math.round((y1 - y0) / sc * 1000) / 1000, pts, marks, corners, top, total, vmax: Math.round(Math.max(...R.v) * 3.6) };
 }
 // back to the start page: the session stays in memory, the Lab shows the library again
-LAB.close = function () { if (fsOn()) { if (document.fullscreenElement) { try { document.exitFullscreen(); } catch (e) {} } else $('hero').classList.remove('fs-fallback'); } LAB.current = null; LAB.sessions = []; LAB.G = null; LAB.dcmp = null; LAB.coach = null; LAB.loaded = false; LAB.selN = 0; if (location.hash !== '#lab') history.replaceState(null, '', '#lab'); labRender(); renderLabStart(); window.scrollTo({ top: 0 }); };
+LAB.close = function () { replayPlay(false); LAB.cmp2 = 'none'; LAB.scrubT = 0; if (fsOn()) { if (document.fullscreenElement) { try { document.exitFullscreen(); } catch (e) {} } else $('hero').classList.remove('fs-fallback'); } LAB.current = null; LAB.sessions = []; LAB.G = null; LAB.dcmp = null; LAB.coach = null; LAB.loaded = false; LAB.selN = 0; if (location.hash !== '#lab') history.replaceState(null, '', '#lab'); labRender(); renderLabStart(); window.scrollTo({ top: 0 }); };
 // open a session as the reference (or as the comparison against my latest session on the same layout)
 LAB.open = async function (meta, asCmp) {
   labEnsureMap(); setStatus('labStatus', t('Loading session…'));
@@ -4708,7 +4752,7 @@ LAB.open = async function (meta, asCmp) {
   LAB.names = await STORE.names(LAB.sessions.map(s => s.owner));
   LAB.sessions.sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.createdAt || 0) - (b.createdAt || 0));
   const reopen = !!(LAB.current && LAB.current.id === sess.id);
-  LAB.current = sess; LAB.selN = 0; LAB.ckInsp = false; LAB.scrubIdx = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = reopen && LAB.pickerOpen; LAB.social = null; LAB.breakOpen = false;
+  LAB.current = sess; LAB.selN = 0; LAB.ckInsp = false; LAB.scrubIdx = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = reopen && LAB.pickerOpen; LAB.social = null; LAB.breakOpen = false; LAB.cmp2 = reopen ? LAB.cmp2 : 'none'; LAB.scrubT = 0; replayPlay(false);
   if (asCmp) { const my = LAB.sessions.filter(s => mySession(s) && s.id !== sess.id).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]; if (my) { LAB.ref = lapKey(my, bestLap(my)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : lapKey(sess, bestLap(sess)); LAB.current = my; } else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; } }
   else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : 'none'; }   // best lap against the session average by default
   LAB.loaded = true; LAB.needFit = true; if (APP.route === 'lab') { LAB.map.fit(); LAB.needFit = false; } labRender();
@@ -4741,13 +4785,13 @@ function labMapHeight(w) {
   const ratio = LAB.G ? LAB.G.H / LAB.G.W : 0.65;
   if (isCockpit()) { const box = $('mapBox').clientHeight; return Math.max(120, box || window.innerHeight); }
   if (fs && isPhone()) return Math.max(220, window.innerHeight - ($('fsHead').offsetHeight || 50) - ($('dataPanel').offsetHeight || 180) - 2);
-  if (fs) { const hgt = (id) => { const e = $(id); return e && e.offsetParent !== null ? e.offsetHeight : 0; }; return Math.max(240, window.innerHeight - 28 - hgt('fsHead') - hgt('mapBar') - hgt('legendData') - hgt('dataPanel') - 24); }
+  if (fs) { const hgt = (id) => { const e = $(id); return e && e.offsetParent !== null ? e.offsetHeight : 0; }; return Math.max(240, window.innerHeight - 28 - hgt('fsHead') - hgt('mapBar') - hgt('legendData') - hgt('replay') - hgt('dataPanel') - 24); }
   if (isPhone()) return Math.round(window.innerHeight * 0.5);
   // desktop: the map fills what is left of the window under the (stuck) pickbar — no scrolling to see the whole lap
   const wrap = $('mapWrap1'); let free = window.innerHeight - 470;
   if (wrap && wrap.offsetParent !== null) {
     // where the map card sits with the page scrolled to the top (stable while scrolling), minus the map's own toolbar and legend
-    const se = document.scrollingElement || document.documentElement, absTop = wrap.getBoundingClientRect().top + (se ? se.scrollTop : 0), chrome = (($('mapBar') && $('mapBar').offsetHeight) || 48) + (($('legendData') && $('legendData').offsetParent !== null) ? $('legendData').offsetHeight : 0) + 8;
+    const se = document.scrollingElement || document.documentElement, absTop = wrap.getBoundingClientRect().top + (se ? se.scrollTop : 0), chrome = (($('mapBar') && $('mapBar').offsetHeight) || 48) + (($('legendData') && $('legendData').offsetParent !== null) ? $('legendData').offsetHeight : 0) + (($('replay') && $('replay').offsetParent !== null) ? $('replay').offsetHeight : 52) + 8;
     free = window.innerHeight - absTop - chrome - 18;
   }
   return Math.round(clamp(free, 360, Math.min(820, Math.max(440, w * ratio * 1.3))));
@@ -4820,33 +4864,32 @@ function afterSelect(follow) {
   if (isCockpit()) drawScrub();
 }
 // the pointer left the map or a chart: no hover — except in the cockpit, where the marker stays at the scrub position
-function hoverOff() { LAB.hoverIdx = isCockpit() && LAB.G ? clamp(LAB.scrubIdx | 0, 0, LAB.G.track.N - 1) : -1; LAB.map.setHover(LAB.hoverIdx); hoverChanged(); }
+function hoverOff() { LAB.hoverIdx = -1; LAB.map.setHover(-1); LAB.map.draw(); hoverChanged(); }
 // hover / scrub position changed: the readout (desktop), the HUD and the step label (cockpit), the charts
 function hoverChanged() {
   if (isCockpit()) { renderHud(); renderCkStep(); }
-  else { showReadout(); const row = activeRow(), key = row ? row.w.n : 0; if (key !== LAB._inspKey) renderInspector(); }
+  else { showReadout(); renderReplay(false); const row = activeRow(), key = row ? row.w.n : 0; if (key !== LAB._inspKey) renderInspector(); }
   scheduleCharts();
 }
 // ----- the cockpit HUD: one row per lap on the screen — colour, lap time, then the speed, time and distance at the scrub position (and Δt) -----
 function renderHud() {
   if (!isCockpit()) return; const D = LAB.dcmp, G = LAB.G, box = $('ckLaps'); if (!D || !G) { box.innerHTML = ''; box.dataset.key = ''; return; }
-  const i = LAB.hoverIdx >= 0 ? LAB.hoverIdx : clamp(LAB.scrubIdx | 0, 0, G.track.N - 1), ds = G.track.ds, onRole = LAB.mapLap === 'cmp' && D.O ? 'cmp' : 'ref';
-  const rows = [{ role: 'ref', P: D.R, name: D.ref.name + (D.ref.mine || D.ref.avg ? '' : ' · ' + shortSess(D.sess)), c: 'var(--actual)' }];
-  if (D.O) rows.push({ role: 'cmp', P: D.O, name: D.nameOf(D.O), c: 'var(--cmp)' });
+  const hov = LAB.hoverIdx >= 0, iR = hov ? LAB.hoverIdx : stationAt(D.R, LAB.scrubT || 0), ds = G.track.ds, onRole = roleNow();
+  const rows = lapList(D).map(l => ({ role: l.role, P: l.P, name: l.name, c: l.col, n: l.n }));
   const key = rows.map(r => r.role + '~' + r.name + '~' + fmtLap(r.P.T)).join('|') + '~' + onRole;
   if (box.dataset.key !== key) {
     box.dataset.key = key; box.innerHTML = '';
     for (const r of rows) {
-      const cell = (cls, html) => { const e = el('span', cls); e.innerHTML = html; e.dataset.role = r.role; if (r.role === onRole) e.classList.add('on'); e.style.setProperty('--c', r.c); e.onclick = () => { if (!D.O) return; LAB.mapLap = r.role === 'cmp' ? 'cmp' : 'you'; labRender(); }; box.appendChild(e); return e; };
-      cell('sw' + (r.role === 'cmp' ? ' dash' : ''), '<i></i>');
+      const cell = (cls, html) => { const e = el('span', cls); e.innerHTML = html; e.dataset.role = r.role; if (r.role === onRole) e.classList.add('on'); e.style.setProperty('--c', r.c); e.onclick = () => { if (!D.O) return; LAB.mapLap = r.role === 'ref' ? 'you' : r.role; labRender(); }; box.appendChild(e); return e; };
+      cell('sw' + (r.role === 'cmp' ? ' dash' : ''), `<i></i><em>${r.n}</em>`);
       cell('nm', `<b>${esc(fmtLap(r.P.T))}</b>${esc(r.name)}`);
       cell('v', `<b data-k="v"></b> ${t('km/h')}`); cell('v', `<b data-k="t"></b> ${t('s')}`); cell('v', `<b data-k="s"></b> ${t('m')}`);
-      cell('v dt', r.role === 'cmp' ? '<b data-k="d"></b>' : '');
+      cell('v dt', r.role !== 'ref' ? '<b data-k="d"></b>' : '');
     }
   }
   const q = (role, k) => box.querySelector(`[data-role="${role}"] [data-k="${k}"]`);
-  for (const r of rows) { const P = r.P; q(r.role, 'v').textContent = kmh(P.v[i]); q(r.role, 't').textContent = P.t[i].toFixed(2); q(r.role, 's').textContent = (i * ds).toFixed(0); }
-  if (D.O) { const d = D.R.t[i] - D.O.t[i], e = q('cmp', 'd'); e.textContent = sg(d); const dt = e.parentElement; dt.classList.toggle('loss', d >= 0.04); dt.classList.toggle('gain', d <= -0.04); }
+  for (const r of rows) { const P = r.P, i = hov ? iR : stationAt(P, LAB.scrubT || 0); q(r.role, 'v').textContent = kmh(P.v[i]); q(r.role, 't').textContent = (hov ? P.t[i] : (LAB.scrubT || 0)).toFixed(2); q(r.role, 's').textContent = (i * ds).toFixed(0);
+    if (r.role !== 'ref') { const d = D.R.t[iR] - P.t[iR], e = q(r.role, 'd'); e.textContent = sg(d); const dt = e.parentElement; dt.classList.toggle('loss', d >= 0.04); dt.classList.toggle('gain', d <= -0.04); } }
 }
 // the step label in the scrub bar: the corner under the marker (or the selected one) and its headline number
 function renderCkStep() {
@@ -4863,22 +4906,43 @@ function drawScrub() {
   const hCss = c.clientHeight || (box.clientHeight - 2) || 58, { ctx, w, h } = setupCanvas(c, hCss);
   ctx.clearRect(0, 0, w, h);
   const tr = G.track, N = tr.N, L = tr.lengthM, pl = 8, pr = 8, pt = 13, pb = 7, X = (s) => pl + (w - pl - pr) * s / L;
-  let vmax = 0, vmin = Infinity; for (let i = 0; i < N; i++) { vmax = Math.max(vmax, D.R.v[i], D.O ? D.O.v[i] : 0); vmin = Math.min(vmin, D.R.v[i], D.O ? D.O.v[i] : Infinity); }
+  let vmax = 0, vmin = Infinity; for (let i = 0; i < N; i++) { vmax = Math.max(vmax, D.R.v[i], D.O ? D.O.v[i] : 0, D.P3 ? D.P3.v[i] : 0); vmin = Math.min(vmin, D.R.v[i], D.O ? D.O.v[i] : Infinity, D.P3 ? D.P3.v[i] : Infinity); }
   const Y = (v) => pt + (h - pt - pb) * (1 - (v - vmin) / Math.max(0.1, vmax - vmin));
   for (const r of D.rows) { const m = r.R; if (m.kind !== 'brake') continue; const a = ((r.w.a + m.bk) * tr.ds) % L, b = (r.w.a + m.apK) * tr.ds; ctx.fillStyle = 'rgba(255,107,112,.16)'; ctx.fillRect(X(a), pt - 3, Math.max(1, X(Math.min(L, b)) - X(a)), h - pt - pb + 6); }
   const act = activeRow(); if (act) { const a = act.w.a * tr.ds, b = a + act.w.len * tr.ds; ctx.fillStyle = 'rgba(255,255,255,.1)'; ctx.fillRect(X(a), 0, Math.max(1, X(Math.min(L, b)) - X(a)), h); if (b > L) ctx.fillRect(X(0), 0, X(b - L) - X(0), h); }
   const line = (P, col, lw, dash) => { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash || []); ctx.beginPath(); for (let i = 0; i <= N; i++) { const y = Y(P.v[i % N]); i ? ctx.lineTo(X(i * tr.ds), y) : ctx.moveTo(X(0), y); } ctx.stroke(); ctx.setLineDash([]); };
-  if (D.O) line(D.O, '#ff7ad9', 1.3, [4, 3]); line(D.R, '#6fb1ff', 1.8);
+  if (D.P3) line(D.P3, cssColor(LAPCOL.third), 1.2); if (D.O) line(D.O, '#ff7ad9', 1.3, [4, 3]); line(D.R, '#6fb1ff', 1.8);
   ctx.font = `600 9px ${LAB.map.tokens().mono}`; ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,255,255,.72)'; let lastX = -99; for (const r of D.rows.slice().sort((a, b) => a.R.sApex - b.R.sApex)) { const x = X(r.R.sApex); if (x - lastX < 22) continue; ctx.fillText('T' + r.w.n, x, 9); lastX = x; }
-  const i = LAB.hoverIdx >= 0 ? LAB.hoverIdx : clamp(LAB.scrubIdx | 0, 0, N - 1), x = X(i * tr.ds);
+  const hov = LAB.hoverIdx >= 0, iR = hov ? LAB.hoverIdx : stationAt(D.R, LAB.scrubT || 0), x = X(iR * tr.ds);
   ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(x, 2); ctx.lineTo(x, h - 2); ctx.stroke();
-  if (D.O) { ctx.beginPath(); ctx.arc(x, Y(D.O.v[i]), 3.5, 0, Math.PI * 2); ctx.fillStyle = '#ff7ad9'; ctx.fill(); }
-  ctx.beginPath(); ctx.arc(x, Y(D.R.v[i]), 4.5, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#6fb1ff'; ctx.lineWidth = 2; ctx.stroke();
+  for (const l of lapList(D)) { if (l.role === 'ref') continue; const i = hov ? iR : stationAt(l.P, LAB.scrubT || 0); ctx.beginPath(); ctx.arc(X(i * tr.ds), Y(l.P.v[i]), 3.5, 0, Math.PI * 2); ctx.fillStyle = l.role === 'cmp' ? '#ff7ad9' : cssColor(LAPCOL.third); ctx.fill(); }
+  ctx.beginPath(); ctx.arc(x, Y(D.R.v[iR]), 4.5, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#6fb1ff'; ctx.lineWidth = 2; ctx.stroke();
 }
 function scrubTo(clientX) {
   const G = LAB.G, D = LAB.dcmp; if (!G || !D) return; const r = $('ckScrubC').getBoundingClientRect(), u = clamp((clientX - r.left - 8) / Math.max(1, r.width - 16), 0, 1);
-  const i = Math.min(G.track.N - 1, Math.max(0, Math.round(u * G.track.lengthM / G.track.ds))); if (i === LAB.hoverIdx) return;
-  LAB.scrubIdx = i; LAB.hoverIdx = i; LAB.map.setHover(i); if (!LAB.map.V.auto) LAB.map.keepInView(LAB.mapLap === 'cmp' && D.O ? D.O : D.R, i); hoverChanged();
+  // the bar is the lap by distance, the drag is by time: the karts move at their own pace and separate where one is faster
+  const tau = u * replayTmax(D), i = stationAt(D.R, tau); if (Math.abs(tau - (LAB.scrubT || 0)) < 0.005 && LAB.hoverIdx < 0) return;
+  LAB.scrubT = tau; LAB.scrubIdx = i; LAB.hoverIdx = -1; LAB.map.setHover(-1); LAB.map.draw(); if (!LAB.map.V.auto) LAB.map.keepInView(lapOnMap(D).P, stationAt(lapOnMap(D).P, tau)); hoverChanged();
+}
+// ----- the replay bar (under the map, outside the cockpit): a slider by time, play, one chip per lap with its live distance / speed / gap -----
+function replayMoved() { const D = LAB.dcmp; if (!D) return; LAB.hoverIdx = -1; LAB.scrubIdx = stationAt(D.R, LAB.scrubT); LAB.map.setHover(-1); LAB.map.draw(); if (!LAB.map.V.auto && !isCockpit()) LAB.map.keepInView(lapOnMap(D).P, stationAt(lapOnMap(D).P, LAB.scrubT)); hoverChanged(); renderReplay(false); }
+function renderReplay(full) {
+  const D = LAB.dcmp, bar = $('replay'); if (!D || isCockpit() || $('hero').hidden) { bar.hidden = true; replayPlay(false); return; }
+  bar.hidden = false; const laps = lapList(D), Tm = replayTmax(D), tau = LAB.hoverIdx >= 0 ? D.R.t[LAB.hoverIdx] : (LAB.scrubT || 0), role = roleNow();
+  if (LAB.hoverIdx < 0) $('rpRange').value = String(Math.round(Math.max(0, Math.min(1, tau / Tm)) * 1000));
+  $('rpTime').textContent = tau.toFixed(2) + ' ' + t('s'); $('rpPlay').innerHTML = LAB.playing ? '&#10074;&#10074;' : '&#9654;'; $('rpPlay').title = LAB.playing ? t('Pause') : t('Play the lap');
+  const box = $('rpLaps'), key = laps.map(l => l.role + l.name).join('|') + role;
+  if (full || box.dataset.key !== key) { box.dataset.key = key; box.innerHTML = ''; for (const l of laps) { const b = el('button', 'rp-lap' + (l.role === role ? ' on' : '')); b.type = 'button'; b.style.setProperty('--c', l.col); b.dataset.role = l.role; b.innerHTML = `<i></i><b>${l.n}</b><span class="nm">${esc(l.name)} · ${esc(fmtLap(l.P.T))}</span><span class="live"></span>`; b.title = t('Show this lap\'s points on the map'); b.onclick = () => { LAB.mapLap = l.role === 'ref' ? 'you' : l.role; labRender(); }; box.appendChild(b); } }
+  const iR = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(D.R, tau), ds = LAB.G.track.ds;
+  for (const l of laps) { const e = box.querySelector(`[data-role="${l.role}"] .live`); if (!e) continue; const i = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(l.P, tau); const gap = l.role === 'ref' ? '' : ` · <b class="${D.R.t[iR] - l.P.t[iR] >= 0.04 ? 'loss' : (D.R.t[iR] - l.P.t[iR] <= -0.04 ? 'gain' : '')}">Δ ${sg(D.R.t[iR] - l.P.t[iR])}</b>`; e.innerHTML = `${(i * ds).toFixed(0)} ${t('m')} · ${kmh(l.P.v[i])} ${t('km/h')}${gap}`; }
+}
+function replayPlay(on) {
+  if (on === LAB.playing) return; LAB.playing = on; const b = $('rpPlay'); if (b) { b.innerHTML = on ? '&#10074;&#10074;' : '&#9654;'; b.classList.toggle('active', on); }
+  if (!on) { if (LAB._rpAnim) cancelAnimationFrame(LAB._rpAnim); LAB._rpAnim = 0; return; }
+  const D = LAB.dcmp; if (!D) { LAB.playing = false; return; } const Tm = replayTmax(D); if (LAB.scrubT >= Tm - 0.05) LAB.scrubT = 0;
+  let last = performance.now();
+  const step = (now) => { if (!LAB.playing) return; const dt = Math.min(0.1, (now - last) / 1000); last = now; LAB.scrubT = Math.min(Tm, LAB.scrubT + dt); replayMoved(); if (LAB.scrubT >= Tm) { replayPlay(false); return; } LAB._rpAnim = requestAnimationFrame(step); };
+  LAB._rpAnim = requestAnimationFrame(step);
 }
 function labEnsureMap() {
   if (LAB.map) return;
@@ -4886,7 +4950,7 @@ function labEnsureMap() {
     getImage: () => { if (!LAB.G) return null; const im = LAB.G.image; if (LAB.G.source === 'gps' && SAT.can(LAB.G) && LAB.opts.tiles) return null; return im && LAB.G.source !== 'gps' ? im : (LAB.opts.aerial ? im : null); },
     getTiles: () => { const G = LAB.G; if (!G) return null; const b = G.sat || { dx: 0, dy: 0 }; return SAT.layer(G, LAB.opts.tiles, { dx: b.dx + LAB.satAdj.dx, dy: b.dy + LAB.satAdj.dy }); },
     onSatMove: (dxPx, dyPx) => { if (!LAB.G) return; const mpp = LAB.G.track.mpp; LAB.satAdj.dx += dxPx * mpp; LAB.satAdj.dy -= dyPx * mpp; saveSatAdj(); renderAlignBar(); },
-    getOverlay: () => ({ D: LAB.dcmp, role: LAB.mapLap === 'cmp' ? 'cmp' : 'ref', hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor }),
+    getOverlay: () => ({ D: LAB.dcmp, role: roleNow(), hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor, marks: labMarks() }),
     viewInset: ckInset,
     onHover: (i) => { if (i < 0 && isCockpit()) { hoverOff(); return; } LAB.hoverIdx = i; hoverChanged(); },
     onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); if (isCockpit()) { if (i >= 0) LAB.scrubIdx = i; LAB.ckInsp = !!row && LAB.selN !== row.w.n; } LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
@@ -4965,7 +5029,11 @@ function labEnsureMap() {
   $('qcIdeal').onclick = () => { const s = LAB.current; if (!s) return; if (isIdealKey(LAB.cmp)) return; LAB.breakOpen = true; LAB.ref = lapKey(s, bestLap(s)); LAB.cmp = 'ideal:' + s.id; LAB.pickerOpen = false; LAB.chat = []; labRender(); if (!isIdealKey(LAB.cmp)) toast(t('This session needs at least two clean laps for an ideal lap.')); else toast(t('Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.'), 6000); };
   $('qcLap').onclick = () => { const s = LAB.current; if (!s) return; LAB.breakOpen = false; const ref = findLap(LAB.ref); const L = ref && ref.sess === s ? ref.L : null; const nx = s.laps.filter(x => x.px && x !== L).sort((a, b) => (b.clean - a.clean) || a.timeMs - b.timeMs)[0]; if (!nx) { toast(t('No other lap in this session.')); return; } LAB.cmp = lapKey(s, nx); LAB.pickerOpen = false; LAB.chat = []; labRender(); };
   $('qcOther').onclick = () => { LAB.breakOpen = false; LAB.pickerOpen = !LAB.pickerOpen; renderCmpPicker(); };
-  $('lapYou').onclick = () => { LAB.mapLap = 'you'; labRender(); }; $('lapCmp').onclick = () => { LAB.mapLap = 'cmp'; labRender(); };
+  $('lapYou').onclick = () => { LAB.mapLap = 'you'; labRender(); }; $('lapCmp').onclick = () => { LAB.mapLap = 'cmp'; labRender(); }; $('lapThird').onclick = () => { LAB.mapLap = 'third'; labRender(); };
+  $('cmp2Sel').addEventListener('change', () => { LAB.cmp2 = $('cmp2Sel').value; if (LAB.cmp2 === 'none' && LAB.mapLap === 'third') LAB.mapLap = 'you'; labRender(); });
+  // the replay bar: drag to move the karts along the lap by time, play to run the lap at real speed
+  $('rpRange').addEventListener('input', () => { const D = LAB.dcmp; if (!D) return; LAB.scrubT = (+$('rpRange').value / 1000) * replayTmax(D); replayMoved(); });
+  $('rpPlay').onclick = () => replayPlay(!LAB.playing);
   $('labUpload').onclick = () => UPLOAD.open({ track: LAB.tid, layout: LAB.lid }); $('labUpload2').onclick = () => UPLOAD.open({});
   $('btnPublish').onclick = labTogglePublish; $('labBack').onclick = () => LAB.close();
   $('btnEditSess').onclick = () => { const s = LAB.current; if (s) SESSEDIT.open(s, () => { LAB.invalidate(s.id); go('lab~' + s.id); }); };
@@ -5051,6 +5119,11 @@ function labRender() {
   const cmpOn = cmp !== 'none';
   $('cmpField').hidden = !cmpOn; $('lapSegField').hidden = !cmpOn;
   if (cmpOn) { const laps = cs.laps.filter(x => x.px), av = sessAvg(cs), ide = cs === sess && !refIsAvg ? sessIdeal(cs, R, apexes) : null; const o = []; if (av) o.push(['avg:' + cs.id, `${t('average clean lap')} · ${fmtLap(av.T)} (${laps.filter(x => x.clean).length})`]); if (ide) o.push(['ideal:' + cs.id, `${t('ideal lap')} · ${fmtLap(ide.T)} (${t('best corners, approximate')})`]); for (const x of laps) o.push([lapKey(cs, x), lapLabel(cs, x)]); LAB.cmp = fillSelect($('cmpSel'), o.filter(x => x[0] !== LAB.ref), cmp); $('cmpLbl').textContent = cs === sess ? t('Compare with — this session') : t('Compare with · {s}', { s: shortSess(cs) }); }
+  // the third lap: a visual comparison (map, charts, replay, a Δt column) — any lap or average of a loaded session; the field shows once a comparison is on
+  let c2 = String(LAB.cmp2 || 'none'); if (c2 === LAB.ref || c2 === LAB.cmp || isIdealKey(c2)) c2 = 'none';
+  const cs2 = cmpSessOf(c2); if (c2 !== 'none' && (!cs2 || (isAvgKey(c2) && !sessAvg(cs2)) || (!isAvgKey(c2) && !(findLap(c2) && findLap(c2).L.px)))) c2 = 'none';
+  LAB.cmp2 = c2; $('cmp2Field').hidden = !cmpOn;
+  if (cmpOn) { const o = [['none', t('— no third lap —')]]; for (const sx of LAB.sessions) { const av = sessAvg(sx); if (av) o.push(['avg:' + sx.id, `${t('average clean lap')} · ${fmtLap(av.T)} · ${shortSess(sx)}`]); for (const x of sx.laps.filter(x => x.px)) o.push([lapKey(sx, x), `${lapLabel(sx, x)}${sx === sess ? '' : ' · ' + shortSess(sx)}`]); } LAB.cmp2 = fillSelect($('cmp2Sel'), o.filter(x => x[0] === 'none' || (x[0] !== LAB.ref && x[0] !== LAB.cmp)), c2); }
   const lapOfSame = cmpOn && cs === sess && !isAvgKey(LAB.cmp) && !isIdealKey(LAB.cmp);
   $('qcNone').classList.toggle('active', !cmpOn); $('qcBestAvg').classList.toggle('active', cmpOn && cs === sess && isAvgKey(LAB.cmp) && !refIsAvg); $('qcIdeal').classList.toggle('active', cmpOn && isIdealKey(LAB.cmp)); $('qcLap').classList.toggle('active', lapOfSame); $('qcOther').classList.toggle('active', (cmpOn && cs !== sess) || LAB.pickerOpen);
   $('cmpPicker').hidden = !LAB.pickerOpen; if (LAB.pickerOpen) renderCmpPicker();
@@ -5064,24 +5137,27 @@ function labRender() {
   const D = DATA.buildComparisonP(R, others, mode, G.track, nameOf, apexes, G.corners.R, rName || null);
   if (!D) { $('digest').innerHTML = `<p class="hint">${apexes.length < 2 ? t('No corners found on this line.') : t('Could not project this lap onto the track line.')}</p>`; $('cornersTable').querySelector('tbody').innerHTML = ''; return; }
   D.ref = { sess, L, avg: refIsAvg, name: refName, mine: mySession(sess) }; D.nameOf = nameOf; D.sess = sess; LAB.dcmp = D;
+  D.P3 = null; D.name3 = '';
+  if (cmpOn && LAB.cmp2 !== 'none' && cs2) { const P3 = isAvgKey(LAB.cmp2) ? sessAvg(cs2) : DATA.projectLap(findLap(LAB.cmp2).L, G.track, G.rev); if (P3) { D.P3 = P3; D.name3 = nameOf(P3); for (const r of D.rows) r.M3 = DATA.windowMetrics(P3, r.w, G.track); } }
   if (D.O && D.O.ideal) for (const r of D.rows) r.pick = D.O.picks.find(p => p.n === r.w.n) || null;   // which lap won this corner
   D.ideal = (D.O && D.O.ideal) ? D.O : ((LAB.breakOpen && cs === sess && !refIsAvg) ? sessIdeal(cs, R, apexes) : null);   // the breakdown stays open while a lap picked from it is the comparison
   markCombos(D);
   LAB.coach = DATA.buildCoach(G.track, D.wins, attached.filter(x => x.L.clean).map(x => x.L), G.rev);
   LAB.corridor = null;
   if (LAB.selN && !D.rows.some(r => r.w.n === LAB.selN)) LAB.selN = 0;
-  if (!D.O) LAB.mapLap = 'you';
-  $('lapYou').classList.toggle('active', LAB.mapLap !== 'cmp'); $('lapCmp').classList.toggle('active', LAB.mapLap === 'cmp'); $('lapCmp').disabled = !D.O;
-  $('lapYou').textContent = t('Reference'); $('lapCmp').textContent = t('Comparison');
-  $('map1Title').hidden = false; $('map1Title').className = 'map-title ' + (LAB.mapLap === 'cmp' ? 'cmp' : 'ref');
-  $('map1Title').textContent = LAB.mapLap === 'cmp' && D.O ? `${nameOf(D.O)} · ${fmtLap(D.O.T)} · ${t('points of this lap')}` : `${t('Reference')} · ${refName}${refIsAvg || !D.ref.mine ? ' · ' + shortSess(sess) : ''} · ${fmtLap(D.R.T)} · ${t('points of this lap')}`;
+  if (!D.O) LAB.mapLap = 'you'; if (LAB.mapLap === 'third' && !D.P3) LAB.mapLap = 'you';
+  $('lapYou').classList.toggle('active', roleNow() === 'ref'); $('lapCmp').classList.toggle('active', roleNow() === 'cmp'); $('lapCmp').disabled = !D.O; $('lapThird').hidden = !D.P3; $('lapThird').classList.toggle('active', roleNow() === 'third');
+  $('lapYou').textContent = '1 · ' + t('Reference'); $('lapCmp').textContent = '2 · ' + t('Comparison'); $('lapThird').textContent = '3 · ' + t('Third lap');
+  $('map1Title').hidden = false; $('map1Title').className = 'map-title ' + roleNow();
+  { const l = lapOnMap(D); $('map1Title').textContent = l.role === 'ref' ? `1 · ${t('Reference')} · ${refName}${refIsAvg || !D.ref.mine ? ' · ' + shortSess(sess) : ''} · ${fmtLap(D.R.T)} · ${t('points of this lap')}` : `${l.n} · ${l.name} · ${fmtLap(l.P.T)} · ${t('points of this lap')}`; }
+  if (LAB.scrubT > replayTmax(D)) LAB.scrubT = 0;
   $('lapLbl').textContent = refName; $('lapBig').textContent = fmtLap(D.R.T);
   $('lmLbl').textContent = `${shortSess(sess)} · ${refName}${D.O ? ' · vs ' + nameOf(D.O) + ' ' + sg(D.total) : ''}`; $('lmBig').textContent = fmtLap(D.R.T); $('labMob').hidden = false; $('labTabs').hidden = false; applyMobTab();
   const chips = $('lapChips'); chips.innerHTML = ''; const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
   let vmax = 0, vmin = Infinity; for (let i = 0; i < D.R.N; i++) { vmax = Math.max(vmax, D.R.v[i]); vmin = Math.min(vmin, D.R.v[i]); }
   const N = D.R.N, s1 = D.R.t[Math.floor(N / 3)], s2 = D.R.t[Math.floor(2 * N / 3)];
   chip(t('max'), kmh(vmax) + ' ' + t('km/h')); chip(t('min'), kmh(vmin) + ' ' + t('km/h')); chip('S1', s1.toFixed(2)); chip('S2', (s2 - s1).toFixed(2)); chip('S3', (D.R.T - s2).toFixed(2));
-  if (D.O) chip(t('comparison'), fmtLap(D.O.T) + ' · ' + sg(D.total));
+  if (D.O) chip(t('comparison'), fmtLap(D.O.T) + ' · ' + sg(D.total)); if (D.P3) chip(t('third lap'), fmtLap(D.P3.T) + ' · ' + sg(D.R.T - D.P3.T));
   if (sess.source && sess.source.app !== 'alfano') chip(t('source'), sourceLabel(sess.source));
   if (sess.kart || sess.kartClass === 'sport') chip(t('kart'), kartLabel(sess));
   if (!sess.sws && resultText(sess)) chip(t('session'), resultText(sess));
@@ -5095,9 +5171,9 @@ function labRender() {
   if (!pb.hidden) { pb.textContent = sess.published ? t('Unpublish') : t('Publish to track page'); pb.classList.toggle('active', !!sess.published); pb.disabled = !sess.track; pb.title = sess.track ? '' : t('Assign a track first (Edit).'); }
   $('btnEditSess').hidden = !mySession(sess);
   STORE.socialAvailable().then(on => { if (LAB.current !== sess) return; $('voteBox').hidden = !(on && STORE.hasDb && sess.owner !== 'local'); if ($('voteBox').hidden) $('lowRated').hidden = true; $('discussPanel').hidden = !on; if (on) { renderSocialBits(); renderDiscussion(); } renderOwnerRow(); });
-  $('legendData').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span><span><i style="background:var(--actual)"></i>${t('reference')}</span>${D.O ? `<span><i style="background:var(--cmp)"></i>${t('comparison')}</span>` : ''}<span>${t('number — corner from the S/F line')}</span>`;
+  $('legendData').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span><span><i style="background:var(--actual)"></i>${t('reference')}</span>${D.O ? `<span><i style="background:var(--cmp)"></i>${t('comparison')}</span>` : ''}${D.P3 ? `<span><i style="background:var(--cmp2)"></i>${t('third lap')}</span>` : ''}<span>${t('number — corner from the S/F line')}</span>`;
   $('mapNote').hidden = true;
-  syncOpts(); renderDigest(); renderCornersTable(); renderInspector(); renderCornerNav(); renderAskState(); showReadout(); drawDataCharts(); renderHud(); drawScrub();
+  syncOpts(); renderDigest(); renderCornersTable(); renderInspector(); renderCornerNav(); renderAskState(); showReadout(); drawDataCharts(); renderHud(); drawScrub(); renderReplay(true);
 }
 // linked corners: a loss in one corner that buys a bigger gain in the next (early brake, early throttle) is not a mistake
 function markCombos(D) {
@@ -5428,7 +5504,8 @@ function renderCornersTable() {
     const w = r.w, m = r.R, c = coachOf(w.n), tr = el('tr'); if (LAB.selN === w.n) tr.className = 'sel';
     const res = c ? Math.max(0, m.time - c.tTop) : 0, f = c && c.infl && c.infl[0];
     const main = r.cmp && Math.abs(r.cmp.dt) >= 0.04 && r.cmp.items[0] ? r.cmp.items[0].t : (f && Math.abs(f.corr) >= 0.35 ? t('what matters here is {f}', { f: f.name }) : '—');
-    const cells = [['T' + w.n, ''], [`${w.dir === 'L' ? t('left') : t('right')} · ${kindWord(m)}`, kindCls(m)], [short(m), 'txt'], [r.O ? (r.pick ? t('lap {n}', { n: r.pick.L.n }) + ' · ' : '') + short(r.O) : '—', 'txt'], [r.cmp ? sg(r.cmp.dt) : '—', (r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm') + ' num'], [c ? (res > 0.03 ? res.toFixed(2) + ' ' + t('s') : t('ok')) : '—', (res > 0.1 ? 'loss' : 'm') + ' num'], [main, 'txt']];
+    const d3 = r.M3 ? m.time - r.M3.time : null;
+    const cells = [['T' + w.n, ''], [`${w.dir === 'L' ? t('left') : t('right')} · ${kindWord(m)}`, kindCls(m)], [short(m), 'txt'], [r.O ? (r.pick ? t('lap {n}', { n: r.pick.L.n }) + ' · ' : '') + short(r.O) : '—', 'txt'], [r.cmp ? sg(r.cmp.dt) + (d3 !== null ? `\n3: ${sg(d3)}` : '') : '—', (r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm') + ' num' + (d3 !== null ? ' two' : '')], [c ? (res > 0.03 ? res.toFixed(2) + ' ' + t('s') : t('ok')) : '—', (res > 0.1 ? 'loss' : 'm') + ' num'], [main, 'txt']];
     for (const [tx, cl] of cells) { const td = el('td'); td.textContent = tx; if (cl) td.className = cl; tr.appendChild(td); }
     tr.onclick = () => selectCorner(w.n, true); const labels = ['#', t('Type'), $('youColHead').textContent, $('cmpColHead').textContent, 'Δt', t('Reserve'), t('Main difference')]; Array.from(tr.children).forEach((td, i) => { td.dataset.label = labels[i] || ''; });
     tr.addEventListener('mouseenter', () => { LAB.hoverIdx = w.apex; LAB.map.setHover(w.apex); renderInspector(); }); tr.addEventListener('mouseleave', () => { LAB.hoverIdx = -1; LAB.map.setHover(-1); renderInspector(); });
@@ -5438,7 +5515,7 @@ function renderCornersTable() {
   const mob = $('cornersMob'); mob.innerHTML = '';
   for (const r of D.rows) { const w = r.w, m = r.R, c = coachOf(w.n), res = c ? Math.max(0, m.time - c.tTop) : 0; const b = el('button', 'crow' + (LAB.selN === w.n ? ' sel' : '')); b.type = 'button';
     const main = r.cmp && Math.abs(r.cmp.dt) >= 0.04 && r.cmp.items[0] ? r.cmp.items[0].t : (c && c.infl && c.infl[0] && Math.abs(c.infl[0].corr) >= 0.35 ? t('what matters here is {f}', { f: c.infl[0].name }) : '');
-    b.innerHTML = `<b>T${w.n}</b><span class="ty ${kindCls(m)}">${esc((w.dir === 'L' ? t('left') : t('right')) + ' · ' + kindWord(m))}</span><span class="d ${r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm'}">${r.cmp ? sg(r.cmp.dt) : m.time.toFixed(2) + ' ' + t('s')}</span><span class="r ${res > 0.1 ? 'hot' : ''}">${c ? (res > 0.03 ? t('reserve') + ' ' + res.toFixed(2) : t('ok')) : ''}</span><span class="k">${esc(short(m))}${main ? ' — ' + esc(main) : ''}</span>`;
+    b.innerHTML = `<b>T${w.n}</b><span class="ty ${kindCls(m)}">${esc((w.dir === 'L' ? t('left') : t('right')) + ' · ' + kindWord(m))}</span><span class="d ${r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm'}">${r.cmp ? sg(r.cmp.dt) + (r.M3 ? ` <small>3: ${sg(m.time - r.M3.time)}</small>` : '') : m.time.toFixed(2) + ' ' + t('s')}</span><span class="r ${res > 0.1 ? 'hot' : ''}">${c ? (res > 0.03 ? t('reserve') + ' ' + res.toFixed(2) : t('ok')) : ''}</span><span class="k">${esc(short(m))}${main ? ' — ' + esc(main) : ''}</span>`;
     b.onclick = () => selectCorner(w.n, false); mob.appendChild(b); }
   if (isLand() && LAB.selN) { const s = mob.querySelector('.crow.sel'); if (s && s.scrollIntoView) s.scrollIntoView({ block: 'nearest' }); }
 }
@@ -5477,18 +5554,18 @@ function renderInspector() {
   const youHead = D.ref.avg ? `${D.ref.name} · ${shortSess(D.sess)}` : (D.ref.mine ? `${t('you')} · ${D.ref.name}` : `${shortSess(D.sess)} · ${D.ref.name}`);
   const refLabel = D.ref.avg ? `${D.ref.name} · ${shortSess(D.sess)}` : (D.ref.mine ? '' : shortSess(D.sess));
   const pill = c ? `<span class="pill ${c.dt >= 0.04 ? 'loss' : (c.dt <= -0.04 ? 'gain' : '')}">${sg(c.dt)} ${t('s')} · ${c.dt >= 0.04 ? (refLabel ? t('reference slower') : t('you are slower')) : (c.dt <= -0.04 ? (refLabel ? t('reference faster') : t('you are faster')) : t('even'))}</span>` : '';
-  const row = (lbl, a, b) => `<tr><td>${lbl}</td><td>${a}</td>${O ? `<td>${b}</td>` : ''}</tr>`;
+  const O3 = D.P3 ? r.M3 : null, row = (lbl, a, b, c) => `<tr><td>${lbl}</td><td>${a}</td>${O ? `<td>${b}</td>` : ''}${O3 ? `<td class="third">${c === undefined ? '' : c}</td>` : ''}</tr>`;
   const sM = (x) => x >= 0 ? x.toFixed(0) + ' ' + t('m') : '—', K = t('km/h');
   let html = `<div class="insp-head"><b>T${w.n}</b><span class="hint">${w.dir === 'L' ? t('left') : t('right')} · R ${w.Rmin.toFixed(0)} ${t('m')} · ${t('apex {s} m from S/F', { s: R.sApex.toFixed(0) })}</span>${pill}</div>`;
-  html += `<table class="insp-table"><tr><th></th><th class="you">${esc(youHead)}</th>${O ? `<th class="cmp">${esc(r.pick ? `${oName} · ${t('lap {n}', { n: r.pick.L.n })}` : oName)}</th>` : ''}</tr>`;
-  html += row(t('entry'), `${kmh(R.vEntry)} ${K}`, O ? `${kmh(O.vEntry)} ${K}` : '');
-  html += row(t('pedal'), pedalText(R), O ? pedalText(O) : '');
-  if (R.kind === 'brake' || (O && O.kind === 'brake')) html += row(t('released'), sM(R.sRel), O ? sM(O.sRel) : '');
-  html += row(t('apex'), `${kmh(R.vApex)} ${K} · ${R.sApex.toFixed(0)} ${t('m')}`, O ? `${kmh(O.vApex)} ${K} · ${O.sApex.toFixed(0)} ${t('m')}` : '');
-  html += row(t('throttle from'), sM(R.sThr), O ? sM(O.sThr) : '');
-  html += row(t('exit'), `${kmh(R.vExit)} ${K}`, O ? `${kmh(O.vExit)} ${K}` : '');
-  html += row(t('lateral'), `${R.gmax.toFixed(2)} g`, O ? `${O.gmax.toFixed(2)} g` : '');
-  html += row(t('time'), `${R.time.toFixed(2)} ${t('s')}`, O ? `${O.time.toFixed(2)} ${t('s')}` : '') + '</table>';
+  html += `<table class="insp-table"><tr><th></th><th class="you">1 · ${esc(youHead)}</th>${O ? `<th class="cmp">2 · ${esc(r.pick ? `${oName} · ${t('lap {n}', { n: r.pick.L.n })}` : oName)}</th>` : ''}${O3 ? `<th class="third">3 · ${esc(D.name3)}</th>` : ''}</tr>`;
+  html += row(t('entry'), `${kmh(R.vEntry)} ${K}`, O ? `${kmh(O.vEntry)} ${K}` : '', O3 ? `${kmh(O3.vEntry)} ${K}` : '');
+  html += row(t('pedal'), pedalText(R), O ? pedalText(O) : '', O3 ? pedalText(O3) : '');
+  if (R.kind === 'brake' || (O && O.kind === 'brake') || (O3 && O3.kind === 'brake')) html += row(t('released'), sM(R.sRel), O ? sM(O.sRel) : '', O3 ? sM(O3.sRel) : '');
+  html += row(t('apex'), `${kmh(R.vApex)} ${K} · ${R.sApex.toFixed(0)} ${t('m')}`, O ? `${kmh(O.vApex)} ${K} · ${O.sApex.toFixed(0)} ${t('m')}` : '', O3 ? `${kmh(O3.vApex)} ${K} · ${O3.sApex.toFixed(0)} ${t('m')}` : '');
+  html += row(t('throttle from'), sM(R.sThr), O ? sM(O.sThr) : '', O3 ? sM(O3.sThr) : '');
+  html += row(t('exit'), `${kmh(R.vExit)} ${K}`, O ? `${kmh(O.vExit)} ${K}` : '', O3 ? `${kmh(O3.vExit)} ${K}` : '');
+  html += row(t('lateral'), `${R.gmax.toFixed(2)} g`, O ? `${O.gmax.toFixed(2)} g` : '', O3 ? `${O3.gmax.toFixed(2)} g` : '');
+  html += row(t('time'), `${R.time.toFixed(2)} ${t('s')}`, O ? `${O.time.toFixed(2)} ${t('s')}` : '', O3 ? `${O3.time.toFixed(2)} ${t('s')} <span class="hint">${sg(R.time - O3.time)}</span>` : '') + '</table>';
   if (r.pick) html += `<div class="insp-text ideal">${esc(r.pick.L === D.ref.L ? t('Your fastest pass through this corner is this very lap.') : t('Your fastest pass through this corner: lap {n}, {t} s ({d} s faster than the reference lap).', { n: r.pick.L.n, t: r.pick.time.toFixed(2), d: Math.max(0, R.time - r.pick.time).toFixed(2) }))} ${esc(t('Corners are judged one by one — check the next corner of that lap too.'))}</div>`;
   if (O) { const pl = plainCorner(r, oName, refLabel); html += `<div class="insp-text"><div class="lbl">${t('In plain words')}</div>${esc(pl.what)}${pl.advice ? `<br><b>${esc(pl.advice)}</b>` : ''}</div>`; }
   if (coach) { const res = R.time - coach.tTop; html += `<div class="insp-text"><div class="lbl">${t('Coach · best passes through this corner')}</div>${esc(DATA.coachText(coach))}${res > 0.03 ? ` <b>${D.ref.mine ? t('Your reserve here ≈ {t} s.', { t: res.toFixed(2) }) : t('Reserve in this lap ≈ {t} s.', { t: res.toFixed(2) })}</b>` : ' ' + (D.ref.mine ? t('You are among the best here.') : t('This lap is among the best here.'))}</div>`; }
@@ -5499,8 +5576,8 @@ function renderInspector() {
 function showReadout() {
   const i = LAB.hoverIdx, G = LAB.G, D = LAB.dcmp, e = $('readout'); e.hidden = true;
   if (i < 0 || !G || !D) return;
-  const P = LAB.mapLap === 'cmp' && D.O ? D.O : D.R;
-  e.innerHTML = `<span class="k">s</span> ${(i * G.track.ds).toFixed(0)} ${t('m')} · <span class="k">t</span> ${P.t[i].toFixed(2)} ${t('s')} · <span class="k">${t('speed')}</span> ${kmh(P.v[i])} ${t('km/h')} · <span class="k">${t('lat.')}</span> ${P.g[i].toFixed(2)} g${D.O ? ` · <span class="k">Δt</span> ${sg(D.R.t[i] - D.O.t[i])}` : ''}`;
+  const P = lapOnMap(D).P;
+  e.innerHTML = `<span class="k">s</span> ${(i * G.track.ds).toFixed(0)} ${t('m')} · <span class="k">t</span> ${P.t[i].toFixed(2)} ${t('s')} · <span class="k">${t('speed')}</span> ${kmh(P.v[i])} ${t('km/h')} · <span class="k">${t('lat.')}</span> ${P.g[i].toFixed(2)} g${D.O ? ` · <span class="k">Δt</span> ${sg(D.R.t[i] - D.O.t[i])}` : ''}${D.P3 ? ` · <span class="k">Δt₃</span> ${sg(D.R.t[i] - D.P3.t[i])}` : ''}`;
   e.hidden = false;
 }
 
@@ -5513,7 +5590,7 @@ function drawDataCharts() {
   const tr = G.track, C = LAB.map.tokens(), N = tr.N, L = tr.lengthM, chDS = $('chDataSpeed'), chDD = $('chDataDelta'), X = (s) => PAD.l + (chDS.clientWidth - PAD.l - PAD.r) * s / L;
   { const { ctx, w, h } = setupCanvas(chDS, ck ? clamp(($('mapBox').clientHeight || 300) - 150 - 84 - 14, 80, 150) : 150);
     ctx.fillStyle = C.surface; ctx.fillRect(0, 0, w, h);
-    let vmax = 0; for (let i = 0; i < N; i++) vmax = Math.max(vmax, D.R.v[i], D.O ? D.O.v[i] : 0);
+    let vmax = 0; for (let i = 0; i < N; i++) vmax = Math.max(vmax, D.R.v[i], D.O ? D.O.v[i] : 0, D.P3 ? D.P3.v[i] : 0);
     const ymax = Math.ceil((vmax * 3.6 + 6) / 10) * 10, Y = (v) => PAD.t + (h - PAD.t - PAD.b) * (1 - v * 3.6 / ymax);
     for (const r of D.rows) { const m = r.R; if (m.kind === 'flat') continue; const a = (r.w.a + (m.kind === 'brake' ? m.bk : (m.kind === 'lift' ? m.lk : m.ek))) * tr.ds, b = (r.w.a + Math.max(m.apK, m.tk >= 0 ? m.tk : m.apK)) * tr.ds; ctx.fillStyle = m.kind === 'brake' ? C.brake : C.lift; ctx.globalAlpha = 0.12; const aa = ((a % L) + L) % L; ctx.fillRect(X(aa), PAD.t, Math.max(1, X(Math.min(L, b)) - X(aa)), h - PAD.t - PAD.b); ctx.globalAlpha = 1; }
     const act = activeRow(); if (act) { const a = act.w.a * tr.ds, b = a + act.w.len * tr.ds; ctx.fillStyle = C.accent; ctx.globalAlpha = 0.12; ctx.fillRect(X(a), PAD.t, Math.max(1, X(Math.min(L, b)) - X(a)), h - PAD.t - PAD.b); if (b > L) ctx.fillRect(X(0), PAD.t, X(b - L) - X(0), h - PAD.t - PAD.b); ctx.globalAlpha = 1; }
@@ -5521,26 +5598,29 @@ function drawDataCharts() {
     for (let v = 0; v <= ymax; v += 20) { const y = Math.round(Y(v / 3.6)) + .5; ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(w - PAD.r, y); ctx.stroke(); ctx.fillText(String(v), PAD.l - 6, y + 3); }
     ctx.textAlign = 'center'; const stepM = L > 1500 ? 200 : 100; for (let m = 0; m <= L; m += stepM) ctx.fillText(String(m), X(m), h - 7);
     const line = (P, col, lw, dash) => { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash || []); ctx.beginPath(); for (let i = 0; i <= N; i++) { const y = Y(P.v[i % N]); i ? ctx.lineTo(X(i * tr.ds), y) : ctx.moveTo(X(0), y); } ctx.stroke(); ctx.setLineDash([]); };
+    if (D.P3) line(D.P3, C.cmp2, 1.4);
     if (D.O) line(D.O, C.cmp, 1.6, [5, 3]);
     line(D.R, C.actual, 2);
     ctx.font = `600 10px ${C.mono}`; ctx.textAlign = 'center';
     for (const r of D.rows) { const m = r.R; ctx.fillStyle = m.kind === 'brake' ? C.brake : (m.kind === 'flat' ? C.throttle : C.lift); ctx.fillText('T' + r.w.n, X(m.sApex), PAD.t - 6); }
     ctx.textAlign = 'left'; ctx.fillStyle = C.muted; ctx.font = `10px ${C.mono}`; ctx.fillText(t('km/h'), 6, PAD.t - 6);
-    ctx.fillStyle = C.actual; ctx.fillText(t('reference'), PAD.l + 4, h - PAD.b - 6); if (D.O) { ctx.fillStyle = C.cmp; ctx.fillText(t('comparison (dashed)'), PAD.l + 80, h - PAD.b - 6); }
-    if (LAB.hoverIdx >= 0) { const i = LAB.hoverIdx, x = X(i * tr.ds); ctx.strokeStyle = C.fg; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, PAD.t); ctx.lineTo(x, h - PAD.b); ctx.stroke(); ctx.beginPath(); ctx.arc(x, Y(D.R.v[i]), 4, 0, Math.PI * 2); ctx.fillStyle = C.accent; ctx.fill(); }
+    ctx.fillStyle = C.actual; ctx.fillText('1 ' + t('reference'), PAD.l + 4, h - PAD.b - 6); if (D.O) { ctx.fillStyle = C.cmp; ctx.fillText('2 ' + t('comparison (dashed)'), PAD.l + 90, h - PAD.b - 6); } if (D.P3) { ctx.fillStyle = C.cmp2; ctx.fillText('3 ' + t('third lap'), PAD.l + 240, h - PAD.b - 6); }
+    // the karts: at the hovered station, or each at its own distance at the replay time
+    { const marks = labMarks(); if (marks) { const iR = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(D.R, LAB.scrubT || 0), x0 = X(iR * tr.ds); ctx.strokeStyle = C.fg; ctx.lineWidth = 1; ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.moveTo(x0, PAD.t); ctx.lineTo(x0, h - PAD.b); ctx.stroke(); ctx.globalAlpha = 1; for (const mk0 of marks) { const x = X(mk0.i * tr.ds); ctx.beginPath(); ctx.arc(x, Y(mk0.P.v[mk0.i]), mk0.main ? 4.5 : 3.5, 0, Math.PI * 2); ctx.fillStyle = mk0.col; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = '#fff'; ctx.stroke(); } } }
   }
   { const { ctx, w, h } = setupCanvas(chDD, 84);
     ctx.fillStyle = C.surface; ctx.fillRect(0, 0, w, h);
     if (!D.O) { ctx.fillStyle = C.muted; ctx.font = `12px ${C.body}`; ctx.fillText(t('Δt appears once a comparison is on (Best vs average, another lap or another session).'), PAD.l, h / 2); return; }
-    let mx = 0.2; for (let i = 0; i <= N; i++) mx = Math.max(mx, Math.abs(D.R.t[i] - D.O.t[i]));
+    let mx = 0.2; for (let i = 0; i <= N; i++) mx = Math.max(mx, Math.abs(D.R.t[i] - D.O.t[i]), D.P3 ? Math.abs(D.R.t[i] - D.P3.t[i]) : 0);
     const Y = (tt) => PAD.t + (h - PAD.t - PAD.b) * (1 - (tt + mx) / (2 * mx));
     ctx.strokeStyle = C.line2; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(PAD.l, Y(0) + .5); ctx.lineTo(w - PAD.r, Y(0) + .5); ctx.stroke();
     ctx.font = `10px ${C.mono}`; ctx.fillStyle = C.muted; ctx.textAlign = 'right'; ctx.fillText('+' + mx.toFixed(1), PAD.l - 6, Y(mx) + 8); ctx.fillText('0', PAD.l - 6, Y(0) + 3); ctx.fillText('-' + mx.toFixed(1), PAD.l - 6, Y(-mx) - 1);
-    ctx.textAlign = 'left'; ctx.fillText(t('Δt reference − comparison, s (rising = losing)'), PAD.l + 6, PAD.t - 6);
-    const k5 = Math.max(1, Math.round(4 / tr.ds)), dtS = (i) => { let a = 0, n = 0; for (let q = -k5; q <= k5; q++) { const j = i + q; if (j < 0 || j > N) continue; a += D.R.t[j] - D.O.t[j]; n++; } return a / n; };
-    ctx.strokeStyle = C.actual; ctx.lineWidth = 1.8; ctx.beginPath(); for (let i = 0; i <= N; i++) { const y = Y(dtS(i)); i ? ctx.lineTo(X(i * tr.ds), y) : ctx.moveTo(X(0), y); } ctx.stroke();
+    ctx.textAlign = 'left'; ctx.fillText(t('Δt reference − comparison, s (rising = losing)') + (D.P3 ? ' · ' + t('third lap') : ''), PAD.l + 6, PAD.t - 6); if (D.P3) { ctx.fillStyle = C.cmp2; ctx.fillText('3', PAD.l + 6 + ctx.measureText(t('Δt reference − comparison, s (rising = losing)') + ' · ' + t('third lap')).width + 6, PAD.t - 6); ctx.fillStyle = C.muted; }
+    const k5 = Math.max(1, Math.round(4 / tr.ds)), dtS = (i, P) => { let a = 0, n = 0; for (let q = -k5; q <= k5; q++) { const j = i + q; if (j < 0 || j > N) continue; a += D.R.t[j] - P.t[j]; n++; } return a / n; };
+    if (D.P3) { ctx.strokeStyle = C.cmp2; ctx.lineWidth = 1.4; ctx.beginPath(); for (let i = 0; i <= N; i++) { const y = Y(dtS(i, D.P3)); i ? ctx.lineTo(X(i * tr.ds), y) : ctx.moveTo(X(0), y); } ctx.stroke(); }
+    ctx.strokeStyle = C.actual; ctx.lineWidth = 1.8; ctx.beginPath(); for (let i = 0; i <= N; i++) { const y = Y(dtS(i, D.O)); i ? ctx.lineTo(X(i * tr.ds), y) : ctx.moveTo(X(0), y); } ctx.stroke();
     ctx.font = `600 10px ${C.mono}`; ctx.textAlign = 'center'; ctx.fillStyle = C.muted; for (const r of D.rows) ctx.fillText('T' + r.w.n, X(r.R.sApex), h - 7);
-    if (LAB.hoverIdx >= 0) { const x = X(LAB.hoverIdx * tr.ds); ctx.strokeStyle = C.fg; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, PAD.t); ctx.lineTo(x, h - PAD.b); ctx.stroke(); }
+    { const iR = LAB.hoverIdx >= 0 ? LAB.hoverIdx : (labMarks() ? stationAt(D.R, LAB.scrubT || 0) : -1); if (iR >= 0) { const x = X(iR * tr.ds); ctx.strokeStyle = C.fg; ctx.lineWidth = 1; ctx.globalAlpha = LAB.hoverIdx >= 0 ? 1 : 0.5; ctx.beginPath(); ctx.moveTo(x, PAD.t); ctx.lineTo(x, h - PAD.b); ctx.stroke(); ctx.globalAlpha = 1; } }
     ctx.textAlign = 'left';
   }
 }
@@ -5603,8 +5683,8 @@ function aiContext() {
   const D = LAB.dcmp; if (!D) return '';
   const sess = D.sess, coach = LAB.coach, clean = sess.laps.filter(x => x.clean), avg = clean.reduce((s, x) => s + x.timeMs, 0) / Math.max(1, clean.length) / 1000;
   const M = (m) => m ? { pedal: pedalText(m), entry_kmh: +kmh(m.vEntry), released_m: m.sRel >= 0 ? Math.round(m.sRel) : null, apex_kmh: +kmh(m.vApex), apex_m: Math.round(m.sApex), throttle_m: m.sThr >= 0 ? Math.round(m.sThr) : null, exit_kmh: +kmh(m.vExit), lateral_g: +m.gmax.toFixed(2), time_s: +m.time.toFixed(2) } : null;
-  const corners = D.rows.map(r => { const c = coach && coach.corners.find(x => x.n === r.w.n); return { corner: 'T' + r.w.n, direction: r.w.dir === 'L' ? 'left' : 'right', radius_m: Math.round(r.w.Rmin), apex_from_sf_m: Math.round(r.R.sApex), reference: M(r.R), comparison: M(r.O), comparison_lap: r.pick ? r.pick.L.n : undefined, delta_s: r.cmp ? +r.cmp.dt.toFixed(2) : null, delta_text: r.cmp ? r.cmp.text : null, coach: c ? { best_passes: DATA.coachText(c), reserve_s: +Math.max(0, r.R.time - c.tTop).toFixed(2), time_spread_s: c.tStd !== undefined ? +c.tStd.toFixed(2) : null } : null }; });
-  return JSON.stringify({ track: LAB.trackName, layout: LAB.G.layout ? LAB.G.layout.name : LAB.lid, session: { name: shortSess(sess), driver: sess.driver, date: sess.date, kart: kartLabel(sess), kart_class: kartClassOf(sess), laps: sess.laps.length, clean: clean.length, best_lap: bestLap(sess).n, best_time: fmtMs(bestLap(sess).timeMs), avg_clean: fmtLap(avg), is_viewer_own: !!D.ref.mine }, reference_lap: { what: D.ref.name, time: fmtLap(D.R.T) }, comparison: D.O ? Object.assign({ who: D.nameOf(D.O), time: fmtLap(D.O.T), delta_s: +D.total.toFixed(2) }, D.O.ideal ? { ideal: true, note: 'the ideal lap stitches the fastest pass through each corner from different laps of this session; approximate — corner combinations are not accounted for; each corner says which lap it came from (comparison_lap)' } : {}) : null, digest: $('digest').innerText, corners });
+  const corners = D.rows.map(r => { const c = coach && coach.corners.find(x => x.n === r.w.n); return { corner: 'T' + r.w.n, direction: r.w.dir === 'L' ? 'left' : 'right', radius_m: Math.round(r.w.Rmin), apex_from_sf_m: Math.round(r.R.sApex), reference: M(r.R), comparison: M(r.O), comparison_lap: r.pick ? r.pick.L.n : undefined, third_time: r.M3 ? +r.M3.time.toFixed(2) : undefined, delta_s: r.cmp ? +r.cmp.dt.toFixed(2) : null, delta_text: r.cmp ? r.cmp.text : null, coach: c ? { best_passes: DATA.coachText(c), reserve_s: +Math.max(0, r.R.time - c.tTop).toFixed(2), time_spread_s: c.tStd !== undefined ? +c.tStd.toFixed(2) : null } : null }; });
+  return JSON.stringify({ track: LAB.trackName, layout: LAB.G.layout ? LAB.G.layout.name : LAB.lid, session: { name: shortSess(sess), driver: sess.driver, date: sess.date, kart: kartLabel(sess), kart_class: kartClassOf(sess), laps: sess.laps.length, clean: clean.length, best_lap: bestLap(sess).n, best_time: fmtMs(bestLap(sess).timeMs), avg_clean: fmtLap(avg), is_viewer_own: !!D.ref.mine }, reference_lap: { what: D.ref.name, time: fmtLap(D.R.T) }, third_lap: D.P3 ? { who: D.name3, time: fmtLap(D.P3.T), delta_s: +(D.R.T - D.P3.T).toFixed(2), note: 'a third lap on the screen for visual comparison; per corner: third_time' } : undefined, comparison: D.O ? Object.assign({ who: D.nameOf(D.O), time: fmtLap(D.O.T), delta_s: +D.total.toFixed(2) }, D.O.ideal ? { ideal: true, note: 'the ideal lap stitches the fastest pass through each corner from different laps of this session; approximate — corner combinations are not accounted for; each corner says which lap it came from (comparison_lap)' } : {}) : null, digest: $('digest').innerText, corners });
 }
 const AI_RULES = () => `You are a rental-karting coach (Sodi RT10, Honda GX390, up to ~80 km/h) and an Alfano telemetry analyst. Below is a JSON breakdown of one session on a track: corners T1…Tn are numbered from the start/finish line; for each one you get what the driver did on the reference lap and on the comparison lap: points in metres from S/F, speeds in km/h, corner time, plus "coach" — statistics of the best passes through that corner across all loaded laps and the reserve. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, briefly and concretely, in plain language without jargon, referring to corner numbers and the numbers in the data. If asked about something not in the data (video, a line more precise than ±1 m, kart condition), say so plainly. Never invent numbers. Plain text, no tables or headings; lists only when short.`;
 async function askAI() {
@@ -6483,7 +6563,7 @@ const ADMIN = (() => {
   try { STORE.visit(); } catch (e) {}   // visitors & retention for the admin panel (visits.sql)
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, SHARE, shareUrl, sharePageSync, aiContext, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, SHARE, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { await NATIVE.init(); } catch (e) {}
