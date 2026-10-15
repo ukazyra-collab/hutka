@@ -437,6 +437,7 @@ body.onboarding #toast{z-index:50}
 .readout{position:absolute;left:10px;bottom:10px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:12px/1.5 var(--mono);pointer-events:none;backdrop-filter:blur(4px);white-space:nowrap}
 .readout .k{color:var(--muted)}
 .mapnote{position:absolute;right:10px;bottom:10px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--muted);pointer-events:none;max-width:70%}
+.adm-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0 10px}.adm-table th{text-align:left;font-weight:600;color:var(--muted);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:4px 6px;border-bottom:1px solid var(--line)}.adm-table td{padding:4px 6px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px}.adm-table td:first-child{font-family:var(--body)}
 #xferList{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto;margin:-4px 0 6px}#xferList button{text-align:left;justify-content:flex-start}#xferList button.on{outline:2px solid var(--accent)}
 .legend{display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding:7px 12px;font-size:12px;color:var(--muted);background:var(--surface)}
 .legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:5px;border:2px solid #fff;box-sizing:border-box;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
@@ -3205,6 +3206,7 @@ Object.assign(I18N.RU, { "Alfano .alf2 (the reference) or an Alfano 6 export (.z
 Object.assign(I18N.RU, { 'Third lap (optional) · session': 'Третий круг (необязательно) · сессия', 'Third lap · lap': 'Третий круг · круг', 'Pick the session of the third lap.': 'Выбери сессию третьего круга.', 'fastest here': 'быстрее всех здесь' });
 Object.assign(I18N.RU, { 'Revs and two gear ratios in the file — looks like a Rotax DD2 (change the kart if not)': 'В файле обороты и две передачи — похоже на Rotax DD2 (если нет — поменяй карт)', 'Revs and {n} gear ratios in the file — a shifter kart; KZ2 is preselected, change it if not': 'В файле обороты и {n} передач — карт с коробкой; выбран KZ2, если нет — поменяй', 'Revs in the file (up to {r} rpm) — a sport kart; pick its class below': 'В файле обороты (до {r} об/мин) — спортивный карт; выбери класс ниже' });
 Object.assign(I18N.RU, { 'Transfer to…': 'Передать…', 'Transfer this session to another driver': 'Передать сессию другому гонщику', "For a session uploaded on someone's behalf, with their consent: it moves to their library and the feed shows it as theirs; likes and comments stay. The link preview is rebuilt when they open the Lab.": 'Для сессии, залитой за другого человека с его согласия: она переходит в его библиотеку, в ленте показывается как его; лайки и комментарии остаются. Превью ссылки перестроится, когда он откроет Lab.', 'Driver (search by name)': 'Гонщик (поиск по имени)', 'First name (optional: set their name)': 'Имя (по желанию: задать ему имя)', 'Last name': 'Фамилия', 'Transfer': 'Передать', 'Transfer to {name}?': 'Передать {name}?', "The session leaves your library and appears in the feed as theirs. Only do this with the driver's consent.": 'Сессия уйдёт из твоей библиотеки и будет показываться в ленте как его. Только с согласия гонщика.', 'Transferred to {name}.': 'Передано: {name}.', 'Run supabase/transfer.sql in the SQL editor once — then admins can transfer sessions.': 'Один раз выполни supabase/transfer.sql в SQL editor — тогда админы смогут передавать сессии.' });
+Object.assign(I18N.RU, { 'Engagement, 30 days': 'Вовлечённость, 30 дней', 'Visits': 'Визиты', '{v} browsers · {u} signed in': '{v} браузеров · {u} вошедших', 'Median visit': 'Медианный визит', 'average {a} · 1 in 10 visits ≥ {p}': 'в среднем {a} · каждый десятый визит ≥ {p}', 'Under 10 s': 'Короче 10 с', 'left at once': 'ушли сразу', 'Opened the Lab': 'Открыли Lab', 'compared {c} · replay {r} · asked the AI {a}': 'сравнивали {c} · реплей {r} · спрашивали ИИ {a}', 'Visits by day': 'Визиты по дням', 'Average visit, minutes by day': 'Средний визит, минут по дням', 'Visits by hour (Dubai time)': 'Визиты по часам (время Дубая)', 'Share of visits that': 'Доля визитов, в которых', 'opened the Lab': 'открыли Lab', 'compared': 'сравнивали', 'played the replay': 'включали реплей', 'asked the AI': 'спрашивали ИИ', 'uploaded': 'загружали', 'liked or commented': 'лайкали или комментировали', 'Drivers by time on the site': 'Гонщики по времени на сайте', 'Driver': 'Гонщик', 'visits': 'визитов', 'min': 'мин', 'compare': 'сравнения', 'uploads': 'загрузки', 'likes / comments': 'лайки / комменты', 'last seen': 'был', 'Most opened sessions': 'Самые открываемые сессии', 'opens {n} · visitors {v}': 'открытий {n} · посетителей {v}', 'A visit is one sitting in a tab (renewed after 30 minutes of silence); its length is measured by a heartbeat once a minute while the tab is visible and in use, so it is accurate to about a minute.': 'Визит — одно сидение во вкладке (новый после 30 минут тишины); длина меряется сигналом раз в минуту, пока вкладка видна и с ней работают, точность — около минуты.', 'Engagement: run supabase/events.sql (or let the migration apply) — visit length and feature use appear here.': 'Вовлечённость: выполни supabase/events.sql (или дождись миграции) — здесь появятся длина визитов и использование функций.', 'h': 'ч' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3518,6 +3520,8 @@ const STORE = (() => {
       async adminStats() { return must(await sb.rpc('hutka_stats')); },
       async adminVisits() { return must(await sb.rpc('hutka_visits')); },
       async visit(vid, dev) { return must(await sb.rpc('hutka_visit', { vid, dev })); },
+      async event(vid, visit, name, props, dev) { return must(await sb.rpc('hutka_event', { vid, visit, name, props: props || {}, dev })); },
+      async adminAnalytics(days) { return must(await sb.rpc('hutka_analytics', { days })); },
       async setCard(sid, card) { return must(await sb.rpc('hutka_set_card', { sid, card })) === true; },
       async setShare(sid, share) { return must(await sb.rpc('hutka_set_share', { sid, share })) === true; },
       async setPublished(sid, pub) { return must(await sb.rpc('hutka_set_published', { sid, pub })) === true; },
@@ -3704,7 +3708,7 @@ const STORE = (() => {
     social.set(sid, out); return out;
   }
   // helpful (+1) / not helpful (−1): the same vote again removes it
-  async function vote(sid, v) { if (!adapter || !me.id) throw new Error('sign in'); v = v === -1 ? -1 : 1; const cur = await sessionSocial(sid); if (cur.mine === v) await adapter.unlike(sid, me.id); else await adapter.like(sid, me.id, v); social.delete(sid); return sessionSocial(sid, true); }
+  async function vote(sid, v) { if (!adapter || !me.id) throw new Error('sign in'); v = v === -1 ? -1 : 1; const cur = await sessionSocial(sid); if (cur.mine === v) await adapter.unlike(sid, me.id); else { await adapter.like(sid, me.id, v); track('like', { sid, v }); } social.delete(sid); return sessionSocial(sid, true); }
   const toggleLike = (sid) => vote(sid, 1);
   // a session several drivers marked as not helpful sinks in the lists and gets a label
   const lowRated = (c) => !!c && (c.down || 0) >= 3 && (c.down || 0) > (c.likes || 0);
@@ -3757,6 +3761,17 @@ const STORE = (() => {
     if (me.id && aiCfg()) fnCall('notify', {}).catch(() => {});   // the activity e-mails (functions/notify) go out when anyone opens the site
   }
   async function adminVisits() { if (!adapter || !adapter.adminVisits || !me.canEdit) return null; return adapter.adminVisits(); }
+  // product analytics (events.sql): one small row per page view / Lab open / comparison / replay / AI question / upload / like / comment,
+  // and a heartbeat once a minute while the tab is in use — so the admin panel can say how long a visit lasts and what it did
+  const visitorId = () => { try { const v = localStorage.getItem('hutka.vid') || ''; return /^[A-Za-z0-9_-]{8,64}$/.test(v) ? v : ''; } catch (e) { return ''; } };
+  function visitId() { const now = Date.now(); try { const s = JSON.parse(sessionStorage.getItem('hutka.visit') || 'null'); if (s && s.id && now - s.t < 30 * 60000) { s.t = now; sessionStorage.setItem('hutka.visit', JSON.stringify(s)); return s.id; } const id = 'v' + Math.random().toString(36).slice(2, 12) + now.toString(36); sessionStorage.setItem('hutka.visit', JSON.stringify({ id, t: now })); return id; } catch (e) { return ''; } }
+  let eventsOk = true;
+  function track(name, props) {
+    if (!eventsOk || !adapter || adapter.kind !== 'supabase' || !adapter.event) return; const vid = visitorId(), vis = visitId(); if (!vid || !vis) return;
+    const dev = ((window.NATIVE && window.NATIVE.on) ? 'app ' : '') + (window.innerWidth < 700 ? 'phone' : window.innerWidth < 1100 ? 'tablet' : 'desktop');
+    adapter.event(vid, vis, name, props || {}, dev).catch((e) => { if (/hutka_event|PGRST202|42883/.test(String(e && e.message || e))) eventsOk = false; });
+  }
+  async function adminAnalytics(days) { if (!adapter || !adapter.adminAnalytics || !me.canEdit) return null; return adapter.adminAnalytics(days || 30); }
   // the link preview of a published session: functions/share-page writes hutka.ai/s/<id> (title, text, the picture); the picture goes to the public bucket cards/<me>/<id>.png
   async function sharePage(sid, remove, img) { const r = await fnCall('share-page', { id: sid, remove: !!remove, img: img || '' }); if (!r.ok) throw await errOf(r); return r.json(); }
   async function uploadCard(sid, blob) { if (!adapter || adapter.kind !== 'supabase' || !me.id || !adapter.sb.storage) return null; const path = `${me.id}/${sid}.png`; const r = await adapter.sb.storage.from('cards').upload(path, blob, { upsert: true, contentType: 'image/png', cacheControl: '3600' }); if (r.error) { const e = new Error(r.error.message || 'upload'); e.code = r.error.statusCode || r.error.code; throw e; } return 'cards/' + path; }
@@ -3792,7 +3807,7 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits,
+    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits, track, adminAnalytics,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
@@ -4052,7 +4067,8 @@ function createMapView(canvas, host) {
       // the karts: one numbered marker per lap at the replay position (or at the hovered station), the chosen lap's on top
       const marks = O.marks || null;
       if (marks && marks.length) { const ordered = marks.slice().sort((a, b) => (a.main ? 1 : 0) - (b.main ? 1 : 0)); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        for (const mk0 of ordered) { if (!(mk0.i >= 0 && mk0.i < N)) continue; const [px, py] = lapPos(tr, mk0.P, mk0.i), [x, y] = T(px, py), r = mk0.main ? 7 : 6; ctx.beginPath(); ctx.arc(x, y + 1, r + 0.8, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fill(); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = mk0.col; ctx.fill(); ctx.lineWidth = mk0.main ? 1.8 : 1.4; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = `600 ${mk0.main ? 9 : 8.5}px ${C.mono}`; ctx.fillText(String(mk0.n), x, y + 0.5); }
+        const ms = O.markScale || 1;   // promo captures only: bigger kart markers
+        for (const mk0 of ordered) { if (!(mk0.i >= 0 && mk0.i < N)) continue; const [px, py] = lapPos(tr, mk0.P, mk0.i), [x, y] = T(px, py), r = (mk0.main ? 7 : 6) * ms; ctx.beginPath(); ctx.arc(x, y + 1, r + 0.8, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fill(); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = mk0.col; ctx.fill(); ctx.lineWidth = (mk0.main ? 1.8 : 1.4) * ms; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = `600 ${(mk0.main ? 9 : 8.5) * ms}px ${C.mono}`; ctx.fillText(String(mk0.n), x, y + 0.5); }
         ctx.textBaseline = 'alphabetic'; }
       else if (M.hoverIdx >= 0 && M.hoverIdx < N && !hiRow) { const [px, py] = lapPos(tr, main, M.hoverIdx), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
     }
@@ -4369,6 +4385,7 @@ async function route() {
     if (name === 'sws') { const pre = SWS.decodeHash((location.hash.split('~')[1] || '')); history.replaceState(null, '', '#profile'); name = 'profile'; r.a = null; setTimeout(() => SWS.open(pre || {}), 300); }
     if (name === 'admin' && !STORE.isAdmin() && !(r.a && STORE.canEditTrack(STORE.getTrack(r.a)))) name = STORE.getTracks().some(tr => STORE.canEditTrack(tr)) ? 'admin' : 'home';
     APP.route = name; APP.a = r.a; APP.b = r.b; APP.c = r.c;
+    if (typeof STORE !== 'undefined' && STORE.track) { const pp = { route: name }; if (r.a && name !== 'lab') pp.a = String(r.a).slice(0, 60); STORE.track('page', pp); }
     for (const p of PAGES) { const pg = $('pg-' + p); if (pg) pg.hidden = p !== name; } if (name === 'layout') $('pg-track').hidden = false;
     if (typeof syncLand === 'function') syncLand();
     for (const a of document.querySelectorAll('.nav a[data-route], .tabbar a[data-route]')) a.classList.toggle('active', a.dataset.route === name || (name === 'track' || name === 'layout') && a.dataset.route === 'tracks' || name === 'driver' && a.dataset.route === 'profile' || name === 'help' && a.dataset.route === 'lab' && a.closest('.tabbar'));
@@ -4474,7 +4491,10 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v32.3';
+const APP_VERSION = 'v32.4';
+// a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
+(() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
+  setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -5030,6 +5050,7 @@ LAB.open = async function (meta, asCmp) {
   labEnsureMap(); setStatus('labStatus', t('Loading session…'));
   if (!(LAB.current && LAB.current.id === meta.id)) LAB.allKarts = false;
   let sess; try { sess = await STORE.loadSession(meta); } catch (e) { setStatus('labStatus', t('Could not load this session.'), 'warn'); return; }
+  STORE.track('lab', { sid: meta.id, mine: meta.owner === STORE.me.id, cmp: !!asCmp });
   LAB.tid = meta.track || ''; LAB.lid = meta.layout || 'custom'; LAB.trackName = (STORE.getTrack(LAB.tid) || {}).name || meta.trackName || t('Custom track'); loadSatAdj(); if (LAB.aligning) setAligning(false);
   let G = null; try { G = await GEOM.build(LAB.tid, LAB.lid, sess); } catch (e) { G = null; }
   if (!G) { setStatus('labStatus', t('No clean laps with GPS in this session.'), 'warn'); return; }
@@ -5231,7 +5252,7 @@ function renderReplay(full) {
   for (const l of laps) { const e = box.querySelector(`[data-role="${l.role}"] .live`); if (!e) continue; const i = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(l.P, tau); const gap = l.role === 'ref' ? '' : ` · <b class="${D.R.t[iR] - l.P.t[iR] >= 0.04 ? 'loss' : (D.R.t[iR] - l.P.t[iR] <= -0.04 ? 'gain' : '')}">Δ ${sg(D.R.t[iR] - l.P.t[iR])}</b>`; e.innerHTML = `${(i * ds).toFixed(0)} ${t('m')} · ${kmh(l.P.v[i])} ${t('km/h')}${l.P.rpm ? ` · ${fmtRpm(l.P.rpm[i])}${gearAt(l.P, i) ? ' · ' + GEAR.gearName(gearAt(l.P, i)) : ''}` : ''}${gap}`; }
 }
 function replayPlay(on) {
-  if (on === LAB.playing) return; LAB.playing = on; const b = $('rpPlay'); if (b) { b.innerHTML = on ? '&#10074;&#10074;' : '&#9654;'; b.classList.toggle('active', on); }
+  if (on === LAB.playing) return; LAB.playing = on; if (on) STORE.track('replay', {}); const b = $('rpPlay'); if (b) { b.innerHTML = on ? '&#10074;&#10074;' : '&#9654;'; b.classList.toggle('active', on); }
   if (!on) { if (LAB._rpAnim) cancelAnimationFrame(LAB._rpAnim); LAB._rpAnim = 0; return; }
   const D = LAB.dcmp; if (!D) { LAB.playing = false; return; } const Tm = replayTmax(D); if (LAB.scrubT >= Tm - 0.05) LAB.scrubT = 0;
   let last = performance.now();
@@ -5244,7 +5265,7 @@ function labEnsureMap() {
     getImage: () => { if (!LAB.G) return null; const im = LAB.G.image; if (LAB.G.source === 'gps' && SAT.can(LAB.G) && LAB.opts.tiles) return null; return im && LAB.G.source !== 'gps' ? im : (LAB.opts.aerial ? im : null); },
     getTiles: () => { const G = LAB.G; if (!G) return null; const b = G.sat || { dx: 0, dy: 0 }; return SAT.layer(G, LAB.opts.tiles, { dx: b.dx + LAB.satAdj.dx, dy: b.dy + LAB.satAdj.dy }); },
     onSatMove: (dxPx, dyPx) => { if (!LAB.G) return; const mpp = LAB.G.track.mpp; LAB.satAdj.dx += dxPx * mpp; LAB.satAdj.dy -= dyPx * mpp; saveSatAdj(); renderAlignBar(); },
-    getOverlay: () => ({ D: LAB.dcmp, role: roleNow(), hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor, marks: labMarks() }),
+    getOverlay: () => ({ D: LAB.dcmp, role: roleNow(), hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor, marks: labMarks(), markScale: LAB.markScale || 1 }),
     viewInset: ckInset,
     onHover: (i) => { if (i < 0 && isCockpit()) { hoverOff(); return; } LAB.hoverIdx = i; hoverChanged(); },
     onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); if (isCockpit()) { if (i >= 0) LAB.scrubIdx = i; LAB.ckInsp = !!row && LAB.selN !== row.w.n; } LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
@@ -5319,6 +5340,8 @@ function labEnsureMap() {
   $('refSel').addEventListener('change', () => { LAB.ref = $('refSel').value; if (LAB.cmp === LAB.ref) LAB.cmp = 'none'; LAB.selN = 0; LAB.chat = []; labRender(); });
   $('cmpSel').addEventListener('change', () => { LAB.cmp = $('cmpSel').value; LAB.breakOpen = isIdealKey(LAB.cmp); LAB.chat = []; labRender(); });
   $('qcNone').onclick = () => { LAB.breakOpen = false; LAB.cmp = 'none'; LAB.pickerOpen = false; LAB.chat = []; labRender(); };
+  for (const [id, mode] of [['qcBestAvg', 'avg'], ['qcIdeal', 'ideal'], ['qcLap', 'lap'], ['qcOther', 'other']]) $(id).addEventListener('click', () => STORE.track('compare', { mode }));
+  $('cmp2Sess').addEventListener('change', () => { if ($('cmp2Sess').value !== 'none') STORE.track('third', {}); });
   $('qcBestAvg').onclick = () => { const s = LAB.current; if (!s) return; LAB.breakOpen = false; LAB.ref = lapKey(s, bestLap(s)); LAB.cmp = sessAvg(s) ? 'avg:' + s.id : 'none'; if (LAB.cmp === 'none') toast(t('This session needs at least two clean laps for an average.')); LAB.pickerOpen = false; LAB.selN = 0; LAB.chat = []; labRender(); };
   $('qcIdeal').onclick = () => { const s = LAB.current; if (!s) return; if (isIdealKey(LAB.cmp)) return; LAB.breakOpen = true; LAB.ref = lapKey(s, bestLap(s)); LAB.cmp = 'ideal:' + s.id; LAB.pickerOpen = false; LAB.chat = []; labRender(); if (!isIdealKey(LAB.cmp)) toast(t('This session needs at least two clean laps for an ideal lap.')); else toast(t('Ideal lap ≈ the fastest pass through each corner, stitched from different laps. Approximate: corner combinations are not accounted for.'), 6000); };
   $('qcLap').onclick = () => { const s = LAB.current; if (!s) return; LAB.breakOpen = false; const ref = findLap(LAB.ref); const L = ref && ref.sess === s ? ref.L : null; const nx = s.laps.filter(x => x.px && x !== L).sort((a, b) => (b.clean - a.clean) || a.timeMs - b.timeMs)[0]; if (!nx) { toast(t('No other lap in this session.')); return; } LAB.cmp = lapKey(s, nx); LAB.pickerOpen = false; LAB.chat = []; labRender(); };
@@ -5582,6 +5605,7 @@ async function renderDiscussion() {
 async function postComment() {
   const s = LAB.current, inp = $('commentInput'); if (!s) return; const text = inp.value.trim(); if (!text) return;
   if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); return; }
+  STORE.track('comment', { sid: s.id });
   const b = $('commentBtn'); b.classList.add('busy');
   try { LAB.social = Object.assign({ sid: s.id }, await STORE.addComment(s.id, text)); inp.value = ''; renderDiscussion(); } catch (e) { toast(t('Could not post the comment.')); }
   b.classList.remove('busy');
@@ -5708,7 +5732,7 @@ const SHARE = {
     } catch (e) { return null; } finally { SHARE.syncing = null; }
   },
   async open() {
-    const sess = LAB.current; if (!sess) return; await SHARE.draw();
+    const sess = LAB.current; if (!sess) return; STORE.track('share', { sid: sess.id }); await SHARE.draw();
     const own = mySession(sess), pub = !!sess.published, local = sess.owner === 'local';
     $('shareNote').textContent = local ? t('A guest session lives in this browser only — share the picture; sign in and publish to share a link.') : (pub ? t('The link opens this session in the Lab for anyone.') : (own ? t('The session is private: the link works for you only. Publish it and the link opens for everyone.') : t('The link opens this session in the Lab.')));
     $('shareCopy').hidden = local; $('shareGo').textContent = ''; $('shareGo').innerHTML = `<svg><use href="#i-share"/></svg><span>${esc(own && !pub && !local ? t('Publish & share') : t('Share'))}</span>`;
@@ -5736,6 +5760,7 @@ const SHARE = {
 $('btnShare').onclick = () => SHARE.open(); $('lmShare').onclick = () => SHARE.open(); $('ckShare').onclick = () => SHARE.open();
 $('shareCv').onclick = () => { const z = $('shareZoom'); $('shareZoomImg').src = $('shareCv').toDataURL('image/png'); z.hidden = false; }; $('shareZoom').onclick = () => { $('shareZoom').hidden = true; }; $('shareClose').onclick = SHARE.close; $('shareGo').onclick = () => SHARE.go(); $('shareSave').onclick = () => SHARE.save(); $('shareCopy').onclick = () => SHARE.copy(); $('shareModal').addEventListener('click', (e) => { if (e.target === $('shareModal')) SHARE.close(); });
 async function labTogglePublish() {
+  if (LAB.current && !LAB.current.published) STORE.track('publish', { sid: LAB.current.id });
   const sess = LAB.current; if (!sess || !mySession(sess)) return;
   const on = !sess.published; if (on && sess.moderated && !STORE.isAdmin()) { toast(t('The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.')); return; }
   if (on) { const ok = await confirmDlg(t('Publish this session?'), t('It appears on the track page and in the hot laps; other drivers can compare their laps with it. You can unpublish at any time.'), t('Publish')); if (!ok) return; }
@@ -6089,7 +6114,7 @@ async function askAI() {
   askCtl = null; $('askBtn').disabled = sampleFn === null; $('askStop').hidden = true; renderChat(); if (sampleFn === null) renderAskState();
 }
 async function askCoachInline() {
-  const q = $('askInput').value.trim(); if (!q || !LAB.dcmp || !STORE.hasIdentity) return;
+  const q = $('askInput').value.trim(); if (!q || !LAB.dcmp || !STORE.hasIdentity) return; STORE.track('ask', { sid: LAB.current ? LAB.current.id : '' });
   const sess = LAB.current; LAB.chat = LAB.chat || []; LAB.chat.push({ role: 'user', content: q }); $('askInput').value = '';
   const bubble = renderChat(true); $('askBtn').disabled = true; $('askStop').hidden = false; askCtl = new AbortController();
   try {
@@ -6205,6 +6230,7 @@ const UPLOAD = (() => {
       // the first session on a brand-new layout defines its track line for everyone who comes after
       if (k === 0 && tr && tr.community && lid !== 'custom') { const l = STORE.getLayout(tid, lid); if (l && !l.refSession && STORE.canEditTrack(tr)) { try { await STORE.saveLayout(tid, Object.assign({}, l, { refSession: sess.id })); GEOM.invalidate(); } catch (e) {} } }
     }
+    STORE.track('upload', { n: parsed.length, kart: kart.cls, app: parsed[0] && parsed[0].data.source ? parsed[0].data.source.app : 'alfano' });
     close(); if (first) { await LAB.open(first, false); go('lab'); }
   };
   async function withFiles(files) { open({}); await onFiles(files); }
@@ -6497,7 +6523,7 @@ async function aiSend() {
   const bubble = renderAiLog(); renderAiNote(); $('aiStop').hidden = false; AI.ctl = new AbortController();
   try {
     const system = await aiSystem(meta);
-    const r = await STORE.ask({ chatId: AI.cur ? AI.cur.id : null, sessionId: meta ? meta.id : null, trackId: meta ? meta.track : null, layoutId: meta ? meta.layout : null, title: AI.cur ? null : (meta ? `${meta.label || meta.name} · ${cutWords(text, 40)}` : cutWords(text, 60)), system, text, signal: AI.ctl.signal, onText: (tx) => { bubble.classList.remove('thinking'); bubble.innerHTML = mdLite(tx); $('aiLog').scrollTop = $('aiLog').scrollHeight; } });
+    STORE.track('ask', { page: 'ai' }); const r = await STORE.ask({ chatId: AI.cur ? AI.cur.id : null, sessionId: meta ? meta.id : null, trackId: meta ? meta.track : null, layoutId: meta ? meta.layout : null, title: AI.cur ? null : (meta ? `${meta.label || meta.name} · ${cutWords(text, 40)}` : cutWords(text, 60)), system, text, signal: AI.ctl.signal, onText: (tx) => { bubble.classList.remove('thinking'); bubble.innerHTML = mdLite(tx); $('aiLog').scrollTop = $('aiLog').scrollHeight; } });
     AI.msgs.push({ role: 'assistant', content: r.text, cut: r.stop === 'max_tokens' });
     if (!AI.cur) { AI.chats = await STORE.chats(); AI.cur = AI.chats.find(c => c.id === r.chatId) || AI.chats[0] || null; if (AI.cur) { $('aiTitle').textContent = AI.cur.title; const tr = AI.cur.track_id ? STORE.getTrack(AI.cur.track_id) : null; $('aiCtx').innerHTML = AI.cur.session_id ? `${t('About session')} <a href="#lab~${esc(AI.cur.session_id)}">${esc(tr ? tr.name : t('open in the Lab'))}</a>` : t('General chat'); $('aiRename').hidden = false; $('aiDelete').hidden = false; history.replaceState(null, '', '#ai~' + AI.cur.id); } renderChatList(); }
     if (AI.wallet && !AI.wallet.off) { if (AI.wallet.free) { if (r.usedDay !== null) { AI.wallet.used_day = r.usedDay; AI.wallet.used_hour = (AI.wallet.used_hour || 0) + 1; $('walletCredits').textContent = `${r.usedDay}/${r.limitDay || AI.wallet.limit_day}`; } } else if (r.credits !== null) { AI.wallet.credits = r.credits; AI.wallet.plan = r.plan || AI.wallet.plan; $('walletCredits').textContent = AI.wallet.plan === 'pro' ? 'Pro' : String(r.credits); } }
@@ -6813,6 +6839,41 @@ const ADMIN = (() => {
       box.appendChild(vc);
       box.appendChild(el('div', 'hint', t('Days are UTC (Dubai is +4). A visitor is a browser; a driver on a phone and a laptop counts twice.')));
     } else box.appendChild(el('div', 'hint', t('Visitors and retention: run supabase/visits.sql in the SQL editor once — the numbers appear here from the next day.')));
+    // engagement (events.sql): how long a visit lasts, what it did, who does what
+    let E = null; try { E = await STORE.adminAnalytics(30); } catch (e) { E = null; }
+    if (E && typeof E.visits === 'number') {
+      const fm = (sec) => { sec = +sec || 0; return sec >= 3600 ? (Math.round(sec / 360) / 10) + ' ' + t('h') : sec >= 60 ? Math.round(sec / 60) + ' ' + t('min') : Math.round(sec) + ' ' + t('s'); };
+      const pc = (n) => E.visits ? Math.round(100 * n / E.visits) + '%' : '—', F = E.features || {};
+      box.appendChild(el('div', 'lbl', t('Engagement, 30 days')));
+      const et = el('div', 'tiles');
+      for (const [k, v, sub] of [[t('Visits'), E.visits, t('{v} browsers · {u} signed in', { v: E.visitors, u: E.signed_in })], [t('Median visit'), fm(E.median_s), t('average {a} · 1 in 10 visits ≥ {p}', { a: fm(E.avg_s), p: fm(E.p90_s) })], [t('Under 10 s'), pc(E.bounce), t('left at once')], [t('Opened the Lab'), pc(F.lab), t('compared {c} · replay {r} · asked the AI {a}', { c: pc(F.compare), r: pc(F.replay), a: pc(F.ask) })]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${esc(String(v))}</div>${sub ? `<div class="hint">${esc(sub)}</div>` : ''}`; et.appendChild(d); }
+      box.appendChild(et);
+      const ec = el('div', 'stat-charts');
+      { const w = el('div', 'stat-chart'); w.appendChild(el('div', 'lbl', t('Visits by day'))); const cv = document.createElement('canvas'); w.appendChild(cv); ec.appendChild(w); requestAnimationFrame(() => drawDays(cv, (E.by_day || []).map(r => ({ d: r.d, n: r.n })))); }
+      { const w = el('div', 'stat-chart'); w.appendChild(el('div', 'lbl', t('Average visit, minutes by day'))); const cv = document.createElement('canvas'); w.appendChild(cv); ec.appendChild(w); requestAnimationFrame(() => drawDays(cv, (E.by_day || []).map(r => ({ d: r.d, n: Math.round((+r.avg_s || 0) / 60 * 10) / 10 })))); }
+      { const w = el('div', 'stat-chart'); w.appendChild(el('div', 'lbl', t('Visits by hour (Dubai time)'))); const cv = document.createElement('canvas'); w.appendChild(cv); ec.appendChild(w); requestAnimationFrame(() => drawHours(cv, E.by_hour || [], 4)); }
+      box.appendChild(ec);
+      box.appendChild(el('div', 'hint', `${t('Share of visits that')}: ${t('opened the Lab')} ${pc(F.lab)} · ${t('compared')} ${pc(F.compare)} · ${t('played the replay')} ${pc(F.replay)} · ${t('asked the AI')} ${pc(F.ask)} · ${t('uploaded')} ${pc(F.upload)} · ${t('liked or commented')} ${pc(F.social)}`));
+      if (E.users && E.users.length) {
+        box.appendChild(el('div', 'lbl', t('Drivers by time on the site')));
+        const tb = el('table', 'adm-table'); tb.innerHTML = `<thead><tr><th>${t('Driver')}</th><th>${t('visits')}</th><th>${t('min')}</th><th>Lab</th><th>${t('compare')}</th><th>AI</th><th>${t('uploads')}</th><th>${t('likes / comments')}</th><th>${t('last seen')}</th></tr></thead>`;
+        const tbody = el('tbody'); for (const u of E.users) { const tr = el('tr'); tr.innerHTML = `<td><a href="#driver~${esc(u.id)}">${esc(u.name || t('Driver'))}</a></td><td>${u.visits}</td><td>${u.min}</td><td>${u.labs}</td><td>${u.cmp}</td><td>${u.asks}</td><td>${u.uploads}</td><td>${u.social}</td><td>${esc(fmtDate(String(u.last || '').slice(0, 10)))}</td>`; tbody.appendChild(tr); } tb.appendChild(tbody); box.appendChild(tb);
+      }
+      if (E.top_sessions && E.top_sessions.length) {
+        const names = await STORE.names(E.top_sessions.map(x => x.owner).filter(Boolean)); box.appendChild(el('div', 'lbl', t('Most opened sessions')));
+        const l = el('div', 'list'); for (const x of E.top_sessions) { const a = el('a', 'item'); a.href = '#lab~' + esc(x.sid); a.append(el('span', 'name', `${x.label || x.sid}${x.owner && names[x.owner] ? ' · ' + names[x.owner].name : ''}`), el('span', 'meta', t('opens {n} · visitors {v}', { n: x.n, v: x.visitors }))); l.appendChild(a); } box.appendChild(l);
+      }
+      box.appendChild(el('div', 'hint', t('A visit is one sitting in a tab (renewed after 30 minutes of silence); its length is measured by a heartbeat once a minute while the tab is visible and in use, so it is accurate to about a minute.')));
+    } else box.appendChild(el('div', 'hint', t('Engagement: run supabase/events.sql (or let the migration apply) — visit length and feature use appear here.')));
+  }
+  // 24 bars, one per hour of the day, shifted to a local offset
+  function drawHours(cv, rows, offset) {
+    const box = cv.parentElement, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = box.clientWidth || 300, h = 72; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); cv.style.width = w + 'px'; cv.style.height = h + 'px';
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); const cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue('--accent').trim() || '#2f6bf0', line = cs.getPropertyValue('--line').trim() || '#ddd', muted = cs.getPropertyValue('--muted').trim() || '#888';
+    const vals = new Array(24).fill(0); for (const r of rows) vals[((+r.h || 0) + offset + 24) % 24] += r.n || 0; const mx = Math.max(1, ...vals), bw = w / 24;
+    ctx.strokeStyle = line; ctx.beginPath(); ctx.moveTo(0, h - 14.5); ctx.lineTo(w, h - 14.5); ctx.stroke();
+    ctx.fillStyle = acc; vals.forEach((v, i) => { const bh = Math.round((h - 20) * v / mx); if (v) ctx.fillRect(i * bw + 1, h - 15 - bh, Math.max(2, bw - 2), bh); });
+    ctx.fillStyle = muted; ctx.font = '10px system-ui, sans-serif'; ctx.textAlign = 'left'; for (const hh of [0, 6, 12, 18]) ctx.fillText(String(hh) + ':00', hh * bw + 1, h - 3); ctx.textAlign = 'center'; ctx.fillText(String(mx), w / 2, 10);
   }
   function drawDays(cv, rows) {
     const box = cv.parentElement, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = box.clientWidth || 300, h = 72; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); cv.style.width = w + 'px'; cv.style.height = h + 'px';
