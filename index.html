@@ -975,6 +975,55 @@ body.cockpit.lab-land.ck-side #labTabs,body.cockpit.lab-land.ck-side #cornersPan
 body.cockpit.lab-land.ck-side #cornersPanel,body.cockpit.lab-land.ck-side #digestPanel,body.cockpit.lab-land.ck-side #discussPanel,body.cockpit.lab-land.ck-side #askPanel,body.cockpit.lab-land .hero .inspector,body.cockpit.lab-land #pickbar.open{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 body.cockpit.lab-land.ck-side .ck-hud,body.cockpit.lab-land.ck-insp .ck-hud{max-width:calc(54% - 64px)}
 body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero .map-bar,body.cockpit.lab-land.ck-side #hero .charts.under,body.cockpit.lab-land.ck-insp #hero .charts.under,body.cockpit.lab-land.ck-side .sat-pill,body.cockpit.lab-land.ck-insp .sat-pill,body.cockpit.lab-land.ck-side .align-bar,body.cockpit.lab-land.ck-insp .align-bar{right:calc(46% + 56px)}
+/* ---------- the bell (Activity), the Activity list, the push question ---------- */
+.bell{position:relative;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;color:var(--muted);flex:none;text-decoration:none}
+.bell svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.bell:hover{background:var(--surface-2);color:var(--fg)}
+.bell.has{color:var(--fg)}
+.bell .n{position:absolute;top:4px;right:2px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--danger);color:#fff;font:700 10.5px/17px var(--body);text-align:center;border:2px solid var(--bg)}
+.actlist{display:flex;flex-direction:column}
+.actrow{display:flex;gap:12px;align-items:flex-start;padding:12px 8px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--fg);border-radius:10px}
+.actrow:last-child{border-bottom:0}
+.actrow:hover{background:var(--surface-2)}
+.actrow.new{background:color-mix(in srgb,var(--accent-soft) 70%,var(--surface))}
+.actrow .avatar{width:36px;height:36px}
+.actrow .tx{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
+.actrow .l{font-size:14px;line-height:1.35}
+.actrow .l .s{color:var(--muted)}
+.actrow .q{font-size:14px;color:var(--fg);background:var(--surface-2);border-radius:10px;padding:8px 10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.actrow .when{font-size:12px;color:var(--faint)}
+.pushask{display:flex;align-items:center;gap:14px;padding:14px 16px;flex-wrap:wrap}
+.pushask .ic{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--accent-soft);color:var(--accent);flex:none}
+.pushask .ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.pushask .tx{flex:1;min-width:180px;display:flex;flex-direction:column;gap:2px;font-size:13.5px;color:var(--muted)}
+.pushask .tx b{color:var(--fg);font-size:15px}
+.pushask .row{gap:8px}
+
+/* ---------- the native app shell: glass bars (iOS 26 style) — the page scrolls under a frosted top bar and a floating tab pill;
+   the status bar is part of the top bar (the page runs edge to edge on iOS), sheets and modals are frosted too ---------- */
+html.native{--glass:rgba(255,255,255,.66);--glass-strong:rgba(255,255,255,.86);--glass-line:rgba(255,255,255,.8);--glass-edge:rgba(20,30,60,.12);--glass-shadow:0 14px 34px -14px rgba(20,30,60,.4),inset 0 1px 0 rgba(255,255,255,.7)}
+@media (prefers-color-scheme:dark){html.native:not([data-theme="light"]){--glass:rgba(20,26,40,.74);--glass-strong:rgba(20,26,40,.9);--glass-line:rgba(255,255,255,.14);--glass-edge:rgba(0,0,0,.4);--glass-shadow:0 14px 34px -14px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.1)}}
+html.native[data-theme="dark"]{--glass:rgba(20,26,40,.74);--glass-strong:rgba(20,26,40,.9);--glass-line:rgba(255,255,255,.14);--glass-edge:rgba(0,0,0,.4);--glass-shadow:0 14px 34px -14px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.1)}
+html.native .top{top:0;padding-top:calc(8px + env(safe-area-inset-top,0px));background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);border-bottom:1px solid var(--glass-edge);box-shadow:inset 0 1px 0 var(--glass-line)}
+html.native .search{background:var(--glass-strong);border-color:var(--glass-edge)}
+html.native .toast{background:var(--glass-strong);color:var(--fg);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--glass-edge);border-radius:16px;box-shadow:var(--glass-shadow)}
+html.native .side{background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%)}
+@media (max-width:900px){
+  html.native .tabbar{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));border-radius:32px;border:1px solid var(--glass-edge);border-top-color:var(--glass-edge);background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(190%);backdrop-filter:blur(28px) saturate(190%);box-shadow:var(--glass-shadow);padding:7px 8px;align-items:center}
+  html.native .tabbar a,html.native .tabbar button{padding:6px 0;border-radius:22px;transition:background .18s,transform .18s,color .18s}
+  html.native .tabbar a.active{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+  html.native .tabbar a:active,html.native .tabbar button:active{transform:scale(.92)}
+  html.native .tabbar .up .circ{margin-top:-26px;width:54px;height:54px;border:3px solid var(--glass-line);box-shadow:0 8px 18px rgba(20,30,60,.32);background:linear-gradient(180deg,#2c3a5e,#1b2540)}
+  html.native .page{padding-bottom:calc(106px + env(safe-area-inset-bottom,0px))}
+  html.native .hero .inspector,html.native #pickbar.open{left:8px;right:8px;bottom:calc(76px + env(safe-area-inset-bottom,0px));border-radius:22px;background:var(--glass-strong);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid var(--glass-edge);box-shadow:var(--glass-shadow)}
+  html.native .toast{bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+  html.native .bugbtn{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  html.native .modal{background:rgba(10,14,24,.38);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  html.native .modal .box{background:var(--glass-strong);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border-radius:24px 24px 0 0;border:1px solid var(--glass-edge);border-bottom:0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px -10px rgba(20,30,60,.35)}
+  html.native .search-drop{background:var(--glass-strong);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%)}
+}
+html.native body.cockpit .ck-panel,html.native body.cockpit .ck-scrub{background:rgba(14,18,30,.55);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border-color:rgba(255,255,255,.16)}
+html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border-color:rgba(255,255,255,.16)}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -1050,6 +1099,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
         <div class="search-drop" id="qDrop" hidden></div>
       </div>
       
+      <a class="bell" href="#activity" id="bell" aria-label="Activity" hidden><svg><use href="#i-bell"/></svg><span class="n" id="bellN" hidden></span></a>
       <a class="userchip" href="#profile" id="userChip"><img alt="" id="chipAvatar"><div><div class="nm" id="chipName">—</div><div class="sub" id="chipSub"></div></div></a>
       <button class="btn primary" id="btnSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button>
     </header>
@@ -1064,6 +1114,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
         </div>
         <div class="stats" id="homeStats"></div>
       </div>
+      <div class="card pushask" id="pushAsk" hidden><div class="ic"><svg><use href="#i-bell"/></svg></div><div class="tx"><b data-t="Know when someone likes or comments">Know when someone likes or comments</b><span data-t="A push when a driver likes your session or comments on it — nothing else.">A push when a driver likes your session or comments on it — nothing else.</span></div><div class="row"><button class="btn primary sm" id="pushYes" type="button" data-t="Turn on">Turn on</button><button class="btn sm" id="pushLater" type="button" data-t="Not now">Not now</button></div></div>
       <div class="home-grid">
         <div style="min-width:0"><h2 class="hh"><svg><use href="#i-timer"/></svg><span data-t="Latest sessions">Latest sessions</span><span class="sub" id="feedSub"></span></h2><div class="feed" id="homeFeed"></div><div class="hint" id="feedHint" style="margin-top:10px"></div></div>
         <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
@@ -1252,6 +1303,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
             <div class="field"><label data-t="Contact link (Telegram / WhatsApp)">Contact link (Telegram / WhatsApp)</label><input type="text" id="profContact" maxlength="160" placeholder="https://t.me/name"></div>
             <div class="field wide"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profCoach" style="width:18px;height:18px"><span data-t="I coach — show “Book a training” on my page (uses the contact link)">I coach — show “Book a training” on my page (uses the contact link)</span></label></div>
             <div class="field wide"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profNotify" style="width:18px;height:18px" checked><span data-t="E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)">E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)</span></label></div>
+            <div class="field wide" id="profPushField" hidden><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profPush" style="width:18px;height:18px" checked><span data-t="Push notifications in the app (likes and comments)">Push notifications in the app (likes and comments)</span></label></div>
             <div class="field wide" id="profSwsField" hidden><label data-t="SWS (Sodi World Series) profile link">SWS (Sodi World Series) profile link</label><div class="row"><input type="url" id="profSws" class="grow" placeholder="https://www.sodiwseries.com/en-gb/drivers/…"><button class="btn sm" id="profSwsImport" type="button" data-t="Import SWS results">Import SWS results</button></div><div class="hint" id="profSwsHint"></div></div>
           </div>
           <div class="row" style="margin-top:12px"><button class="btn primary" id="profSave" type="button" data-t="Save">Save</button><button class="btn ghost" id="profSignOut" type="button" hidden data-t="Sign out">Sign out</button><span class="status" id="profStatus"></span></div>
@@ -1265,6 +1317,12 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
 
     <!-- ========== DRIVER ========== -->
     <!-- ========== HELP: how to get the session file and upload it ========== -->
+    <!-- ========== ACTIVITY ========== -->
+    <section class="page" id="pg-activity" hidden>
+      <div class="ph"><h1 data-t="Activity">Activity</h1><p class="hint" data-t="Likes and comments on your sessions. Tap one to open the session.">Likes and comments on your sessions. Tap one to open the session.</p></div>
+      <div class="card"><div class="actlist" id="actList"></div><div class="empty" id="actEmpty" hidden></div></div>
+    </section>
+
     <section class="page" id="pg-help" hidden>
       <div class="ph"><div class="row" style="gap:12px;align-items:center"><a class="btn sm ghost" href="#lab">‹ <span data-t="Lab">Lab</span></a><div><h1 data-t="How to upload a session">How to upload a session</h1><div class="sub" id="helpSub"></div></div></div></div>
       <div id="helpBody"></div>
@@ -3207,6 +3265,13 @@ Object.assign(I18N.RU, { 'Third lap (optional) · session': 'Третий кру
 Object.assign(I18N.RU, { 'Revs and two gear ratios in the file — looks like a Rotax DD2 (change the kart if not)': 'В файле обороты и две передачи — похоже на Rotax DD2 (если нет — поменяй карт)', 'Revs and {n} gear ratios in the file — a shifter kart; KZ2 is preselected, change it if not': 'В файле обороты и {n} передач — карт с коробкой; выбран KZ2, если нет — поменяй', 'Revs in the file (up to {r} rpm) — a sport kart; pick its class below': 'В файле обороты (до {r} об/мин) — спортивный карт; выбери класс ниже' });
 Object.assign(I18N.RU, { 'Transfer to…': 'Передать…', 'Transfer this session to another driver': 'Передать сессию другому гонщику', "For a session uploaded on someone's behalf, with their consent: it moves to their library and the feed shows it as theirs; likes and comments stay. The link preview is rebuilt when they open the Lab.": 'Для сессии, залитой за другого человека с его согласия: она переходит в его библиотеку, в ленте показывается как его; лайки и комментарии остаются. Превью ссылки перестроится, когда он откроет Lab.', 'Driver (search by name)': 'Гонщик (поиск по имени)', 'First name (optional: set their name)': 'Имя (по желанию: задать ему имя)', 'Last name': 'Фамилия', 'Transfer': 'Передать', 'Transfer to {name}?': 'Передать {name}?', "The session leaves your library and appears in the feed as theirs. Only do this with the driver's consent.": 'Сессия уйдёт из твоей библиотеки и будет показываться в ленте как его. Только с согласия гонщика.', 'Transferred to {name}.': 'Передано: {name}.', 'Run supabase/transfer.sql in the SQL editor once — then admins can transfer sessions.': 'Один раз выполни supabase/transfer.sql в SQL editor — тогда админы смогут передавать сессии.' });
 Object.assign(I18N.RU, { 'Engagement, 30 days': 'Вовлечённость, 30 дней', 'Visits': 'Визиты', '{v} browsers · {u} signed in': '{v} браузеров · {u} вошедших', 'Median visit': 'Медианный визит', 'average {a} · 1 in 10 visits ≥ {p}': 'в среднем {a} · каждый десятый визит ≥ {p}', 'Under 10 s': 'Короче 10 с', 'left at once': 'ушли сразу', 'Opened the Lab': 'Открыли Lab', 'compared {c} · replay {r} · asked the AI {a}': 'сравнивали {c} · реплей {r} · спрашивали ИИ {a}', 'Visits by day': 'Визиты по дням', 'Average visit, minutes by day': 'Средний визит, минут по дням', 'Visits by hour (Dubai time)': 'Визиты по часам (время Дубая)', 'Share of visits that': 'Доля визитов, в которых', 'opened the Lab': 'открыли Lab', 'compared': 'сравнивали', 'played the replay': 'включали реплей', 'asked the AI': 'спрашивали ИИ', 'uploaded': 'загружали', 'liked or commented': 'лайкали или комментировали', 'Drivers by time on the site': 'Гонщики по времени на сайте', 'Driver': 'Гонщик', 'visits': 'визитов', 'min': 'мин', 'compare': 'сравнения', 'uploads': 'загрузки', 'likes / comments': 'лайки / комменты', 'last seen': 'был', 'Most opened sessions': 'Самые открываемые сессии', 'opens {n} · visitors {v}': 'открытий {n} · посетителей {v}', 'A visit is one sitting in a tab (renewed after 30 minutes of silence); its length is measured by a heartbeat once a minute while the tab is visible and in use, so it is accurate to about a minute.': 'Визит — одно сидение во вкладке (новый после 30 минут тишины); длина меряется сигналом раз в минуту, пока вкладка видна и с ней работают, точность — около минуты.', 'Engagement: run supabase/events.sql (or let the migration apply) — visit length and feature use appear here.': 'Вовлечённость: выполни supabase/events.sql (или дождись миграции) — здесь появятся длина визитов и использование функций.', 'h': 'ч' });
+// v33 — the app: pushes, the Activity list, the bell
+Object.assign(I18N.RU, { 'Know when someone likes or comments': 'Узнавай, когда лайкают или комментируют', 'A push when a driver likes your session or comments on it — nothing else.': 'Пуш, когда гонщик лайкнул твою сессию или оставил комментарий — и больше ничего.', 'Turn on': 'Включить', 'Not now': 'Не сейчас',
+  'Pushes are on.': 'Пуши включены.', 'Pushes are off — turn them on in the phone settings when you want them.': 'Пуши выключены — включи их в настройках телефона, когда захочешь.',
+  'Activity': 'Активность', 'Likes and comments on your sessions. Tap one to open the session.': 'Лайки и комментарии к твоим сессиям. Нажми — откроется сессия.', 'Sign in to see who liked or commented on your sessions.': 'Войди, чтобы видеть, кто лайкнул или прокомментировал твои сессии.',
+  'Activity is not available yet.': 'Активность пока недоступна.', 'Nothing yet — publish a session and share it: likes and comments land here.': 'Пока пусто — опубликуй сессию и поделись ей: лайки и комментарии появятся здесь.',
+  'commented on': 'прокомментировал(а)', 'liked': 'лайкнул(а)', 'A driver': 'Гонщик', 'your session': 'твою сессию', '{n} d ago': '{n} дн назад', 'Activity on Hutka': 'Активность на Hutka',
+  'Push notifications in the app (likes and comments)': 'Пуш-уведомления в приложении (лайки и комментарии)' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3499,7 +3564,7 @@ const STORE = (() => {
       async saveSession(sid, meta, chunks) { must(await sb.from('sessions').upsert({ id: sid, owner: meta.owner, track_id: meta.track || '', layout_id: meta.layout || 'custom', published: !!meta.published, best_ms: meta.bestMs, meta, updated_at: new Date().toISOString() })); must(await sb.from('session_data').upsert({ id: sid, enc: meta.enc, data: chunks.join('') })); },
       async updateSession(sid, patch) { const cur = await A.getSessionMeta(sid); if (!cur) throw new Error('missing'); const meta = Object.assign(cur, patch, { updatedAt: Date.now() }); delete meta.id; must(await sb.from('sessions').update({ meta, published: !!meta.published, track_id: meta.track || '', layout_id: meta.layout || 'custom', updated_at: new Date().toISOString() }).eq('id', sid)); },
       deleteSession: async (sid) => must(await sb.from('sessions').delete().eq('id', sid)),
-      async getProfile(id) { const rows = must(await sb.from('profiles').select('*').eq('id', id).limit(1)); if (!rows.length) return null; const r = rows[0]; A.profilePerson = ('first_name' in r); return { racingName: r.racing_name || '', firstName: r.first_name || '', lastName: r.last_name || '', birthYear: r.birth_year || null, weightKg: r.weight_kg || null, country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', sws: r.sws_url || '', swsResults: r.sws_results || null, instagram: r.instagram || '', contact: r.contact || '', coach: !!r.coach, bio: r.bio || '', notify: r.notify !== false, updatedAt: r.updated_at }; },
+      async getProfile(id) { const rows = must(await sb.from('profiles').select('*').eq('id', id).limit(1)); if (!rows.length) return null; const r = rows[0]; A.profilePerson = ('first_name' in r); return { racingName: r.racing_name || '', firstName: r.first_name || '', lastName: r.last_name || '', birthYear: r.birth_year || null, weightKg: r.weight_kg || null, country: r.country || '', homeTrack: r.home_track || '', avatar: r.avatar || '', sws: r.sws_url || '', swsResults: r.sws_results || null, instagram: r.instagram || '', contact: r.contact || '', coach: !!r.coach, bio: r.bio || '', notify: r.notify !== false, push: r.push !== false, updatedAt: r.updated_at }; },
       async saveProfile(id, body) {
         const base = { id, racing_name: body.racingName || '', country: body.country || '', home_track: body.homeTrack || '', avatar: body.avatar || '', updated_at: new Date().toISOString() };
         const extra = { sws_url: body.sws || '', sws_results: body.swsResults || null, instagram: body.instagram || '', contact: body.contact || '', coach: !!body.coach, bio: body.bio || '' };
@@ -3512,6 +3577,7 @@ const STORE = (() => {
           if (r.error && tier > 1 && noCol(r.error)) { if (tier === 3) A.profilePerson = false; else A.profileExtras = false; continue; }
           must(r);
           if (body.notify !== undefined) { try { await sb.from('profiles').update({ notify: !!body.notify }).eq('id', id); } catch (e) {} }   // notify.sql — absent before it runs
+          if (body.push !== undefined) { try { await sb.from('profiles').update({ push: !!body.push }).eq('id', id); } catch (e) {} }   // push.sql — absent before it runs
           return true;
         }
       },
@@ -3521,6 +3587,10 @@ const STORE = (() => {
       async adminVisits() { return must(await sb.rpc('hutka_visits')); },
       async visit(vid, dev) { return must(await sb.rpc('hutka_visit', { vid, dev })); },
       async counts() { return must(await sb.rpc('hutka_counts')); },
+      async pushToken(token, platform, dev) { return must(await sb.rpc('hutka_push_token', { token, platform, dev })) === true; },
+      async pushForget(token) { return must(await sb.rpc('hutka_push_forget', { token })) === true; },
+      async activity(n) { return must(await sb.rpc('hutka_activity', { n: n || 50 })); },
+      async activitySeen() { return must(await sb.rpc('hutka_activity_seen')); },
       async event(vid, visit, name, props, dev) { return must(await sb.rpc('hutka_event', { vid, visit, name, props: props || {}, dev })); },
       async adminAnalytics(days) { return must(await sb.rpc('hutka_analytics', { days })); },
       async setCard(sid, card) { return must(await sb.rpc('hutka_set_card', { sid, card })) === true; },
@@ -3709,11 +3779,11 @@ const STORE = (() => {
     social.set(sid, out); return out;
   }
   // helpful (+1) / not helpful (−1): the same vote again removes it
-  async function vote(sid, v) { if (!adapter || !me.id) throw new Error('sign in'); v = v === -1 ? -1 : 1; const cur = await sessionSocial(sid); if (cur.mine === v) await adapter.unlike(sid, me.id); else { await adapter.like(sid, me.id, v); track('like', { sid, v }); } social.delete(sid); return sessionSocial(sid, true); }
+  async function vote(sid, v) { if (!adapter || !me.id) throw new Error('sign in'); v = v === -1 ? -1 : 1; const cur = await sessionSocial(sid); if (cur.mine === v) await adapter.unlike(sid, me.id); else { await adapter.like(sid, me.id, v); track('like', { sid, v }); if (v === 1) kickNotify(); } social.delete(sid); return sessionSocial(sid, true); }
   const toggleLike = (sid) => vote(sid, 1);
   // a session several drivers marked as not helpful sinks in the lists and gets a label
   const lowRated = (c) => !!c && (c.down || 0) >= 3 && (c.down || 0) > (c.likes || 0);
-  async function addComment(sid, text) { if (!adapter || !me.id) throw new Error('sign in'); text = String(text || '').trim().slice(0, 1000); if (!text) return; await adapter.addComment(sid, me.id, text); social.delete(sid); return sessionSocial(sid, true); }
+  async function addComment(sid, text) { if (!adapter || !me.id) throw new Error('sign in'); text = String(text || '').trim().slice(0, 1000); if (!text) return; await adapter.addComment(sid, me.id, text); kickNotify(); social.delete(sid); return sessionSocial(sid, true); }
   async function deleteComment(sid, id) { if (!adapter) return; await adapter.deleteComment(id); social.delete(sid); return sessionSocial(sid, true); }
   async function followInfo(uid, fresh) {
     if (!fresh && followCache.has(uid)) return followCache.get(uid);
@@ -3768,6 +3838,14 @@ const STORE = (() => {
     adapter.visit(vid, dev).catch(() => {});
     if (me.id && aiCfg()) fnCall('notify', {}).catch(() => {});   // the activity e-mails (functions/notify) go out when anyone opens the site
   }
+  // the app's push token (push.sql); the Activity list and its unread count; a nudge to functions/notify ~20 s after a like or a comment
+  // so the push reaches the session's owner right away (the function groups whatever is pending by then)
+  async function pushToken(token, platform, dev) { if (!adapter || !adapter.pushToken || !me.id) return false; return adapter.pushToken(token, platform, dev); }
+  async function pushForget(token) { if (!adapter || !adapter.pushForget || !me.id) return false; try { return await adapter.pushForget(token); } catch (e) { return false; } }
+  async function activity(n) { if (!adapter || !adapter.activity || !me.id) return null; try { const a = await adapter.activity(n); return a && Array.isArray(a.items) ? a : null; } catch (e) { return null; } }
+  async function activitySeen() { if (!adapter || !adapter.activitySeen || !me.id) return 0; try { return await adapter.activitySeen(); } catch (e) { return 0; } }
+  let kickAt = 0;
+  function kickNotify() { if (!me.id || !aiCfg() || Date.now() - kickAt < 15000) return; kickAt = Date.now(); setTimeout(() => { fnCall('notify', {}).catch(() => {}); }, 20000); }
   async function adminVisits() { if (!adapter || !adapter.adminVisits || !me.canEdit) return null; return adapter.adminVisits(); }
   // product analytics (events.sql): one small row per page view / Lab open / comparison / replay / AI question / upload / like / comment,
   // and a heartbeat once a minute while the tab is in use — so the admin panel can say how long a visit lasts and what it did
@@ -3817,7 +3895,7 @@ const STORE = (() => {
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits, track, adminAnalytics,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
-    sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
+    sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
@@ -4369,7 +4447,7 @@ function voteButtons(sid, cnt, onChange) {
     if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to rate sessions.')); return; }
     if (busy) return; busy = true; const prev = Object.assign({}, st);
     if (st.mine === v) { st.mine = 0; if (v === 1) st.likes--; else st.down--; } else { if (st.mine === 1) st.likes--; if (st.mine === -1) st.down--; st.mine = v; if (v === 1) st.likes++; else st.down++; }
-    paint(); b.classList.add('pop'); setTimeout(() => b.classList.remove('pop'), 350); if (onChange) onChange(Object.assign({}, st));
+    NATIVE.haptic(v === 1 && st.mine === 1 ? 'medium' : 'light'); paint(); b.classList.add('pop'); setTimeout(() => b.classList.remove('pop'), 350); if (onChange) onChange(Object.assign({}, st));
     try { const r = await STORE.vote(sid, v); Object.assign(st, { likes: r.likes || 0, down: r.down || 0, mine: r.mine || 0, comments: r.comments || st.comments }); } catch (e) { Object.assign(st, prev); toast(t('Could not save the vote.')); }
     paint(); if (onChange) onChange(Object.assign({}, st)); busy = false;
   };
@@ -4384,7 +4462,7 @@ const trackHours = (tr) => { if (!tr.close) return null; if (!tr.open) return { 
 const APP = { route: 'tracks', a: null, b: null, geo: null, hoverTrack: null };
 function parseHash() { const h = (location.hash || '#home').slice(1); const parts = h.includes('~') ? h.split('~') : h.split('-'); return { name: parts[0] || 'home', a: parts[1] || null, b: parts[2] || null, c: parts[3] || null }; }
 function go(hash) { if (location.hash === '#' + hash) route(); else location.hash = hash; }
-const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver', 'ai', 'sws', 'help'];
+const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver', 'ai', 'sws', 'help', 'activity'];
 let routeSeq = 0, routeHash = null;
 async function route() {
   if (routeHash === location.hash) return; routeHash = location.hash; const seq = ++routeSeq;   // the same hash twice in a row is one navigation
@@ -4409,6 +4487,7 @@ async function route() {
     else if (name === 'ai') await renderAIPage(r.a, r.b);
     else if (name === 'admin') await ADMIN.show(r.a, r.b);
     else if (name === 'help') renderHelpPage();
+    else if (name === 'activity') await renderActivity();
   } catch (e) { console.error('route', e); }
   finally { if (seq === routeSeq) routeHash = null; }
 }
@@ -4424,6 +4503,7 @@ async function renderShell() {
   $('chipName').textContent = (prof && prof.racingName) || (STORE.hasIdentity ? (me.name || t('You')) : t('Guest'));
   $('chipSub').textContent = STORE.hasIdentity ? (me.canEdit ? t('admin') : t('driver')) : (STORE.hasAuth ? t('not signed in') : t('local library only'));
   $('userChip').hidden = STORE.hasAuth && !STORE.hasIdentity; $('btnSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity);
+  ACTIVITY.refresh();
   const canAdm = STORE.isAdmin() || STORE.getTracks().some(tr => STORE.canEditTrack(tr));
   $('navAdmin').hidden = !canAdm; $('adminSep').hidden = !canAdm; { const lbl = STORE.isAdmin() ? t('Admin Panel') : t('My tracks'); for (const id of ['navAdmin', 'profAdminLink']) { const sp = $(id).querySelector('span'); if (sp) sp.textContent = lbl; } $('pg-admin').querySelector('h1').textContent = lbl; } $('navAI').hidden = !STORE.hasAuth; $('tabAI').hidden = !STORE.hasAuth;
   $('modeNote').textContent = STORE.hasAuth ? (STORE.hasIdentity ? '' : t('Sign in to upload sessions and keep a library across devices. Browsing is open to everyone.')) : (STORE.hasDb ? (STORE.hasIdentity ? (STORE.canWrite() ? '' : t('Read-only access: ask the owner for Contributor access to publish sessions.')) : t('Sign in to claude.ai to publish sessions and keep a library across devices.')) : t('Offline mode: sessions stay in this browser. Open the shared Hutka link signed in to claude.ai to publish and compare with others.'));
@@ -4433,10 +4513,12 @@ async function renderShell() {
 $('langEn').onclick = $('langEnM').onclick = () => { I18N.setLang('en'); renderShell(); route(); };
 $('langRu').onclick = $('langRuM').onclick = () => { I18N.setLang('ru'); renderShell(); route(); };
 $('tabUpload').onclick = () => UPLOAD.open(APP.route === 'lab' && LAB.tid ? { track: LAB.tid, layout: LAB.lid } : {});
+for (const a of document.querySelectorAll('.tabbar a, .tabbar button, .nav a')) a.addEventListener('pointerdown', () => NATIVE.haptic('light'), { passive: true });
 // ---------- the native shell (the iOS / Android app is a Capacitor wrapper around this site): deep links bring sign-in back from the
 // system browser, files opened "in Hutka" land in the upload window, and the splash screen goes away once the page is up ----------
 const NATIVE = window.NATIVE = {
   on: !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()),
+  platform: (window.Capacitor && window.Capacitor.getPlatform) ? window.Capacitor.getPlatform() : 'web',
   redirect: 'hutka://auth',
   // the site does not ship the Capacitor JS runtime (it runs in ordinary browsers too), so plugins are called through the bridge the
   // native shell injects into the page: Capacitor.nativePromise(plugin, method, options) and Capacitor.addListener(plugin, event, cb)
@@ -4445,18 +4527,103 @@ const NATIVE = window.NATIVE = {
   async openUrl(url) { try { await this.call('Browser', 'open', { url, presentationStyle: 'popover' }); } catch (e) { window.open(url, '_blank'); } },
   async closeBrowser() { try { await this.call('Browser', 'close'); } catch (e) {} },
   async readFile(url) { const r = await this.call('Filesystem', 'readFile', { path: url }); const raw = typeof r.data === 'string' ? r.data : ''; const bin = atob(raw); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); const name = decodeURIComponent((String(url).split('?')[0].split('/').pop() || '').trim()) || 'session.alf2'; return new File([u8], name); },
+  // haptics: a tick on taps that change something (tabs, a corner, play), a thump on a like, a notification pattern when something finished
+  hapAt: 0,
+  haptic(kind) {
+    if (!this.on) return; const now = Date.now(); if (now - this.hapAt < 60) return; this.hapAt = now;
+    const k = kind || 'light';
+    if (k === 'success' || k === 'warning' || k === 'error') this.call('Haptics', 'notification', { type: k.toUpperCase() }).catch(() => {});
+    else this.call('Haptics', 'impact', { style: k === 'heavy' ? 'HEAVY' : k === 'medium' ? 'MEDIUM' : 'LIGHT' }).catch(() => {});
+  },
+  // the status bar: on iOS the page runs under it (the glass top bar covers it), its text follows the theme; on Android a solid bar in the page colour
+  dark() { const th = document.documentElement.dataset.theme; return th === 'dark' || (th !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches); },
+  async statusBar() {
+    if (!this.on) return; const dark = this.dark();
+    try { if (this.platform === 'ios') await this.call('StatusBar', 'setOverlaysWebView', { overlay: true }); else { await this.call('StatusBar', 'setOverlaysWebView', { overlay: false }); await this.call('StatusBar', 'setBackgroundColor', { color: dark ? '#0f1420' : '#f5f6f8' }); } } catch (e) {}
+    try { await this.call('StatusBar', 'setStyle', { style: dark ? 'DARK' : 'LIGHT' }); } catch (e) {}
+  },
+  async badge(n) { if (!this.on) return; try { if (n > 0) await this.call('Badge', 'set', { count: n }); else await this.call('Badge', 'clear'); } catch (e) {} },
+  // the system share sheet with the picture, the text and the link (the web share API is the fallback, see SHARE.go)
+  async share(file, text, url) {
+    if (!this.on) throw new Error('no bridge');
+    const b64 = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1] || ''); fr.onerror = rej; fr.readAsDataURL(file); });
+    const w = await this.call('Filesystem', 'writeFile', { path: file.name || 'hutka.png', data: b64, directory: 'CACHE' });
+    await this.call('Share', 'share', Object.assign({ title: 'Hutka', text, files: [w.uri], dialogTitle: 'Hutka' }, url ? { url } : {}));
+  },
+  // pushes: asked once, softly, on the home page of a signed-in driver; the token goes to push_tokens (push.sql); a tap on a push opens its link
+  push: {
+    token: '', wired: false,
+    pref(v) { try { if (v !== undefined) localStorage.setItem('hutka.push', v); return localStorage.getItem('hutka.push') || ''; } catch (e) { return ''; } },
+    shouldAsk() { if (!NATIVE.on || !STORE.hasIdentity) return false; const p = this.pref(); if (p === 'on' || p === 'off') return false; if (p.startsWith('later:') && Date.now() - (+p.slice(6) || 0) < 7 * 864e5) return false; return true; },
+    later() { this.pref('later:' + Date.now()); },
+    async enable() {
+      try { const p = await NATIVE.call('PushNotifications', 'requestPermissions'); if (!p || p.receive !== 'granted') { this.pref('off'); return false; } } catch (e) { return false; }
+      this.pref('on'); await this.register(); return true;
+    },
+    async register() {
+      if (!NATIVE.on || !STORE.hasIdentity) return;
+      try { const p = await NATIVE.call('PushNotifications', 'checkPermissions'); if (!p || p.receive !== 'granted') return; } catch (e) { return; }
+      this.wire();
+      if (NATIVE.platform === 'android') { try { await NATIVE.call('PushNotifications', 'createChannel', { id: 'hutka', name: 'Activity', description: 'Likes and comments on your sessions', importance: 4, visibility: 1, vibration: true }); } catch (e) {} }
+      try { await NATIVE.call('PushNotifications', 'register'); } catch (e) {}
+    },
+    wire() {
+      if (this.wired) return; this.wired = true;
+      NATIVE.listen('PushNotifications', 'registration', async (e) => { const tk = e && e.value ? String(e.value) : ''; if (!tk) return; this.token = tk; try { localStorage.setItem('hutka.pushtoken', tk); } catch (x) {} try { await STORE.pushToken(tk, NATIVE.platform, navigator.userAgent.slice(0, 80)); } catch (x) {} });
+      NATIVE.listen('PushNotifications', 'registrationError', (e) => { console.warn('push registration', e && e.error); });
+      NATIVE.listen('PushNotifications', 'pushNotificationReceived', (n) => { NATIVE.haptic('success'); const title = n && n.title ? n.title : t('Activity on Hutka'); toast(title + (n && n.body ? ' — ' + n.body : ''), 4000); ACTIVITY.refresh(true); });
+      NATIVE.listen('PushNotifications', 'pushNotificationActionPerformed', (a) => { const d = (a && a.notification && a.notification.data) || {}; const u = String(d.url || '#activity'); if (/^#[a-z]/.test(u)) go(u.slice(1)); else go('activity'); });
+    },
+    // signing out on this phone: the token leaves push_tokens (the next sign-in registers it again)
+    async forget() { let tk = this.token; try { tk = tk || localStorage.getItem('hutka.pushtoken') || ''; } catch (e) {} if (!tk) return; try { await STORE.pushForget(tk); } catch (e) {} this.token = ''; try { localStorage.removeItem('hutka.pushtoken'); } catch (e) {} }
+  },
   async init() {
     if (!this.on) return; document.documentElement.classList.add('native');
     try { this.listen('App', 'appUrlOpen', (e) => this.onUrl(e && e.url)); } catch (e) {}
     try { const l = await this.call('App', 'getLaunchUrl'); if (l && l.url) this.onUrl(l.url); } catch (e) {}
+    try { this.listen('App', 'appStateChange', (e) => { if (e && e.isActive) { ACTIVITY.refresh(true); this.statusBar(); } }); } catch (e) {}
+    try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => this.statusBar()); } catch (e) {}
+    await this.statusBar();
     try { await this.call('SplashScreen', 'hide'); } catch (e) {}
+    try { if (this.push.pref() === 'on') await this.push.register(); } catch (e) {}
   },
   async onUrl(url) {
     if (!url) return; url = String(url);
-    if (/^hutka:\/\/auth/i.test(url)) { await this.closeBrowser(); try { const ok = await STORE.adapter.finishSignIn(url); if (ok) { AUTH.close(); toast(t('Signed in.')); } } catch (e) { toast(t('Could not sign in: {e}', { e: e && e.message || e })); } return; }
+    if (/^hutka:\/\/auth/i.test(url)) { await this.closeBrowser(); try { const ok = await STORE.adapter.finishSignIn(url); if (ok) { AUTH.close(); toast(t('Signed in.')); this.haptic('success'); } } catch (e) { toast(t('Could not sign in: {e}', { e: e && e.message || e })); } return; }
     if (/^(file|content):/i.test(url)) { try { const f = await this.readFile(url); if (f) { if (APP.route !== 'lab') go('lab'); setTimeout(() => UPLOAD.withFiles([f]), 400); } } catch (e) { toast(t('Could not open the file: {e}', { e: e && e.message || e })); } }
   }
 };
+if (NATIVE.on) document.documentElement.classList.add('native');   // the app shell's look (the glass bars) from the first paint
+// the Activity list: what happened to my sessions (push.sql hutka_activity) — the bell in the top bar carries the unread count, the page lists it
+const ACTIVITY = {
+  unread: 0, at: 0,
+  async refresh(force) {
+    if (!STORE.hasIdentity || !STORE.activity) { ACTIVITY.set(0); return; }
+    if (!force && Date.now() - ACTIVITY.at < 30000) return; ACTIVITY.at = Date.now();
+    const a = await STORE.activity(1); ACTIVITY.set(a ? (+a.unread || 0) : 0);
+  },
+  set(n) { ACTIVITY.unread = n; const b = $('bell'), c = $('bellN'); if (!b) return; b.hidden = !STORE.hasIdentity; c.hidden = !n; c.textContent = n > 99 ? '99+' : String(n); b.classList.toggle('has', n > 0); NATIVE.badge(n); },
+  async render() {
+    const box = $('actList'); box.innerHTML = ''; $('actEmpty').hidden = true;
+    if (!STORE.hasIdentity) { $('actEmpty').hidden = false; $('actEmpty').textContent = t('Sign in to see who liked or commented on your sessions.'); return; }
+    const sk = el('div', 'skel'); sk.style.height = '120px'; box.appendChild(sk);
+    const a = await STORE.activity(60); box.innerHTML = '';
+    if (!a) { $('actEmpty').hidden = false; $('actEmpty').textContent = t('Activity is not available yet.'); return; }
+    if (!a.items.length) { $('actEmpty').hidden = false; $('actEmpty').textContent = t('Nothing yet — publish a session and share it: likes and comments land here.'); }
+    for (const it of a.items) {
+      const row = el('a', 'actrow' + (it.seen ? '' : ' new')); row.href = '#lab~' + esc(it.sid || '') + '~discuss';
+      const im = el('img', 'avatar'); im.src = it.avatar || GENERIC_AVATAR; im.alt = ''; im.width = 36; im.height = 36;
+      const tx = el('div', 'tx'); const who = esc(it.name || t('A driver')), sess = esc([it.label, it.bestMs ? fmtMs(+it.bestMs) : '', it.trackName].filter(Boolean).join(' · ') || t('your session'));
+      tx.innerHTML = it.kind === 'comment' ? `<div class="l"><b>${who}</b> ${esc(t('commented on'))} <span class="s">${sess}</span></div><div class="q">“${esc(it.text || '')}”</div>` : `<div class="l"><b>${who}</b> ${esc(t('liked'))} <span class="s">${sess}</span></div>`;
+      tx.appendChild(el('div', 'when', timeAgo(it.at)));
+      row.append(im, tx); box.appendChild(row);
+    }
+    if (a.unread) { await STORE.activitySeen(); ACTIVITY.set(0); }
+    ACTIVITY.at = Date.now();
+  }
+};
+function timeAgo(iso) { const d = Date.now() - new Date(iso).getTime(); if (!(d >= 0)) return ''; const m = Math.round(d / 60000); if (m < 1) return t('just now'); if (m < 60) return t('{n} min ago', { n: m }); const h = Math.round(m / 60); if (h < 24) return t('{n} h ago', { n: h }); const dd = Math.round(h / 24); if (dd < 7) return t('{n} d ago', { n: dd }); return fmtDate(String(iso).slice(0, 10)); }
+async function renderActivity() { await ACTIVITY.render(); }
 // sign-in (standalone hosting with Supabase auth)
 // Google and Apple buttons follow config.js; inside the native app a social button is shown only when Apple sign-in is set up too
 // (App Store rule 4.8: an app that offers Google must offer Sign in with Apple). A password sign-in is there for accounts created with one
@@ -4499,7 +4666,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v32.5';
+const APP_VERSION = 'v33';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -5260,7 +5427,7 @@ function renderReplay(full) {
   for (const l of laps) { const e = box.querySelector(`[data-role="${l.role}"] .live`); if (!e) continue; const i = LAB.hoverIdx >= 0 ? LAB.hoverIdx : stationAt(l.P, tau); const gap = l.role === 'ref' ? '' : ` · <b class="${D.R.t[iR] - l.P.t[iR] >= 0.04 ? 'loss' : (D.R.t[iR] - l.P.t[iR] <= -0.04 ? 'gain' : '')}">Δ ${sg(D.R.t[iR] - l.P.t[iR])}</b>`; e.innerHTML = `${(i * ds).toFixed(0)} ${t('m')} · ${kmh(l.P.v[i])} ${t('km/h')}${l.P.rpm ? ` · ${fmtRpm(l.P.rpm[i])}${gearAt(l.P, i) ? ' · ' + GEAR.gearName(gearAt(l.P, i)) : ''}` : ''}${gap}`; }
 }
 function replayPlay(on) {
-  if (on === LAB.playing) return; LAB.playing = on; if (on) STORE.track('replay', {}); const b = $('rpPlay'); if (b) { b.innerHTML = on ? '&#10074;&#10074;' : '&#9654;'; b.classList.toggle('active', on); }
+  if (on === LAB.playing) return; LAB.playing = on; NATIVE.haptic('light'); if (on) STORE.track('replay', {}); const b = $('rpPlay'); if (b) { b.innerHTML = on ? '&#10074;&#10074;' : '&#9654;'; b.classList.toggle('active', on); }
   if (!on) { if (LAB._rpAnim) cancelAnimationFrame(LAB._rpAnim); LAB._rpAnim = 0; return; }
   const D = LAB.dcmp; if (!D) { LAB.playing = false; return; } const Tm = replayTmax(D); if (LAB.scrubT >= Tm - 0.05) LAB.scrubT = 0;
   let last = performance.now();
@@ -5424,7 +5591,7 @@ function syncOpts() {
   $('satNote').hidden = true; $('tglAlign').textContent = t('Move imagery'); renderSatPill();
   if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; $('ckSat').hidden = true; LAB.map.draw(); } });
   $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').hidden = !!(sat && LAB.opts.tiles); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))) || !!(sat && LAB.opts.tiles && !(LAB.G && LAB.G.aerial)); LAB.map.draw(); }
-function selectCorner(n, scroll) { LAB.selN = (LAB.selN === n) ? 0 : n; LAB.ckInsp = !!LAB.selN; if (isCockpit() && LAB.side && LAB.selN) setSide(false); afterSelect(true); if (scroll && LAB.selN && !isCockpit()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+function selectCorner(n, scroll) { NATIVE.haptic('light'); LAB.selN = (LAB.selN === n) ? 0 : n; LAB.ckInsp = !!LAB.selN; if (isCockpit() && LAB.side && LAB.selN) setSide(false); afterSelect(true); if (scroll && LAB.selN && !isCockpit()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 
 // ----- the start screen: my sessions and what the drivers I follow have published -----
 async function renderLabStart() {
@@ -5615,7 +5782,7 @@ async function postComment() {
   if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); return; }
   STORE.track('comment', { sid: s.id });
   const b = $('commentBtn'); b.classList.add('busy');
-  try { LAB.social = Object.assign({ sid: s.id }, await STORE.addComment(s.id, text)); inp.value = ''; renderDiscussion(); } catch (e) { toast(t('Could not post the comment.')); }
+  try { LAB.social = Object.assign({ sid: s.id }, await STORE.addComment(s.id, text)); inp.value = ''; renderDiscussion(); NATIVE.haptic('success'); } catch (e) { NATIVE.haptic('error'); toast(t('Could not post the comment.')); }
   b.classList.remove('busy');
 }
 const fmtWhen = (ms) => { if (!ms) return ''; const d = new Date(ms), diff = (Date.now() - ms) / 60000; if (diff < 1) return t('just now'); if (diff < 60) return t('{n} min ago', { n: Math.round(diff) }); if (diff < 60 * 24) return t('{n} h ago', { n: Math.round(diff / 60) }); return d.toLocaleDateString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short' }); };
@@ -5756,6 +5923,7 @@ const SHARE = {
     if (sess.published && !local && shareStale(sess)) { setStatus('shareStatus', t('Preparing the link…')); await Promise.race([SHARE.sync(sess), new Promise(r => setTimeout(r, 9000))]); setStatus('shareStatus', ''); }
     const url = local ? null : SHARE.url(), text = SHARE.text() + (url ? '\n' + url : '');
     try { const b = await SHARE.blob(); const file = new File([b], 'hutka-' + (sess.id || 'session') + '.png', { type: 'image/png' });
+      if (NATIVE.on) { try { NATIVE.haptic('light'); await NATIVE.share(file, SHARE.text(), url); return; } catch (e) { if (e && /cancel/i.test(String(e.message || e))) return; } }
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share(Object.assign({ files: [file], title: 'Hutka', text }, url ? { url } : {})); return; }
       if (navigator.share && url) { await navigator.share({ title: 'Hutka', text: SHARE.text(), url }); return; }
     } catch (e) { if (e && e.name === 'AbortError') return; }
@@ -5773,7 +5941,7 @@ async function labTogglePublish() {
   const on = !sess.published; if (on && sess.moderated && !STORE.isAdmin()) { toast(t('The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.')); return; }
   if (on) { const ok = await confirmDlg(t('Publish this session?'), t('It appears on the track page and in the hot laps; other drivers can compare their laps with it. You can unpublish at any time.'), t('Publish')); if (!ok) return; }
   const pb = $('btnPublish'); pb.classList.add('busy');
-  try { await STORE.updateSession(sess.id, { published: on }); sess.published = on; toast(on ? t('Published — it is now on the track page.') : t('Unpublished.')); labRender(); if (on) SHARE.sync(sess); else sharePageSync(sess).catch(() => {}); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); }
+  try { await STORE.updateSession(sess.id, { published: on }); sess.published = on; NATIVE.haptic('success'); toast(on ? t('Published — it is now on the track page.') : t('Unpublished.')); labRender(); if (on) SHARE.sync(sess); else sharePageSync(sess).catch(() => {}); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); }
   pb.classList.remove('busy');
 }
 
@@ -6239,7 +6407,7 @@ const UPLOAD = (() => {
       if (k === 0 && tr && tr.community && lid !== 'custom') { const l = STORE.getLayout(tid, lid); if (l && !l.refSession && STORE.canEditTrack(tr)) { try { await STORE.saveLayout(tid, Object.assign({}, l, { refSession: sess.id })); GEOM.invalidate(); } catch (e) {} } }
     }
     STORE.track('upload', { n: parsed.length, kart: kart.cls, app: parsed[0] && parsed[0].data.source ? parsed[0].data.source.app : 'alfano' });
-    close(); if (first) { await LAB.open(first, false); go('lab'); }
+    close(); if (first) { NATIVE.haptic('success'); await LAB.open(first, false); go('lab'); }
   };
   async function withFiles(files) { open({}); await onFiles(files); }
   return { open, close, withFiles };
@@ -6285,6 +6453,10 @@ async function renderHomePage() {
   $('homeSub').textContent = t('Upload a session — every corner, compared with the fastest on the same layout.');
   $('homeUpload').onclick = () => UPLOAD.open({});
   $('homeSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity); $('homeSignIn').onclick = () => AUTH.open();
+  // the app: one soft question about pushes for a signed-in driver (the system dialog follows "Turn on"; "Not now" asks again in a week)
+  { const ask = $('pushAsk'); ask.hidden = !(NATIVE.on && NATIVE.push.shouldAsk());
+    $('pushYes').onclick = async () => { NATIVE.haptic('light'); ask.hidden = true; const ok = await NATIVE.push.enable(); toast(ok ? t('Pushes are on.') : t('Pushes are off — turn them on in the phone settings when you want them.')); };
+    $('pushLater').onclick = () => { NATIVE.push.later(); ask.hidden = true; }; }
   const feed = $('homeFeed'); feed.innerHTML = '';
   for (let i = 0; i < 3; i++) { const sk = el('div', 'post skel'); sk.style.height = '220px'; feed.appendChild(sk); }
   // 100 most recent published sessions — one driver uploading 30 files in a row must not push everyone else out of the feed (they fold into one post below)
@@ -6668,7 +6840,7 @@ const ONBOARD = {
 };
 function guessCountry() { try { const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; const m = { 'Asia/Dubai': 'AE', 'Asia/Muscat': 'OM', 'Asia/Qatar': 'QA', 'Asia/Bahrain': 'BH', 'Asia/Riyadh': 'SA', 'Asia/Kuwait': 'KW', 'Europe/Minsk': 'BY', 'Europe/Moscow': 'RU', 'Europe/Kiev': 'UA', 'Europe/Kyiv': 'UA', 'Europe/Warsaw': 'PL', 'Europe/Vilnius': 'LT', 'Europe/Riga': 'LV', 'Europe/Tallinn': 'EE', 'Asia/Almaty': 'KZ', 'Asia/Tbilisi': 'GE', 'Asia/Yerevan': 'AM', 'Europe/London': 'GB', 'Europe/Berlin': 'DE', 'Europe/Paris': 'FR', 'Europe/Madrid': 'ES', 'Europe/Rome': 'IT', 'Europe/Istanbul': 'TR', 'Asia/Bangkok': 'TH', 'Asia/Singapore': 'SG', 'Asia/Kolkata': 'IN', 'America/New_York': 'US', 'America/Los_Angeles': 'US', 'America/Chicago': 'US' }; return m[tz] || ''; } catch (e) { return ''; } }
 $('onbPhoto').onchange = async (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; try { ONBOARD.photo = await imageToDataUrl(f, 256, 60000); $('onbAvatar').src = ONBOARD.photo; } catch (err) { setStatus('onbStatus', t('Could not read the image.'), 'warn'); } e.target.value = ''; };
-$('onbSignOut').onclick = async () => { try { await STORE.adapter.signOut(); } catch (e) {} STORE.reload(); };
+$('onbSignOut').onclick = async () => { try { await NATIVE.push.forget(); } catch (e) {} try { await STORE.adapter.signOut(); } catch (e) {} STORE.reload(); };
 $('onbSave').onclick = async () => {
   const first = cleanName($('onbFirst').value), last = cleanName($('onbLast').value), country = $('onbCountry').value, home = $('onbHome').value;
   if (!first) { setStatus('onbStatus', t('Enter your first name.'), 'warn'); $('onbFirst').focus(); return; }
@@ -6696,14 +6868,14 @@ async function renderProfile() {
   $('profSignOut').hidden = !(STORE.hasAuth && STORE.hasIdentity);
   fillCountries($('profCountry'), true); $('profCountry').value = prof.country || '';
   const trs = STORE.getTracks(); fillSelect($('profHome'), [['', '—']].concat(trs.map(x => [x.id, x.name])), prof.homeTrack || '');
-  { const nm = splitName(prof); $('profFirst').value = nm.first; $('profLast').value = nm.last; } fillYears($('profYear'), prof.birthYear); $('profNotify').checked = prof.notify !== false; $('profWeight').value = prof.weightKg || ''; $('profBio').value = prof.bio || ''; $('profIg').value = prof.instagram || ''; $('profContact').value = prof.contact || ''; $('profCoach').checked = !!prof.coach; $('profSws').value = prof.sws || '';
+  { const nm = splitName(prof); $('profFirst').value = nm.first; $('profLast').value = nm.last; } fillYears($('profYear'), prof.birthYear); $('profNotify').checked = prof.notify !== false; $('profPush').checked = prof.push !== false; $('profPushField').hidden = !NATIVE.on; $('profWeight').value = prof.weightKg || ''; $('profBio').value = prof.bio || ''; $('profIg').value = prof.instagram || ''; $('profContact').value = prof.contact || ''; $('profCoach').checked = !!prof.coach; $('profSws').value = prof.sws || '';
   $('profSwsHint').textContent = t('Paste the link to your SWS driver page; it is shown on your public page. “Import SWS results” brings your race history here.');
   $('profSwsImport').onclick = () => SWS.open({});
   { const card = $('profSwsCard'); card.hidden = true; }   // SWS lives inside the session editor for now (less noise on the profile)
   $('profSave').onclick = async () => {
     const first = cleanName($('profFirst').value), last = cleanName($('profLast').value);
     if (!first) { setStatus('profStatus', t('Enter your first name.'), 'warn'); $('profFirst').focus(); return; }
-    const body = { notify: $('profNotify').checked, firstName: first, lastName: last, racingName: [first, last].filter(Boolean).join(' ').slice(0, 40), birthYear: +$('profYear').value || null, weightKg: cleanWeight($('profWeight').value), country: $('profCountry').value, homeTrack: $('profHome').value, avatar: pendingAvatar === undefined ? (prof.avatar || '') : (pendingAvatar || ''), bio: $('profBio').value.trim().slice(0, 160), instagram: $('profIg').value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@').replace(/\/$/, '').slice(0, 80), contact: $('profContact').value.trim().slice(0, 160), coach: $('profCoach').checked, sws: $('profSws').value.trim().slice(0, 200), swsResults: prof.swsResults || null };
+    const body = { notify: $('profNotify').checked, push: $('profPush').checked, firstName: first, lastName: last, racingName: [first, last].filter(Boolean).join(' ').slice(0, 40), birthYear: +$('profYear').value || null, weightKg: cleanWeight($('profWeight').value), country: $('profCountry').value, homeTrack: $('profHome').value, avatar: pendingAvatar === undefined ? (prof.avatar || '') : (pendingAvatar || ''), bio: $('profBio').value.trim().slice(0, 160), instagram: $('profIg').value.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@').replace(/\/$/, '').slice(0, 80), contact: $('profContact').value.trim().slice(0, 160), coach: $('profCoach').checked, sws: $('profSws').value.trim().slice(0, 200), swsResults: prof.swsResults || null };
     const b = $('profSave'); b.classList.add('busy'); setStatus('profStatus', t('Saving…'));
     try {
       await STORE.saveProfile(body);
@@ -6718,7 +6890,7 @@ async function renderProfile() {
   };
   $('profAvatarFile').onchange = async (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; try { pendingAvatar = await imageToDataUrl(f, 256, 60000); $('profAvatar').src = pendingAvatar; setStatus('profStatus', t('Press Save to keep the new photo.')); } catch (err) { setStatus('profStatus', t('Could not read the image.'), 'warn'); } e.target.value = ''; };
   $('profAvatarClear').onclick = () => { pendingAvatar = null; $('profAvatar').src = STORE.me.avatarUrl || GENERIC_AVATAR; setStatus('profStatus', t('Press Save to keep the change.')); };
-  $('profSignOut').onclick = async () => { try { await STORE.adapter.signOut(); } catch (e) {} STORE.reload(); };
+  $('profSignOut').onclick = async () => { try { await NATIVE.push.forget(); } catch (e) {} try { await STORE.adapter.signOut(); } catch (e) {} STORE.reload(); };
   $('profUpload').onclick = () => UPLOAD.open({});
   // community numbers
   const sc = $('profSocialCard'); sc.hidden = !(STORE.hasIdentity && STORE.hasDb && await STORE.socialAvailable());

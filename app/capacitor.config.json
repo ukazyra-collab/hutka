@@ -13,7 +13,7 @@
     ]
   },
   "ios": {
-    "contentInset": "automatic",
+    "contentInset": "never",
     "backgroundColor": "#ffffff",
     "preferredContentMode": "mobile",
     "limitsNavigationsToAppBoundDomains": false
@@ -36,6 +36,13 @@
       "style": "LIGHT",
       "backgroundColor": "#ffffff",
       "overlaysWebView": false
+    },
+    "PushNotifications": {
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "alert"
+      ]
     }
   }
 }

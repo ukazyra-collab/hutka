@@ -105,6 +105,47 @@ Hutka 1.1
 
 Скриншоты для стора (6.9": 1320×2868, 3–6 штук): лента с разбором, Lab с тремя кругами и реплеем, Best vs ideal с breakdown, ИИ-тренер, страница трассы. Снимать на iPhone 16 Pro Max или в симуляторе (⌘S).
 
+## 4c. Версия 1.2 (15 окт 2026) — пуши, хаптик, «стекло», Activity
+
+Что нового в приложении (сайт подхватывает сам, кроме нативной части):
+- **Пуш-уведомления.** На главной у вошедшего гонщика один раз спрашивается «Знать, когда лайкают или комментируют?» → системный диалог → токен устройства уходит в `push_tokens` (push.sql). Лайк или комментарий к твоей сессии → пуш в течение ~20 секунд («Greg Watt liked your session · Ironman heat 2 · 1:15.030»), нажатие открывает обсуждение сессии; число на иконке = непрочитанная активность. Если пуш доставлен — письмо про то же событие не шлётся. Выключить: Profile → «Push notifications in the app» (или настройки телефона).
+- **Activity** — колокольчик в верхней панели с числом непрочитанного (и на сайте тоже): список «кто лайкнул / прокомментировал», нажатие открывает сессию.
+- **Хаптик**: лёгкий отклик на вкладках, поворотах, play реплея; «thump» на лайке; паттерн «успех» после загрузки, публикации, комментария, входа; «ошибка» если не отправилось.
+- **Стекло**: плавающая таб-панель-«таблетка» и верхняя панель из матового стекла (блюр + насыщенность), страница едет под статус-бар (iOS), шторки инспектора/выбора сессии, модалки и тосты — тоже стекло; тёмная тема учтена. Только в приложении (`html.native`), сайт в браузере не меняется.
+- **Поделиться** — системный share sheet с картинкой, текстом и ссылкой (плагин Share), а не только Web Share API.
+- Нативные плагины: `@capacitor/push-notifications`, `@capacitor/haptics`, `@capawesome/capacitor-badge` (число на иконке). iOS: `AppDelegate.swift` передаёт APNs-токен плагину, `App.entitlements` (`aps-environment`), `contentInset: never` + статус-бар поверх страницы (включается из JS только на iOS). Android: `POST_NOTIFICATIONS`, иконка `ic_stat_hutka` (белый силуэт марки), цвет, канал `hutka`.
+- Номера: iOS **1.2 / Build 3**, Android **versionName 1.2 / versionCode 3**.
+
+### Что нужно сделать один раз, чтобы пуши заработали (только это делается руками)
+
+**iOS (после одобрения Apple Developer на Kozyra Media):**
+1. developer.apple.com → Certificates, Identifiers & Profiles → **Identifiers** → App IDs → `ai.hutka.app` → галочка **Push Notifications** → Save. (Если App ID ещё не создан — Xcode создаст его при первой сборке с автоматической подписью; потом включить галочку.)
+2. Там же → **Keys** → «+» → имя `Hutka push`, галочка **Apple Push Notifications service (APNs)** → Continue → Register → **Download** (`AuthKey_XXXXXXXXXX.p8`, скачивается один раз). Запомни **Key ID** (10 символов) и **Team ID** (правый верхний угол Membership).
+3. Supabase → Project Settings → **Edge Functions → Secrets** → добавить:
+   - `APNS_KEY` — содержимое файла `.p8` целиком (вместе со строками `-----BEGIN PRIVATE KEY-----` / `-----END PRIVATE KEY-----`);
+   - `APNS_KEY_ID` — Key ID;
+   - `APNS_TEAM_ID` — Team ID.
+   (`APNS_TOPIC` не нужен — по умолчанию `ai.hutka.app`.) Функция `notify` сама пробует production, а если токен от сборки из Xcode — sandbox.
+4. В Xcode: target App → Signing & Capabilities — capability **Push Notifications** уже прописана через `App.entitlements`; при Archive с автоматической подписью Xcode выставит `aps-environment = production`.
+
+**Android (Firebase, бесплатно):**
+1. https://console.firebase.google.com → **Add project** → имя `Hutka` (Google Analytics можно выключить).
+2. В проекте → **Add app → Android** → package name `ai.hutka.app`, nickname Hutka → Register → **Download google-services.json** → положить файл в `app/android/app/google-services.json` (в репозитории его нет, он остаётся на Mac; gradle подхватывает автоматически).
+3. Project settings (шестерёнка) → **Service accounts** → **Generate new private key** → скачается JSON.
+4. Supabase → Edge Functions → Secrets → `FCM_SERVICE_ACCOUNT` — содержимое этого JSON целиком (одной строкой или как есть).
+
+Пока секретов нет, функция `notify` пуши просто пропускает (письма идут как раньше) — ничего не ломается. Проверка после настройки: в приложении войти, нажать «Turn on», с другого аккаунта лайкнуть свою сессию — пуш приходит в пределах ~20–40 с; в Supabase → Database → `push_tokens` видна строка с токеном.
+
+Текст «What's New» 1.2 (EN):
+
+```
+Hutka 1.2
+• Push notifications: know the moment someone likes or comments on your session — tap to open the discussion.
+• Activity: a bell with everything that happened to your sessions.
+• Haptic feedback and a new glass look: a floating tab bar, frosted panels, dark mode.
+• Share a session through the system share sheet — picture, text and link.
+```
+
 ## 5. Обновления
 
 - **Сайт** (почти всё): просто деплой на GitHub Pages — приложение подхватит само.
@@ -118,4 +159,4 @@ Hutka 1.1
 - `ios/App/App/Info.plist` — URL-схема `hutka`, типы документов `.alf2/.gpx/.vbo/.csv` («Открыть в Hutka»), тексты разрешений на фото/камеру, все ориентации, `ITSAppUsesNonExemptEncryption=false`.
 - `android/app/src/main/AndroidManifest.xml` — intent-filter'ы для `hutka://auth` и файлов; `MainActivity.java` переупаковывает «Поделиться» (ACTION_SEND) в ACTION_VIEW, который Capacitor отдаёт сайту событием `appUrlOpen`.
 - На стороне сайта всё в `NATIVE` (`app_core.js`): `appUrlOpen` → либо `finishSignIn(url)` (токены из `hutka://auth#…` или `?code=` → сессия Supabase), либо чтение файла через плагин Filesystem → `UPLOAD.withFiles`. Вход через Google/Apple в приложении идёт через плагин Browser (`skipBrowserRedirect`).
-- Плагины: `@capacitor/app`, `browser`, `filesystem`, `share`, `splash-screen`, `status-bar`. Сайт вызывает их через мост, который оболочка внедряет в страницу (`Capacitor.nativePromise(plugin, method, options)` и `Capacitor.addListener(plugin, event, cb)`), поэтому JS-рантайм Capacitor в бандл сайта не входит — сайт остаётся обычным сайтом для браузеров.
+- Плагины: `@capacitor/app`, `browser`, `filesystem`, `share`, `splash-screen`, `status-bar`, `push-notifications`, `haptics`, `@capawesome/capacitor-badge`. Сайт вызывает их через мост, который оболочка внедряет в страницу (`Capacitor.nativePromise(plugin, method, options)` и `Capacitor.addListener(plugin, event, cb)`), поэтому JS-рантайм Capacitor в бандл сайта не входит — сайт остаётся обычным сайтом для браузеров.
