@@ -116,6 +116,11 @@ Hutka 1.1
 - Нативные плагины: `@capacitor/push-notifications`, `@capacitor/haptics`, `@capawesome/capacitor-badge` (число на иконке). iOS: `AppDelegate.swift` передаёт APNs-токен плагину, `App.entitlements` (`aps-environment`), `contentInset: never` + статус-бар поверх страницы (включается из JS только на iOS). Android: `POST_NOTIFICATIONS`, иконка `ic_stat_hutka` (белый силуэт марки), цвет, канал `hutka`.
 - Номера: iOS **1.2 / Build 3**, Android **versionName 1.2 / versionCode 3**.
 
+### Вход в приложении
+- Ссылка из письма открывается в Safari и логинит сайт, а не приложение, пока в Supabase → Authentication → URL Configuration → **Redirect URLs** нет `hutka://auth` (тогда Supabase после проверки ссылки возвращает в приложение). Это же нужно для Google / Apple из приложения.
+- Надёжнее ссылки — **код из письма**: с v33.2 письмо Magic Link показывает шестизначный код, в окне входа после «Email me a link» появляется поле для него; вход происходит прямо в приложении. Шаблон `supabase/emails/magic-link.html` надо вставить в Supabase → Authentication → Email Templates → Magic Link (один раз).
+- Google в приложении показывается, когда в `config.js` `googleAuth: true`. Apple — после платного аккаунта (раздел 1.3 выше, `appleAuth: true`); до подачи в App Store Apple обязателен (правило 4.8).
+
 ### Тест на своём iPhone по кабелю без платного аккаунта (бесплатный Apple ID)
 `cd app && sh dev.sh` — переключает проект на bundle id `ai.hutka.dev` и убирает capability Push Notifications (личная команда её не подписывает; а `ai.hutka.app` остаётся свободным для аккаунта Kozyra Media — явные App ID уникальны между командами). Дальше `npx cap open ios` → Team = Personal Team → iPhone по кабелю → Run. Сборка живёт 7 дней. Перед настоящей сборкой: `sh release.sh` (возвращает `ai.hutka.app` и пуши).
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="description" content="Racing AI for karting: upload a session — every braking point, apex and throttle point, compared with the fastest drivers on the same layout. Corner guides for 25 tracks, an AI coach, hot laps.">
 <link rel="canonical" href="https://hutka.ai/">
 <meta property="og:type" content="website">
@@ -142,7 +142,7 @@ p{margin:0}
   .page{padding-inline:16px}
   .userchip .nm,.userchip .sub{display:none}
 }
-.lab-mob{position:sticky;top:56px;z-index:6;display:flex;align-items:center;gap:8px;padding:8px 10px;margin:0 -12px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.lab-mob{position:sticky;top:var(--topH,56px);z-index:6;display:flex;align-items:center;gap:8px;padding:8px 10px;margin:0 -12px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .lab-mob .lm-t{flex:1;min-width:0;display:flex;flex-direction:column}
 .lab-mob .lm-t .lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lab-mob .lm-t b{font:600 22px/1.1 var(--mono);letter-spacing:-.02em}
@@ -765,6 +765,7 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .brand.mobile{display:flex}
   .mobile-only{display:flex!important}
   .top{padding:8px 12px;gap:10px;top:0}
+  .modal input[type=text],.modal input[type=email],.modal input[type=password],.modal input[type=url],.modal input[type=number],.modal textarea{font-size:16px}
   .top .search{height:40px;border-radius:12px;padding:0 12px}
   .top .search input[type=text]{font-size:16px}
   .userchip{padding:2px}
@@ -1491,7 +1492,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="seCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="seSave" type="button" data-t="Save">Save</button></div>
 </div></div>
 <!-- sign-in modal (standalone hosting) -->
-<div class="modal" id="authModal" hidden><div class="box" style="width:min(440px,100%)"><h3 data-t="Sign in to Hutka">Sign in to Hutka</h3><p class="hint" data-t="A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.">A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.</p><div class="field"><label>Email</label><input type="text" id="authEmail" placeholder="you@example.com" autocomplete="email"></div><div class="field" id="authPassField" hidden><label data-t="Password">Password</label><input type="password" id="authPass" autocomplete="current-password"></div><div class="row"><button class="btn primary" id="authEmailBtn" type="button" data-t="Email me a link">Email me a link</button><button class="btn primary" id="authPassBtn" type="button" hidden data-t="Sign in">Sign in</button><button class="btn" id="authAppleBtn" type="button" hidden> Apple</button><button class="btn" id="authGoogleBtn" type="button" hidden>Google</button><button class="btn ghost" id="authCancel" type="button" data-t="Cancel">Cancel</button></div><div class="row"><button class="btn xs ghost" id="authPassToggle" type="button" data-t="I have a password">I have a password</button></div><div class="status" id="authStatus"></div></div></div>
+<div class="modal" id="authModal" hidden><div class="box" style="width:min(440px,100%)"><h3 data-t="Sign in to Hutka">Sign in to Hutka</h3><p class="hint" data-t="A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.">A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.</p><div class="field"><label>Email</label><input type="text" id="authEmail" placeholder="you@example.com" autocomplete="email"></div><div class="field" id="authPassField" hidden><label data-t="Password">Password</label><input type="password" id="authPass" autocomplete="current-password"></div><div class="field" id="authCodeField" hidden><label data-t="Code from the e-mail">Code from the e-mail</label><input type="text" id="authCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456"></div><div class="row"><button class="btn primary" id="authEmailBtn" type="button" data-t="Email me a link">Email me a link</button><button class="btn primary" id="authCodeBtn" type="button" hidden data-t="Confirm code">Confirm code</button><button class="btn primary" id="authPassBtn" type="button" hidden data-t="Sign in">Sign in</button><button class="btn" id="authAppleBtn" type="button" hidden> Apple</button><button class="btn" id="authGoogleBtn" type="button" hidden>Google</button><button class="btn ghost" id="authCancel" type="button" data-t="Cancel">Cancel</button></div><div class="row"><button class="btn xs ghost" id="authPassToggle" type="button" data-t="I have a password">I have a password</button></div><div class="status" id="authStatus"></div></div></div>
 <div class="modal" id="onbModal" hidden><div class="box onb" style="width:min(560px,100%)">
   <div class="onb-head"><div><h3 data-t="Welcome to Hutka">Welcome to Hutka</h3><p class="hint" data-t="Set up your driver profile — other drivers see it next to your laps. One minute, and you can change it later in Profile.">Set up your driver profile — other drivers see it next to your laps. One minute, and you can change it later in Profile.</p></div></div>
   <div class="onb-photo"><img class="avatar" id="onbAvatar" alt="" style="width:84px;height:84px"><div><label class="btn sm filebtn"><span data-t="Add photo">Add photo</span><input type="file" id="onbPhoto" accept="image/*"></label><div class="hint" style="margin-top:6px" data-t="Optional, but a face next to a lap time looks a lot better than a grey circle.">Optional, but a face next to a lap time looks a lot better than a grey circle.</div></div></div>
@@ -3272,6 +3273,10 @@ Object.assign(I18N.RU, { 'Know when someone likes or comments': 'Узнавай,
   'Activity is not available yet.': 'Активность пока недоступна.', 'Nothing yet — publish a session and share it: likes and comments land here.': 'Пока пусто — опубликуй сессию и поделись ей: лайки и комментарии появятся здесь.',
   'commented on': 'прокомментировал(а)', 'liked': 'лайкнул(а)', 'A driver': 'Гонщик', 'your session': 'твою сессию', '{n} d ago': '{n} дн назад', 'Activity on Hutka': 'Активность на Hutka',
   'Push notifications in the app (likes and comments)': 'Пуш-уведомления в приложении (лайки и комментарии)' });
+// v33.2 — the sign-in code
+Object.assign(I18N.RU, { 'Code from the e-mail': 'Код из письма', 'Confirm code': 'Подтвердить код', 'Check your inbox: type the 6-digit code from the e-mail here (or tap the link in it).': 'Проверь почту: введи сюда шестизначный код из письма (или нажми ссылку в нём).',
+  'Check your inbox: open the link in the email, or type the 6-digit code from it here.': 'Проверь почту: открой ссылку из письма или введи сюда шестизначный код из него.', 'Enter the 6-digit code from the e-mail.': 'Введи шестизначный код из письма.',
+  'That code did not work — check the digits, or ask for a new e-mail.': 'Код не подошёл — проверь цифры или запроси новое письмо.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3622,6 +3627,7 @@ const STORE = (() => {
       signInGoogle: async () => { if (window.NATIVE && window.NATIVE.on) { const r = must(await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.NATIVE.redirect, skipBrowserRedirect: true } })); if (r && r.url) await window.NATIVE.openUrl(r.url); return r; } return must(await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } })); },
       signInApple: async () => { const native = window.NATIVE && window.NATIVE.on; const r = must(await sb.auth.signInWithOAuth({ provider: 'apple', options: native ? { redirectTo: window.NATIVE.redirect, skipBrowserRedirect: true } : { redirectTo: location.origin + location.pathname } })); if (native && r && r.url) await window.NATIVE.openUrl(r.url); return r; },
       signInPassword: async (email, password) => must(await sb.auth.signInWithPassword({ email, password })),
+      verifyEmailCode: async (email, code) => must(await sb.auth.verifyOtp({ email, token: code, type: 'email' })),   // the 6-digit code from the magic-link e-mail ({{ .Token }} in the template)
       finishSignIn: async (url) => { const u = new URL(String(url).replace(/^hutka:\/\//i, 'https://hutka.app/')); const code = u.searchParams.get('code'); if (code) { must(await sb.auth.exchangeCodeForSession(code)); return true; } const h = new URLSearchParams((u.hash || '').replace(/^#/, '')); const at = h.get('access_token'), rt = h.get('refresh_token'); if (at && rt) { must(await sb.auth.setSession({ access_token: at, refresh_token: rt })); return true; } const err = h.get('error_description') || u.searchParams.get('error_description'); if (err) throw new Error(err); return false; },
       signOut: async () => { await sb.auth.signOut(); },
       token: () => session && session.access_token || ''
@@ -4541,6 +4547,7 @@ const NATIVE = window.NATIVE = {
     if (!this.on) return; const dark = this.dark();
     try { if (this.platform === 'ios') await this.call('StatusBar', 'setOverlaysWebView', { overlay: true }); else { await this.call('StatusBar', 'setOverlaysWebView', { overlay: false }); await this.call('StatusBar', 'setBackgroundColor', { color: dark ? '#0f1420' : '#f5f6f8' }); } } catch (e) {}
     try { await this.call('StatusBar', 'setStyle', { style: dark ? 'DARK' : 'LIGHT' }); } catch (e) {}
+    setTimeout(() => dispatchEvent(new Event('resize')), 250);
   },
   async badge(n) { if (!this.on) return; try { if (n > 0) await this.call('Badge', 'set', { count: n }); else await this.call('Badge', 'clear'); } catch (e) {} },
   // the system share sheet with the picture, the text and the link (the web share API is the fallback, see SHARE.go)
@@ -4594,6 +4601,9 @@ const NATIVE = window.NATIVE = {
   }
 };
 if (NATIVE.on || /[?&]app=1\b/.test(location.search)) document.documentElement.classList.add('native');   // the app shell's look (the glass bars) from the first paint; hutka.ai/?app=1 previews it in a browser
+// inside the app the page scale is pinned: WKWebView otherwise zooms in when a field gets focus and re-scales on rotation, after which
+// sticky bars and sliders drift (the map has its own pinch zoom)
+if (NATIVE.on) { const vp = document.querySelector('meta[name=viewport]'); if (vp) vp.setAttribute('content', 'width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,shrink-to-fit=no'); }
 // the Activity list: what happened to my sessions (push.sql hutka_activity) — the bell in the top bar carries the unread count, the page lists it
 const ACTIVITY = {
   unread: 0, at: 0,
@@ -4629,15 +4639,17 @@ async function renderActivity() { await ACTIVITY.render(); }
 // (App Store rule 4.8: an app that offers Google must offer Sign in with Apple). A password sign-in is there for accounts created with one
 // (the App Store review account, for instance) — it stays folded away behind "I have a password".
 const AUTH = {
-  open() { const cfg = window.HUTKA_CONFIG || {}, apple = !!cfg.appleAuth, google = !!cfg.googleAuth && (!NATIVE.on || apple); $('authStatus').textContent = ''; $('authEmail').value = ''; $('authPass').value = ''; $('authGoogleBtn').hidden = !google; $('authAppleBtn').hidden = !apple; AUTH.pass(false); $('authModal').hidden = false; $('authEmail').focus(); },
+  open() { const cfg = window.HUTKA_CONFIG || {}, apple = !!cfg.appleAuth, google = !!cfg.googleAuth; $('authStatus').textContent = ''; $('authEmail').value = ''; $('authPass').value = ''; $('authCode').value = ''; $('authCodeField').hidden = true; $('authCodeBtn').hidden = true; $('authGoogleBtn').hidden = !google; $('authAppleBtn').hidden = !apple; $('authEmailBtn').disabled = false; AUTH.pass(false); $('authModal').hidden = false; if (!NATIVE.on) $('authEmail').focus(); },
   pass(on) { $('authPassField').hidden = !on; $('authPassBtn').hidden = !on; $('authEmailBtn').hidden = !!on; $('authPassToggle').textContent = on ? t('Email me a link instead') : t('I have a password'); if (on) $('authPass').focus(); },
   close() { $('authModal').hidden = true; }
 };
 $('btnSignIn').onclick = AUTH.open; $('authCancel').onclick = AUTH.close; $('authModal').addEventListener('click', (e) => { if (e.target === $('authModal')) AUTH.close(); });
-$('authEmailBtn').onclick = async () => { const email = $('authEmail').value.trim(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setStatus('authStatus', t('Enter a valid email.'), 'warn'); return; } $('authEmailBtn').disabled = true; try { await STORE.adapter.signInEmail(email); setStatus('authStatus', t('Check your inbox: open the link in the email and you are in.'), 'ok'); } catch (e) { setStatus('authStatus', t('Could not send the link: {e}', { e: e && e.message || e }), 'warn'); } $('authEmailBtn').disabled = false; };
+$('authEmailBtn').onclick = async () => { const email = $('authEmail').value.trim(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setStatus('authStatus', t('Enter a valid email.'), 'warn'); return; } $('authEmailBtn').disabled = true; try { await STORE.adapter.signInEmail(email); setStatus('authStatus', NATIVE.on ? t('Check your inbox: type the 6-digit code from the e-mail here (or tap the link in it).') : t('Check your inbox: open the link in the email, or type the 6-digit code from it here.'), 'ok'); $('authCodeField').hidden = false; $('authCodeBtn').hidden = false; $('authEmailBtn').hidden = true; $('authCode').focus(); } catch (e) { setStatus('authStatus', t('Could not send the link: {e}', { e: e && e.message || e }), 'warn'); } $('authEmailBtn').disabled = false; };
 $('authGoogleBtn').onclick = async () => { try { await STORE.adapter.signInGoogle(); } catch (e) { setStatus('authStatus', t('Could not start Google sign-in: {e}', { e: e && e.message || e }), 'warn'); } };
 $('authAppleBtn').onclick = async () => { try { await STORE.adapter.signInApple(); } catch (e) { setStatus('authStatus', t('Could not start Apple sign-in: {e}', { e: e && e.message || e }), 'warn'); } };
 $('authPassToggle').onclick = () => AUTH.pass($('authPassField').hidden);
+$('authCodeBtn').onclick = async () => { const email = $('authEmail').value.trim(), code = $('authCode').value.replace(/\D/g, ''); if (code.length < 6) { setStatus('authStatus', t('Enter the 6-digit code from the e-mail.'), 'warn'); return; } $('authCodeBtn').disabled = true; try { await STORE.adapter.verifyEmailCode(email, code); AUTH.close(); NATIVE.haptic('success'); toast(t('Signed in.')); } catch (e) { NATIVE.haptic('error'); setStatus('authStatus', t('That code did not work — check the digits, or ask for a new e-mail.'), 'warn'); } $('authCodeBtn').disabled = false; };
+$('authCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authCodeBtn').click(); });
 $('authPassBtn').onclick = async () => { const email = $('authEmail').value.trim(), pass = $('authPass').value; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !pass) { setStatus('authStatus', t('Enter the email and the password.'), 'warn'); return; } $('authPassBtn').disabled = true; try { await STORE.adapter.signInPassword(email, pass); AUTH.close(); } catch (e) { setStatus('authStatus', t('Could not sign in: {e}', { e: e && e.message || e }), 'warn'); } $('authPassBtn').disabled = false; };
 $('authPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authPassBtn').click(); });
 $('authEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authEmailBtn').click(); });
@@ -4666,7 +4678,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v33.1';
+const APP_VERSION = 'v33.2';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();

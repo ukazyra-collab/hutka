@@ -11,4 +11,4 @@
 | Change Email Address | `email-change.html` | `Confirm your new email for Hutka` |
 | Reset Password | `recovery.html` | `Reset your Hutka password` |
 
-Переменные `{{ .ConfirmationURL }}` и `{{ .Email }}` подставляет Supabase. Лимит писем: Authentication → Rate Limits → emails sent — 100 в час (с своим SMTP).
+Переменные `{{ .ConfirmationURL }}`, `{{ .Email }}` и `{{ .Token }}` (шестизначный код входа — тот же токен, что в ссылке; с v33.2 письмо Magic Link показывает его для приложения) подставляет Supabase. После правки `magic-link.html` шаблон нужно вставить в Supabase заново (Authentication → Email Templates → Magic Link → Body). Лимит писем: Authentication → Rate Limits → emails sent — 100 в час (с своим SMTP).
