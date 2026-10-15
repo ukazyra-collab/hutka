@@ -1,0 +1,20 @@
+# Supabase CLI / GitHub-integration project config: the edge functions are deployed from supabase/functions on every push to main.
+# Every function checks the user's token itself, so the gateway's JWT check stays off (new signing keys would otherwise reject calls).
+project_id = "tqixfqrludqpxqxypiia"
+
+[functions.ask]
+verify_jwt = false
+[functions.wallet]
+verify_jwt = false
+[functions.report]
+verify_jwt = false
+[functions.share-page]
+verify_jwt = false
+[functions.notify]
+verify_jwt = false
+[functions.stripe-checkout]
+verify_jwt = false
+[functions.stripe-portal]
+verify_jwt = false
+[functions.stripe-webhook]
+verify_jwt = false
