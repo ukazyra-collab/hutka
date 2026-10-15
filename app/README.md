@@ -115,6 +115,7 @@ Hutka 1.1
 - **Поделиться** — системный share sheet с картинкой, текстом и ссылкой (плагин Share), а не только Web Share API.
 - Нативные плагины: `@capacitor/push-notifications`, `@capacitor/haptics`, `@capawesome/capacitor-badge` (число на иконке). iOS: `AppDelegate.swift` передаёт APNs-токен плагину, `App.entitlements` (`aps-environment`), `contentInset: never` + статус-бар поверх страницы (включается из JS только на iOS). Android: `POST_NOTIFICATIONS`, иконка `ic_stat_hutka` (белый силуэт марки), цвет, канал `hutka`.
 - Номера: iOS **1.2 / Build 3**, Android **versionName 1.2 / versionCode 3**.
+- Правки после первого теста на iPhone (15 окт, вечер): статус-бар поверх страницы с первого кадра (`StatusBar.overlaysWebView: true` в конфиге), без «резинки» на концах страницы (`SceneDelegate`: `webView.scrollView.bounces = false` — иначе верхняя панель и таб-панель уезжают вместе с отскоком), страница в приложении сама перезагружается, когда на сайте вышла новая версия (`version.txt`, проверка при возврате в приложение — GitHub Pages кэширует `index.html` на 10 минут). Сайт: масштаб приколочен, модалки/тосты поверх кокпита (были под ним — «кнопки не работают в фуллскрине»).
 
 ### Вход в приложении
 - Ссылка из письма открывается в Safari и логинит сайт, а не приложение, пока в Supabase → Authentication → URL Configuration → **Redirect URLs** нет `hutka://auth` (тогда Supabase после проверки ссылки возвращает в приложение). Это же нужно для Google / Apple из приложения.

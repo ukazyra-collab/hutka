@@ -8,10 +8,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = CAPBridgeViewController()
+        let bridgeVC = CAPBridgeViewController()
+        window?.rootViewController = bridgeVC
         window?.makeKeyAndVisible()
+        // no rubber band at the ends of the page: the site's own top bar and tab bar stay put instead of riding with the bounce
+        bridgeVC.loadViewIfNeeded()
+        bridgeVC.webView?.scrollView.bounces = false
 
         SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)
+    }
+
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        (window?.rootViewController as? CAPBridgeViewController)?.webView?.scrollView.bounces = false
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
