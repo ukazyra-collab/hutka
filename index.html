@@ -437,6 +437,7 @@ body.onboarding #toast{z-index:50}
 .readout{position:absolute;left:10px;bottom:10px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:12px/1.5 var(--mono);pointer-events:none;backdrop-filter:blur(4px);white-space:nowrap}
 .readout .k{color:var(--muted)}
 .mapnote{position:absolute;right:10px;bottom:10px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--muted);pointer-events:none;max-width:70%}
+#xferList{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto;margin:-4px 0 6px}#xferList button{text-align:left;justify-content:flex-start}#xferList button.on{outline:2px solid var(--accent)}
 .legend{display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding:7px 12px;font-size:12px;color:var(--muted);background:var(--surface)}
 .legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:5px;border:2px solid #fff;box-sizing:border-box;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
 .legend i{display:inline-block;width:14px;height:4px;border-radius:2px;vertical-align:middle;margin-right:5px}
@@ -1135,7 +1136,7 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
     <!-- ========== LAYOUT ========== -->
     <!-- ========== LAB ========== -->
     <section class="page" id="pg-lab" hidden>
-      <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnShare" type="button" hidden><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="btnModerate" type="button" hidden></button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
+      <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnShare" type="button" hidden><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="btnModerate" type="button" hidden></button><button class="btn" id="btnTransfer" type="button" hidden data-t="Transfer to…">Transfer to…</button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
       <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div><button class="btn primary sm" id="labSignIn" style="margin-left:auto;flex:none" hidden data-t="Sign in">Sign in</button></div>
       <div id="labStart" hidden>
         <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="labMineSub"></span></h2><div id="labMine"></div><div class="hint" id="labMineHint"></div></div>
@@ -1447,6 +1448,16 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
   <div class="hint onb-foot"><span id="onbWho"></span> <button class="btn xs ghost" id="onbSignOut" type="button" data-t="Sign out">Sign out</button></div>
 </div></div>
 <!-- confirm modal -->
+<div class="modal" id="xferModal" hidden><div class="box" style="width:min(520px,100%)">
+  <h3 data-t="Transfer this session to another driver">Transfer this session to another driver</h3>
+  <p class="hint" data-t="For a session uploaded on someone's behalf, with their consent: it moves to their library and the feed shows it as theirs; likes and comments stay. The link preview is rebuilt when they open the Lab.">For a session uploaded on someone's behalf, with their consent: it moves to their library and the feed shows it as theirs; likes and comments stay. The link preview is rebuilt when they open the Lab.</p>
+  <div class="field"><label data-t="Driver (search by name)">Driver (search by name)</label><input type="text" id="xferQ" autocomplete="off" placeholder="Greg…"></div>
+  <div class="list" id="xferList"></div>
+  <div class="hint" id="xferPicked"></div>
+  <div class="row"><div class="field"><label data-t="First name (optional: set their name)">First name (optional: set their name)</label><input type="text" id="xferFirst" maxlength="40"></div><div class="field"><label data-t="Last name">Last name</label><input type="text" id="xferLast" maxlength="40"></div></div>
+  <div class="status" id="xferStatus"></div>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="xferCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="xferGo" type="button" disabled data-t="Transfer">Transfer</button></div>
+</div></div>
 <div class="modal" id="cfModal" hidden><div class="box" style="width:min(440px,100%)"><h3 id="cfTitle"></h3><p class="hint" id="cfText"></p><div class="row" style="justify-content:flex-end"><button class="btn" id="cfNo" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="cfYes" type="button"></button></div></div></div>
 <button class="bugbtn" id="bugBtn" type="button" title="Report a problem" aria-label="Report a problem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l1.9 1.9M16 2l-1.9 1.9M9 7h6a3 3 0 0 1 3 3v5a6 6 0 0 1-12 0v-5a3 3 0 0 1 3-3zM3 13h3M18 13h3M4 20l3-2M20 20l-3-2M12 10v10"/></svg></button>
 <div class="modal" id="shareModal" hidden><div class="box" style="width:min(520px,100%)">
@@ -3193,6 +3204,7 @@ Object.assign(I18N.RU, {
 Object.assign(I18N.RU, { "Alfano .alf2 (the reference) or an Alfano 6 export (.zip, with revs and temperatures on sport karts), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.": 'Alfano .alf2 (эталон) или экспорт Alfano 6 (.zip, с оборотами и температурой на спортивном карте), AiM, RaceChrono, TrackAddict, Harry\'s LapTimer, VBOX, GPX — один файл на сессию; можно несколько сразу.' });
 Object.assign(I18N.RU, { 'Third lap (optional) · session': 'Третий круг (необязательно) · сессия', 'Third lap · lap': 'Третий круг · круг', 'Pick the session of the third lap.': 'Выбери сессию третьего круга.', 'fastest here': 'быстрее всех здесь' });
 Object.assign(I18N.RU, { 'Revs and two gear ratios in the file — looks like a Rotax DD2 (change the kart if not)': 'В файле обороты и две передачи — похоже на Rotax DD2 (если нет — поменяй карт)', 'Revs and {n} gear ratios in the file — a shifter kart; KZ2 is preselected, change it if not': 'В файле обороты и {n} передач — карт с коробкой; выбран KZ2, если нет — поменяй', 'Revs in the file (up to {r} rpm) — a sport kart; pick its class below': 'В файле обороты (до {r} об/мин) — спортивный карт; выбери класс ниже' });
+Object.assign(I18N.RU, { 'Transfer to…': 'Передать…', 'Transfer this session to another driver': 'Передать сессию другому гонщику', "For a session uploaded on someone's behalf, with their consent: it moves to their library and the feed shows it as theirs; likes and comments stay. The link preview is rebuilt when they open the Lab.": 'Для сессии, залитой за другого человека с его согласия: она переходит в его библиотеку, в ленте показывается как его; лайки и комментарии остаются. Превью ссылки перестроится, когда он откроет Lab.', 'Driver (search by name)': 'Гонщик (поиск по имени)', 'First name (optional: set their name)': 'Имя (по желанию: задать ему имя)', 'Last name': 'Фамилия', 'Transfer': 'Передать', 'Transfer to {name}?': 'Передать {name}?', "The session leaves your library and appears in the feed as theirs. Only do this with the driver's consent.": 'Сессия уйдёт из твоей библиотеки и будет показываться в ленте как его. Только с согласия гонщика.', 'Transferred to {name}.': 'Передано: {name}.', 'Run supabase/transfer.sql in the SQL editor once — then admins can transfer sessions.': 'Один раз выполни supabase/transfer.sql в SQL editor — тогда админы смогут передавать сессии.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3509,6 +3521,8 @@ const STORE = (() => {
       async setCard(sid, card) { return must(await sb.rpc('hutka_set_card', { sid, card })) === true; },
       async setShare(sid, share) { return must(await sb.rpc('hutka_set_share', { sid, share })) === true; },
       async setPublished(sid, pub) { return must(await sb.rpc('hutka_set_published', { sid, pub })) === true; },
+      async transferSession(sid, uid) { return must(await sb.rpc('hutka_transfer_session', { sid, new_owner: uid })) === true; },
+      async setDriverName(uid, first, last) { return must(await sb.rpc('hutka_set_driver_name', { uid, first, last })) === true; },
       async moderated() { return must(await sb.rpc('hutka_moderated')) || []; },
       addClaim: async (body) => must(await sb.from('claims').insert({ track_id: body.track, by: body.by, text: body.text || '' })),
       async listClaims() { return must(await sb.from('claims').select('*').order('created_at', { ascending: false })).map(r => ({ id: String(r.id), track: r.track_id, by: r.by, text: r.text, createdAt: new Date(r.created_at).getTime() })); },
@@ -3645,6 +3659,15 @@ const STORE = (() => {
     const ok = await adapter.setPublished(sid, pub); if (ok) { const c = sessCache.get(sid); if (c) { c.published = pub; if (pub) delete c.moderated; else c.moderated = true; } notify('sessions'); } return ok;
   }
   async function moderatedList() { if (!adapter || !adapter.moderated || !me.canEdit) return []; return adapter.moderated(); }
+  // admins: a session uploaded on someone's behalf goes to that driver (transfer.sql); the driver's name can be set too
+  async function transferSession(sid, uid) {
+    if (!adapter || !adapter.transferSession || !me.canEdit) { const e = new Error('admins only'); e.code = 'not_admin'; throw e; }
+    const ok = await adapter.transferSession(sid, uid); if (ok) { const c = sessCache.get(sid); if (c) { c.owner = uid; delete c.share; } sessForCache.clear(); notify('sessions'); } return ok;
+  }
+  async function setDriverName(uid, first, last) {
+    if (!adapter || !adapter.setDriverName || !me.canEdit) { const e = new Error('admins only'); e.code = 'not_admin'; throw e; }
+    const ok = await adapter.setDriverName(uid, first, last); if (ok) { profiles.delete(uid); allProfilesCache = null; } return ok;
+  }
   // drop loaded session data that nothing on the page holds (after background work): the next open fetches it again
   function trimSessions(keep) { const k = new Set(keep || []); for (const id of [...sessCache.keys()]) if (!k.has(id)) sessCache.delete(id); }
   async function deleteSession(meta) { if (adapter && meta.owner !== 'local') await adapter.deleteSession(meta.id, meta.chunks); else await LDB.del('sessions', meta.id); sessCache.delete(meta.id); notify('sessions'); }
@@ -3769,7 +3792,7 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits,
+    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
@@ -4451,7 +4474,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v32.2';
+const APP_VERSION = 'v32.3';
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -5301,6 +5324,25 @@ function labEnsureMap() {
   $('qcLap').onclick = () => { const s = LAB.current; if (!s) return; LAB.breakOpen = false; const ref = findLap(LAB.ref); const L = ref && ref.sess === s ? ref.L : null; const nx = s.laps.filter(x => x.px && x !== L).sort((a, b) => (b.clean - a.clean) || a.timeMs - b.timeMs)[0]; if (!nx) { toast(t('No other lap in this session.')); return; } LAB.cmp = lapKey(s, nx); LAB.pickerOpen = false; LAB.chat = []; labRender(); };
   $('qcOther').onclick = () => { LAB.breakOpen = false; LAB.pickerFor = ''; LAB.pickerOpen = !LAB.pickerOpen; renderCmpPicker(); };
   $('btnModerate').onclick = async () => { const s = LAB.current; if (!s || !STORE.isAdmin()) return; const on = !s.published; if (!on && !(await confirmDlg(t('Hide this session from the public?'), t('It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again here.'), t('Hide')))) return; const b = $('btnModerate'); b.classList.add('busy'); try { await STORE.setPublishedAdmin(s.id, on); s.published = on; if (on) delete s.moderated; else s.moderated = true; labRender(); toast(on ? t('Shown again.') : t('Hidden from the public.')); sharePageSync(s).catch(() => {}); } catch (e) { toast(/hutka_set_published|PGRST202|42883/.test(String(e && e.message || e)) ? t('Run supabase/moderate.sql in the SQL editor once — then admins can hide sessions.') : t('Could not save: {e}', { e: e && e.message || e })); } b.classList.remove('busy'); };
+  // admins: hand the session to the driver it belongs to (uploaded on their behalf), optionally setting their name
+  { let picked = null, seq = 0;
+    const render = (list) => { const box = $('xferList'); box.innerHTML = ''; for (const d of list) { const b = el('button', 'btn sm' + (picked && picked.id === d.id ? ' on' : ''), d.name + (d.country ? ' · ' + d.country : '')); b.type = 'button'; b.onclick = async () => { picked = d; render(list); $('xferPicked').textContent = '→ ' + d.name; $('xferGo').disabled = false; const pr = await STORE.profile(d.id).catch(() => null); $('xferFirst').value = (pr && pr.firstName) || ''; $('xferLast').value = (pr && pr.lastName) || ''; }; box.appendChild(b); } };
+    $('btnTransfer').onclick = () => { const s = LAB.current; if (!s || !STORE.isAdmin()) return; picked = null; $('xferQ').value = ''; $('xferList').innerHTML = ''; $('xferPicked').textContent = ''; $('xferFirst').value = ''; $('xferLast').value = ''; $('xferGo').disabled = true; setStatus('xferStatus', ''); $('xferModal').hidden = false; $('xferQ').focus(); };
+    $('xferQ').addEventListener('input', async () => { const q = $('xferQ').value.trim(), my = ++seq; if (q.length < 2) { render([]); return; } const list = await STORE.searchDrivers(q); if (my !== seq) return; render(list.filter(d => d.id !== (LAB.current && LAB.current.owner))); });
+    $('xferCancel').onclick = () => { $('xferModal').hidden = true; }; $('xferModal').addEventListener('click', (e) => { if (e.target === $('xferModal')) $('xferModal').hidden = true; });
+    $('xferGo').onclick = async () => {
+      const s = LAB.current; if (!s || !picked) return;
+      if (!(await confirmDlg(t('Transfer to {name}?', { name: picked.name }), t('The session leaves your library and appears in the feed as theirs. Only do this with the driver\'s consent.'), t('Transfer')))) return;
+      const b = $('xferGo'); b.classList.add('busy'); setStatus('xferStatus', t('Saving…'));
+      try {
+        const first = $('xferFirst').value.trim(), last = $('xferLast').value.trim();
+        if (first) await STORE.setDriverName(picked.id, first, last);
+        await STORE.transferSession(s.id, picked.id); s.owner = picked.id; delete s.share;
+        $('xferModal').hidden = true; toast(t('Transferred to {name}.', { name: first ? `${first} ${last}`.trim() : picked.name }));
+        LAB.names = await STORE.names(LAB.sessions.map(x => x.owner)); labRender(); sharePageSync(s).catch(() => {});
+      } catch (e) { setStatus('xferStatus', /hutka_transfer_session|hutka_set_driver_name|PGRST202|42883/.test(String(e && e.message || e)) ? t('Run supabase/transfer.sql in the SQL editor once — then admins can transfer sessions.') : t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
+      b.classList.remove('busy');
+    }; }
   $('lapYou').onclick = () => { LAB.mapLap = 'you'; labRender(); }; $('lapCmp').onclick = () => { LAB.mapLap = 'cmp'; labRender(); }; $('lapThird').onclick = () => { LAB.mapLap = 'third'; labRender(); };
   $('cmp2Sel').addEventListener('change', () => { LAB.cmp2 = $('cmp2Sel').value; if (LAB.cmp2 === 'none' && LAB.mapLap === 'third') LAB.mapLap = 'you'; labRender(); });
   // the third lap's session: none, a loaded session (its best lap, or the next one when that is already on the screen), or the picker
@@ -5454,6 +5496,7 @@ function labRender() {
   const pb = $('btnPublish'); pb.hidden = !(STORE.canWrite() && mySession(sess) && sess.owner !== 'local'); $('btnShare').hidden = false;
   if (!pb.hidden) { pb.textContent = sess.published ? t('Unpublish') : t('Publish to track page'); pb.classList.toggle('active', !!sess.published); pb.disabled = !sess.track; pb.title = sess.track ? '' : t('Assign a track first (Edit).');
     if (sess.moderated && !sess.published && !STORE.isAdmin()) { pb.disabled = true; pb.textContent = t('Hidden by admins'); pb.title = t('The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine, or ask them.'); } }
+  $('btnTransfer').hidden = !(STORE.isAdmin() && STORE.hasDb && sess.owner !== 'local');
   { const mod = $('btnModerate'); mod.hidden = !(STORE.isAdmin() && STORE.hasDb && !mySession(sess) && sess.owner !== 'local'); if (!mod.hidden) { mod.textContent = sess.published ? t('Hide from public') : (sess.moderated ? t('Show again') : t('Unpublished by owner')); mod.disabled = !sess.published && !sess.moderated; mod.classList.toggle('active', !!sess.moderated); mod.title = t('Admins: hide a broken or wrongly placed session from the feed and the track page — its owner keeps it.'); } }
   $('btnEditSess').hidden = !mySession(sess);
   STORE.socialAvailable().then(on => { if (LAB.current !== sess) return; $('voteBox').hidden = !(on && STORE.hasDb && sess.owner !== 'local'); if ($('voteBox').hidden) $('lowRated').hidden = true; $('discussPanel').hidden = !on; if (on) { renderSocialBits(); renderDiscussion(); } renderOwnerRow(); });
