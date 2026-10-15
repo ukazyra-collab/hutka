@@ -3279,6 +3279,10 @@ Object.assign(I18N.RU, { 'Know when someone likes or comments': 'Узнавай,
 Object.assign(I18N.RU, { 'Code from the e-mail': 'Код из письма', 'Confirm code': 'Подтвердить код', 'Check your inbox: type the 6-digit code from the e-mail here (or tap the link in it).': 'Проверь почту: введи сюда шестизначный код из письма (или нажми ссылку в нём).',
   'Check your inbox: open the link in the email, or type the 6-digit code from it here.': 'Проверь почту: открой ссылку из письма или введи сюда шестизначный код из него.', 'Enter the 6-digit code from the e-mail.': 'Введи шестизначный код из письма.',
   'That code did not work — check the digits, or ask for a new e-mail.': 'Код не подошёл — проверь цифры или запроси новое письмо.' });
+// v33.4 — the help page: the app in the share sheet
+Object.assign(I18N.RU, { 'With the Hutka app:': 'С приложением Hutka:', 'tap Hutka in the row of apps — the session opens in the upload window straight away, steps 4–5 are not needed.': 'нажми Hutka в ряду приложений — сессия сразу откроется в окне загрузки, шаги 4–5 не нужны.',
+  'Hutka at the front of that row, once and for all: iPhone — scroll the app row to the end → More → Edit → “+” next to Hutka (Favourites), then drag it to the top; Android — hold Hutka in the share sheet → Pin.': 'Чтобы Hutka всегда была первой в этом ряду: iPhone — пролистай ряд приложений до конца → «Ещё» → «Править» → «+» у Hutka (Избранное), потом перетащи её наверх; Android — удержи Hutka в меню «Поделиться» → «Закрепить».',
+  'Without the app:': 'Без приложения:' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4676,7 +4680,7 @@ function renderHelpPage() {
   const a = card(t('Alfano 7 — the ADA app on your phone'), t('The app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.'));
   a.appendChild(step(1, t('Open the ADA app and go to Sessions'), esc(t('In the list “Select your sessions”, tap the session you want — the row lights up. One session = one file.')), 'ada-sessions.jpg'));
   a.appendChild(step(2, t('Tap the paper plane'), esc(t('The paper-plane icon in the bottom row (2 on the picture) — that is “send the session out of the app”. The phone’s share sheet opens. (The box-with-arrow icon on the far right is import — not that one.)'))));
-  a.appendChild(step(3, t('Save the file on the phone'), `<b>iPhone:</b> ${esc(t('tap “Save to Files”, choose a folder (Downloads is fine), tap Save.'))}<br><b>Android:</b> ${esc(t('choose “Save” / “Downloads”.'))}<br><span class="hint">${esc(t('The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.'))}</span>`));
+  a.appendChild(step(3, t('Save the file on the phone'), `<b>${esc(t('With the Hutka app:'))}</b> ${esc(t('tap Hutka in the row of apps — the session opens in the upload window straight away, steps 4–5 are not needed.'))} <span class="hint">${esc(t('Hutka at the front of that row, once and for all: iPhone — scroll the app row to the end → More → Edit → “+” next to Hutka (Favourites), then drag it to the top; Android — hold Hutka in the share sheet → Pin.'))}</span><br><b>${esc(t('Without the app:'))}</b> <b>iPhone:</b> ${esc(t('tap “Save to Files”, choose a folder (Downloads is fine), tap Save.'))} <b>Android:</b> ${esc(t('choose “Save” / “Downloads”.'))}<br><span class="hint">${esc(t('The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.'))}</span>`));
   a.appendChild(step(4, t('Open hutka.ai and tap Upload'), esc(t('The round button in the middle of the bottom bar (on a computer — “Upload session” at the top right of the Lab). Sign in first if you have not — it takes one email.')), 'hutka-upload.jpg'));
   a.appendChild(step(5, t('Choose the file'), esc(t('Tap “Choose session files”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.')), 'hutka-choose.jpg'));
   a.appendChild(step(6, t('Check the track, tap Analyse'), esc(t('Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap Analyse — the Lab opens with every corner.')), 'hutka-form.jpg'));
@@ -4688,7 +4692,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v33.3';
+const APP_VERSION = 'v33.4';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
