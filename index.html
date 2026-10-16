@@ -3292,6 +3292,13 @@ Object.assign(I18N.RU, { 'Code from the e-mail': 'Код из письма', 'Co
 Object.assign(I18N.RU, { 'With the Hutka app:': 'С приложением Hutka:', 'tap Hutka in the row of apps — the session opens in the upload window straight away, steps 4–5 are not needed.': 'нажми Hutka в ряду приложений — сессия сразу откроется в окне загрузки, шаги 4–5 не нужны.',
   'Hutka at the front of that row, once and for all: iPhone — scroll the app row to the end → More → Edit → “+” next to Hutka (Favourites), then drag it to the top; Android — hold Hutka in the share sheet → Pin.': 'Чтобы Hutka всегда была первой в этом ряду: iPhone — пролистай ряд приложений до конца → «Ещё» → «Править» → «+» у Hutka (Избранное), потом перетащи её наверх; Android — удержи Hutka в меню «Поделиться» → «Закрепить».',
   'Without the app:': 'Без приложения:' });
+// v33.7 — a track that is not in Hutka: looked up on the map, its page made from the session
+Object.assign(I18N.RU, { 'Not in Hutka yet — looking the place up on the map…': 'В Hutka такой трассы нет — ищу место на карте…', '{city} Karting': 'Картинг {city}', 'Kart track': 'Картинг-трасса',
+  'Found on the map: {name} — check the name, it becomes the track page; other drivers will find it by GPS from now on.': 'Нашёл на карте: {name} — проверь название, оно станет страницей трассы; другие гонщики теперь найдут её по GPS.',
+  'Not on the map yet — name the track (the page is created with this session, you can edit it later; other drivers find it by GPS from then on).': 'На карте такой нет — назови трассу (страница создастся с этой сессией, потом её можно править; другие гонщики найдут её по GPS).',
+  'GPS does not match any track in Hutka yet — it is added below with its own page, or keep the session private without a track.': 'GPS не совпал ни с одной трассой в Hutka — она добавится ниже со своей страницей, или оставь сессию приватной без трассы.',
+  'GPS does not match any track in Hutka yet — sign in and upload again: the track page is created automatically.': 'GPS не совпал ни с одной трассой в Hutka — войди и загрузи снова: страница трассы создастся сама.',
+  'Checking the map…': 'Сверяюсь с картой…', '{length} m, {corners} corners — mapped from a driver’s session on {date}. Know this track? Add the website, hours and a photo on the track page.': '{length} м, {corners} поворотов — снято с сессии гонщика {date}. Знаешь эту трассу? Добавь сайт, часы работы и фото на странице трассы.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4742,7 +4749,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v33.6';
+const APP_VERSION = 'v33.7';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -4889,7 +4896,7 @@ function drawCoverShape(cv, pv, name) {
   const pad = 26, sw = (w * 0.55 - 2 * pad) / Math.max(pv.w || 1, 0.05), sh = (h - 2 * pad) / Math.max(pv.h || 1, 0.05), s = Math.min(sw, sh), ox = w - pad - (pv.w || 1) * s, oy = (h - (pv.h || 1) * s) / 2;
   const path = () => { ctx.beginPath(); pv.pts.forEach((p, i) => { const x = ox + p[0] * s, y = h - (oy + p[1] * s); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath(); };
   ctx.lineJoin = 'round'; ctx.lineCap = 'round'; path(); ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 22; ctx.stroke(); path(); ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 4; ctx.stroke();
-  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `600 12px ${getComputedStyle(document.documentElement).getPropertyValue('--mono') || 'monospace'}`; ctx.fillText('GPS · ' + (name || ''), pad, h - pad / 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `600 12px ${getComputedStyle(document.documentElement).getPropertyValue('--mono') || 'monospace'}`; ctx.fillText('GPS · ' + (name || ''), pad, pad + 10);   // top left: the bottom of the cover fades into the page
 }
 function trackRow(tr, d) {
   const a = el('a', 'track-row'); a.href = '#track~' + tr.id; a.dataset.id = tr.id;
@@ -6399,8 +6406,39 @@ async function readAnyLogger(f) {
   return IMPORT.parse(f);
 }
 const sourceLabel = (src) => { if (!src || src.app === 'alfano') return ''; const g = src.grade === 'high' ? t('precise') : (src.grade === 'medium' ? t('approximate') : t('rough')); return `${src.appName || src.app} · ${src.hz} Hz · ${g}`; };
+// a track Hutka does not know: what the map knows about the place — the kart venue nearest to the laps (Overpass: sport=karting,
+// a raceway) and the city / country / street under it (Nominatim reverse). One lookup per place, kept for the session; ~1–4 s; any failure → empties
+const VENUE = (() => {
+  const key = (c) => 'hutka.venue.' + c.lat.toFixed(3) + ',' + c.lon.toFixed(3);
+  const tag = (tg, ...ks) => { for (const k of ks) if (tg && tg[k]) return String(tg[k]).trim(); return ''; };
+  const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+  async function overpass(c) {
+    const q = `[out:json][timeout:10];(nwr(around:1500,${c.lat.toFixed(5)},${c.lon.toFixed(5)})["sport"="karting"];nwr(around:700,${c.lat.toFixed(5)},${c.lon.toFixed(5)})["highway"="raceway"];nwr(around:900,${c.lat.toFixed(5)},${c.lon.toFixed(5)})["leisure"="track"]["sport"~"karting|motor"];);out center tags;`;
+    const mirrors = [(window.HUTKA_CONFIG || {}).overpassUrl, 'https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'].filter(Boolean);
+    for (const m of mirrors) {
+      try { const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 7000); const r = await fetch(m, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, signal: ctl.signal }); clearTimeout(tm); if (!r.ok) continue; const j = await r.json(); if (!j || !Array.isArray(j.elements)) continue;
+        const els = j.elements.map(e => { const tg = e.tags || {}, lat = e.lat !== undefined ? e.lat : (e.center ? e.center.lat : null), lon = e.lon !== undefined ? e.lon : (e.center ? e.center.lon : null); if (lat === null) return null; return { name: tag(tg, 'name:en', 'name', 'official_name', 'brand'), lat, lon, d: GEO.distKm(c, { lat, lon }), tags: Object.keys(tg).length, website: (w => w ? (/^https?:/i.test(w) ? w : 'https://' + w) : '')(tag(tg, 'website', 'contact:website', 'url')), phone: tag(tg, 'phone', 'contact:phone'), city: tag(tg, 'addr:city', 'addr:town', 'addr:village'), street: tag(tg, 'addr:street'), hours: tag(tg, 'opening_hours'), indoor: tg.indoor === 'yes' || tg.covered === 'yes', osm: `${e.type[0]}${e.id}` }; }).filter(Boolean);
+        els.sort((a, b) => (b.name ? 1 : 0) - (a.name ? 1 : 0) || a.d - b.d || b.tags - a.tags);
+        return els[0] || null; } catch (e) { /* next mirror */ }
+    }
+    return null;
+  }
+  async function reverse(c) {
+    try { const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 6000); const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${c.lat.toFixed(5)}&lon=${c.lon.toFixed(5)}&zoom=16&accept-language=en`, { signal: ctl.signal, headers: { Accept: 'application/json' } }); clearTimeout(tm); if (!r.ok) return null; const j = await r.json(); const a = j.address || {};
+      const venue = j.name && /kart|circuit|raceway|speedway|kartodrom|motodrom|autodrom/i.test(j.name + ' ' + (j.type || '')) ? String(j.name) : '';
+      return { venue, city: a.city || a.town || a.village || a.municipality || a.county || '', cc: (a.country_code || '').toUpperCase(), street: [a.road, a.suburb || a.neighbourhood].filter(Boolean).join(', '), country: a.country || '' }; } catch (e) { return null; }
+  }
+  async function lookup(c) {
+    try { const hit = sessionStorage.getItem(key(c)); if (hit) return JSON.parse(hit); } catch (e) {}
+    let o = null, r = null; try { [o, r] = await withTimeout(Promise.all([overpass(c), reverse(c)]), 9000); } catch (e) {}
+    const out = { venue: (o && o.name) || (r && r.venue) || '', city: (r && r.city) || (o && o.city) || '', cc: (r && r.cc) || '', address: (o && o.street) || (r && r.street) || '', website: (o && o.website) || '', phone: (o && o.phone) || '', hours: (o && o.hours) || '', indoor: !!(o && o.indoor), osm: (o && o.osm) || '' };
+    try { sessionStorage.setItem(key(c), JSON.stringify(out)); } catch (e) {}
+    return out;
+  }
+  return { lookup };
+})();
 const UPLOAD = (() => {
-  let parsed = [], ctx = {};
+  let parsed = [], ctx = {}, venueP = null, venue = null;
   function open(o) {
     ctx = o || {}; parsed = []; $('uplForm').hidden = true; $('uplGo').disabled = true; setStatus('uplStatus', ''); $('uplName').value = ''; $('uplNote').value = ''; $('uplModal').hidden = false; $('uplFile').value = '';
     $('uplDetect').textContent = '';
@@ -6419,7 +6457,17 @@ const UPLOAD = (() => {
     const canAdd = STORE.canWrite() && (STORE.isAdmin() || await STORE.communityAvailable());
     fillSelect($('uplTrack'), (canAdd ? [['__new__', '+ ' + t('Add a new track…')]] : []).concat([['', t('— no track (private, custom) —')]], STORE.getTracks().map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), ctx.track || (near ? near.x.id : (canAdd ? '__new__' : '')));
     // a new track: name from the file where the logger wrote one, city and country from the nearest known city
-    { const city = GEO.nearestCity(c.lat, c.lon); $('uplNewName').value = p0.meta.track ? p0.meta.track.replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase()) : ''; $('uplNewCity').value = city && city.km < 80 ? city.name : ''; fillCountries($('uplNewCountry'), true); $('uplNewCountry').value = city && city.km < 400 ? city.cc : ''; $('uplNewHint').textContent = t('Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.'); }
+    { const city = GEO.nearestCity(c.lat, c.lon), fileName = p0.data.source && p0.data.source.app !== 'alfano' ? '' : (p0.meta.track || ''), guess = fileName && !/alfano|lap|session|driver/i.test(fileName) ? fileName.replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase()) : '';
+      $('uplNewName').value = guess; $('uplNewCity').value = city && city.km < 60 ? city.name : ''; fillCountries($('uplNewCountry'), true); $('uplNewCountry').value = city && city.km < 150 ? city.cc : ''; venue = null; venueP = null;
+      if (!near && canAdd) { $('uplNewHint').textContent = t('Not in Hutka yet — looking the place up on the map…'); const typed = { name: $('uplNewName').value, city: $('uplNewCity').value };
+        venueP = VENUE.lookup(c).then((v) => { venue = v; if (parsed[0] !== p0) return v;
+          if (v.venue && (!$('uplNewName').value || $('uplNewName').value === typed.name)) $('uplNewName').value = v.venue;
+          if (v.city && (!$('uplNewCity').value || $('uplNewCity').value === typed.city)) $('uplNewCity').value = v.city;
+          if (v.cc && [...$('uplNewCountry').options].some(o => o.value === v.cc)) $('uplNewCountry').value = v.cc;
+          if (!$('uplNewName').value) $('uplNewName').value = $('uplNewCity').value ? t('{city} Karting', { city: $('uplNewCity').value }) : t('Kart track');
+          $('uplNewHint').textContent = v.venue ? t('Found on the map: {name} — check the name, it becomes the track page; other drivers will find it by GPS from now on.', { name: v.venue }) : t('Not on the map yet — name the track (the page is created with this session, you can edit it later; other drivers find it by GPS from then on).');
+          return v; }).catch(() => null);
+      } else $('uplNewHint').textContent = t('Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.'); }
     await fillLayouts(); syncPub(); syncNew();
     if (ctx.layout) { $('uplLayout').value = ctx.layout; showLayoutPhoto(); }
     fillKarts(); fillFormats($('uplFormat'), ''); $('uplPos').value = ''; $('uplDrivers').value = '';
@@ -6432,7 +6480,7 @@ const UPLOAD = (() => {
         engTx = ' · ' + (n === 2 ? t('Revs and two gear ratios in the file — looks like a Rotax DD2 (change the kart if not)') : (n >= 3 ? t('Revs and {n} gear ratios in the file — a shifter kart; KZ2 is preselected, change it if not', { n }) : t('Revs in the file (up to {r} rpm) — a sport kart; pick its class below', { r: fmtRpm(rmax) }))); } }
     $('uplName').value = p0.meta.driver ? `${p0.meta.driver}${p0.meta.date ? ', ' + fmtDate(p0.meta.date) : ''}` : (p0.data.name || '');
     const src = p0.data.source; const srcTx = src && src.app !== 'alfano' ? ' · ' + t('Source: {s}', { s: sourceLabel(src) }) + (src.grade !== 'high' ? ' — ' + t('braking and throttle points will be approximate; Alfano at 10 Hz is the reference') : '') + (p0.data.lapsHow === 'loop' ? ' · ' + t('laps were cut where the loop closes (no start/finish beacon in the file)') : '') : '';
-    $('uplDetect').textContent = `${t('{n} laps, best {b}', { n: laps.length, b: fmtMs(best.timeMs) })} · ${near ? t('GPS puts this session at {name} ({d} km)', { name: near.x.name, d: near.d.toFixed(1) }) : (canAdd ? t('GPS does not match any track in Hutka yet — add it below (name, city), or keep the session private without a track.') : t('GPS does not match any track in the catalogue — it will be saved as a custom track.'))}${parsed.length > 1 ? ' · ' + t('{n} files: one session each, the same track and layout', { n: parsed.length }) : ''}${srcTx}${engTx}`;
+    $('uplDetect').textContent = `${t('{n} laps, best {b}', { n: laps.length, b: fmtMs(best.timeMs) })} · ${near ? t('GPS puts this session at {name} ({d} km)', { name: near.x.name, d: near.d.toFixed(1) }) : (canAdd ? t('GPS does not match any track in Hutka yet — it is added below with its own page, or keep the session private without a track.') : (STORE.hasAuth && !STORE.hasIdentity ? t('GPS does not match any track in Hutka yet — sign in and upload again: the track page is created automatically.') : t('GPS does not match any track in the catalogue — it will be saved as a custom track.')))}${parsed.length > 1 ? ' · ' + t('{n} files: one session each, the same track and layout', { n: parsed.length }) : ''}${srcTx}${engTx}`;
     setStatus('uplStatus', '', ''); $('uplForm').hidden = false; $('uplGo').disabled = false;
   }
   let center = null;
@@ -6461,11 +6509,17 @@ const UPLOAD = (() => {
     if (!parsed.length) return; $('uplGo').disabled = true; setStatus('uplStatus', t('Saving…'));
     let tid = $('uplTrack').value, lid = $('uplLayout').value || 'custom'; const label = $('uplName').value.trim(), note = $('uplNote').value.trim(), kart = kartPick();
     // a track that is not in Hutka yet: its page and a first layout are created together with the session
+    let newTrack = false;
     if (tid === '__new__') {
-      const name = $('uplNewName').value.trim(); if (!name) { setStatus('uplStatus', t('Give the new track a name.'), 'warn'); $('uplGo').disabled = false; return; }
+      if (venueP) { setStatus('uplStatus', t('Checking the map…')); try { await Promise.race([venueP, new Promise(r => setTimeout(r, 8000))]); } catch (e) {} }
+      const v = venue || {}, city = $('uplNewCity').value.trim() || v.city || '', cc = $('uplNewCountry').value || v.cc || '';
+      const name = $('uplNewName').value.trim() || v.venue || (city ? t('{city} Karting', { city }) : t('Kart track'));
+      const bestLap = parsed[0].data.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a), lengthM = bestLap && bestLap.len ? Math.round(bestLap.len) : 0;
+      const hrs = parseHours(v.hours || '');
       try {
-        tid = await STORE.saveTrack({ name, city: $('uplNewCity').value.trim(), country: $('uplNewCountry').value || '', lat: center ? +center.lat.toFixed(5) : null, lon: center ? +center.lon.toFixed(5) : null, karts: kart.name ? [{ name: kart.name, cls: kart.cls }] : [], community: true });
-        lid = await STORE.saveLayout(tid, { name: t('Main'), order: 0, cornerR: 110, widthM: 8 });
+        tid = await STORE.saveTrack(Object.assign({ name, city, country: cc, lat: center ? +center.lat.toFixed(5) : null, lon: center ? +center.lon.toFixed(5) : null, address: v.address || '', website: v.website || '', phone: v.phone || '', indoor: !!v.indoor, lengthM, karts: kart.name ? [{ name: kart.name, cls: kart.cls }] : [], community: true, osm: v.osm || '' }, hrs));
+        lid = await STORE.saveLayout(tid, { name: t('Main'), order: 0, cornerR: 110, widthM: 8, lengthM });
+        newTrack = true;
       } catch (e) { setStatus('uplStatus', t('Could not create the track: {e}', { e: e && e.message || e }), 'warn'); $('uplGo').disabled = false; return; }
     }
     const tr = tid ? STORE.getTrack(tid) : null;
@@ -6479,8 +6533,10 @@ const UPLOAD = (() => {
       // loggers without a start/finish beacon: start every lap at the layout's S/F so corners line up with everyone else's
       if (sess.source && sess.source.app !== 'alfano' && tid && lid !== 'custom') { try { const G = await GEOM.build(tid, lid); IMPORT.alignToStart(sess, G); } catch (e) {} }
       try { await STORE.saveSession(sess); if (!first) first = sess; } catch (e) { setStatus('uplStatus', t('Could not save the session: {e}', { e: e && e.message || e }), 'warn'); $('uplGo').disabled = false; return; }
-      // the first session on a brand-new layout defines its track line for everyone who comes after
-      if (k === 0 && tr && tr.community && lid !== 'custom') { const l = STORE.getLayout(tid, lid); if (l && !l.refSession && STORE.canEditTrack(tr)) { try { await STORE.saveLayout(tid, Object.assign({}, l, { refSession: sess.id })); GEOM.invalidate(); } catch (e) {} } }
+      // the first session on a brand-new layout defines its track line for everyone who comes after; the page gets the length and the corner count
+      if (k === 0 && tr && tr.community && lid !== 'custom') { const l = STORE.getLayout(tid, lid); if (l && !l.refSession && STORE.canEditTrack(tr)) { try { await STORE.saveLayout(tid, Object.assign({}, l, { refSession: sess.id })); GEOM.invalidate();
+            const G = await GEOM.build(tid, lid, sess, { noMedia: true }); if (G && G.track) { const corners = GEOM.apexes(G, null).length, lengthM = Math.round(G.lengthM || G.track.lengthM || l.lengthM || 0); const l2 = STORE.getLayout(tid, lid) || l; await STORE.saveLayout(tid, Object.assign({}, l2, { refSession: sess.id, lengthM, corners }));
+              if (newTrack) { const tr2 = STORE.getTrack(tid) || tr; const desc = t('{length} m, {corners} corners — mapped from a driver\u2019s session on {date}. Know this track? Add the website, hours and a photo on the track page.', { length: lengthM, corners, date: fmtDate(sess.date) }); await STORE.saveTrack(Object.assign({}, tr2, { lengthM, corners, description: tr2.description || desc })); } } } catch (e) {} } }
     }
     STORE.track('upload', { n: parsed.length, kart: kart.cls, app: parsed[0] && parsed[0].data.source ? parsed[0].data.source.app : 'alfano' });
     close(); if (first) { NATIVE.haptic('success'); await LAB.open(first, false); go('lab'); }
@@ -6488,6 +6544,8 @@ const UPLOAD = (() => {
   async function withFiles(files) { open({}); await onFiles(files); }
   return { open, close, withFiles };
 })();
+// OSM opening_hours → the track's open / close fields, only when the tag is one plain daily range ("10:00-22:00", "Mo-Su 10:00-23:00"); anything else stays empty
+function parseHours(h) { const m = /^(?:Mo-Su\s+)?(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/.exec(String(h || '').trim()); return m ? { open: m[1].padStart(5, '0'), close: m[2].padStart(5, '0') } : {}; }
 const fileDate = (f) => { try { const d = new Date(f.lastModified || Date.now()); return d.toISOString().slice(0, 16).replace('T', ' '); } catch (e) { return ''; } };
 // ---------- home: the feed of published sessions, where people drive, who is fastest ----------
 // the analysis card from the session meta (LAB.cardOf): the lap line, the Lab's points, the corner numbers — y grows downwards
