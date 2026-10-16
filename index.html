@@ -42,6 +42,7 @@
 /* Layout: Hutka's app shell — fixed left sidebar with the mark and the nav, a search bar on top, cards on a cool light ground.
    Color: Hutka navy for primary actions, blue for links and focus, green/red only as semantic state; telemetry colors are their own set. */
 :root{
+  --sa-top:env(safe-area-inset-top,0px);--sa-right:env(safe-area-inset-right,0px);--sa-bottom:env(safe-area-inset-bottom,0px);--sa-left:env(safe-area-inset-left,0px);
   --bg:#f5f6f8; --surface:#ffffff; --surface-2:#f3f4f7; --surface-3:#e9ebf0; --line:#e3e6ec; --line-2:#cdd3dd;
   --fg:#1a2237; --muted:#5f6b84; --faint:#98a1b3;
   --btn:#1f2b48; --btn-ink:#ffffff; --accent:#2f6bf0; --accent-ink:#ffffff; --accent-soft:#e9f0ff;
@@ -90,7 +91,7 @@ p{margin:0}
 
 /* ---------- shell ---------- */
 .app{display:grid;grid-template-columns:var(--side) minmax(0,1fr);min-height:100%}
-.side{background:var(--surface);border-right:1px solid var(--line);padding-block:18px 18px;padding-inline:14px;position:sticky;top:env(safe-area-inset-top,0px);height:100vh;display:flex;flex-direction:column;gap:6px;min-width:0}
+.side{background:var(--surface);border-right:1px solid var(--line);padding-block:18px 18px;padding-inline:14px;position:sticky;top:var(--sa-top);height:100vh;display:flex;flex-direction:column;gap:6px;min-width:0}
 .brand{display:flex;align-items:center;gap:10px;padding:6px 10px 18px;text-decoration:none;color:var(--fg)}
 .brand .mark{width:34px;height:25px;flex:none;object-fit:contain}
 :root[data-theme="dark"] .brand .mark{content:url(logo-dark.png?v=2)}
@@ -107,7 +108,7 @@ p{margin:0}
 .lang button{border:0;background:none;padding:5px 12px;border-radius:999px;cursor:pointer;color:var(--muted);font-weight:600;font-size:12.5px;letter-spacing:.02em}
 .lang button.active{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
 .main{min-width:0;display:flex;flex-direction:column}
-.top{display:flex;align-items:center;gap:16px;padding-block:16px;padding-inline:28px;position:sticky;top:env(safe-area-inset-top,0px);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);z-index:5}
+.top{display:flex;align-items:center;gap:16px;padding-block:16px;padding-inline:28px;position:sticky;top:var(--sa-top);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);z-index:5}
 .search{flex:1;display:flex;align-items:center;gap:10px;height:46px;border:1px solid var(--line-2);border-radius:14px;background:var(--surface);padding:0 16px;max-width:980px;margin:0 auto;position:relative;min-width:0}
 .search svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;flex:none}
 .search input[type=text]{flex:1;border:0;background:none;outline:none;font-size:15px;min-width:0;padding:0;border-radius:0}
@@ -739,7 +740,7 @@ body.onboarding #toast{z-index:90}
 .bugbtn{position:fixed;right:14px;bottom:14px;z-index:28;width:38px;height:38px;border-radius:50%;border:1px solid var(--line-2);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px);color:var(--muted);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(16,22,48,.12);opacity:.75;transition:opacity .15s,transform .15s}
 .bugbtn:hover{opacity:1;transform:translateY(-1px);color:var(--fg)}
 .bugbtn svg{width:18px;height:18px}
-@media (max-width:900px){.bugbtn{bottom:calc(66px + env(safe-area-inset-bottom,0px));right:10px;width:34px;height:34px;opacity:.6}}
+@media (max-width:900px){.bugbtn{bottom:calc(66px + var(--sa-bottom));right:10px;width:34px;height:34px;opacity:.6}}
 body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:none}
 .rep{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .rep:last-child{border-bottom:0}
@@ -772,12 +773,12 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .userchip .nm,.userchip .sub{display:none}
   .userchip img{width:34px;height:34px}
   #btnSignIn{height:36px;padding:0 12px;font-size:13px}
-  .page{padding:2px 12px calc(84px + env(safe-area-inset-bottom,0px));gap:12px}
+  .page{padding:2px 12px calc(84px + var(--sa-bottom));gap:12px}
   .card{padding:14px;border-radius:14px}
   .card h2{font-size:16px}
   .ph h1{font-size:24px}
   .ph .row .btn{height:38px;font-size:13.5px;padding:0 12px}
-  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));justify-content:space-around;align-items:flex-end}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px 4px calc(6px + var(--sa-bottom));justify-content:space-around;align-items:flex-end}
   .tabbar a,.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;border:0;background:none;color:var(--muted);text-decoration:none;font:500 10.5px/1 var(--body);cursor:pointer;min-width:0}
   .tabbar svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .tabbar a.active{color:var(--accent)}
@@ -819,11 +820,11 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .map-bar .btn{flex:none}
   .charts.under{padding:4px 6px 6px}
   .hero{gap:10px}
-  .hero .inspector{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom,0px));max-height:50vh;overflow:auto;border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);z-index:25;transform:translateY(115%);transition:transform .25s ease;padding:14px 16px 18px}
+  .hero .inspector{position:fixed;left:0;right:0;bottom:calc(58px + var(--sa-bottom));max-height:50vh;overflow:auto;border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);z-index:25;transform:translateY(115%);transition:transform .25s ease;padding:14px 16px 18px}
   .hero .inspector.open{transform:none}
   .lab-mob[hidden]{display:none!important}
   #pickbar{display:none}
-  #pickbar.open{display:block;position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom,0px));max-height:72vh;overflow:auto;z-index:26;border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);padding:14px 16px 18px}
+  #pickbar.open{display:block;position:fixed;left:0;right:0;bottom:calc(58px + var(--sa-bottom));max-height:72vh;overflow:auto;z-index:26;border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);padding:14px 16px 18px}
   #pickbar .lapline,#pickbar #ownerRow{display:none}
   #labTabs[hidden]{display:none!important}
   .mob-hide{display:none!important}
@@ -855,7 +856,7 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .admin-grid{grid-template-columns:1fr}
   .modal{padding:0;align-items:end}
   .modal .box{border-radius:18px 18px 0 0;max-height:94vh;padding:16px;width:100%}
-  .toast{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+  .toast{bottom:calc(72px + var(--sa-bottom))}
   /* data tables become stacked cards */
   .tbl.resp{display:block}
   .tbl.resp thead{display:none}
@@ -871,12 +872,12 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .tbl.resp td .row{flex-wrap:wrap}
 }
 /* the native app shell: the status bar is native, the page starts right under it */
-html.native .top{padding-top:max(8px,env(safe-area-inset-top,0px))}
+html.native .top{padding-top:max(8px,var(--sa-top))}
 /* ---------- the phone cockpit: a phone held sideways, or the full-screen map on a phone — a logger-app layout over the whole screen:
    live data at the top left, round buttons on the right, the lap scrub bar at the bottom; corners, digest, coach and the comparison open as sheets ---------- */
 .ck-hud,.ck-btns,.ck-scrub{display:none}
 @media (max-height:520px) and (orientation:landscape) and (pointer:coarse){ .toast{bottom:12px} }
-body.cockpit{overflow:hidden;--sl:max(8px,env(safe-area-inset-left,0px));--sr:max(8px,env(safe-area-inset-right,0px));--st:max(8px,env(safe-area-inset-top,0px));--sb:max(8px,env(safe-area-inset-bottom,0px))}
+body.cockpit{overflow:hidden;--sl:max(8px,var(--sa-left));--sr:max(8px,var(--sa-right));--st:max(8px,var(--sa-top));--sb:max(8px,var(--sa-bottom))}
 body.cockpit .top,body.cockpit .tabbar,body.cockpit #labMob,body.cockpit .land-hint{display:none!important}
 body.cockpit .page{padding:0;gap:0;max-width:none}
 body.cockpit #pg-lab.has{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
@@ -949,8 +950,8 @@ body.cockpit.ck-side #labTabs button[data-tab="chart"]{display:none}
 #labTabs .x{display:none}
 body.cockpit.ck-side #labTabs .x{display:grid;place-items:center;margin-left:auto;flex:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);font-size:17px;line-height:1;padding:0;cursor:pointer}
 body.cockpit.ck-side #cornersPanel,body.cockpit.ck-side #digestPanel,body.cockpit.ck-side #discussPanel,body.cockpit.ck-side #askPanel{display:block;position:fixed;z-index:62;margin:0;overflow:auto;border:0;border-radius:0;padding:6px 10px 14px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px)}
-body.cockpit.lab-land.ck-side #labTabs{right:0;top:0;width:46%;height:42px;border-left:1px solid var(--line);border-bottom:1px solid var(--line)}
-body.cockpit.lab-land.ck-side #cornersPanel,body.cockpit.lab-land.ck-side #digestPanel,body.cockpit.lab-land.ck-side #discussPanel,body.cockpit.lab-land.ck-side #askPanel{right:0;top:42px;bottom:0;width:46%;border-left:1px solid var(--line)}
+body.cockpit.lab-land.ck-side #labTabs{right:0;top:0;width:46%;height:calc(42px + var(--sa-top));padding-top:calc(6px + var(--sa-top));border-left:1px solid var(--line);border-bottom:1px solid var(--line)}
+body.cockpit.lab-land.ck-side #cornersPanel,body.cockpit.lab-land.ck-side #digestPanel,body.cockpit.lab-land.ck-side #discussPanel,body.cockpit.lab-land.ck-side #askPanel{right:0;top:calc(42px + var(--sa-top));bottom:0;width:46%;border-left:1px solid var(--line)}
 body.cockpit:not(.lab-land).ck-side #labTabs{left:0;right:0;bottom:56vh;height:42px;border-top:1px solid var(--line);border-radius:16px 16px 0 0}
 body.cockpit:not(.lab-land).ck-side #cornersPanel,body.cockpit:not(.lab-land).ck-side #digestPanel,body.cockpit:not(.lab-land).ck-side #discussPanel,body.cockpit:not(.lab-land).ck-side #askPanel{left:0;right:0;bottom:0;height:56vh}
 body.cockpit #cornersPanel h2{display:none}
@@ -960,11 +961,11 @@ body.cockpit .crow b{font-size:14px}
 body.cockpit .crow .k{font-size:11.5px}
 body.cockpit .digest{font-size:13px}
 body.cockpit .hero .inspector{z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px)}
-body.cockpit.lab-land .hero .inspector{left:auto;right:0;top:0;bottom:0;width:46%;max-height:none;border-radius:0;border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.15);transform:translateX(110%);padding:10px 12px 14px;overscroll-behavior:contain}
+body.cockpit.lab-land .hero .inspector{left:auto;right:0;top:0;bottom:0;width:46%;max-height:none;border-radius:0;border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.15);transform:translateX(110%);padding:calc(10px + var(--sa-top)) 12px 14px;overscroll-behavior:contain}
 body.cockpit.lab-land .hero .inspector.open{transform:none}
 body.cockpit:not(.lab-land) .hero .inspector{bottom:0;max-height:60vh}
 body.cockpit .insp-head b{font-size:18px}
-body.cockpit.lab-land #pickbar.open{left:auto;right:0;top:0;bottom:0;width:62%;max-height:none;border-radius:0;border-left:1px solid var(--line);z-index:64}
+body.cockpit.lab-land #pickbar.open{left:auto;right:0;top:0;bottom:0;width:62%;max-height:none;border-radius:0;border-left:1px solid var(--line);z-index:64;padding-top:calc(10px + var(--sa-top))}
 body.cockpit:not(.lab-land) #pickbar.open{bottom:0;z-index:64}
 /* with a sheet open on the right, the buttons, the scrub bar and the overlays keep to the visible part of the map */
 body.cockpit.lab-land.ck-side .ck-btns,body.cockpit.lab-land.ck-insp .ck-btns{right:calc(46% + 8px)}
@@ -972,10 +973,14 @@ body.cockpit.lab-land.ck-pick .ck-btns{right:calc(62% + 8px)}
 body.cockpit.lab-land.ck-side .ck-scrub,body.cockpit.lab-land.ck-insp .ck-scrub{right:calc(46% + 8px)}
 body.cockpit.lab-land.ck-pick .ck-scrub{right:calc(62% + 8px)}
 /* sheets on the right keep clear of the notch / home indicator */
-body.cockpit.lab-land.ck-side #labTabs,body.cockpit.lab-land.ck-side #cornersPanel,body.cockpit.lab-land.ck-side #digestPanel,body.cockpit.lab-land.ck-side #discussPanel,body.cockpit.lab-land.ck-side #askPanel,body.cockpit.lab-land .hero .inspector,body.cockpit.lab-land #pickbar.open{padding-right:calc(10px + env(safe-area-inset-right,0px))}
-body.cockpit.lab-land.ck-side #cornersPanel,body.cockpit.lab-land.ck-side #digestPanel,body.cockpit.lab-land.ck-side #discussPanel,body.cockpit.lab-land.ck-side #askPanel,body.cockpit.lab-land .hero .inspector,body.cockpit.lab-land #pickbar.open{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+body.cockpit.lab-land.ck-side #labTabs,body.cockpit.lab-land.ck-side #cornersPanel,body.cockpit.lab-land.ck-side #digestPanel,body.cockpit.lab-land.ck-side #discussPanel,body.cockpit.lab-land.ck-side #askPanel,body.cockpit.lab-land .hero .inspector,body.cockpit.lab-land #pickbar.open{padding-right:calc(10px + var(--sa-right))}
+body.cockpit.lab-land.ck-side #cornersPanel,body.cockpit.lab-land.ck-side #digestPanel,body.cockpit.lab-land.ck-side #discussPanel,body.cockpit.lab-land.ck-side #askPanel,body.cockpit.lab-land .hero .inspector,body.cockpit.lab-land #pickbar.open{padding-bottom:calc(14px + var(--sa-bottom))}
 body.cockpit.lab-land.ck-side .ck-hud,body.cockpit.lab-land.ck-insp .ck-hud{max-width:calc(54% - 64px)}
 body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero .map-bar,body.cockpit.lab-land.ck-side #hero .charts.under,body.cockpit.lab-land.ck-insp #hero .charts.under,body.cockpit.lab-land.ck-side .sat-pill,body.cockpit.lab-land.ck-insp .sat-pill,body.cockpit.lab-land.ck-side .align-bar,body.cockpit.lab-land.ck-insp .align-bar{right:calc(46% + 56px)}
+/* sideways: the close buttons of the sheets on the right keep clear of the status bar and the navigation bar (Android) / the notch (iPhone) */
+body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pickbar #pickClose{right:calc(10px + var(--sa-right));top:calc(8px + var(--sa-top))}
+/* a phone sideways: the share sheet's preview fits above the buttons, so the buttons are in view without scrolling */
+@media (max-height:480px){ .share-pv canvas{width:auto;max-height:46vh;max-width:100%} .modal .box{padding:12px 16px;gap:10px} .modal h3{font-size:16px} }
 /* ---------- the bell (Activity), the Activity list, the push question ---------- */
 .bell{position:relative;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;color:var(--muted);flex:none;text-decoration:none}
 .bell svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -1005,9 +1010,10 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
 html.native{--glass:rgba(255,255,255,.66);--glass-strong:rgba(255,255,255,.86);--glass-line:rgba(255,255,255,.8);--glass-edge:rgba(20,30,60,.12);--glass-shadow:0 14px 34px -14px rgba(20,30,60,.4),inset 0 1px 0 rgba(255,255,255,.7)}
 @media (prefers-color-scheme:dark){html.native:not([data-theme="light"]){--glass:rgba(20,26,40,.74);--glass-strong:rgba(20,26,40,.9);--glass-line:rgba(255,255,255,.14);--glass-edge:rgba(0,0,0,.4);--glass-shadow:0 14px 34px -14px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.1)}}
 html.native[data-theme="dark"]{--glass:rgba(20,26,40,.74);--glass-strong:rgba(20,26,40,.9);--glass-line:rgba(255,255,255,.14);--glass-edge:rgba(0,0,0,.4);--glass-shadow:0 14px 34px -14px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.1)}
-html.native .top{top:0;padding-top:calc(8px + env(safe-area-inset-top,0px));background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);border-bottom:1px solid var(--glass-edge);box-shadow:inset 0 1px 0 var(--glass-line)}
+html.native .top{top:0;padding-top:calc(8px + var(--sa-top));background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);border-bottom:1px solid var(--glass-edge);box-shadow:inset 0 1px 0 var(--glass-line)}
 html.native .search{background:var(--glass-strong);border-color:var(--glass-edge)}
 html.native,html.native body{overscroll-behavior:none}
+html.android{--sa-top:var(--safe-area-inset-top,env(safe-area-inset-top,0px));--sa-right:var(--safe-area-inset-right,env(safe-area-inset-right,0px));--sa-bottom:var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px));--sa-left:var(--safe-area-inset-left,env(safe-area-inset-left,0px))}
 .ptr{position:fixed;left:50%;top:calc(var(--topH,56px) - 46px);transform:translate(-50%,0);opacity:0;width:40px;height:40px;border-radius:50%;background:var(--glass-strong);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--glass-edge);box-shadow:var(--glass-shadow);display:grid;place-items:center;z-index:95;pointer-events:none;transition:opacity .15s;color:var(--muted);font:700 18px/1 var(--body)}
 .ptr .ic{display:block;transition:transform .2s}
 .ptr.armed{color:var(--accent)}.ptr.armed .ic{transform:rotate(180deg)}
@@ -1021,17 +1027,17 @@ html.android .modal{-webkit-backdrop-filter:none;backdrop-filter:none}
 html.native .toast{background:var(--glass-strong);color:var(--fg);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--glass-edge);border-radius:16px;box-shadow:var(--glass-shadow)}
 html.native .side{background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%)}
 @media (max-width:900px){
-  html.native .tabbar{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));border-radius:32px;border:1px solid var(--glass-edge);border-top-color:var(--glass-edge);background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(190%);backdrop-filter:blur(28px) saturate(190%);box-shadow:var(--glass-shadow);padding:7px 8px;align-items:center}
+  html.native .tabbar{left:12px;right:12px;bottom:calc(10px + var(--sa-bottom));border-radius:32px;border:1px solid var(--glass-edge);border-top-color:var(--glass-edge);background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(190%);backdrop-filter:blur(28px) saturate(190%);box-shadow:var(--glass-shadow);padding:7px 8px;align-items:center}
   html.native .tabbar a,html.native .tabbar button{padding:6px 0;border-radius:22px;transition:background .18s,transform .18s,color .18s}
   html.native .tabbar a.active{background:color-mix(in srgb,var(--accent) 14%,transparent)}
   html.native .tabbar a:active,html.native .tabbar button:active{transform:scale(.92)}
   html.native .tabbar .up .circ{margin-top:-26px;width:54px;height:54px;border:3px solid var(--glass-line);box-shadow:0 8px 18px rgba(20,30,60,.32);background:linear-gradient(180deg,#2c3a5e,#1b2540)}
-  html.native .page{padding-bottom:calc(106px + env(safe-area-inset-bottom,0px))}
-  html.native .hero .inspector,html.native #pickbar.open{left:8px;right:8px;bottom:calc(76px + env(safe-area-inset-bottom,0px));border-radius:22px;background:var(--glass-strong);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid var(--glass-edge);box-shadow:var(--glass-shadow)}
-  html.native .toast{bottom:calc(90px + env(safe-area-inset-bottom,0px))}
-  html.native .bugbtn{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  html.native .page{padding-bottom:calc(106px + var(--sa-bottom))}
+  html.native .hero .inspector,html.native #pickbar.open{left:8px;right:8px;bottom:calc(76px + var(--sa-bottom));border-radius:22px;background:var(--glass-strong);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid var(--glass-edge);box-shadow:var(--glass-shadow)}
+  html.native .toast{bottom:calc(90px + var(--sa-bottom))}
+  html.native .bugbtn{bottom:calc(84px + var(--sa-bottom))}
   html.native .modal{background:rgba(10,14,24,.38);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  html.native .modal .box{background:var(--glass-strong);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border-radius:24px 24px 0 0;border:1px solid var(--glass-edge);border-bottom:0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px -10px rgba(20,30,60,.35)}
+  html.native .modal .box{background:var(--glass-strong);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border-radius:24px 24px 0 0;border:1px solid var(--glass-edge);border-bottom:0;padding-bottom:calc(16px + var(--sa-bottom));box-shadow:0 -10px 40px -10px rgba(20,30,60,.35)}
   html.native .search-drop{background:var(--glass-strong);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%)}
 }
 html.native body.cockpit .ck-panel,html.native body.cockpit .ck-scrub{background:rgba(14,18,30,.55);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border-color:rgba(255,255,255,.16)}
@@ -1046,36 +1052,49 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 .ld-cta .btn{height:44px;padding:0 18px;font-size:15px}
 .ld-proof{margin-top:16px;font-size:13px;color:var(--faint);display:flex;gap:14px;flex-wrap:wrap}
 .ld-proof b{color:var(--muted);font-weight:600}
-.ld-map{position:relative;aspect-ratio:1/1.02;min-width:0;border-radius:16px;overflow:hidden;background:linear-gradient(160deg,#141a2b,#1b2340 60%,#20294a);box-shadow:0 30px 60px -30px rgba(20,30,60,.5)}
+.ld-vis{min-width:0}
+.ld-map{position:relative;aspect-ratio:1/1.02;min-width:0;border-radius:16px;overflow:hidden;background:linear-gradient(160deg,#141a2b,#1b2340 60%,#20294a);box-shadow:0 30px 60px -30px rgba(20,30,60,.5);cursor:pointer;isolation:isolate}
 .ld-map canvas{width:100%;height:100%;display:block}
-.ld-cap{position:absolute;left:12px;bottom:10px;right:12px;font:500 11.5px/1.35 var(--body);color:rgba(255,255,255,.62);text-shadow:0 1px 2px rgba(0,0,0,.4)}
+/* the live map (the Lab's own view on the satellite picture) sits over the drawn card and fades in once its imagery is there */
+.ld-live{position:absolute;inset:0;z-index:1;opacity:0;transition:opacity .7s;pointer-events:none}
+.ld-live.on{opacity:1}
+.ld-live canvas{width:100%;height:100%;display:block;pointer-events:none}
+/* the promo pictures: each one cuts in over the previous along a slanted edge; the last one cuts away to show the map again */
+.ld-slides{position:absolute;inset:0;z-index:2;pointer-events:none}
+.ld-slide{position:absolute;inset:0;background:linear-gradient(135deg,#f4f6fa,#eef0f6);visibility:hidden;clip-path:polygon(100% 0,100% 0,100% 100%,120% 100%);transition:clip-path 0s .8s,visibility 0s .8s}
+.ld-slide.on{visibility:visible;clip-path:polygon(-20% 0,100% 0,100% 100%,0 100%);transition:clip-path .8s cubic-bezier(.7,0,.3,1),visibility 0s}
+.ld-slide.out{visibility:visible;clip-path:polygon(-20% 0,-20% 0,0 100%,0 100%);transition:clip-path .8s cubic-bezier(.7,0,.3,1),visibility 0s .8s}
+.ld-slide img{width:100%;height:100%;object-fit:contain;display:block}
+.ld-band{position:absolute;left:0;top:0;right:0;z-index:5;padding:12px 15px 24px;color:#fff;pointer-events:none;background:linear-gradient(rgba(9,13,24,.82),rgba(9,13,24,.58) 58%,rgba(9,13,24,0));transition:opacity .35s .55s}
+.ld-band .k{font:700 10.5px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.58)}
+.ld-band .v{font:700 30px/1.05 var(--mono);margin-top:6px;display:inline;vertical-align:baseline}
+.ld-band .s{font:500 12.5px/1.3 var(--body);color:rgba(255,255,255,.66);display:inline;margin-left:8px;vertical-align:baseline}
+.ld-band .b{font:700 12.5px/1.3 var(--body);margin-top:5px;color:#ffa23a}
+.ld-band .b:empty{display:none}
+.ld-cap{position:absolute;left:0;bottom:0;right:0;z-index:5;padding:26px 14px 10px;font:500 11.5px/1.35 var(--body);color:rgba(255,255,255,.66);background:linear-gradient(rgba(9,13,24,0),rgba(9,13,24,.74));pointer-events:none;transition:opacity .35s .55s}
 .ld-cap b{color:#fff;font-weight:600}
-.ld-show{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
-.ld-slides{position:relative;aspect-ratio:1/1;max-height:520px;margin:0 auto;width:min(100%,520px)}
-.ld-slide{position:absolute;inset:0;opacity:0;transition:opacity .5s;border-radius:14px;overflow:hidden;background:var(--surface-2)}
-.ld-slide.on{opacity:1}
-.ld-slide img{width:100%;height:100%;object-fit:cover;display:block}
-.ld-dots{display:flex;gap:6px;justify-content:center}
+.ld-cap .cr{color:rgba(255,255,255,.42);display:block;font-size:10.5px;margin-top:1px}
+.ld-band.off,.ld-cap.off{opacity:0;transition:opacity .25s}
+.ld-dots{display:flex;gap:6px;align-items:center;justify-content:center;margin-top:12px;min-height:8px}
 .ld-dots button{width:8px;height:8px;border-radius:50%;border:0;background:var(--line-2);padding:0;cursor:pointer;transition:width .2s,background .2s}
 .ld-dots button.on{width:22px;border-radius:4px;background:var(--accent)}
+@media (prefers-reduced-motion:reduce){.ld-slide,.ld-slide.on,.ld-slide.out{transition:none}}
 .ld-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .ld-step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:4px}
 .ld-step .n{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:700 12.5px var(--body);margin-bottom:6px}
 .ld-step b{font-size:14.5px;line-height:1.3}
 .ld-step span{font-size:13px;color:var(--muted);line-height:1.45}
-@media (min-width:901px){
-  .ld-slides{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;aspect-ratio:auto;max-height:none;width:100%}
-  .ld-slide{position:static;opacity:1;aspect-ratio:1/1}
-  .ld-dots{display:none}
-}
 @media (max-width:900px){
   .ld-hero{grid-template-columns:1fr;gap:18px;padding:20px 16px 18px;border-radius:16px}
   .ld-text h1{font-size:27px;max-width:none}
   .ld-text p{font-size:15px}
   .ld-cta .btn{height:42px;font-size:14.5px}
   .ld-proof{margin-top:12px}
-  .ld-map{aspect-ratio:1/1.22}
-  .ld-show{padding:12px 12px 14px}
+  .ld-map{aspect-ratio:1/1.15}
+  .ld-band{padding:11px 13px 22px}
+  .ld-band .v{font-size:25px}
+  .ld-band .s{font-size:12px;margin-left:6px}
+  .ld-band .b{font-size:12px}
   .ld-steps{grid-template-columns:1fr}
 }
 </style>
@@ -1170,11 +1189,16 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
             <div class="row ld-cta"><button class="btn primary" id="ldUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload a session">Upload a session</span></button><a class="btn" id="ldDemo" href="#lab"><svg><use href="#i-lab"/></svg><span data-t="Open a live example">Open a live example</span></a></div>
             <div class="ld-proof" id="ldProof"></div>
           </div>
-          <div class="ld-map" id="ldMap"><canvas id="ldCanvas"></canvas><div class="ld-cap" id="ldCap"></div></div>
-        </div>
-        <div class="ld-show" id="ldShow">
-          <div class="ld-slides" id="ldSlides"></div>
-          <div class="ld-dots" id="ldDots"></div>
+          <div class="ld-vis">
+            <div class="ld-map" id="ldMap">
+              <canvas id="ldCanvas"></canvas>
+              <div class="ld-live" id="ldLive"></div>
+              <div class="ld-slides" id="ldSlides"></div>
+              <div class="ld-band" id="ldBand"><div class="k" id="ldBandK"></div><div class="v" id="ldBandV"></div><div class="s" id="ldBandS"></div><div class="b" id="ldBandB"></div></div>
+              <div class="ld-cap" id="ldCap"></div>
+            </div>
+            <div class="ld-dots" id="ldDots"></div>
+          </div>
         </div>
         <div class="ld-steps">
           <div class="ld-step"><div class="n">1</div><b data-t="Export the session from your logger app">Export the session from your logger app</b><span data-t="Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — one file per session.">Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — one file per session.</span></div>
@@ -3369,6 +3393,7 @@ Object.assign(I18N.RU, { 'Racing AI for karting': 'Гоночный ИИ для 
   'Upload a session': 'Загрузить сессию', 'Open a live example': 'Открыть живой пример', 'RESERVE PER CORNER': 'РЕЗЕРВ ПО ПОВОРОТАМ', '{s} s': '{s} с', 'on the table in one lap': 'на столе за один круг', 'Biggest: corner {n} · +{s} s': 'Самый большой: поворот {n} · +{s} с', 'a driver': 'гонщик',
   'a real session: the seconds each corner leaves against the best passes on this layout': 'настоящая сессия: секунды, которые каждый поворот оставляет относительно лучших проездов на этом лейауте',
   'tracks': 'трасс', 'laps analysed': 'кругов разобрано', 'sessions published': 'сессий опубликовано',
+  'Corner {n} · the biggest reserve': 'Поворот {n} · самый большой резерв', 'Corner {n} · the second biggest': 'Поворот {n} · второй по величине', 'vs the fastest on this layout': 'против самых быстрых на этом лейауте', 'Fastest here: {s}': 'Самые быстрые здесь: {s}', 'a real session': 'настоящая сессия', 'The example session': 'Сессия-пример', 'Imagery © Esri, Maxar, Earthstar Geographics': 'Снимок © Esri, Maxar, Earthstar Geographics', 'Open this session in the Lab': 'Открыть эту сессию в Лаборатории',
   'Export the session from your logger app': 'Выгрузи сессию из приложения логгера', 'Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — one file per session.': 'Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — один файл на сессию.',
   'Upload it — the track is recognised by GPS': 'Загрузи — трасса узнаётся по GPS', 'A track that is not in Hutka yet gets its own page from your session.': 'Трасса, которой ещё нет в Hutka, получает свою страницу из твоей сессии.',
   'See every corner, compare, ask the coach': 'Смотри каждый поворот, сравнивай, спрашивай тренера', 'Brake point, apex, throttle, exit — against the fastest; three laps on one map, a replay, an AI coach in plain words.': 'Точка торможения, апекс, газ, выход — против самых быстрых; три круга на одной карте, реплей, ИИ-тренер простыми словами.' });
@@ -4082,17 +4107,18 @@ function createMapView(canvas, host) {
     // a big screen at a high zoom would need hundreds of tiles: step the zoom down until the count is sane
     for (;;) { f = Math.pow(2, M0.z - z); size = 256 * f; tx0 = Math.floor((x0 + ox) / size); tx1 = Math.floor((x1 + ox) / size); ty0 = Math.floor((y0 + oy) / size); ty1 = Math.floor((y1 + oy) / size); if ((tx1 - tx0 + 1) * (ty1 - ty0 + 1) <= 110 || z <= 12) break; z--; }
     ctx.save(); ctx.translate(V.tx, V.ty); ctx.rotate(V.rot); ctx.scale(sc, sc); ctx.globalAlpha = TL.alpha === undefined ? 1 : TL.alpha;
-    const n = Math.pow(2, z);
+    const n = Math.pow(2, z); let nAll = 0, nOk = 0;
     for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
       if (ty < 0 || ty >= n) continue; const txw = ((tx % n) + n) % n;
       const fx = tx * size - ox, fy = ty * size - oy;
-      let e = tile(TL, z, txw, ty), drawn = false;
-      if (e.ok) { ctx.drawImage(e.img, fx, fy, size + 0.5, size + 0.5); drawn = true; }
+      let e = tile(TL, z, txw, ty), drawn = false; nAll++;
+      if (e.ok) { ctx.drawImage(e.img, fx, fy, size + 0.5, size + 0.5); drawn = true; nOk++; }
       else {   // not there yet (or missing at this zoom): the nearest loaded ancestor, scaled — never a blank flash
-        for (let up = 1; up <= 5 && !drawn; up++) { const pz = z - up, pf = Math.pow(2, up); const pe = tiles.get(`${pz}/${Math.floor(txw / pf)}/${Math.floor(ty / pf)}`) || (e.err && up === 1 ? tile(TL, pz, Math.floor(txw / pf), Math.floor(ty / pf)) : null); if (pe && pe.ok) { const sx = (txw % pf) * 256 / pf, sy = (ty % pf) * 256 / pf; ctx.drawImage(pe.img, sx, sy, 256 / pf, 256 / pf, fx, fy, size + 0.5, size + 0.5); drawn = true; } }
+        for (let up = 1; up <= 5 && !drawn; up++) { const pz = z - up, pf = Math.pow(2, up); const pe = tiles.get(`${pz}/${Math.floor(txw / pf)}/${Math.floor(ty / pf)}`) || (e.err && up === 1 ? tile(TL, pz, Math.floor(txw / pf), Math.floor(ty / pf)) : null); if (pe && pe.ok) { const sx = (txw % pf) * 256 / pf, sy = (ty % pf) * 256 / pf; ctx.drawImage(pe.img, sx, sy, 256 / pf, 256 / pf, fx, fy, size + 0.5, size + 0.5); drawn = true; if (e.err) nOk++; } }
       }
     }
     ctx.restore();
+    if (host.onTiles) host.onTiles(nOk, nAll);   // how much of the view has its imagery (the landing waits for it before showing the map)
   }
   let drawReq = false;
   function draw() { if (drawReq) return; drawReq = true; requestAnimationFrame(() => { drawReq = false; paint(); if (host.afterDraw) host.afterDraw(); }); }
@@ -4239,12 +4265,15 @@ function createMapView(canvas, host) {
         ctx.fillStyle = hi ? (m.kind === 'brake' ? '#fff' : '#111') : 'rgba(255,255,255,0.95)'; ctx.font = `${hi ? 700 : 600} ${hi ? 12 : 10}px ${C.mono}`; ctx.fillText(String(w0.n), bx, by + 0.5);
         M.badges.push({ row: r, x: bx, y: by, r: rad });
       }
+      const I = labels.length ? inset(w, h) : null;   // labels keep to the free part of the canvas (the cockpit HUD, the landing band and caption sit outside it)
       for (const lb of labels) {
         ctx.font = `600 11px ${C.mono}`;
         const out = lb.dir === 'R' ? -1 : 1, [px, py] = lapPos(tr, main, lb.i), [x, y] = T(px, py), [snx, sny] = RN(tr.nx[lb.i], tr.ny[lb.i]);
         const tw = ctx.measureText(lb.text).width + 12, th = 20;
-        let off = Math.min((widthM / 2 + 1.5) * pxm, 60) + 40, lx, ly, tries = 0, rect;
-        do { lx = x + out * snx * off; ly = y + out * sny * off; lx = Math.max(tw / 2 + 4, Math.min(w - tw / 2 - 4, lx)); ly = Math.max(th / 2 + 4, Math.min(h - th / 2 - 4, ly)); rect = [lx - tw / 2, ly - th / 2, tw, th]; off += th + 3; tries++; } while (tries < 6 && placed.some(p => rect[0] < p[0] + p[2] && rect[0] + rect[2] > p[0] && rect[1] < p[1] + p[3] && rect[1] + rect[3] > p[1]));
+        const base = Math.min((widthM / 2 + 1.5) * pxm, 60) + 40, free = (r) => !placed.some(p => r[0] < p[0] + p[2] && r[0] + r[2] > p[0] && r[1] < p[1] + p[3] && r[1] + r[3] > p[1]);
+        let lx, ly, rect, first = null, found = false;
+        for (const dir of [out, -out]) { let off = base; for (let tries = 0; tries < 6 && !found; tries++) { lx = x + dir * snx * off; ly = y + dir * sny * off; lx = Math.max(I.l + tw / 2 + 4, Math.min(w - I.r - tw / 2 - 4, lx)); ly = Math.max(I.t + th / 2 + 4, Math.min(h - I.b - th / 2 - 4, ly)); rect = [lx - tw / 2, ly - th / 2, tw, th]; if (!first) first = [lx, ly, rect]; if (free(rect)) found = true; else off += th + 3; } if (found) break; }
+        if (!found) [lx, ly, rect] = first;   // nowhere free: the usual spot, over whatever is there
         placed.push(rect);
         ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(lx, ly); ctx.stroke();
         ctx.fillStyle = 'rgba(14,17,22,0.9)'; roundRect(ctx, rect[0], rect[1], rect[2], rect[3], 5); ctx.fill(); ctx.strokeStyle = lb.col; ctx.lineWidth = 1; ctx.stroke();
@@ -4822,7 +4851,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34';
+const APP_VERSION = 'v34.1';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -5375,7 +5404,7 @@ function cardFrom(D, G, coach) {
   return { v: CARD_V, w: Math.round((x1 - x0) / sc * 1000) / 1000, h: Math.round((y1 - y0) / sc * 1000) / 1000, pts, marks, corners, top, total, vmax: Math.round(Math.max(...R.v) * 3.6) };
 }
 // back to the start page: the session stays in memory, the Lab shows the library again
-LAB.close = function () { replayPlay(false); LAB.cmp2 = 'none'; LAB.scrubT = 0; if (fsOn()) { if (document.fullscreenElement) { try { document.exitFullscreen(); } catch (e) {} } else $('hero').classList.remove('fs-fallback'); } LAB.current = null; LAB.sessions = []; LAB.G = null; LAB.dcmp = null; LAB.coach = null; LAB.loaded = false; LAB.selN = 0; if (location.hash !== '#lab') history.replaceState(null, '', '#lab'); labRender(); renderLabStart(); window.scrollTo({ top: 0 }); };
+LAB.close = function () { replayPlay(false); LAB.cmp2 = 'none'; LAB.scrubT = 0; if (fsOn()) { if (LAB.fsExit) LAB.fsExit(); else $('hero').classList.remove('fs-fallback'); } LAB.current = null; LAB.sessions = []; LAB.G = null; LAB.dcmp = null; LAB.coach = null; LAB.loaded = false; LAB.selN = 0; if (location.hash !== '#lab') history.replaceState(null, '', '#lab'); labRender(); renderLabStart(); window.scrollTo({ top: 0 }); };
 // open a session as the reference (or as the comparison against my latest session on the same layout)
 LAB.open = async function (meta, asCmp) {
   labEnsureMap(); setStatus('labStatus', t('Loading session…'));
@@ -5601,7 +5630,7 @@ function labEnsureMap() {
     onHover: (i) => { if (i < 0 && isCockpit()) { hoverOff(); return; } LAB.hoverIdx = i; hoverChanged(); },
     onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); if (isCockpit()) { if (i >= 0) LAB.scrubIdx = i; LAB.ckInsp = !!row && LAB.selN !== row.w.n; } LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
   // the cockpit: back, the round buttons, the step label and the scrub bar
-  $('ckBack').onclick = () => { if (document.fullscreenElement) { document.exitFullscreen(); return; } if ($('hero').classList.contains('fs-fallback')) { fsFallbackOn(false); return; } if (history.length > 1) history.back(); else go('home'); };
+  $('ckBack').onclick = () => { if (fsOn()) { LAB.fsExit(); return; } if (history.length > 1) history.back(); else go('home'); };
   $('ckSat').onclick = () => $('tglTiles').click();
   $('ckCmp').onclick = () => { const pb = $('pickbar'); pb.classList.toggle('open'); if (pb.classList.contains('open') && LAB.side) setSide(false); };
   $('ckList').onclick = () => setSide(!(LAB.side && LAB.tab !== 'ai'), LAB.tab === 'ai' ? 'corners' : LAB.tab);
@@ -5651,10 +5680,18 @@ function labEnsureMap() {
   $('pickClose').onclick = () => $('pickbar').classList.remove('open', 'peek');
   for (const b of $('labTabs').querySelectorAll('button[data-tab]')) b.onclick = () => { LAB.tab = b.dataset.tab; applyMobTab(); if (LAB.tab === 'chart') drawDataCharts(); };
   const fsOn = () => document.fullscreenElement === $('hero') || $('hero').classList.contains('fs-fallback');
-  $('btnFull').onclick = () => { const h = $('hero'); if (fsOn()) { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); return; } if (h.requestFullscreen) h.requestFullscreen().catch(() => fsFallbackOn(true)); else fsFallbackOn(true); };
-  $('btnFullExit').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); else fsFallbackOn(false); };
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('hero').classList.contains('fs-fallback')) fsFallbackOn(false); });
-  document.addEventListener('fullscreenchange', () => { const fs = document.fullscreenElement === $('hero'); placePickbar(fs); $('fsHead').hidden = !fs; $('btnFull').classList.toggle('active', fs); syncLand(); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { LAB.map.fit(); LAB.map.draw(); drawDataCharts(); if (isCockpit()) { renderHud(); renderCkStep(); drawScrub(); } } }, 60); });
+  // full screen = the CSS layout (the hero fixed over the page) — modals, sheets and toasts stay on top of it. Where the browser has a real full
+  // screen (not the app), the whole document goes full screen with it, so the browser chrome goes away; a single element in the top layer
+  // would hide everything outside it (the share sheet, the coach and the corner list opened underneath — Android)
+  const browserFs = () => !NATIVE.on && !!document.documentElement.requestFullscreen && !!document.fullscreenEnabled;
+  const fsExit = () => { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); if ($('hero').classList.contains('fs-fallback')) fsFallbackOn(false); };
+  const fsEnter = () => { fsFallbackOn(true); if (browserFs()) document.documentElement.requestFullscreen().catch(() => {}); };
+  LAB.fsExit = fsExit;
+  $('btnFull').onclick = () => { if (fsOn()) fsExit(); else fsEnter(); };
+  $('btnFullExit').onclick = fsExit;
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('hero').classList.contains('fs-fallback')) fsExit(); });
+  // the browser left its full screen (Esc, the system back): the layout follows; an element that still ends up in the top layer (older code paths) is laid out as before
+  document.addEventListener('fullscreenchange', () => { const el = document.fullscreenElement; if (!el && $('hero').classList.contains('fs-fallback')) { fsFallbackOn(false); return; } if (el === $('hero')) { placePickbar(true); $('fsHead').hidden = false; $('btnFull').classList.add('active'); syncLand(); applyMobTab(); } setTimeout(() => { if (LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (isCockpit()) { renderHud(); renderCkStep(); drawScrub(); } } }, 60); });
   // the phone turned: window.orientation first (Apple documents it: 90 = turned to the left, home button on the right), else the
   // Screen Orientation angle (counter-clockwise from natural); the map keeps its place on the glass, the interface re-lays out
   { const ang = () => typeof window.orientation === 'number' ? (window.orientation + 360) % 360 : ((screen.orientation && typeof screen.orientation.angle === 'number') ? screen.orientation.angle : 0); let last = ang(), lastAt = 0;
@@ -6656,40 +6693,39 @@ function drawPreview(cv, pv, color) {
 // the last feed render, so a card computed in the background (CARDS.run) can refresh its post in place
 const HOME = { last: null,
   refreshPost(id, card) { const L = HOME.last; if (!L || APP.route !== 'home') return; const pub = L.pubs.find(s => s.id === id), old = document.querySelector(`#homeFeed .post[data-sid="${CSS.escape(id)}"]`); if (!pub || !old) return; pub.card = card; old.replaceWith(postCard(pub, L.names, L.counts[id], { group: (L.groupOf || {})[id] || null })); } };
-// ---------- the landing for guests: a real session with the seconds left in every corner, like a product page should ----------
+// ---------- the landing for guests: a real session on the satellite picture of its track — the Lab's own map, live — then the promo pictures ----------
 const LANDING = {
-  timer: 0, idx: 0,
-  slides: [['three', 'Three laps on one map'], ['ideal', 'Best vs ideal lap'], ['coach', 'An AI coach that has read your telemetry'], ['replay', 'Press play'], ['dd2', 'Sport karts: revs, gears, shifts'], ['feed', 'The feed shows the analysis']],
+  timer: 0, idx: 0, slides: [], ex: null, live: null, wired: false, capHtml: '',
+  promo: [['three', 'Three laps on one map'], ['ideal', 'Best vs ideal lap'], ['coach', 'An AI coach that has read your telemetry'], ['replay', 'Press play'], ['dd2', 'Sport karts: revs, gears, shifts']],
+  col: (r) => r >= 0.2 ? '#ff5c62' : r >= 0.1 ? '#ffa23a' : '#39c76f',
+  bandH: () => Math.max(0, $('ldBand').offsetHeight - 14), capH: () => Math.max(0, $('ldCap').offsetHeight - 16),   // the map may run a little under the gradients
   // the session that shows the product best: enough laps, a card with a few corners worth 0.05–0.8 s, nothing absurd
   pick(pubs) {
     const score = (s) => { const c = s.card; if (!c || !c.corners || c.corners.length < 6 || (s.nLaps || 0) < 15) return -1; const good = c.corners.filter(q => q[3] >= 0.05 && q[3] <= 0.8).length, mx = Math.max(...c.corners.map(q => q[3])); if (mx > 1 || c.total > 8 || c.total < 0.4) return -1; return good * 10 + Math.min(s.nLaps || 0, 60) / 10; };
     return pubs.map(s => ({ s, k: score(s) })).filter(x => x.k >= 0).sort((a, b) => b.k - a.k).map(x => x.s)[0] || null;
   },
-  // the lap line with every corner's reserve, the three biggest called out, a magnifier on the biggest — drawn from the card alone.
-  // The top band holds the headline numbers and the magnifier; the map sits under it; labels dodge each other (the bubbles are placed first)
+  // the drawn card — shown while the session loads, and wherever imagery cannot load: the lap line with every corner's reserve, the
+  // three biggest called out, drawn from the card alone under the band; labels dodge each other (the bubbles are placed first)
   draw(cv, c) {
     if (!cv || !c || !c.pts) return;
     const box = cv.parentElement, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = box.clientWidth || 360, h = box.clientHeight || 340; if (w < 40) return;
     cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const cs = getComputedStyle(document.documentElement), mono = cs.getPropertyValue('--mono') || 'monospace', body = cs.getPropertyValue('--body') || 'sans-serif';
-    const small = w < 420, R = small ? 50 : 70, band = R * 2 + 26, padX = small ? 30 : 44, padB = small ? 54 : 60;
-    const corners = (c.corners || []).slice(), byRes = corners.slice().sort((a, b) => b[3] - a[3]), top = byRes.slice(0, 3).map(q => q[2]), q0 = byRes[0] && byRes[0][3] >= 0.05 ? byRes[0] : null;
-    const col = (r) => r >= 0.2 ? '#ff5c62' : r >= 0.1 ? '#ffa23a' : '#39c76f';
+    const small = w < 420, band = LANDING.bandH(), padX = small ? 30 : 44, padB = LANDING.capH() + 6;
+    const corners = (c.corners || []).slice(), byRes = corners.slice().sort((a, b) => b[3] - a[3]), top = byRes.slice(0, 3).map(q => q[2]);
     const s = Math.min((w - padX * 2) / Math.max(c.w || 1, 0.05), (h - band - padB) / Math.max(c.h || 1, 0.05)), ox = (w - (c.w || 1) * s) / 2, oy = band + (h - band - padB - (c.h || 1) * s) / 2, X = (p) => ox + p[0] * s, Y = (p) => oy + p[1] * s;
     const path = () => { ctx.beginPath(); c.pts.forEach((p, i) => { i ? ctx.lineTo(X(p), Y(p)) : ctx.moveTo(X(p), Y(p)); }); ctx.closePath(); };
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     path(); ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = small ? 11 : 15; ctx.stroke();
     path(); ctx.strokeStyle = '#4f8dff'; ctx.lineWidth = small ? 3 : 3.5; ctx.stroke();
-    // the bubbles first, so labels can keep clear of them
     const placed = []; const hit = (r) => placed.some(p => !(r.x + r.w < p.x || p.x + p.w < r.x || r.y + r.h < p.y || p.y + p.h < r.y));
     const rad = (q) => top.includes(q[2]) ? (small ? 10.5 : 13) : (small ? 7.5 : 9.5);
     for (const q of corners) { const r = rad(q); placed.push({ x: X(q) - r - 2, y: Y(q) - r - 2, w: 2 * r + 4, h: 2 * r + 4 }); }
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     for (const q of corners.slice().sort((a, b) => a[3] - b[3])) { const big = top.includes(q[2]), r = rad(q), x = X(q), y = Y(q);
       ctx.beginPath(); ctx.arc(x, y, r + 2, 0, Math.PI * 2); ctx.fillStyle = 'rgba(20,26,43,.92)'; ctx.fill();
-      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = col(q[3]); ctx.fill();
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = LANDING.col(q[3]); ctx.fill();
       ctx.fillStyle = '#fff'; ctx.font = `700 ${big ? (small ? 10.5 : 12) : (small ? 8.5 : 9.5)}px ${body}`; ctx.fillText(String(q[2]), x, y + 0.5); }
-    // the labels: the biggest reserves first, each in the first free spot around its bubble (right, left, below, above); the rest stay bubbles
     const maxLabels = small ? 7 : 10; let nl = 0;
     for (const q of byRes) { if (q[3] < 0.05 || nl >= maxLabels) break; const big = top.includes(q[2]), r = rad(q), x = X(q), y = Y(q), tx = `+${q[3].toFixed(2)}`;
       ctx.font = `${big ? 700 : 600} ${big ? (small ? 12.5 : 14) : (small ? 10.5 : 11.5)}px ${mono}`; const tw = ctx.measureText(tx).width + 10, th = big ? 19 : 16;
@@ -6698,39 +6734,119 @@ const LANDING = {
       if (!spot) continue; placed.push(spot); nl++;
       ctx.fillStyle = big ? 'rgba(20,26,43,.9)' : 'rgba(20,26,43,.72)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(spot.x, spot.y, spot.w, spot.h, 5) : ctx.rect(spot.x, spot.y, spot.w, spot.h); ctx.fill();
       ctx.fillStyle = big ? '#fff' : 'rgba(255,255,255,.88)'; ctx.fillText(tx, spot.x + spot.w / 2, spot.y + spot.h / 2 + 0.5); }
-    // the top band: the headline on the left, the magnifier on the right
-    ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.font = `700 ${small ? 9.5 : 10.5}px ${body}`; ctx.fillText(t('RESERVE PER CORNER'), 16, 18);
-    ctx.fillStyle = '#fff'; ctx.font = `700 ${small ? 24 : 30}px ${mono}`; ctx.fillText(t('{s} s', { s: (c.total || 0).toFixed(2) }), 16, small ? 44 : 52);
-    ctx.fillStyle = 'rgba(255,255,255,.62)'; ctx.font = `500 ${small ? 11 : 12.5}px ${body}`; ctx.fillText(t('on the table in one lap'), 16, small ? 64 : 76);
-    if (q0) { ctx.fillStyle = col(q0[3]); ctx.font = `700 ${small ? 12 : 13.5}px ${body}`; ctx.fillText(t('Biggest: corner {n} · +{s} s', { n: q0[2], s: q0[3].toFixed(2) }), 16, small ? 86 : 104); }
-    if (q0) {
-      const mx = w - R - 14, my = 14 + R, zoom = small ? 3 : 3.4, cx = X(q0), cy = Y(q0);
-      ctx.save(); ctx.beginPath(); ctx.arc(mx, my, R, 0, Math.PI * 2); ctx.clip(); ctx.fillStyle = '#0f141f'; ctx.fillRect(mx - R, my - R, 2 * R, 2 * R);
-      ctx.translate(mx - cx * zoom, my - cy * zoom); ctx.scale(zoom, zoom);
-      path(); ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = (small ? 11 : 15) / zoom * 1.5; ctx.stroke(); path(); ctx.strokeStyle = '#4f8dff'; ctx.lineWidth = 3.5 / zoom * 1.4; ctx.stroke();
-      for (const m of c.marks || []) { if (Math.hypot(X(m) - cx, Y(m) - cy) > R / zoom + 4) continue; ctx.beginPath(); ctx.arc(X(m), Y(m), 2.6 / zoom * 2, 0, Math.PI * 2); ctx.fillStyle = { b: '#ff5c62', l: '#f2c94c', e: '#f2c94c', r: '#ff8c2e', t: '#39c76f', a: '#fff' }[m[2]] || '#999'; ctx.fill(); }
-      ctx.restore();
-      ctx.beginPath(); ctx.arc(mx, my, R, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(79,141,255,.22)'; ctx.lineWidth = 7; ctx.stroke();
-      ctx.beginPath(); ctx.arc(mx, my, R, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 1.5; ctx.stroke();
-      // the corner's badge on the magnifier
-      const bx = mx - R + (small ? 16 : 22), by = my - R + (small ? 16 : 22), br = small ? 11 : 13; ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI * 2); ctx.fillStyle = col(q0[3]); ctx.fill(); ctx.textAlign = 'center'; ctx.fillStyle = '#fff'; ctx.font = `700 ${small ? 10.5 : 12}px ${body}`; ctx.fillText(String(q0[2]), bx, by + 0.5);
-      ctx.textAlign = 'left'; ctx.font = `700 ${small ? 13 : 16}px ${mono}`; ctx.fillStyle = '#fff'; ctx.fillText(`+${q0[3].toFixed(2)}`, bx + br + 5, by + 0.5);
-      // a thin line from the magnifier to the corner on the map
-      ctx.beginPath(); ctx.moveTo(mx - R * 0.6, my + R * 0.8); ctx.lineTo(cx, cy); ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 1; ctx.setLineDash([3, 4]); ctx.stroke(); ctx.setLineDash([]); }
+    ctx.textBaseline = 'alphabetic';
   },
-  show(k) { const sl = $('ldSlides').children, dots = $('ldDots').children; if (!sl.length) return; LANDING.idx = (k + sl.length) % sl.length; for (let i = 0; i < sl.length; i++) { sl[i].classList.toggle('on', i === LANDING.idx); if (dots[i]) dots[i].classList.toggle('on', i === LANDING.idx); } },
-  start() { clearInterval(LANDING.timer); LANDING.timer = setInterval(() => { if (document.visibilityState === 'visible' && APP.route === 'home' && !$('landing').hidden) LANDING.show(LANDING.idx + 1); }, 4500); },
+  // ----- the live map: the example session loaded like the Lab does, on the track's imagery; the card's reserves matched to its corners -----
+  async buildLive(ex) {
+    const c = ex.card; if (!c || !c.corners || !c.pts) return null;
+    const sess = await STORE.loadSession(ex), tid = ex.track || '', lid = ex.layout || 'custom';
+    const G = await GEOM.build(tid, lid, sess, { noMedia: true }); if (!G || !G.frame || !G.frame.merc || !G.track) return null;
+    if (!GEOM.attach(sess, G).ok) return null;
+    if (!(await SAT.probe(G))) return null;   // imagery cannot load here: the drawn card stays
+    const list = [sess]; if (G.refSess && G.refSess.id !== sess.id && kartCompatible(G.refSess, sess)) list.push(G.refSess);
+    const A = analyseFor(G, sess, list); if (!A || !A.D || !A.D.rows.length) return null;
+    const D = A.D, tr = G.track, R = D.R, N = tr.N, off = (G.widthM || 8) * 1.6;
+    // the card's corner positions are the lap's bounding box normalised (cardFrom): undo that on the live lap, then take the nearest live corner —
+    // the card was computed against more sessions, so its numbering can differ from tonight's
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (let i = 0; i < N; i++) { const x = tr.cx[i] + R.o[i] * tr.nx[i], y = tr.cy[i] + R.o[i] * tr.ny[i]; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    const pad = (G.widthM || 8) * 2.2; x0 -= pad; y0 -= pad; x1 += pad; y1 += pad; const sc = Math.max(x1 - x0, y1 - y0) || 1;
+    const rows = D.rows.map(r => { const i = r.w.apex, side = r.w.dir === 'L' ? 1 : -1; return { r, x: tr.cx[i] + tr.nx[i] * side * off, y: tr.cy[i] + tr.ny[i] * side * off, res: -1 }; });
+    for (const q of c.corners) { const mx = q[0] * sc + x0, my = q[1] * sc + y0; let best = null, bd = 30; for (const w of rows) { const d = Math.hypot(w.x - mx, w.y - my); if (d < bd) { bd = d; best = w; } } if (best && best.res < 0) best.res = q[3]; }
+    for (const w of rows) if (w.res < 0) w.res = 0;
+    const byRes = rows.filter(w => w.res >= 0.05).sort((a, b) => b.res - a.res);
+    return { G, D, Dv: Object.assign({}, D, { O: null, P3: null }), sess, rows, byRes, total: c.total || Math.round(rows.reduce((a, w) => a + w.res, 0) * 100) / 100, coach: A.coach, hi: null, k: 0, map: null, shown: false };
+  },
+  mount(L) {
+    const wrap = $('ldLive'); wrap.innerHTML = ''; const cv = document.createElement('canvas'); wrap.appendChild(cv);
+    L.map = createMapView(cv, { height: () => wrap.clientHeight || 320, getTrack: () => L.G.track, getWidthM: () => L.G.widthM, getFrameSize: () => [L.G.W, L.G.H], getImage: () => null,
+      getTiles: () => { const TL = SAT.layer(L.G, true, L.G.sat); return TL ? Object.assign(TL, { attribution: '' }) : null; },   // the credit is in the caption
+      getOverlay: () => ({ D: L.Dv, role: 'ref', hiRow: L.hi, band: true, ticks: !!L.hi, labelsAll: false, model: null, modelOn: false, corridor: null, marks: null, markScale: 1 }),
+      viewInset: () => ({ t: LANDING.bandH(), b: LANDING.capH() }),
+      afterDraw: () => { if (!L.hi) LANDING.reserves(L); },
+      onTiles: (ok, all) => { if (all && ok >= all && !L.shown) LANDING.reveal(L); } });
+    L.map.fit(); L.map.draw();
+    setTimeout(() => { if (!L.shown && LANDING.live === L) LANDING.reveal(L); }, 5000);   // imagery that is slow to come: show the map anyway
+  },
+  reveal(L) { L.shown = true; $('ldLive').classList.add('on'); LANDING.setSlides(); LANDING.labels(LANDING.slides[LANDING.idx]); L.map.fit(); L.map.draw(); },
+  // the reserve of every corner next to its badge (the overview): the biggest first, each in the first free spot around the badge
+  reserves(L) {
+    const m = L.map, { ctx, w, h } = m.setup(), cs = getComputedStyle(document.documentElement), mono = cs.getPropertyValue('--mono') || 'monospace', small = w < 420;
+    const top = L.byRes.slice(0, 3).map(q => q.r), placed = m.M.badges.map(b => ({ x: b.x - b.r - 2, y: b.y - b.r - 2, w: 2 * b.r + 4, h: 2 * b.r + 4 }));
+    const hit = (r) => placed.some(p => !(r.x + r.w < p.x || p.x + p.w < r.x || r.y + r.h < p.y || p.y + p.h < r.y));
+    const yTop = LANDING.bandH() - 10, yBot = h - LANDING.capH() + 12, maxLabels = small ? 7 : 10; let nl = 0;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const q of L.byRes) { if (nl >= maxLabels) break; const b = m.M.badges.find(x => x.row === q.r); if (!b) continue; const big = top.includes(q.r), tx = `+${q.res.toFixed(2)}`;
+      ctx.font = `${big ? 700 : 600} ${big ? (small ? 12.5 : 14) : (small ? 10.5 : 11.5)}px ${mono}`; const tw = ctx.measureText(tx).width + 10, th = big ? 19 : 16;
+      const cands = [[b.x + b.r + 5, b.y - th / 2], [b.x - b.r - 5 - tw, b.y - th / 2], [b.x - tw / 2, b.y + b.r + 4], [b.x - tw / 2, b.y - b.r - 4 - th]];
+      let spot = null; for (const [lx, ly] of cands) { const rr = { x: lx, y: ly, w: tw, h: th }; if (lx < 4 || ly < yTop || lx + tw > w - 4 || ly + th > yBot) continue; if (!hit(rr)) { spot = rr; break; } }
+      if (!spot) continue; placed.push(spot); nl++;
+      ctx.fillStyle = LANDING.col(q.res); ctx.globalAlpha = big ? 1 : 0.88; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(spot.x, spot.y, spot.w, spot.h, 5) : ctx.rect(spot.x, spot.y, spot.w, spot.h); ctx.fill(); ctx.globalAlpha = 1;
+      ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 1; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.fillText(tx, spot.x + spot.w / 2, spot.y + spot.h / 2 + 0.5); }
+    ctx.textBaseline = 'alphabetic';
+  },
+  // the camera of the live map: the whole lap, or one of the two biggest corners (the Lab's own focus, with its labels)
+  camera(k) { const L = LANDING.live, m = L && L.map; if (!m) return; const q = k > 0 ? L.byRes[k - 1] : null; L.hi = q ? q.r : null; L.k = k; if (q) m.focusWindow(q.r.w.a, q.r.w.len, 35, 4.5); else m.fitAnimated(); },
+  // what the fastest passes do in this corner, in a line: brake 40–45 m · apex 46–48 km/h · exit 68–70 km/h
+  fastLine(rec) {
+    const r = (x, u) => x ? (x.lo.toFixed(0) === x.hi.toFixed(0) ? `${x.lo.toFixed(0)}${u}` : `${x.lo.toFixed(0)}–${x.hi.toFixed(0)}${u}`) : '';
+    const kv = (x) => x ? ((x.lo * 3.6).toFixed(0) === (x.hi * 3.6).toFixed(0) ? (x.lo * 3.6).toFixed(0) : `${(x.lo * 3.6).toFixed(0)}–${(x.hi * 3.6).toFixed(0)}`) + ' ' + t('km/h') : '';
+    const parts = [], M = ' ' + t('m');
+    if (rec.kind === 'brake' && rec.brake) parts.push(t('brake {r}', { r: r(rec.brake, M) })); else if (rec.kind === 'lift' && rec.lift) parts.push(t('lift {r}', { r: r(rec.lift, M) })); else parts.push(t('no brake'));
+    if (rec.apex) parts.push(t('apex {v}', { v: kv(rec.apex) })); if (rec.exit) parts.push(t('exit {v}', { v: kv(rec.exit) }));
+    return parts.join(' · ');
+  },
+  // ----- the slides: the map (1–3 views), then the promo pictures -----
+  setSlides() {
+    const L = LANDING.live, nMap = L && L.shown ? 1 + Math.min(2, L.byRes.length) : 1, cur = LANDING.slides[LANDING.idx] || null, S = [];
+    for (let k = 0; k < nMap; k++) S.push({ kind: 'map', k });
+    const box = $('ldSlides'); if (!box.children.length) LANDING.promo.forEach(([key, alt]) => { const d = el('div', 'ld-slide'); const im = new Image(); im.src = `promo/${key}.webp?v=1`; im.alt = alt; im.decoding = 'async'; d.appendChild(im); box.appendChild(d); });
+    LANDING.promo.forEach(([key, alt], i) => S.push({ kind: 'img', key, alt, el: box.children[i] }));
+    LANDING.slides = S; LANDING.idx = Math.max(0, S.findIndex(s => cur && (cur.kind === 'img' ? s.el === cur.el : s.kind === 'map' && s.k === cur.k)));
+    const dots = $('ldDots'); dots.innerHTML = '';
+    S.forEach((s, i) => { const b = el('button', i === LANDING.idx ? 'on' : ''); b.type = 'button'; b.setAttribute('aria-label', s.kind === 'map' ? t('The example session') : s.alt); b.onclick = (e) => { e.stopPropagation(); LANDING.show(i, true); }; dots.appendChild(b); });
+  },
+  // the band over the map and the caption under it; both step aside for a promo picture
+  labels(s) {
+    const L = LANDING.live, c = (LANDING.ex && LANDING.ex.card) || {}, band = $('ldBand'), cap = $('ldCap'), isMap = !s || s.kind === 'map';
+    band.classList.toggle('off', !isMap); cap.classList.toggle('off', !isMap); if (!isMap) return;
+    const k = s ? s.k : 0, q = k > 0 && L ? L.byRes[k - 1] : null, set = (id, v) => { $(id).textContent = v || ''; };
+    if (q) { const n = q.r.w.n, rec = L.coach && L.coach.corners.find(x => x.n === n);
+      set('ldBandK', k === 1 ? t('Corner {n} · the biggest reserve', { n }) : t('Corner {n} · the second biggest', { n })); set('ldBandV', `+${q.res.toFixed(2)} ${t('s')}`); set('ldBandS', t('vs the fastest on this layout')); set('ldBandB', rec ? t('Fastest here: {s}', { s: LANDING.fastLine(rec) }) : ''); $('ldBandB').style.color = '#fff'; }
+    else { const top = L ? L.byRes[0] : null, n0 = top ? top.r.w.n : (c.top && c.top[0] ? c.top[0][0] : 0), r0 = top ? top.res : (c.top && c.top[0] ? c.top[0][1] : 0), total = L ? L.total : (c.total || 0);
+      set('ldBandK', t('RESERVE PER CORNER')); set('ldBandV', t('{s} s', { s: total.toFixed(2) })); set('ldBandS', t('on the table in one lap')); set('ldBandB', n0 ? t('Biggest: corner {n} · +{s} s', { n: n0, s: r0.toFixed(2) }) : ''); $('ldBandB').style.color = LANDING.col(r0); }
+    cap.innerHTML = LANDING.capHtml + `<span class="cr">${esc(L && L.shown ? t('Imagery © Esri, Maxar, Earthstar Geographics') : t('a real session'))}</span>`;
+  },
+  show(k, user) {
+    const S = LANDING.slides; if (!S.length) return; const from = S[LANDING.idx] || null, to = S[((k % S.length) + S.length) % S.length]; LANDING.idx = S.indexOf(to);
+    LANDING.labels(to); if (to.kind === 'map') LANDING.camera(to.k);
+    // a picture cuts in over whatever is there; on the way back to the map the current picture cuts away; the one just covered keeps still until it is hidden
+    for (const s of S) { if (s.kind !== 'img') continue; const e = s.el; if (s === to) { e.classList.remove('out'); e.classList.add('on'); e.style.zIndex = 4; } else if (s === from && to.kind === 'map') { e.classList.remove('on'); e.classList.add('out'); e.style.zIndex = 3; } else { e.classList.remove('on', 'out'); e.style.zIndex = s === from ? 3 : 2; } }
+    const dots = $('ldDots').children; for (let i = 0; i < dots.length; i++) dots[i].classList.toggle('on', i === LANDING.idx);
+    if (user) LANDING.start();
+  },
+  start() { LANDING.stop(); const tick = () => { const s = LANDING.slides[LANDING.idx]; LANDING.timer = setTimeout(() => { if (document.visibilityState === 'visible' && APP.route === 'home' && !$('landing').hidden) LANDING.show(LANDING.idx + 1); tick(); }, s && s.kind === 'map' && s.k === 0 ? 6000 : 4500); }; tick(); },
+  stop() { clearTimeout(LANDING.timer); LANDING.timer = 0; },
   async render(pubs, C) {
-    const L = $('landing'); L.hidden = false;
+    const Ld = $('landing'); Ld.hidden = false;
     $('ldUpload').onclick = () => UPLOAD.open({});
-    const ex = LANDING.pick(pubs); const trk = ex ? STORE.getTrack(ex.track) : null; const who = ex ? (await STORE.names([ex.owner]))[ex.owner] : null;
-    if (ex) { $('ldDemo').href = '#lab~' + ex.id; $('ldMap').hidden = false; requestAnimationFrame(() => LANDING.draw($('ldCanvas'), ex.card)); $('ldCap').innerHTML = `<b>${esc(trk ? trk.name : ex.trackName || '')}</b> · ${esc(who ? who.name : t('a driver'))} · ${esc(fmtMs(ex.bestMs))} · ${esc(t('{n} laps', { n: ex.nLaps || 0 }))} — ${esc(t('a real session: the seconds each corner leaves against the best passes on this layout'))}`; }
-    else { $('ldMap').hidden = true; $('ldDemo').href = '#tracks'; }
+    const ex = LANDING.pick(pubs), trk = ex ? STORE.getTrack(ex.track) : null, who = ex ? (await STORE.names([ex.owner]))[ex.owner] : null, fresh = !ex || !LANDING.ex || LANDING.ex.id !== ex.id;
+    LANDING.ex = ex;
+    if (ex) { $('ldDemo').href = '#lab~' + ex.id; $('ldMap').hidden = false; $('ldMap').title = t('Open this session in the Lab'); $('ldMap').onclick = () => { location.hash = '#lab~' + ex.id; };
+      LANDING.capHtml = `<b>${esc(trk ? trk.name : ex.trackName || '')}</b> · ${esc(who ? who.name : t('a driver'))} · ${esc(fmtMs(ex.bestMs))} · ${esc(t('{n} laps', { n: ex.nLaps || 0 })).replace(/ /g, '\u00a0')}`; }
+    else { $('ldMap').hidden = true; $('ldDemo').href = '#tracks'; LANDING.capHtml = ''; }
     const pr = $('ldProof'); pr.innerHTML = ''; if (C) { for (const [v, k] of [[C.tracks, t('tracks')], [C.laps, t('laps analysed')], [C.published, t('sessions published')]]) if (v) { const sp = el('span'); sp.innerHTML = `<b>${esc(String(v))}</b> ${esc(k)}`; pr.appendChild(sp); } }
-    const box = $('ldSlides'), dots = $('ldDots'); if (!box.children.length) { LANDING.slides.forEach(([k, alt], i) => { const d = el('div', 'ld-slide' + (i === 0 ? ' on' : '')); const im = new Image(); im.src = `promo/${k}.webp?v=1`; im.alt = alt; im.loading = i === 0 ? 'eager' : 'lazy'; im.decoding = 'async'; d.appendChild(im); box.appendChild(d); const b = el('button', i === 0 ? 'on' : ''); b.type = 'button'; b.setAttribute('aria-label', alt); b.onclick = () => { LANDING.show(i); LANDING.start(); }; dots.appendChild(b); });
-      let x0 = null; box.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true }); box.addEventListener('touchend', (e) => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) { LANDING.show(LANDING.idx + (dx < 0 ? 1 : -1)); LANDING.start(); } }, { passive: true }); }
+    if (fresh) { LANDING.live = null; $('ldLive').classList.remove('on'); $('ldLive').innerHTML = ''; LANDING.idx = 0; }
+    LANDING.setSlides(); LANDING.show(LANDING.idx);
+    if (ex) requestAnimationFrame(() => LANDING.draw($('ldCanvas'), ex.card));
     LANDING.start();
-    window.addEventListener('resize', () => { if (APP.route === 'home' && !$('landing').hidden && ex) LANDING.draw($('ldCanvas'), ex.card); });
+    if (!LANDING.wired) { LANDING.wired = true;
+      window.addEventListener('resize', () => { if (APP.route !== 'home' || $('landing').hidden || !LANDING.ex) return; LANDING.draw($('ldCanvas'), LANDING.ex.card); const L = LANDING.live; if (L && L.map) { L.map.fit(); L.map.draw(); if (L.k) LANDING.camera(L.k); } });
+      const box = $('ldMap'); let x0 = null, y0 = null;   // a swipe moves between the slides
+      box.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+      box.addEventListener('touchend', (e) => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) LANDING.show(LANDING.idx + (dx < 0 ? 1 : -1), true); }, { passive: true }); }
+    // the live map comes in the background: the feed below must not wait for a session to load
+    if (ex && fresh) LANDING.buildLive(ex).then((L) => { if (L && LANDING.ex === ex && !LANDING.live && APP.route === 'home') { LANDING.live = L; LANDING.mount(L); } }).catch((e) => console.warn('landing: live map', e));
   }
 };
 async function renderHomePage() {
@@ -6752,7 +6868,7 @@ async function renderHomePage() {
   // a guest sees the landing (the product first); a signed-in driver the compact hero with the counters
   const guest = !STORE.hasIdentity && STORE.hasDb;
   document.querySelector('#pg-home .home-hero').hidden = guest; $('landing').hidden = !guest;
-  if (guest) { try { await LANDING.render(pubs, C); } catch (e) { console.error('landing', e); } } else clearInterval(LANDING.timer);
+  if (guest) { try { await LANDING.render(pubs, C); } catch (e) { console.error('landing', e); } } else LANDING.stop();
   // hero stats
   // site-wide totals from hutka_counts; without the function (older database) — what the feed slice shows
   { const st = $('homeStats'); st.innerHTML = ''; const drivers = C ? C.drivers : new Set(pubs.map(s => s.owner)).size, laps = C ? C.laps : pubs.reduce((a, s) => a + (s.nLaps || 0), 0), nSess = C ? C.sessions : pubs.length; for (const [k, v] of [[t('Tracks'), C ? C.tracks : STORE.getTracks().length], [t('Sessions'), nSess], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="v">${v}</div><div class="k">${esc(k)}</div>`; st.appendChild(d); } }
@@ -7502,7 +7618,7 @@ const ADMIN = (() => {
   try { STORE.visit(); } catch (e) {}   // visitors & retention for the admin panel (visits.sql)
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, SHARE, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { await NATIVE.init(); } catch (e) {}
