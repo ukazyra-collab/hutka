@@ -88,6 +88,9 @@ npx cap open android   # откроется Android Studio
 3. **Testing → Internal testing** → Create release → загрузи `.aab` → добавь тестеров по почте → ссылка для установки. Потом **Production → Create release** → Review. Первая проверка Google — до 7 дней, обновления обычно часы.
 4. Версия: `android/app/build.gradle` → `versionCode` (+1 на каждую загрузку) и `versionName`.
 
+## 4a-0. Имя пакета Android: `hutka.ai` (16 окт 2026)
+Приложение в Play Console создано с именем пакета **`hutka.ai`** (оно фиксируется навсегда), поэтому в `android/app/build.gradle` стоит `applicationId "hutka.ai"` — а `namespace` и Java-пакет остались `ai.hutka.app`, это разные вещи, менять их не нужно. Всё, что привязывается к имени пакета Android, делать на `hutka.ai`: Firebase (Android app в проекте Firebase → `google-services.json`), Android App Links (`assetlinks.json`), OAuth-клиент Android в Google Cloud (если понадобится). iOS bundle id — отдельный, `ai.hutka.app`.
+
 ## 4a. Android — что сделано и как собрать (16 окт 2026)
 
 Нативная часть под Android готова: Capacitor 8 рисует страницу edge-to-edge и сам отдаёт `env(safe-area-inset-*)` (плагин SystemBars, в конфиге `initialViewportFitValueHint: cover`), поэтому стеклянная шапка и таб-панель встают так же, как на iPhone; цвет иконок статус-бара и жестовой панели следует теме; аппаратная кнопка «назад» сначала закрывает открытое (модалку, пикер, инспектор, кокпит), потом идёт по истории, потом сворачивает приложение; «Поделиться» через системное меню (FileProvider уже в манифесте); пуши через FCM (иконка `ic_stat_hutka`, канал `hutka`, разрешение `POST_NOTIFICATIONS`); «Открыть в Hutka» для .alf2/.gpx/.csv; вход через Google/почту возвращается по `hutka://auth`. Блюр на больших панелях чуть легче (`html.android`), чтобы не тормозило на средних телефонах.

@@ -4,7 +4,8 @@ android {
     namespace = "ai.hutka.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "ai.hutka.app"
+        // the Play Console app was created with the package name "hutka.ai" (fixed for its lifetime); the Java namespace stays ai.hutka.app
+        applicationId "hutka.ai"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 3
