@@ -3445,6 +3445,7 @@ Object.assign(I18N.RU, { 'Report': 'Пожаловаться', 'Reported ✓': '
   'All your sessions, comments, likes, follows, coach chats and the profile are deleted at once. This cannot be undone.': 'Все твои сессии, комментарии, лайки, подписки, чаты с тренером и профиль удаляются сразу. Отменить нельзя.', 'Delete everything': 'Удалить всё', 'Really delete?': 'Точно удалить?', 'Last check: the account {e} and everything in it will be gone.': 'Последняя проверка: аккаунт {e} и всё в нём исчезнут.', 'Yes, delete my account': 'Да, удалить мой аккаунт', 'Your account is deleted.': 'Аккаунт удалён.', 'Could not delete: {e}': 'Не удалилось: {e}',
   'Reports on content and drivers': 'Жалобы на контент и гонщиков', 'Run supabase/safety.sql in the SQL editor once — reports on sessions, comments and drivers appear here.': 'Выполни supabase/safety.sql в SQL-редакторе один раз — жалобы на сессии, комментарии и гонщиков появятся здесь.', 'No reports. The "Report" buttons on sessions, comments, driver pages and coach answers send them here.': 'Жалоб нет. Кнопки «Пожаловаться» на сессиях, комментариях, страницах гонщиков и ответах тренера присылают их сюда.',
   '(session gone)': '(сессии уже нет)', '(comment gone)': '(комментария уже нет)', 'comment': 'комментарий', 'Coach': 'Тренер', 'reported by {n}': 'пожаловался {n}', 'a driver': 'гонщик', 'Delete comment': 'Удалить комментарий', 'Delete this comment?': 'Удалить этот комментарий?', 'Hide session': 'Скрыть сессию', 'It disappears from the feed and the track page. The owner keeps it, unpublished.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется, неопубликованной.' });
+Object.assign(I18N.RU, { 'My sessions': 'Мои сессии', 'sessions': 'сессий', 'drivers': 'гонщиков' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4922,7 +4923,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.2';
+const APP_VERSION = 'v34.3';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6943,9 +6944,11 @@ const LANDING = {
     const ex = LANDING.pick(pubs), trk = ex ? STORE.getTrack(ex.track) : null, fresh = !ex || !LANDING.ex || LANDING.ex.id !== ex.id;
     LANDING.ex = ex;
     const caption = (who) => { LANDING.capHtml = `<b>${esc(trk ? trk.name : ex.trackName || '')}</b> · ${esc(who || t('a driver'))} · ${esc(fmtMs(ex.bestMs))} · ${esc(t('{n} laps', { n: ex.nLaps || 0 })).replace(/ /g, ' ')}`; };
-    if (ex) { $('ldDemo').href = '#lab~' + ex.id; $('ldMap').hidden = false; $('ldMap').title = t('Open this session in the Lab'); $('ldMap').onclick = () => { location.hash = '#lab~' + ex.id; }; caption(ex.who || ''); }
-    else { $('ldMap').hidden = true; $('ldDemo').href = '#tracks'; LANDING.capHtml = ''; }
-    const pr = $('ldProof'); if (C) { pr.innerHTML = ''; for (const [v, k] of [[C.tracks, t('tracks')], [C.laps, t('laps analysed')], [C.published, t('sessions published')]]) if (v) { const sp = el('span'); sp.innerHTML = `<b>${esc(String(v))}</b> ${esc(k)}`; pr.appendChild(sp); } }
+    if (ex) { if (!STORE.hasIdentity) $('ldDemo').href = '#lab~' + ex.id; $('ldMap').hidden = false; $('ldMap').title = t('Open this session in the Lab'); $('ldMap').onclick = () => { location.hash = '#lab~' + ex.id; }; caption(ex.who || ''); }
+    else { $('ldMap').hidden = true; if (!STORE.hasIdentity) $('ldDemo').href = '#tracks'; LANDING.capHtml = ''; }
+    const pr = $('ldProof'); if (C) { pr.innerHTML = ''; const rows = STORE.hasIdentity ? [[C.tracks, t('tracks')], [C.sessions, t('sessions')], [C.drivers, t('drivers')], [C.laps, t('laps analysed')]] : [[C.tracks, t('tracks')], [C.laps, t('laps analysed')], [C.published, t('sessions published')]]; for (const [v, k] of rows) if (v) { const sp = el('span'); sp.innerHTML = `<b>${esc(String(v))}</b> ${esc(k)}`; pr.appendChild(sp); } }
+    // a signed-in driver: the second button leads to their own library, the copy stays
+    { const d = $('ldDemo'), sp = d.querySelector('span'); if (STORE.hasIdentity) { d.href = '#lab'; if (sp) sp.textContent = t('My sessions'); } else if (sp) sp.textContent = t('Open a live example'); }
     if (fresh) { LANDING.live = null; LANDING.fellBack = false; $('ldLive').classList.remove('on'); $('ldLive').innerHTML = ''; LANDING.idx = 0; const cv = $('ldCanvas'); cv.width = cv.width; $('ldMap').classList.toggle('ld-wait', !!ex); clearTimeout(LANDING.waitT); if (ex) LANDING.waitT = setTimeout(LANDING.fallback, 12000); clearTimeout(LANDING.promoT); LANDING.promoT = setTimeout(LANDING.loadPromo, 6000); }
     LANDING.setSlides(); LANDING.show(LANDING.idx);
     if (!ex) LANDING.loadPromo();
@@ -6973,18 +6976,18 @@ async function renderHomePage() {
   const feed = $('homeFeed'); feed.innerHTML = '';
   for (let i = 0; i < 3; i++) { const sk = el('div', 'post skel'); sk.style.height = '220px'; feed.appendChild(sk); }
   // a guest sees the landing at once — with the hero remembered from the last visit already loading — before the feed has been asked for
-  const guest0 = !STORE.hasIdentity && STORE.hasDb;
-  if (guest0) { document.querySelector('#pg-home .home-hero').hidden = true; $('landing').hidden = false; const h = LANDING.cached(); if (h) { try { await LANDING.render([h], null); } catch (e) { console.error('landing', e); } } }
+  const landing0 = !!STORE.hasDb;
+  if (landing0) { document.querySelector('#pg-home .home-hero').hidden = true; $('landing').hidden = false; const h = LANDING.cached(); if (h) { try { await LANDING.render([h], null); } catch (e) { console.error('landing', e); } } }
   // 100 most recent published sessions — one driver uploading 30 files in a row must not push everyone else out of the feed (they fold into one post below)
   const pubs = STORE.hasDb ? await STORE.recentPublished(100) : [];
   const C = STORE.hasDb ? await STORE.siteCounts() : null;
   await STORE.socialAvailable();
   const names = await STORE.names(pubs.map(s => s.owner)), counts = await STORE.socialCounts(pubs.map(s => s.id));
   for (const tid of new Set(pubs.map(s => s.track).filter(Boolean))) await STORE.getLayouts(tid);
-  // a guest sees the landing (the product first); a signed-in driver the compact hero with the counters
-  const guest = !STORE.hasIdentity && STORE.hasDb;
-  document.querySelector('#pg-home .home-hero').hidden = guest; $('landing').hidden = !guest;
-  if (guest) { try { await LANDING.render(pubs, C); } catch (e) { console.error('landing', e); } } else LANDING.stop();
+  // everyone sees the landing hero (the live session on its track, then the product pictures); the three steps are for guests, a signed-in driver knows them
+  const guest = !STORE.hasIdentity, showLanding = !!STORE.hasDb;
+  document.querySelector('#pg-home .home-hero').hidden = showLanding; $('landing').hidden = !showLanding; document.querySelector('#landing .ld-steps').hidden = !guest;
+  if (showLanding) { try { await LANDING.render(pubs, C); } catch (e) { console.error('landing', e); } } else LANDING.stop();
   // hero stats
   // site-wide totals from hutka_counts; without the function (older database) — what the feed slice shows
   { const st = $('homeStats'); st.innerHTML = ''; const drivers = C ? C.drivers : new Set(pubs.map(s => s.owner)).size, laps = C ? C.laps : pubs.reduce((a, s) => a + (s.nLaps || 0), 0), nSess = C ? C.sessions : pubs.length; for (const [k, v] of [[t('Tracks'), C ? C.tracks : STORE.getTracks().length], [t('Sessions'), nSess], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="v">${v}</div><div class="k">${esc(k)}</div>`; st.appendChild(d); } }
