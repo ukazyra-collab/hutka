@@ -981,6 +981,26 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
 body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pickbar #pickClose{right:calc(10px + var(--sa-right));top:calc(8px + var(--sa-top))}
 /* a phone sideways: the share sheet's preview fits above the buttons, so the buttons are in view without scrolling */
 @media (max-height:480px){ .share-pv canvas{width:auto;max-height:46vh;max-width:100%} .modal .box{padding:12px 16px;gap:10px} .modal h3{font-size:16px} }
+/* ---------- community safety: report / block / delete account ---------- */
+.radios{display:flex;flex-direction:column;gap:6px}
+.radios label{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
+.danger-zone{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.danger-zone .hint{font-size:12.5px}
+.btn.danger{color:var(--brake,#d33);border-color:color-mix(in srgb,var(--brake,#d33) 40%,var(--line))}
+.btn.danger:hover{background:color-mix(in srgb,var(--brake,#d33) 10%,transparent)}
+.blocked-note{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--surface-2)}
+h2 .h2act{margin-left:auto;font-weight:500}
+.cmt .head .flagbtn{margin-left:auto;background:none;border:0;color:var(--faint);font-size:11.5px;cursor:pointer;padding:0 2px}
+.cmt .head .flagbtn:hover{color:var(--muted)}
+.msg.ai .ai-flag{display:block;margin-top:6px;background:none;border:0;color:var(--faint);font-size:11px;cursor:pointer;padding:0;text-align:left}
+.msg.ai .ai-flag:hover{color:var(--muted)}
+.post .pf .btn.flag{color:var(--faint)}
+.flag-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.flag-row.done{opacity:.55}
+.flag-row .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.flag-row .tx{font-size:13.5px;line-height:1.45;white-space:pre-wrap}
+.flag-row .meta{font-size:11.5px;color:var(--faint)}
+.flag-row .acts{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
 /* ---------- the bell (Activity), the Activity list, the push question ---------- */
 .bell{position:relative;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;color:var(--muted);flex:none;text-decoration:none}
 .bell svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -1357,7 +1377,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       <div class="card" id="digestPanel" hidden><h2><svg><use href="#i-clip"/></svg><span data-t="Session digest">Session digest</span><span class="sub" id="digestSub"></span></h2><div class="digest" id="digest"></div><details class="gloss"><summary class="hint" data-t="What the terms mean">What the terms mean</summary><ul id="glossList"></ul></details></div>
       <div class="card" id="askPanel" hidden><h2><svg><use href="#i-lab"/></svg><span data-t="Ask the AI about this session">Ask the AI about this session</span></h2><div class="chat" id="chatLog"></div><div class="chips" id="askChips"></div><div class="askrow"><textarea id="askInput"></textarea><div class="askbtns"><button class="btn primary" id="askBtn" type="button" data-t="Ask">Ask</button><button class="btn" id="askStop" type="button" hidden data-t="Stop">Stop</button></div></div><div class="hint" id="askNote" style="margin-top:6px"></div></div>
       <div class="card" id="cornersPanel" hidden><h2><svg><use href="#i-corner"/></svg><span data-t="Corner by corner">Corner by corner</span><span class="sub" data-t="click a row to pin it on the map">click a row to pin it on the map</span></h2><div class="crows mobile-only" id="cornersMob"></div><div class="tblwrap" id="cornersWrap"><table class="tbl corners" id="cornersTable"><thead><tr><th>#</th><th data-t="Type">Type</th><th class="you" id="youColHead"></th><th id="cmpColHead"></th><th>Δt</th><th data-t="Reserve">Reserve</th><th data-t="Main difference">Main difference</th></tr></thead><tbody></tbody></table></div><div class="ideal-break" id="idealBreak" hidden></div></div>
-      <div class="card" id="discussPanel" hidden><h2><svg><use href="#i-chat"/></svg><span data-t="Discussion">Discussion</span><span class="sub" id="discussSub"></span></h2><div class="comments" id="commentList"></div><div class="askrow" id="commentForm"><textarea id="commentInput" rows="2"></textarea><div class="askbtns"><button class="btn primary" id="commentBtn" type="button" data-t="Post">Post</button></div></div><div class="hint" id="commentNote"></div></div>
+      <div class="card" id="discussPanel" hidden><h2><svg><use href="#i-chat"/></svg><span data-t="Discussion">Discussion</span><span class="sub" id="discussSub"></span><button class="btn xs ghost h2act" id="discussReport" type="button" hidden data-t="Report this session">Report this session</button></h2><div class="comments" id="commentList"></div><div class="askrow" id="commentForm"><textarea id="commentInput" rows="2"></textarea><div class="askbtns"><button class="btn primary" id="commentBtn" type="button" data-t="Post">Post</button></div></div><div class="hint" id="commentNote"></div></div>
     </section>
 
     <!-- ========== AI COACH ========== -->
@@ -1410,6 +1430,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
             <div class="field wide" id="profSwsField" hidden><label data-t="SWS (Sodi World Series) profile link">SWS (Sodi World Series) profile link</label><div class="row"><input type="url" id="profSws" class="grow" placeholder="https://www.sodiwseries.com/en-gb/drivers/…"><button class="btn sm" id="profSwsImport" type="button" data-t="Import SWS results">Import SWS results</button></div><div class="hint" id="profSwsHint"></div></div>
           </div>
           <div class="row" style="margin-top:12px"><button class="btn primary" id="profSave" type="button" data-t="Save">Save</button><button class="btn ghost" id="profSignOut" type="button" hidden data-t="Sign out">Sign out</button><span class="status" id="profStatus"></span></div>
+          <div class="danger-zone" id="profDanger" hidden><button class="btn sm ghost danger" id="profDelete" type="button" data-t="Delete account">Delete account</button><span class="hint" data-t="Everything goes at once — sessions, comments, likes, chats, the profile. No undo.">Everything goes at once — sessions, comments, likes, chats, the profile. No undo.</span> <a class="hint" href="delete-account.html" target="_blank" rel="noopener" data-t="What exactly is deleted">What exactly is deleted</a></div>
           <div class="row mobile-only" style="margin-top:14px;gap:10px;align-items:center"><span class="hint" data-t="Language">Language</span><div class="lang" role="group"><button type="button" id="langEnM">EN</button><button type="button" id="langRuM">RU</button></div><a class="btn sm" href="#help"><svg><use href="#i-help"/></svg><span data-t="Help">Help</span></a><a class="btn sm" href="#admin" id="profAdminLink" hidden><svg><use href="#i-shield"/></svg><span data-t="Admin Panel">Admin Panel</span></a></div>
         </div>
         <div class="card" id="profSocialCard"><h2><svg><use href="#i-users"/></svg><span data-t="Community">Community</span></h2><div class="tiles" id="profSocial"></div><div class="hint" id="profSocialHint" style="margin-top:10px"></div></div>
@@ -1431,7 +1452,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       <div id="helpBody"></div>
     </section>
     <section class="page" id="pg-driver" hidden>
-      <div class="card"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><img class="avatar" id="drvAvatar" alt="" style="width:72px;height:72px"><div style="min-width:0;flex:1"><div style="font-size:22px;font-weight:800" id="drvName">—</div><div class="hint" id="drvMeta"></div><div class="hint" id="drvFollowers"></div><div id="drvBio" style="margin-top:6px;font-size:14px"></div><div class="row" id="drvLinks" style="margin-top:8px"></div></div><button class="btn primary" id="drvFollow" type="button" hidden></button></div></div>
+      <div class="card"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><img class="avatar" id="drvAvatar" alt="" style="width:72px;height:72px"><div style="min-width:0;flex:1"><div style="font-size:22px;font-weight:800" id="drvName">—</div><div class="hint" id="drvMeta"></div><div class="hint" id="drvFollowers"></div><div id="drvBio" style="margin-top:6px;font-size:14px"></div><div class="row" id="drvLinks" style="margin-top:8px"></div></div><div class="row" id="drvActs" style="gap:6px"><button class="btn primary" id="drvFollow" type="button" hidden></button><button class="btn" id="drvBlock" type="button" hidden data-t="Block">Block</button><button class="btn ghost" id="drvReport" type="button" hidden data-t="Report">Report</button></div></div><div class="hint blocked-note" id="drvBlockedNote" hidden></div></div>
       <div class="card" id="drvSwsCard" hidden><h2><svg><use href="#i-flag"/></svg><span data-t="SWS results">SWS results</span><span class="sub" id="drvSwsSub"></span></h2><div id="drvSwsBox"></div></div>
       <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="Personal bests">Personal bests</span></h2><div id="drvBest"></div></div>
       <div class="card"><h2><svg><use href="#i-clip"/></svg><span data-t="Published sessions">Published sessions</span><span class="sub" id="drvSessSub"></span></h2><div id="drvSessions"></div></div>
@@ -1517,6 +1538,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
             </div>
           </div>
         <div class="card" id="admModCard" hidden><h2><svg><use href="#i-info"/></svg><span data-t="Hidden sessions">Hidden sessions</span><span class="sub" data-t="hidden by admins — the owners keep them">hidden by admins — the owners keep them</span></h2><div class="list" id="admMod"></div></div>
+        <div class="card" id="admFlagsCard" hidden><h2><svg><use href="#i-flag"/></svg><span data-t="Reports on content and drivers">Reports on content and drivers</span><span class="sub" id="admFlagsSub"></span></h2><div class="list" id="admFlags"></div><div class="hint" id="admFlagsHint" style="margin-top:8px"></div></div>
         <div class="card" id="admReportsCard" hidden><h2><svg><use href="#i-info"/></svg><span data-t="Bug reports">Bug reports</span><span class="sub" id="admReportsSub"></span></h2><div class="list" id="admReports"></div><div class="hint" id="admReportsHint" style="margin-top:8px"></div></div>
         <div class="card" id="admStatsCard" hidden><h2><svg><use href="#i-speed"/></svg><span data-t="Statistics">Statistics</span><span class="sub" id="admStatsSub"></span></h2><div id="admStats"></div></div>
         <div class="card" id="admAiCard" hidden><h2><svg><use href="#i-spark"/></svg><span data-t="AI coach · usage and cost">AI coach · usage and cost</span></h2><div id="admAiUsage"></div></div>
@@ -1630,6 +1652,20 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div class="status" id="shareStatus"></div>
 </div></div>
 <div class="zoom" id="shareZoom" hidden><img id="shareZoomImg" alt=""></div>
+<div class="modal" id="flagModal" hidden><div class="box" style="width:min(460px,100%)">
+  <h3 data-t="Report">Report</h3>
+  <p class="hint" id="flagWhat"></p>
+  <div class="field"><label data-t="What is wrong">What is wrong</label>
+    <div class="radios" id="flagReasons">
+      <label><input type="radio" name="flagReason" value="spam"><span data-t="Spam or advertising">Spam or advertising</span></label>
+      <label><input type="radio" name="flagReason" value="abuse"><span data-t="Abusive or offensive">Abusive or offensive</span></label>
+      <label><input type="radio" name="flagReason" value="wrong"><span data-t="Wrong or misleading data">Wrong or misleading data</span></label>
+      <label><input type="radio" name="flagReason" value="other" checked><span data-t="Something else">Something else</span></label>
+    </div></div>
+  <div class="field"><label data-t="Details (optional)">Details (optional)</label><textarea id="flagNote" rows="3" maxlength="500"></textarea></div>
+  <div class="row"><button class="btn primary" id="flagSend" type="button" data-t="Send report">Send report</button><button class="btn ghost" id="flagCancel" type="button" data-t="Cancel">Cancel</button><span class="status" id="flagStatus"></span></div>
+  <p class="hint" data-t="Reports go to the Hutka team; the author is not told who reported.">Reports go to the Hutka team; the author is not told who reported.</p>
+</div></div>
 <div class="modal" id="bugModal" hidden><div class="box" style="width:min(520px,100%)">
   <h3 data-t="Report a problem">Report a problem</h3>
   <p class="hint" data-t="What went wrong, what you expected, which track or session. The page address, device and recent errors are attached automatically.">What went wrong, what you expected, which track or session. The page address, device and recent errors are attached automatically.</p>
@@ -3400,6 +3436,15 @@ Object.assign(I18N.RU, { 'Racing AI for karting': 'Гоночный ИИ для 
   'Export the session from your logger app': 'Выгрузи сессию из приложения логгера', 'Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — one file per session.': 'Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — один файл на сессию.',
   'Upload it — the track is recognised by GPS': 'Загрузи — трасса узнаётся по GPS', 'A track that is not in Hutka yet gets its own page from your session.': 'Трасса, которой ещё нет в Hutka, получает свою страницу из твоей сессии.',
   'See every corner, compare, ask the coach': 'Смотри каждый поворот, сравнивай, спрашивай тренера', 'Brake point, apex, throttle, exit — against the fastest; three laps on one map, a replay, an AI coach in plain words.': 'Точка торможения, апекс, газ, выход — против самых быстрых; три круга на одной карте, реплей, ИИ-тренер простыми словами.' });
+Object.assign(I18N.RU, { 'Report': 'Пожаловаться', 'Reported ✓': 'Жалоба отправлена ✓', 'Report to the Hutka team': 'Сообщить команде Hutka', 'Session: {x}': 'Сессия: {x}', 'Comment by {x}': 'Комментарий {x}', 'Driver: {x}': 'Гонщик: {x}', 'A coach answer': 'Ответ тренера',
+  'What is wrong': 'Что не так', 'Spam or advertising': 'Спам или реклама', 'Abusive or offensive': 'Оскорбления', 'Wrong or misleading data': 'Неверные данные', 'Something else': 'Другое', 'Details (optional)': 'Подробности (необязательно)', 'Send report': 'Отправить', 'Reports go to the Hutka team; the author is not told who reported.': 'Жалоба уходит команде Hutka; автор не узнает, кто пожаловался.',
+  'Sign in to report.': 'Войди, чтобы пожаловаться.', 'Thank you — the report went to the Hutka team.': 'Спасибо — жалоба ушла команде Hutka.', 'Could not send: {e}': 'Не отправилось: {e}', 'Report this session': 'Пожаловаться на сессию', 'Report this answer': 'Пожаловаться на ответ',
+  'Block': 'Заблокировать', 'Unblock': 'Разблокировать', 'Block {name}?': 'Заблокировать {name}?', 'this driver': 'этого гонщика', 'Their sessions and comments disappear for you; they cannot comment on or vote for your sessions. You can unblock any time here.': 'Его сессии и комментарии пропадут для тебя; он не сможет комментировать и оценивать твои сессии. Разблокировать можно здесь в любой момент.',
+  'You blocked this driver: their sessions and comments are hidden for you, and they cannot comment on or vote for your sessions.': 'Ты заблокировал этого гонщика: его сессии и комментарии скрыты для тебя, он не может комментировать и оценивать твои сессии.', 'Sign in first.': 'Сначала войди.',
+  'Delete account': 'Удалить аккаунт', 'Everything goes at once — sessions, comments, likes, chats, the profile. No undo.': 'Удаляется всё сразу — сессии, комментарии, лайки, чаты, профиль. Отменить нельзя.', 'What exactly is deleted': 'Что именно удаляется', 'Delete your account?': 'Удалить аккаунт?',
+  'All your sessions, comments, likes, follows, coach chats and the profile are deleted at once. This cannot be undone.': 'Все твои сессии, комментарии, лайки, подписки, чаты с тренером и профиль удаляются сразу. Отменить нельзя.', 'Delete everything': 'Удалить всё', 'Really delete?': 'Точно удалить?', 'Last check: the account {e} and everything in it will be gone.': 'Последняя проверка: аккаунт {e} и всё в нём исчезнут.', 'Yes, delete my account': 'Да, удалить мой аккаунт', 'Your account is deleted.': 'Аккаунт удалён.', 'Could not delete: {e}': 'Не удалилось: {e}',
+  'Reports on content and drivers': 'Жалобы на контент и гонщиков', 'Run supabase/safety.sql in the SQL editor once — reports on sessions, comments and drivers appear here.': 'Выполни supabase/safety.sql в SQL-редакторе один раз — жалобы на сессии, комментарии и гонщиков появятся здесь.', 'No reports. The "Report" buttons on sessions, comments, driver pages and coach answers send them here.': 'Жалоб нет. Кнопки «Пожаловаться» на сессиях, комментариях, страницах гонщиков и ответах тренера присылают их сюда.',
+  '(session gone)': '(сессии уже нет)', '(comment gone)': '(комментария уже нет)', 'comment': 'комментарий', 'Coach': 'Тренер', 'reported by {n}': 'пожаловался {n}', 'a driver': 'гонщик', 'Delete comment': 'Удалить комментарий', 'Delete this comment?': 'Удалить этот комментарий?', 'Hide session': 'Скрыть сессию', 'It disappears from the feed and the track page. The owner keeps it, unpublished.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется, неопубликованной.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3727,6 +3772,15 @@ const STORE = (() => {
       async transferSession(sid, uid) { return must(await sb.rpc('hutka_transfer_session', { sid, new_owner: uid })) === true; },
       async setDriverName(uid, first, last) { return must(await sb.rpc('hutka_set_driver_name', { uid, first, last })) === true; },
       async moderated() { return must(await sb.rpc('hutka_moderated')) || []; },
+      // community safety (safety.sql): reports on content and people, blocks, the account
+      flag: async (uid, kind, target, reason, note) => must(await sb.from('flags').insert({ reporter: uid, kind, target: String(target), reason, note: note || '' })),
+      async myFlags(uid) { return must(await sb.from('flags').select('kind,target,status').eq('reporter', uid).limit(500)).map(r => ({ kind: r.kind, target: String(r.target), status: r.status })); },
+      async adminFlags(onlyNew) { return must(await sb.rpc('hutka_flags', { only_new: onlyNew !== false })) || []; },
+      flagDone: async (id, done) => must(await sb.from('flags').update({ status: done === false ? 'new' : 'done', handled_at: done === false ? null : new Date().toISOString() }).eq('id', +id)),
+      async blocksOf(uid) { return must(await sb.from('blocks').select('blocked').eq('blocker', uid).limit(1000)).map(r => r.blocked); },
+      block: async (a, b) => must(await sb.from('blocks').upsert({ blocker: a, blocked: b })),
+      unblock: async (a, b) => must(await sb.from('blocks').delete().eq('blocker', a).eq('blocked', b)),
+      async deleteAccount() { return must(await sb.rpc('hutka_delete_account')) === true; },
       addClaim: async (body) => must(await sb.from('claims').insert({ track_id: body.track, by: body.by, text: body.text || '' })),
       async listClaims() { return must(await sb.from('claims').select('*').order('created_at', { ascending: false })).map(r => ({ id: String(r.id), track: r.track_id, by: r.by, text: r.text, createdAt: new Date(r.created_at).getTime() })); },
       deleteClaim: async (id) => must(await sb.from('claims').delete().eq('id', +id)),
@@ -3815,10 +3869,10 @@ const STORE = (() => {
   async function sessionsFor(tid, lid) {
     if (!adapter) return []; const key = tid + '|' + (lid || ''), c = sessForCache.get(key); if (c && Date.now() - c.t < 20000) return c.list.slice();
     if (c && c.p) return c.p;
-    const p = (async () => { try { const list = (await adapter.sessionsFor(tid, lid)).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)); sessForCache.set(key, { t: Date.now(), list }); return list.slice(); } catch (e) { sessForCache.delete(key); return []; } })();
+    const p = (async () => { try { await blocked(); const list = notBlocked((await adapter.sessionsFor(tid, lid)).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))); sessForCache.set(key, { t: Date.now(), list }); return list.slice(); } catch (e) { sessForCache.delete(key); return []; } })();
     sessForCache.set(key, { t: 0, list: [], p }); return p;
   }
-  async function sessionsByOwner(uid) { if (!adapter || !uid || uid === 'local') return []; try { return (await adapter.sessionsByOwners([uid])).filter(m => m.published).sort(byDate); } catch (e) { return []; } }
+  async function sessionsByOwner(uid) { if (!adapter || !uid || uid === 'local') return []; try { return (await adapter.sessionsByOwners([uid])).filter(m => m.published).sort(byDate); } catch (e) { return []; } }   // the driver's own page: not filtered (a blocked driver's page says so)
   async function getSessionMeta(sid) { const c = sessCache.get(sid); if (c) return c; if (adapter) { try { const m = await adapter.getSessionMeta(sid); if (m) return m; } catch (e) {} } const rec = await LDB.get('sessions', sid).catch(() => null); return rec ? rec.meta : null; }
   async function loadSession(meta) {
     if (sessCache.has(meta.id)) return sessCache.get(meta.id);
@@ -3904,7 +3958,7 @@ const STORE = (() => {
   async function sessionSocial(sid, fresh) {
     if (!fresh && social.has(sid)) return social.get(sid);
     const out = { likes: 0, down: 0, mine: 0, liked: false, likers: [], comments: [] };
-    if (adapter && sid) { try { const ls = await adapter.likesFor(sid); for (const x of ls) { if (x.vote === -1) out.down++; else { out.likes++; out.likers.push(x.user); } if (me.id && x.user === me.id) out.mine = x.vote === -1 ? -1 : 1; } out.liked = out.mine === 1; } catch (e) {} try { out.comments = (await adapter.commentsFor(sid)).sort((a, b) => a.createdAt - b.createdAt); } catch (e) {} }
+    if (adapter && sid) { try { const ls = await adapter.likesFor(sid); for (const x of ls) { if (x.vote === -1) out.down++; else { out.likes++; out.likers.push(x.user); } if (me.id && x.user === me.id) out.mine = x.vote === -1 ? -1 : 1; } out.liked = out.mine === 1; } catch (e) {} try { await blocked(); out.comments = notBlocked((await adapter.commentsFor(sid)).sort((a, b) => a.createdAt - b.createdAt)); } catch (e) {} }
     social.set(sid, out); return out;
   }
   // helpful (+1) / not helpful (−1): the same vote again removes it
@@ -3922,7 +3976,7 @@ const STORE = (() => {
   }
   async function toggleFollow(uid) { if (!adapter || !me.id) throw new Error('sign in'); if (uid === me.id) return followInfo(uid); const cur = await followInfo(uid); if (cur.iFollow) await adapter.unfollow(me.id, uid); else await adapter.follow(me.id, uid); followCache.clear(); return followInfo(uid, true); }
   async function followingIds() { if (!adapter || !me.id) return []; try { return await adapter.followingOf(me.id); } catch (e) { return []; } }
-  async function feed() { const ids = await followingIds(); if (!ids.length) return []; try { return (await adapter.sessionsByOwners(ids)).sort(byDate).slice(0, 30); } catch (e) { return []; } }
+  async function feed() { const ids = await followingIds(); if (!ids.length) return []; try { await blocked(); return notBlocked((await adapter.sessionsByOwners(ids)).sort(byDate)).slice(0, 30); } catch (e) { return []; } }
   // the home-page counter: site-wide totals (hutka_counts, public); null when the function is not there yet — the page then counts what it has
   let countsAt = 0, countsV = null;
   async function siteCounts() {
@@ -3930,7 +3984,7 @@ const STORE = (() => {
     if (countsV && Date.now() - countsAt < 60000) return countsV;
     try { const c = await adapter.counts(); if (!c || typeof c.sessions !== 'number') return null; countsV = c; countsAt = Date.now(); return c; } catch (e) { return null; }
   }
-  async function recentPublished(n) { if (!adapter) return []; try { return (await adapter.recentPublished(n || 30)).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); } catch (e) { return []; } }
+  async function recentPublished(n) { if (!adapter) return []; try { await blocked(); return notBlocked((await adapter.recentPublished(n || 30)).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))); } catch (e) { return []; } }
   async function socialCounts(ids) { const empty = () => { const o = {}; for (const id of ids) o[id] = { likes: 0, down: 0, comments: 0, liked: false, mine: 0 }; return o; }; if (!adapter || !ids.length) return empty(); try { return await adapter.socialCounts(ids, me.id); } catch (e) { return empty(); } }
   async function refreshProfile() { if (adapter && me.id) { try { const p = await adapter.getProfile(me.id); profiles.set(me.id, p); return p; } catch (e) {} } return profiles.get(me.id) || null; }
 
@@ -3971,7 +4025,7 @@ const STORE = (() => {
   // so the push reaches the session's owner right away (the function groups whatever is pending by then)
   async function pushToken(token, platform, dev) { if (!adapter || !adapter.pushToken || !me.id) return false; return adapter.pushToken(token, platform, dev); }
   async function pushForget(token) { if (!adapter || !adapter.pushForget || !me.id) return false; try { return await adapter.pushForget(token); } catch (e) { return false; } }
-  async function activity(n) { if (!adapter || !adapter.activity || !me.id) return null; try { const a = await adapter.activity(n); return a && Array.isArray(a.items) ? a : null; } catch (e) { return null; } }
+  async function activity(n) { if (!adapter || !adapter.activity || !me.id) return null; try { const a = await adapter.activity(n); if (!(a && Array.isArray(a.items))) return null; await blocked(); a.items = notBlocked(a.items); return a; } catch (e) { return null; } }
   async function activitySeen() { if (!adapter || !adapter.activitySeen || !me.id) return 0; try { return await adapter.activitySeen(); } catch (e) { return 0; } }
   let kickAt = 0;
   function kickNotify() { if (!me.id || !aiCfg() || Date.now() - kickAt < 15000) return; kickAt = Date.now(); setTimeout(() => { fnCall('notify', {}).catch(() => {}); }, 20000); }
@@ -4019,13 +4073,27 @@ const STORE = (() => {
   async function claim(tid, text) { if (!adapter) throw new Error('offline'); await adapter.addClaim({ track: tid, by: me.id || 'local', text: text || '', createdAt: Date.now() }); }
   async function claims() { if (!adapter) return []; try { return (await adapter.listClaims()).sort((a, b) => b.createdAt - a.createdAt); } catch (e) { return []; } }
   async function deleteClaim(id) { if (adapter) await adapter.deleteClaim(id); }
+  // ----- community safety: blocked drivers vanish from what I see; reports go to the admins; the account can be deleted -----
+  let blockedIds = null, flagged = null;
+  async function blocked(fresh) { if (!adapter || !adapter.blocksOf || !me.id) return []; if (blockedIds && !fresh) return blockedIds; try { blockedIds = await adapter.blocksOf(me.id); } catch (e) { blockedIds = blockedIds || []; } return blockedIds; }
+  const isBlocked = (uid) => !!(blockedIds && uid && blockedIds.includes(uid));
+  const notBlocked = (list) => blockedIds && blockedIds.length ? list.filter(m => !isBlocked(m.owner || m.user || m.actor)) : list;
+  async function block(uid) { if (!adapter || !me.id || !uid || uid === me.id) throw new Error('sign in'); await adapter.block(me.id, uid); await blocked(true); social.clear(); followCache.clear(); sessForCache.clear(); track('block', { uid }); return blockedIds; }
+  async function unblock(uid) { if (!adapter || !me.id) throw new Error('sign in'); await adapter.unblock(me.id, uid); await blocked(true); social.clear(); sessForCache.clear(); return blockedIds; }
+  // one report per thing per driver; kind: session | comment | profile | ai
+  async function flag(kind, target, reason, note) { if (!adapter || !adapter.flag || !me.id) throw new Error('sign in'); try { await adapter.flag(me.id, kind, target, reason, note); } catch (e) { if (!/duplicate|23505/.test(String(e && (e.message || e.code)))) throw e; } (flagged = flagged || new Set()).add(kind + ':' + target); track('report', { kind }); }
+  async function myFlags() { if (flagged) return flagged; flagged = new Set(); if (adapter && adapter.myFlags && me.id) { try { for (const f of await adapter.myFlags(me.id)) flagged.add(f.kind + ':' + f.target); } catch (e) {} } return flagged; }
+  const hasFlagged = (kind, target) => !!(flagged && flagged.has(kind + ':' + String(target)));
+  async function adminFlags(onlyNew) { if (!adapter || !adapter.adminFlags) return []; return adapter.adminFlags(onlyNew); }
+  async function flagDone(id, done) { if (adapter && adapter.flagDone) await adapter.flagDone(id, done); }
+  async function deleteAccount() { if (!adapter || !adapter.deleteAccount || !me.id) throw new Error('sign in'); const ok = await adapter.deleteAccount(); if (!ok) throw new Error('not deleted'); try { await adapter.signOut(); } catch (e) {} return true; }
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits, track, adminAnalytics,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
-    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport };
+    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
 // optional model line, and (for the admin editor) the traced control points. Pan, smooth zoom, rotation, hover and click. ----------
@@ -4858,6 +4926,27 @@ const APP_VERSION = 'v34.2';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
+// ---------- a report on someone's content (a session, a comment, a driver, a coach answer): one modal, the reason and a note; sent to the admins ----------
+const FLAG = { kind: '', target: '', after: null,
+  // what the modal says it is about
+  what: (kind, label) => ({ session: t('Session: {x}', { x: label }), comment: t('Comment by {x}', { x: label }), profile: t('Driver: {x}', { x: label }), ai: t('A coach answer') }[kind] || label),
+  open(kind, target, label, after) {
+    if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to report.')); return; }
+    FLAG.kind = kind; FLAG.target = String(target); FLAG.after = after || null;
+    $('flagWhat').textContent = FLAG.what(kind, label || ''); $('flagNote').value = ''; setStatus('flagStatus', ''); const r = $('flagReasons').querySelector('input[value="other"]'); if (r) r.checked = true;
+    $('flagModal').hidden = false; NATIVE.haptic('light');
+  },
+  close() { $('flagModal').hidden = true; },
+  async send() {
+    const reason = ($('flagReasons').querySelector('input:checked') || {}).value || 'other', note = $('flagNote').value.trim().slice(0, 500), b = $('flagSend'); b.classList.add('busy');
+    try { await STORE.flag(FLAG.kind, FLAG.target, reason, note); FLAG.close(); toast(t('Thank you — the report went to the Hutka team.')); if (FLAG.after) FLAG.after(); }
+    catch (e) { setStatus('flagStatus', t('Could not send: {e}', { e: e && e.message || e }), 'warn'); }
+    b.classList.remove('busy');
+  },
+  // a small "Report" button (or "Reported ✓" once sent); cls adds classes
+  button(kind, target, label, cls, after) { const b = el('button', 'btn xs ghost flag' + (cls ? ' ' + cls : ''), STORE.hasFlagged(kind, target) ? t('Reported ✓') : t('Report')); b.type = 'button'; b.title = t('Report to the Hutka team'); b.onclick = (e) => { e.preventDefault(); e.stopPropagation(); FLAG.open(kind, target, label, () => { b.textContent = t('Reported ✓'); if (after) after(); }); }; return b; }
+};
+$('flagSend').onclick = FLAG.send; $('flagCancel').onclick = FLAG.close; $('flagModal').addEventListener('click', (e) => { if (e.target === $('flagModal')) FLAG.close(); });
 const BUG = { errors: [], shot: null,
   note(msg) { const line = `${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`; if (BUG.errors[BUG.errors.length - 1] !== line) BUG.errors.push(line); if (BUG.errors.length > 8) BUG.errors.shift(); },
   open() { BUG.shot = null; $('bugShotName').textContent = ''; $('bugText').value = ''; setStatus('bugStatus', ''); $('bugEmailField').hidden = !!(STORE.hasIdentity && STORE.me.email); $('bugEmail').value = ''; $('bugModal').hidden = false; setTimeout(() => $('bugText').focus(), 50); },
@@ -5209,6 +5298,13 @@ async function renderDriverPage(uid) {
   const paint = (f) => { $('drvFollowers').textContent = `${tn(f.followers, '{n} follower', '{n} followers').replace('{n}', f.followers)} · ${t('{n} following', { n: f.following })}`; fb.textContent = f.iFollow ? t('Following ✓') : t('Follow'); fb.classList.toggle('active', !!f.iFollow); };
   if (socOn) { try { paint(await STORE.followInfo(uid, true)); } catch (e) { $('drvFollowers').textContent = ''; } } else $('drvFollowers').textContent = '';
   fb.onclick = async () => { if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to follow drivers.')); return; } fb.classList.add('busy'); try { paint(await STORE.toggleFollow(uid)); } catch (e) { toast(t('Could not save.')); } fb.classList.remove('busy'); };
+  // block / report (not for my own page): a blocked driver's sessions and comments vanish for me, and they cannot write under my sessions
+  const bb = $('drvBlock'), rb = $('drvReport'), note = $('drvBlockedNote'); bb.hidden = rb.hidden = nm.isMe || !STORE.hasDb; note.hidden = true;
+  if (STORE.hasIdentity && !nm.isMe) { await STORE.blocked(); await STORE.myFlags(); }
+  const paintBlock = () => { const on = STORE.isBlocked(uid); bb.textContent = on ? t('Unblock') : t('Block'); bb.classList.toggle('active', on); note.hidden = !on; note.textContent = on ? t('You blocked this driver: their sessions and comments are hidden for you, and they cannot comment on or vote for your sessions.') : ''; fb.hidden = fb.hidden || on; $('drvBest').hidden = on; $('drvSessions').hidden = on; };
+  bb.onclick = async () => { if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in first.')); return; } if (!STORE.isBlocked(uid) && !(await confirmDlg(t('Block {name}?', { name: nm.name || t('this driver') }), t('Their sessions and comments disappear for you; they cannot comment on or vote for your sessions. You can unblock any time here.'), t('Block')))) return; bb.classList.add('busy'); try { if (STORE.isBlocked(uid)) await STORE.unblock(uid); else await STORE.block(uid); paintBlock(); } catch (e) { toast(t('Could not save.')); } bb.classList.remove('busy'); };
+  rb.textContent = STORE.hasFlagged('profile', uid) ? t('Reported ✓') : t('Report'); rb.onclick = () => FLAG.open('profile', uid, nm.name || t('Driver'), () => { rb.textContent = t('Reported ✓'); });
+  paintBlock();
   const pubs = await publishedBy(uid);
   renderBests($('drvBest'), pubs); renderSessionsTable($('drvSessions'), pubs, $('drvSessSub'));
 }
@@ -5960,7 +6056,9 @@ async function renderDiscussion() {
   const can = STORE.hasDb && STORE.hasIdentity && s.owner !== 'local';
   $('commentForm').hidden = !(STORE.hasDb && s.owner !== 'local'); $('commentInput').disabled = !can; $('commentBtn').disabled = !can;
   $('commentNote').textContent = !STORE.hasDb || s.owner === 'local' ? t('Discussion works for sessions in the shared library.') : (can ? t('Ctrl+Enter to post. Be concrete: a corner number and what you saw.') : t('Sign in to join the discussion.'));
+  { const rb = $('discussReport'); rb.hidden = !(STORE.hasDb && s.owner !== 'local' && !mySession(s)); rb.textContent = STORE.hasFlagged('session', s.id) ? t('Reported ✓') : t('Report this session'); rb.onclick = () => FLAG.open('session', s.id, s.label || s.name || '', () => { rb.textContent = t('Reported ✓'); }); }
   if (!STORE.hasDb || s.owner === 'local') { list.innerHTML = ''; $('discussSub').textContent = ''; return; }
+  if (STORE.hasIdentity) await STORE.myFlags();
   if (!LAB.social || LAB.social.sid !== s.id) await renderSocialBits();
   if (LAB.current !== s) return;
   const cs = LAB.social.comments || []; $('discussSub').textContent = cs.length ? String(cs.length) : '';
@@ -5971,6 +6069,7 @@ async function renderDiscussion() {
     const d = el('div', 'cmt'); const im = new Image(); im.src = (names[c.user] && names[c.user].avatar) || GENERIC_AVATAR; im.alt = '';
     const body = el('div', 'body'); const head = el('div', 'head'); head.innerHTML = `<b><a href="#driver~${esc(c.user)}">${esc((names[c.user] || {}).name || t('Driver'))}</a></b><span>${esc(fmtWhen(c.createdAt))}</span>`;
     if (STORE.hasIdentity && (c.user === STORE.me.id || STORE.isAdmin())) { const x = el('button', 'x', '×'); x.type = 'button'; x.title = t('Delete'); x.onclick = async () => { try { LAB.social = Object.assign({ sid: s.id }, await STORE.deleteComment(s.id, c.id)); renderDiscussion(); } catch (e) { toast(t('Could not delete.')); } }; head.appendChild(x); }
+    if (c.user !== STORE.me.id) { const f = el('button', 'flagbtn', STORE.hasFlagged('comment', c.id) ? t('Reported ✓') : t('Report')); f.type = 'button'; f.onclick = () => FLAG.open('comment', c.id, (names[c.user] || {}).name || t('Driver'), () => { f.textContent = t('Reported ✓'); }); head.appendChild(f); }
     const tx = el('div'); tx.textContent = c.text; body.append(head, tx); d.append(im, body); list.appendChild(d);
   }
 }
@@ -6940,6 +7039,7 @@ function postCard(s, names, cnt, opts) {
   if (STORE.socialOn) pf.append(like, cm); else { const soon = el('span', 'soon', t('votes & comments soon')); pf.appendChild(soon); } pf.appendChild(el('span', 'sp'));
   if (!mine && s.track) { const c = el('a', 'btn sm', t('Compare')); c.href = `#lab~${esc(s.id)}~cmp`; c.title = t('Compare with mine'); pf.appendChild(c); }
   pf.appendChild(open);
+  if (!mine && STORE.hasDb) pf.appendChild(FLAG.button('session', s.id, s.label || s.name || '', 'sm'));   // a report on someone's session goes to the admins
   // admins: hide a broken or wrongly placed session from the public (moderate.sql); its owner keeps it
   if (!mine && STORE.isAdmin() && STORE.hasDb) { const hb = el('button', 'btn sm ghost mod', t('Hide')); hb.type = 'button'; hb.title = t('Hide from the public (admins): the session stays in its owner\'s library, unpublished.'); hb.onclick = async () => { if (!(await confirmDlg(t('Hide this session from the public?'), t('It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again from the Lab.'), t('Hide')))) return; hb.classList.add('busy'); try { await STORE.setPublishedAdmin(s.id, false); s.published = false; s.moderated = true; d.remove(); toast(t('Hidden from the public.')); sharePageSync(s).catch(() => {}); } catch (e) { hb.classList.remove('busy'); toast(/hutka_set_published|PGRST202|42883/.test(String(e && e.message || e)) ? t('Run supabase/moderate.sql in the SQL editor once — then admins can hide sessions.') : t('Could not hide: {e}', { e: e && e.message || e })); } }; pf.insertBefore(hb, open); }
   d.append(ph, pb); if (more) d.appendChild(more); d.appendChild(pf); return d;
@@ -7107,6 +7207,7 @@ function renderAiLog(loading) {
       d.innerHTML = mdLite(m.content); const mm = aiMiniMap(m.content); if (mm) d.prepend(mm);
       if (sid) for (const sp of d.querySelectorAll('.tref')) { const n = +sp.textContent.slice(1); if (LAB.dcmp.rows.some(r => r.w.n === n)) { sp.classList.add('go'); sp.style.cursor = 'pointer'; sp.title = t('Open T{n} in the Lab', { n }); sp.onclick = () => { location.hash = '#lab~' + sid + '~t' + n; }; } }
       if (m.cut) { const c = el('button', 'btn xs ghost ai-cut'); c.type = 'button'; c.textContent = t('The answer was cut short — continue'); c.onclick = () => { $('aiInput').value = t('Continue exactly where you stopped, briefly.'); aiSend(); }; d.appendChild(c); }
+      if (AI.cur && STORE.hasIdentity) { const tgt = AI.cur.id + ':' + AI.msgs.indexOf(m); const f = el('button', 'ai-flag', STORE.hasFlagged('ai', tgt) ? t('Reported ✓') : t('Report this answer')); f.type = 'button'; f.onclick = () => FLAG.open('ai', tgt, '', () => { f.textContent = t('Reported ✓'); }); d.appendChild(f); }
     }
     log.appendChild(d); last = d;
   }
@@ -7312,6 +7413,15 @@ async function renderProfile() {
   $('profAvatarFile').onchange = async (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; try { pendingAvatar = await imageToDataUrl(f, 256, 60000); $('profAvatar').src = pendingAvatar; setStatus('profStatus', t('Press Save to keep the new photo.')); } catch (err) { setStatus('profStatus', t('Could not read the image.'), 'warn'); } e.target.value = ''; };
   $('profAvatarClear').onclick = () => { pendingAvatar = null; $('profAvatar').src = STORE.me.avatarUrl || GENERIC_AVATAR; setStatus('profStatus', t('Press Save to keep the change.')); };
   $('profSignOut').onclick = async () => { try { await NATIVE.push.forget(); } catch (e) {} try { await STORE.adapter.signOut(); } catch (e) {} STORE.reload(); };
+  // the account: everything at once (delete-account.html lists what goes and what stays)
+  $('profDanger').hidden = !(STORE.hasAuth && STORE.hasIdentity && STORE.adapter && STORE.adapter.deleteAccount);
+  $('profDelete').onclick = async () => {
+    if (!(await confirmDlg(t('Delete your account?'), t('All your sessions, comments, likes, follows, coach chats and the profile are deleted at once. This cannot be undone.'), t('Delete everything')))) return;
+    if (!(await confirmDlg(t('Really delete?'), t('Last check: the account {e} and everything in it will be gone.', { e: STORE.me.email || '' }), t('Yes, delete my account')))) return;
+    $('profDelete').classList.add('busy');
+    try { try { await NATIVE.push.forget(); } catch (e) {} await STORE.deleteAccount(); try { localStorage.removeItem('hutka.hero'); } catch (e) {} toast(t('Your account is deleted.')); setTimeout(() => STORE.reload(), 900); }
+    catch (e) { $('profDelete').classList.remove('busy'); setStatus('profStatus', t('Could not delete: {e}', { e: e && e.message || e }), 'warn'); }
+  };
   $('profUpload').onclick = () => UPLOAD.open({});
   // community numbers
   const sc = $('profSocialCard'); sc.hidden = !(STORE.hasIdentity && STORE.hasDb && await STORE.socialAvailable());
@@ -7389,6 +7499,7 @@ const ADMIN = (() => {
     $('admAiCard').hidden = !(admin && STORE.aiOn); if (admin && STORE.aiOn) renderAiUsage($('admAiUsage'));
     $('admStatsCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderSiteStats();
     $('admReportsCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderReports();
+    $('admFlagsCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderFlags();
     $('admModCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderModerated();
     $('admImportCard').hidden = !admin; if (admin && !$('osmCountry').options.length) { fillCountries($('osmCountry'), false); $('osmCountry').value = 'AE'; }
     if (tid && STORE.getTrack(tid)) { A.tid = tid; A.lid = lid || null; await renderTrackForm(); await renderLayouts(); if (lid) await renderLayoutEditor(); else $('admLayoutCard').hidden = true; }
@@ -7403,6 +7514,27 @@ const ADMIN = (() => {
     if (!list.length) { box.appendChild(el('div', 'hint', t('Nothing hidden. A broken or wrongly placed session can be hidden from the feed with the Hide button on its post (or in the Lab).'))); return; }
     const names = await STORE.names(list.map(r => r.owner));
     for (const r of list) { const tr = STORE.getTrack(r.track); const d = el('div', 'item'); d.innerHTML = `<span class="name">${esc((names[r.owner] || {}).name || t('Driver'))} · ${esc(r.label || '')}</span><span class="meta">${esc(tr ? tr.name : r.track || '')}${r.layout && r.layout !== 'custom' ? ' · ' + esc(layoutName(r.track, r.layout)) : ''} · ${esc(fmtMs(+r.bestMs))} · ${esc(fmtDate(r.date))}</span>`; const b = el('button', 'btn xs', t('Show again')); b.type = 'button'; b.onclick = async () => { b.classList.add('busy'); try { await STORE.setPublishedAdmin(r.id, true); toast(t('Shown again.')); renderModerated(); } catch (e) { b.classList.remove('busy'); toast(t('Could not save: {e}', { e: e && e.message || e })); } }; d.appendChild(b); box.appendChild(d); }
+  }
+  // reports on content and drivers (safety.sql): what was reported, by whom, with the way to act on it
+  async function renderFlags() {
+    const box = $('admFlags'); box.innerHTML = ''; let list = [];
+    try { list = await STORE.adminFlags(false); } catch (e) { $('admFlagsHint').textContent = /hutka_flags|PGRST202|42883/.test(String(e && e.message || e)) ? t('Run supabase/safety.sql in the SQL editor once — reports on sessions, comments and drivers appear here.') : t('Could not load: {e}', { e: e && e.message || e }); return; }
+    const open = list.filter(r => r.status !== 'done'); $('admFlagsSub').textContent = open.length ? String(open.length) : ''; $('admFlagsHint').textContent = list.length ? '' : t('No reports. The "Report" buttons on sessions, comments, driver pages and coach answers send them here.');
+    const names = await STORE.names(list.map(r => r.sessionOwner).concat(list.map(r => r.commentUser)).filter(Boolean));
+    const reasons = { spam: t('Spam or advertising'), abuse: t('Abusive or offensive'), wrong: t('Wrong or misleading data'), other: t('Something else') };
+    for (const r of list.slice(0, 80)) {
+      const d = el('div', 'flag-row' + (r.status === 'done' ? ' done' : '')), left = el('div'), acts = el('div', 'acts');
+      let what = '';
+      if (r.kind === 'session') what = `<a href="#lab~${esc(r.target)}">${esc(r.sessionLabel || r.target)}</a>${r.sessionOwner ? ' · <a href="#driver~' + esc(r.sessionOwner) + '">' + esc((names[r.sessionOwner] || {}).name || t('Driver')) + '</a>' : ' · ' + esc(t('(session gone)'))}`;
+      else if (r.kind === 'comment') what = r.commentSession ? `<a href="#lab~${esc(r.commentSession)}~discuss">${esc(t('comment'))}</a> · <a href="#driver~${esc(r.commentUser || '')}">${esc((names[r.commentUser] || {}).name || t('Driver'))}</a>: “${esc((r.commentText || '').slice(0, 200))}”` : esc(t('(comment gone)'));
+      else if (r.kind === 'profile') what = `<a href="#driver~${esc(r.target)}">${esc(r.profileName || r.target)}</a>`;
+      else what = esc(t('A coach answer')) + ' · ' + esc(r.target);
+      left.innerHTML = `<div class="k">${esc({ session: t('Session'), comment: t('Comment'), profile: t('Driver'), ai: t('Coach') }[r.kind] || r.kind)} · ${esc(reasons[r.reason] || r.reason)}</div><div class="tx">${what}${r.note ? '<br>' + esc(r.note) : ''}</div><div class="meta">${esc(fmtDate(r.at))} · ${esc(t('reported by {n}', { n: r.reporterName || t('a driver') }))}</div>`;
+      const done = el('button', 'btn xs', r.status === 'done' ? t('Reopen') : t('Done')); done.type = 'button'; done.onclick = async () => { try { await STORE.flagDone(r.id, r.status !== 'done'); renderFlags(); } catch (e) { toast(t('Could not save.')); } }; acts.appendChild(done);
+      if (r.kind === 'comment' && r.commentSession) { const del = el('button', 'btn xs ghost danger', t('Delete comment')); del.type = 'button'; del.onclick = async () => { if (!(await confirmDlg(t('Delete this comment?'), r.commentText || '', t('Delete')))) return; try { await STORE.deleteComment(r.commentSession, r.target); await STORE.flagDone(r.id, true); renderFlags(); } catch (e) { toast(t('Could not delete.')); } }; acts.appendChild(del); }
+      if (r.kind === 'session' && r.sessionOwner) { const hide = el('button', 'btn xs ghost danger', t('Hide session')); hide.type = 'button'; hide.onclick = async () => { if (!(await confirmDlg(t('Hide this session from the public?'), t('It disappears from the feed and the track page. The owner keeps it, unpublished.'), t('Hide')))) return; try { await STORE.setPublishedAdmin(r.target, false); await STORE.flagDone(r.id, true); renderFlags(); } catch (e) { toast(t('Could not save.')); } }; acts.appendChild(hide); }
+      d.append(left, acts); box.appendChild(d);
+    }
   }
   async function renderReports() {
     const box = $('admReports'); box.innerHTML = ''; let list = [];
