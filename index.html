@@ -1015,6 +1015,9 @@ html.native,html.native body{overscroll-behavior:none}
 .ptr.busy::after{content:'';position:absolute;width:18px;height:18px;border:2.5px solid var(--line-2);border-top-color:var(--accent);border-radius:50%;animation:ptrspin .8s linear infinite}
 @keyframes ptrspin{to{transform:rotate(360deg)}}
 html.native .top,html.native .tabbar{transform:translateZ(0)}
+/* Android WebView: lighter blur on the big frosted surfaces (sheets, modals) — the bars keep theirs */
+html.android .hero .inspector,html.android #pickbar.open,html.android .modal .box,html.android .search-drop{-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%)}
+html.android .modal{-webkit-backdrop-filter:none;backdrop-filter:none}
 html.native .toast{background:var(--glass-strong);color:var(--fg);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--glass-edge);border-radius:16px;box-shadow:var(--glass-shadow)}
 html.native .side{background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%)}
 @media (max-width:900px){
@@ -4556,10 +4559,25 @@ const NATIVE = window.NATIVE = {
   // the status bar: on iOS the page runs under it (the glass top bar covers it), its text follows the theme; on Android a solid bar in the page colour
   dark() { const th = document.documentElement.dataset.theme; return th === 'dark' || (th !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches); },
   async statusBar() {
-    if (!this.on) return; const dark = this.dark();
-    try { if (this.platform === 'ios') await this.call('StatusBar', 'setOverlaysWebView', { overlay: true }); else { await this.call('StatusBar', 'setOverlaysWebView', { overlay: false }); await this.call('StatusBar', 'setBackgroundColor', { color: dark ? '#0f1420' : '#f5f6f8' }); } } catch (e) {}
-    try { await this.call('StatusBar', 'setStyle', { style: dark ? 'DARK' : 'LIGHT' }); } catch (e) {}
+    if (!this.on) return; const dark = this.dark(), style = dark ? 'DARK' : 'LIGHT';   // DARK = light icons (for a dark page), LIGHT = dark icons
+    if (this.platform === 'ios') { try { await this.call('StatusBar', 'setOverlaysWebView', { overlay: true }); } catch (e) {} try { await this.call('StatusBar', 'setStyle', { style }); } catch (e) {} }
+    else { // Android: edge to edge is the system's (Capacitor's SystemBars feeds env(safe-area-inset-*)); only the icon colour of both bars follows the theme
+      let ok = false; try { await this.call('SystemBars', 'setStyle', { style }); ok = true; } catch (e) {}
+      if (!ok) { try { await this.call('StatusBar', 'setStyle', { style }); } catch (e) {} } }
     setTimeout(() => dispatchEvent(new Event('resize')), 250);
+  },
+  // one layer at a time, topmost first: a zoomed picture, a modal, the session picker sheet, the corner inspector, the cockpit side sheet, the full-screen map
+  closeTop() {
+    const z = document.querySelector('.zoom:not([hidden])'); if (z) { z.hidden = true; return true; }
+    const m = [...document.querySelectorAll('.modal:not([hidden])')].pop(); if (m) { m.hidden = true; return true; }
+    const pb = $('pickbar'); if (pb && pb.classList.contains('open')) { pb.classList.remove('open', 'peek'); return true; }
+    if (APP.route === 'lab' && typeof LAB !== 'undefined') {
+      if (LAB.selN) { LAB.selN = 0; if (typeof afterSelect === 'function') afterSelect(true); return true; }
+      if (LAB.side) { if (typeof setSide === 'function') setSide(false); return true; }
+      const h = $('hero'); if (h && h.classList.contains('fs-fallback')) { $('ckBack') && $('ckBack').click(); return true; }
+    }
+    const d = $('qDrop'); if (d && !d.hidden) { d.hidden = true; return true; }
+    return false;
   },
   async badge(n) { if (!this.on) return; try { if (n > 0) await this.call('Badge', 'set', { count: n }); else await this.call('Badge', 'clear'); } catch (e) {} },
   // the system share sheet with the picture, the text and the link (the web share API is the fallback, see SHARE.go)
@@ -4601,6 +4619,7 @@ const NATIVE = window.NATIVE = {
     try { this.listen('App', 'appUrlOpen', (e) => this.onUrl(e && e.url)); } catch (e) {}
     try { const l = await this.call('App', 'getLaunchUrl'); if (l && l.url) this.onUrl(l.url); } catch (e) {}
     try { this.listen('App', 'appStateChange', (e) => { if (e && e.isActive) { ACTIVITY.refresh(true); this.statusBar(); this.freshness(); } }); } catch (e) {}
+    try { this.listen('App', 'backButton', (e) => { if (this.closeTop()) return; if (e && e.canGoBack && history.length > 1) history.back(); else this.call('App', 'minimizeApp').catch(() => {}); }); } catch (e) {}
     setTimeout(() => this.freshness(), 4000);
     try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => this.statusBar()); } catch (e) {}
     await this.statusBar();
@@ -4621,6 +4640,7 @@ const NATIVE = window.NATIVE = {
   }
 };
 if (NATIVE.on || /[?&]app=1\b/.test(location.search)) document.documentElement.classList.add('native');   // the app shell's look (the glass bars) from the first paint; hutka.ai/?app=1 previews it in a browser
+if (NATIVE.on) document.documentElement.classList.add(NATIVE.platform === 'android' ? 'android' : 'ios');
 // inside the app the page scale is pinned: WKWebView otherwise zooms in when a field gets focus and re-scales on rotation, after which
 // sticky bars and sliders drift (the map has its own pinch zoom)
 if (NATIVE.on) { const vp = document.querySelector('meta[name=viewport]'); if (vp) vp.setAttribute('content', 'width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,shrink-to-fit=no'); }
@@ -4722,7 +4742,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v33.5';
+const APP_VERSION = 'v33.6';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();

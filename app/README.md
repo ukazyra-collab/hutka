@@ -88,6 +88,23 @@ npx cap open android   # откроется Android Studio
 3. **Testing → Internal testing** → Create release → загрузи `.aab` → добавь тестеров по почте → ссылка для установки. Потом **Production → Create release** → Review. Первая проверка Google — до 7 дней, обновления обычно часы.
 4. Версия: `android/app/build.gradle` → `versionCode` (+1 на каждую загрузку) и `versionName`.
 
+## 4a. Android — что сделано и как собрать (16 окт 2026)
+
+Нативная часть под Android готова: Capacitor 8 рисует страницу edge-to-edge и сам отдаёт `env(safe-area-inset-*)` (плагин SystemBars, в конфиге `initialViewportFitValueHint: cover`), поэтому стеклянная шапка и таб-панель встают так же, как на iPhone; цвет иконок статус-бара и жестовой панели следует теме; аппаратная кнопка «назад» сначала закрывает открытое (модалку, пикер, инспектор, кокпит), потом идёт по истории, потом сворачивает приложение; «Поделиться» через системное меню (FileProvider уже в манифесте); пуши через FCM (иконка `ic_stat_hutka`, канал `hutka`, разрешение `POST_NOTIFICATIONS`); «Открыть в Hutka» для .alf2/.gpx/.csv; вход через Google/почту возвращается по `hutka://auth`. Блюр на больших панелях чуть легче (`html.android`), чтобы не тормозило на средних телефонах.
+
+### Сборка и запуск на телефоне
+1. **Android Studio** — https://developer.android.com/studio (Mac, ~1.5 ГБ). При первом запуске «Standard» установка: он скачает SDK, эмулятор и JDK.
+2. Терминал: `cd ~/Desktop/hutka/app && git pull && npm install && sh build.sh && npx cap open android` — откроется Android Studio с проектом `app/android`. Первый раз он минуту-три синхронизирует Gradle и может предложить скачать SDK 36 / Build-Tools — соглашайся.
+3. Телефон: Настройки → О телефоне → 7 раз нажать «Номер сборки» → появится «Для разработчиков» → включить **Отладка по USB**. Подключить кабелем → на телефоне «Разрешить отладку» → телефон появится вверху Android Studio в списке устройств. Без телефона: Device Manager (иконка телефона справа) → Create device → Pixel 8 → образ API 36 → эмулятор.
+4. ▶ Run. Первая сборка 2–5 минут. Приложение ставится и открывается; аккаунт разработчика не нужен, живёт без ограничений по времени.
+5. Для пушей: `google-services.json` из Firebase (раздел 4c) положить в `app/android/app/` **до** сборки; без файла всё остальное работает, пуши пропускаются.
+
+### Google Play
+1. https://play.google.com/console → регистрация **как организация** (Kozyra Media): нужен D-U-N-S номер (тот же, что для Apple), сайт, почта и телефон организации, $25 один раз. Проверка — от пары дней до пары недель. Личный аккаунт не подходит: с 2023 года у них обязательный закрытый тест с 12 тестерами 14 дней перед публикацией.
+2. Пока проверка идёт — сборка релиза: Android Studio → **Build → Generate Signed App Bundle / APK → Android App Bundle** → Create new keystore: файл `hutka-upload.jks` (хранить вне репозитория, например в iCloud Drive), пароли записать — это ключ загрузки; Google Play App Signing подпишет приложение своим ключом → release → готовый `.aab` в `android/app/release/`.
+3. В консоли: Create app → Hutka → заполнить Dashboard (политика `https://hutka.ai/privacy.html`, App access с тестовым аккаунтом, Data safety: e-mail, имя, фото, пользовательский контент; не для рекламы) → **Testing → Internal testing** → загрузить `.aab` → список тестеров по e-mail → ссылка на установку (без ревью, минуты). Потом **Production → Create release** → ревью Google (первое — до 7 дней).
+4. Версии: `android/app/build.gradle` → `versionCode` +1 на каждую загрузку, `versionName` — как у iOS.
+
 ## 4b. Версия 1.1 (15 окт 2026) — что сдавать в магазины
 
 Приложение показывает живой сайт, так что всё новое уже в нём; в проекте подняты только номера: iOS **Version 1.1 / Build 2** (`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` в `App.xcodeproj`), Android **versionName 1.1 / versionCode 2**. На Mac: `git pull`, `cd app`, `npm install`, `sh build.sh`, `npx cap open ios` → Archive → Upload (iOS); Android Studio → Generate Signed Bundle.

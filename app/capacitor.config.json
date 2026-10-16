@@ -43,6 +43,10 @@
         "sound",
         "alert"
       ]
+    },
+    "SystemBars": {
+      "insetsHandling": "css",
+      "initialViewportFitValueHint": "cover"
     }
   }
 }
