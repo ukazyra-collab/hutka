@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hutka — Delete your account</title>
+<style>
+  body{margin:0;background:#f5f6f8;color:#1a2237;font:16px/1.6 -apple-system,"Segoe UI",system-ui,Arial,sans-serif}
+  main{max-width:760px;margin:0 auto;padding:32px 20px 60px}
+  h1{font-size:28px;margin:0 0 4px}h2{font-size:20px;margin:28px 0 8px}
+  .sub{color:#5b6475;margin-bottom:24px}
+  a{color:#2f6bf0}
+  .lang{display:flex;gap:10px;margin-bottom:20px}
+  .lang button{border:1px solid #cdd3dd;background:#fff;border-radius:999px;padding:6px 14px;font:600 14px inherit;cursor:pointer}
+  .lang button.on{background:#1f2b48;color:#fff;border-color:#1f2b48}
+  [hidden]{display:none!important}
+  ul{padding-left:20px}
+</style>
+</head>
+<body>
+<main>
+  <div class="lang"><button id="en" class="on" type="button">English</button><button id="ru" type="button">Русский</button></div>
+
+  <section id="s-en">
+    <h1>Delete your Hutka account</h1>
+    <div class="sub">Hutka (hutka.ai) and the Hutka app · operated by KOZYRA MEDIA GROUP - FZCO, Dubai, UAE</div>
+    <h2>In the app or on the website</h2>
+    <p>Sign in → <b>Profile</b> → scroll to the bottom → <b>Delete account</b> → confirm. The account and everything attached to it are deleted at once; it cannot be undone.</p>
+    <h2>By e-mail</h2>
+    <p>Write to <a href="mailto:hello@hutka.ai?subject=Delete%20my%20Hutka%20account">hello@hutka.ai</a> from the e-mail address of the account (or, for a Google / Apple sign-in, the address of that account). We delete the account within 30 days and confirm by reply.</p>
+    <h2>What is deleted</h2>
+    <ul>
+      <li>the account and sign-in (e-mail, Google or Apple link) and the profile (racing name, country, home track, photo, bio);</li>
+      <li>all sessions you uploaded, with their telemetry files, share pictures and link previews — published ones disappear from track pages and the feed;</li>
+      <li>comments, likes, follows and notifications;</li>
+      <li>chats with the AI coach and the credits balance;</li>
+      <li>push-notification tokens of your devices.</li>
+    </ul>
+    <h2>What stays</h2>
+    <ul>
+      <li>anonymous usage counters (which pages were opened) — no longer linked to any account;</li>
+      <li>tracks and layouts you added to the catalogue — they are part of the shared track pages; the "added by" link is removed;</li>
+      <li>standard server logs of our hosting providers, which expire on their own schedule.</li>
+    </ul>
+    <h2>Deleting only some data</h2>
+    <p>Without deleting the account you can at any time delete any session (Lab → the session → Delete), any of your comments, and clear the profile fields and photo in Profile. Chats with the coach can be deleted in AI coach.</p>
+    <p>Questions: <a href="mailto:hello@hutka.ai">hello@hutka.ai</a> · <a href="privacy.html">Privacy Policy</a></p>
+  </section>
+
+  <section id="s-ru" hidden lang="ru">
+    <h1>Удаление аккаунта Hutka</h1>
+    <div class="sub">Hutka (hutka.ai) и приложение Hutka · оператор KOZYRA MEDIA GROUP - FZCO, Дубай, ОАЭ</div>
+    <h2>В приложении или на сайте</h2>
+    <p>Войти → <b>Профиль</b> → в самом низу → <b>Удалить аккаунт</b> → подтвердить. Аккаунт и всё, что к нему привязано, удаляются сразу; отменить нельзя.</p>
+    <h2>По почте</h2>
+    <p>Напишите на <a href="mailto:hello@hutka.ai?subject=Delete%20my%20Hutka%20account">hello@hutka.ai</a> с адреса аккаунта (при входе через Google / Apple — с адреса того аккаунта). Удаляем в течение 30 дней и подтверждаем ответным письмом.</p>
+    <h2>Что удаляется</h2>
+    <ul>
+      <li>аккаунт и вход (почта, связка с Google или Apple) и профиль (гоночное имя, страна, домашняя трасса, фото, описание);</li>
+      <li>все загруженные сессии с файлами телеметрии, картинками для шаринга и превью ссылок — опубликованные пропадают со страниц трасс и из ленты;</li>
+      <li>комментарии, лайки, подписки и уведомления;</li>
+      <li>чаты с ИИ-тренером и баланс кредитов;</li>
+      <li>пуш-токены ваших устройств.</li>
+    </ul>
+    <h2>Что остаётся</h2>
+    <ul>
+      <li>анонимные счётчики использования (какие страницы открывались) — без связи с аккаунтом;</li>
+      <li>трассы и лейауты, которые вы добавили в каталог, — это часть общих страниц трасс; ссылка «добавил» снимается;</li>
+      <li>стандартные серверные логи хостинг-провайдеров — стираются по их расписанию.</li>
+    </ul>
+    <h2>Удалить только часть данных</h2>
+    <p>Не удаляя аккаунт, можно в любой момент удалить любую сессию (Лаборатория → сессия → Удалить), любой свой комментарий, очистить поля и фото профиля в Профиле. Чаты с тренером удаляются в разделе ИИ-тренер.</p>
+    <p>Вопросы: <a href="mailto:hello@hutka.ai">hello@hutka.ai</a> · <a href="privacy.html#ru">Политика конфиденциальности</a></p>
+  </section>
+</main>
+<script>
+  const pick = (l) => { document.getElementById('s-en').hidden = l !== 'en'; document.getElementById('s-ru').hidden = l !== 'ru'; document.getElementById('en').classList.toggle('on', l === 'en'); document.getElementById('ru').classList.toggle('on', l === 'ru'); document.documentElement.lang = l; };
+  document.getElementById('en').onclick = () => pick('en'); document.getElementById('ru').onclick = () => pick('ru');
+  if (/^ru/i.test(navigator.language || '') || location.hash === '#ru') pick('ru');
+</script>
+</body>
+</html>

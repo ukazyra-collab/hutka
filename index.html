@@ -1055,6 +1055,9 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 .ld-vis{min-width:0}
 .ld-map{position:relative;aspect-ratio:1/1.02;min-width:0;border-radius:16px;overflow:hidden;background:linear-gradient(160deg,#141a2b,#1b2340 60%,#20294a);box-shadow:0 30px 60px -30px rgba(20,30,60,.5);cursor:pointer;isolation:isolate}
 .ld-map canvas{width:100%;height:100%;display:block}
+/* waiting for the session and its imagery: a slow sheen over the dark box (the band with the numbers is already there) */
+.ld-map.ld-wait::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(100deg,rgba(255,255,255,0) 35%,rgba(255,255,255,.07) 50%,rgba(255,255,255,0) 65%);background-size:220% 100%;animation:ldsheen 1.8s linear infinite}
+@keyframes ldsheen{from{background-position:120% 0}to{background-position:-120% 0}}
 /* the live map (the Lab's own view on the satellite picture) sits over the drawn card and fades in once its imagery is there */
 .ld-live{position:absolute;inset:0;z-index:1;opacity:0;transition:opacity .7s;pointer-events:none}
 .ld-live.on{opacity:1}
@@ -4851,7 +4854,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.1';
+const APP_VERSION = 'v34.2';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -4909,7 +4912,8 @@ const GEOM = (() => {
   async function build(tid, lid, pref, opts) {
     const layout = await layoutDoc(tid, lid);
     let refSess = null, refMeta = null;
-    if (layout) {
+    // opts.selfRef: the given session is the reference (the landing hero: one load, no lookup of the layout's own reference)
+    if (layout && !(opts && opts.selfRef && pref)) {
       if (layout.refSession) refMeta = await STORE.getSessionMeta(layout.refSession);
       if (!refMeta) { const pubs = await STORE.sessionsFor(tid, lid); if (pubs.length) refMeta = pubs[0]; }
       if (refMeta) { if (pref && pref.id === refMeta.id) refSess = pref; else { try { refSess = await STORE.loadSession(refMeta); } catch (e) { refSess = null; } } }
@@ -6695,7 +6699,7 @@ const HOME = { last: null,
   refreshPost(id, card) { const L = HOME.last; if (!L || APP.route !== 'home') return; const pub = L.pubs.find(s => s.id === id), old = document.querySelector(`#homeFeed .post[data-sid="${CSS.escape(id)}"]`); if (!pub || !old) return; pub.card = card; old.replaceWith(postCard(pub, L.names, L.counts[id], { group: (L.groupOf || {})[id] || null })); } };
 // ---------- the landing for guests: a real session on the satellite picture of its track — the Lab's own map, live — then the promo pictures ----------
 const LANDING = {
-  timer: 0, idx: 0, slides: [], ex: null, live: null, wired: false, capHtml: '',
+  timer: 0, idx: 0, slides: [], ex: null, live: null, wired: false, capHtml: '', fellBack: false, waitT: 0, promoT: 0,
   promo: [['three', 'Three laps on one map'], ['ideal', 'Best vs ideal lap'], ['coach', 'An AI coach that has read your telemetry'], ['replay', 'Press play'], ['dd2', 'Sport karts: revs, gears, shifts']],
   col: (r) => r >= 0.2 ? '#ff5c62' : r >= 0.1 ? '#ffa23a' : '#39c76f',
   bandH: () => Math.max(0, $('ldBand').offsetHeight - 14), capH: () => Math.max(0, $('ldCap').offsetHeight - 16),   // the map may run a little under the gradients
@@ -6740,7 +6744,7 @@ const LANDING = {
   async buildLive(ex) {
     const c = ex.card; if (!c || !c.corners || !c.pts) return null;
     const sess = await STORE.loadSession(ex), tid = ex.track || '', lid = ex.layout || 'custom';
-    const G = await GEOM.build(tid, lid, sess, { noMedia: true }); if (!G || !G.frame || !G.frame.merc || !G.track) return null;
+    const G = await GEOM.build(tid, lid, sess, { noMedia: true, selfRef: true }); if (!G || !G.frame || !G.frame.merc || !G.track) return null;
     if (!GEOM.attach(sess, G).ok) return null;
     if (!(await SAT.probe(G))) return null;   // imagery cannot load here: the drawn card stays
     const list = [sess]; if (G.refSess && G.refSess.id !== sess.id && kartCompatible(G.refSess, sess)) list.push(G.refSess);
@@ -6768,7 +6772,11 @@ const LANDING = {
     L.map.fit(); L.map.draw();
     setTimeout(() => { if (!L.shown && LANDING.live === L) LANDING.reveal(L); }, 5000);   // imagery that is slow to come: show the map anyway
   },
-  reveal(L) { L.shown = true; $('ldLive').classList.add('on'); LANDING.setSlides(); LANDING.labels(LANDING.slides[LANDING.idx]); L.map.fit(); L.map.draw(); },
+  reveal(L) { L.shown = true; clearTimeout(LANDING.waitT); $('ldMap').classList.remove('ld-wait'); $('ldLive').classList.add('on'); LANDING.setSlides(); LANDING.labels(LANDING.slides[LANDING.idx]); L.map.fit(); L.map.draw(); LANDING.loadPromo(); },
+  // no imagery here (blocked, offline) or the session would not load: the drawn card takes the hero
+  fallback() { if (LANDING.live && LANDING.live.shown) return; LANDING.fellBack = true; clearTimeout(LANDING.waitT); $('ldMap').classList.remove('ld-wait'); if (LANDING.ex) LANDING.draw($('ldCanvas'), LANDING.ex.card); LANDING.loadPromo(); },
+  // the promo pictures load after the map has its imagery (or once the wait is over), so the tiles get the connection first
+  loadPromo() { clearTimeout(LANDING.promoT); for (const im of document.querySelectorAll('#ldSlides img[data-src]')) { im.src = im.dataset.src; im.removeAttribute('data-src'); } },
   // the reserve of every corner next to its badge (the overview): the biggest first, each in the first free spot around the badge
   reserves(L) {
     const m = L.map, { ctx, w, h } = m.setup(), cs = getComputedStyle(document.documentElement), mono = cs.getPropertyValue('--mono') || 'monospace', small = w < 420;
@@ -6800,7 +6808,7 @@ const LANDING = {
   setSlides() {
     const L = LANDING.live, nMap = L && L.shown ? 1 + Math.min(2, L.byRes.length) : 1, cur = LANDING.slides[LANDING.idx] || null, S = [];
     for (let k = 0; k < nMap; k++) S.push({ kind: 'map', k });
-    const box = $('ldSlides'); if (!box.children.length) LANDING.promo.forEach(([key, alt]) => { const d = el('div', 'ld-slide'); const im = new Image(); im.src = `promo/${key}.webp?v=1`; im.alt = alt; im.decoding = 'async'; d.appendChild(im); box.appendChild(d); });
+    const box = $('ldSlides'); if (!box.children.length) LANDING.promo.forEach(([key, alt]) => { const d = el('div', 'ld-slide'); const im = new Image(); im.dataset.src = `promo/${key}.webp?v=1`; im.alt = alt; im.decoding = 'async'; d.appendChild(im); box.appendChild(d); });
     LANDING.promo.forEach(([key, alt], i) => S.push({ kind: 'img', key, alt, el: box.children[i] }));
     LANDING.slides = S; LANDING.idx = Math.max(0, S.findIndex(s => cur && (cur.kind === 'img' ? s.el === cur.el : s.kind === 'map' && s.k === cur.k)));
     const dots = $('ldDots'); dots.innerHTML = '';
@@ -6827,26 +6835,32 @@ const LANDING = {
   },
   start() { LANDING.stop(); const tick = () => { const s = LANDING.slides[LANDING.idx]; LANDING.timer = setTimeout(() => { if (document.visibilityState === 'visible' && APP.route === 'home' && !$('landing').hidden) LANDING.show(LANDING.idx + 1); tick(); }, s && s.kind === 'map' && s.k === 0 ? 6000 : 4500); }; tick(); },
   stop() { clearTimeout(LANDING.timer); LANDING.timer = 0; },
+  // the hero remembered from the last visit: the next visit starts loading it before the feed has even been asked for
+  cached() { try { const h = JSON.parse(localStorage.getItem('hutka.hero') || 'null'); return h && h.id && h.card ? h : null; } catch (e) { return null; } },
+  remember(ex, who, trackName) { try { localStorage.setItem('hutka.hero', JSON.stringify({ id: ex.id, owner: ex.owner, track: ex.track, layout: ex.layout, bestMs: ex.bestMs, nLaps: ex.nLaps, card: ex.card, trackName: trackName || ex.trackName || '', who: who || '' })); } catch (e) {} },
   async render(pubs, C) {
     const Ld = $('landing'); Ld.hidden = false;
     $('ldUpload').onclick = () => UPLOAD.open({});
-    const ex = LANDING.pick(pubs), trk = ex ? STORE.getTrack(ex.track) : null, who = ex ? (await STORE.names([ex.owner]))[ex.owner] : null, fresh = !ex || !LANDING.ex || LANDING.ex.id !== ex.id;
+    const ex = LANDING.pick(pubs), trk = ex ? STORE.getTrack(ex.track) : null, fresh = !ex || !LANDING.ex || LANDING.ex.id !== ex.id;
     LANDING.ex = ex;
-    if (ex) { $('ldDemo').href = '#lab~' + ex.id; $('ldMap').hidden = false; $('ldMap').title = t('Open this session in the Lab'); $('ldMap').onclick = () => { location.hash = '#lab~' + ex.id; };
-      LANDING.capHtml = `<b>${esc(trk ? trk.name : ex.trackName || '')}</b> · ${esc(who ? who.name : t('a driver'))} · ${esc(fmtMs(ex.bestMs))} · ${esc(t('{n} laps', { n: ex.nLaps || 0 })).replace(/ /g, '\u00a0')}`; }
+    const caption = (who) => { LANDING.capHtml = `<b>${esc(trk ? trk.name : ex.trackName || '')}</b> · ${esc(who || t('a driver'))} · ${esc(fmtMs(ex.bestMs))} · ${esc(t('{n} laps', { n: ex.nLaps || 0 })).replace(/ /g, ' ')}`; };
+    if (ex) { $('ldDemo').href = '#lab~' + ex.id; $('ldMap').hidden = false; $('ldMap').title = t('Open this session in the Lab'); $('ldMap').onclick = () => { location.hash = '#lab~' + ex.id; }; caption(ex.who || ''); }
     else { $('ldMap').hidden = true; $('ldDemo').href = '#tracks'; LANDING.capHtml = ''; }
-    const pr = $('ldProof'); pr.innerHTML = ''; if (C) { for (const [v, k] of [[C.tracks, t('tracks')], [C.laps, t('laps analysed')], [C.published, t('sessions published')]]) if (v) { const sp = el('span'); sp.innerHTML = `<b>${esc(String(v))}</b> ${esc(k)}`; pr.appendChild(sp); } }
-    if (fresh) { LANDING.live = null; $('ldLive').classList.remove('on'); $('ldLive').innerHTML = ''; LANDING.idx = 0; }
+    const pr = $('ldProof'); if (C) { pr.innerHTML = ''; for (const [v, k] of [[C.tracks, t('tracks')], [C.laps, t('laps analysed')], [C.published, t('sessions published')]]) if (v) { const sp = el('span'); sp.innerHTML = `<b>${esc(String(v))}</b> ${esc(k)}`; pr.appendChild(sp); } }
+    if (fresh) { LANDING.live = null; LANDING.fellBack = false; $('ldLive').classList.remove('on'); $('ldLive').innerHTML = ''; LANDING.idx = 0; const cv = $('ldCanvas'); cv.width = cv.width; $('ldMap').classList.toggle('ld-wait', !!ex); clearTimeout(LANDING.waitT); if (ex) LANDING.waitT = setTimeout(LANDING.fallback, 12000); clearTimeout(LANDING.promoT); LANDING.promoT = setTimeout(LANDING.loadPromo, 6000); }
     LANDING.setSlides(); LANDING.show(LANDING.idx);
-    if (ex) requestAnimationFrame(() => LANDING.draw($('ldCanvas'), ex.card));
+    if (!ex) LANDING.loadPromo();
     LANDING.start();
     if (!LANDING.wired) { LANDING.wired = true;
-      window.addEventListener('resize', () => { if (APP.route !== 'home' || $('landing').hidden || !LANDING.ex) return; LANDING.draw($('ldCanvas'), LANDING.ex.card); const L = LANDING.live; if (L && L.map) { L.map.fit(); L.map.draw(); if (L.k) LANDING.camera(L.k); } });
+      window.addEventListener('resize', () => { if (APP.route !== 'home' || $('landing').hidden || !LANDING.ex) return; if (LANDING.fellBack) LANDING.draw($('ldCanvas'), LANDING.ex.card); const L = LANDING.live; if (L && L.map) { L.map.fit(); L.map.draw(); if (L.k) LANDING.camera(L.k); } });
       const box = $('ldMap'); let x0 = null, y0 = null;   // a swipe moves between the slides
       box.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
       box.addEventListener('touchend', (e) => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) LANDING.show(LANDING.idx + (dx < 0 ? 1 : -1), true); }, { passive: true }); }
-    // the live map comes in the background: the feed below must not wait for a session to load
-    if (ex && fresh) LANDING.buildLive(ex).then((L) => { if (L && LANDING.ex === ex && !LANDING.live && APP.route === 'home') { LANDING.live = L; LANDING.mount(L); } }).catch((e) => console.warn('landing: live map', e));
+    // the live map comes in the background: the feed below must not wait for a session to load; a failure leaves the drawn card
+    if (ex && fresh) LANDING.buildLive(ex).then((L) => { if (LANDING.ex !== ex) return; if (L && !LANDING.live && APP.route === 'home') { LANDING.live = L; LANDING.mount(L); } else if (!L) LANDING.fallback(); }).catch((e) => { console.warn('landing: live map', e); if (LANDING.ex === ex) LANDING.fallback(); });
+    // the driver's name (one lookup) and the hero remembered for the next visit
+    if (ex && !ex.who) { try { const who = (await STORE.names([ex.owner]))[ex.owner]; if (LANDING.ex === ex) { caption(who ? who.name : ''); LANDING.labels(LANDING.slides[LANDING.idx]); LANDING.remember(ex, who ? who.name : '', trk ? trk.name : ''); } } catch (e) {} }
+    else if (ex) LANDING.remember(ex, ex.who, trk ? trk.name : ex.trackName);
   }
 };
 async function renderHomePage() {
@@ -6859,6 +6873,9 @@ async function renderHomePage() {
     $('pushLater').onclick = () => { NATIVE.push.later(); ask.hidden = true; }; }
   const feed = $('homeFeed'); feed.innerHTML = '';
   for (let i = 0; i < 3; i++) { const sk = el('div', 'post skel'); sk.style.height = '220px'; feed.appendChild(sk); }
+  // a guest sees the landing at once — with the hero remembered from the last visit already loading — before the feed has been asked for
+  const guest0 = !STORE.hasIdentity && STORE.hasDb;
+  if (guest0) { document.querySelector('#pg-home .home-hero').hidden = true; $('landing').hidden = false; const h = LANDING.cached(); if (h) { try { await LANDING.render([h], null); } catch (e) { console.error('landing', e); } } }
   // 100 most recent published sessions — one driver uploading 30 files in a row must not push everyone else out of the feed (they fold into one post below)
   const pubs = STORE.hasDb ? await STORE.recentPublished(100) : [];
   const C = STORE.hasDb ? await STORE.siteCounts() : null;
