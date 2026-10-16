@@ -1036,6 +1036,48 @@ html.native .side{background:var(--glass);-webkit-backdrop-filter:blur(26px) sat
 }
 html.native body.cockpit .ck-panel,html.native body.cockpit .ck-scrub{background:rgba(14,18,30,.55);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border-color:rgba(255,255,255,.16)}
 html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border-color:rgba(255,255,255,.16)}
+/* ---------- the landing (guests): the product first ---------- */
+.landing{display:flex;flex-direction:column;gap:18px}
+.ld-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 44px;align-items:center;padding:28px 30px 26px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.ld-eyebrow{font:700 11.5px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.ld-text h1{font-size:34px;line-height:1.08;letter-spacing:-.025em;margin:0 0 12px;max-width:16ch}
+.ld-text p{color:var(--muted);font-size:16px;line-height:1.5;max-width:50ch;margin:0 0 18px}
+.ld-cta{gap:10px;flex-wrap:wrap}
+.ld-cta .btn{height:44px;padding:0 18px;font-size:15px}
+.ld-proof{margin-top:16px;font-size:13px;color:var(--faint);display:flex;gap:14px;flex-wrap:wrap}
+.ld-proof b{color:var(--muted);font-weight:600}
+.ld-map{position:relative;aspect-ratio:1/1.02;min-width:0;border-radius:16px;overflow:hidden;background:linear-gradient(160deg,#141a2b,#1b2340 60%,#20294a);box-shadow:0 30px 60px -30px rgba(20,30,60,.5)}
+.ld-map canvas{width:100%;height:100%;display:block}
+.ld-cap{position:absolute;left:12px;bottom:10px;right:12px;font:500 11.5px/1.35 var(--body);color:rgba(255,255,255,.62);text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.ld-cap b{color:#fff;font-weight:600}
+.ld-show{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.ld-slides{position:relative;aspect-ratio:1/1;max-height:520px;margin:0 auto;width:min(100%,520px)}
+.ld-slide{position:absolute;inset:0;opacity:0;transition:opacity .5s;border-radius:14px;overflow:hidden;background:var(--surface-2)}
+.ld-slide.on{opacity:1}
+.ld-slide img{width:100%;height:100%;object-fit:cover;display:block}
+.ld-dots{display:flex;gap:6px;justify-content:center}
+.ld-dots button{width:8px;height:8px;border-radius:50%;border:0;background:var(--line-2);padding:0;cursor:pointer;transition:width .2s,background .2s}
+.ld-dots button.on{width:22px;border-radius:4px;background:var(--accent)}
+.ld-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ld-step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:4px}
+.ld-step .n{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:700 12.5px var(--body);margin-bottom:6px}
+.ld-step b{font-size:14.5px;line-height:1.3}
+.ld-step span{font-size:13px;color:var(--muted);line-height:1.45}
+@media (min-width:901px){
+  .ld-slides{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;aspect-ratio:auto;max-height:none;width:100%}
+  .ld-slide{position:static;opacity:1;aspect-ratio:1/1}
+  .ld-dots{display:none}
+}
+@media (max-width:900px){
+  .ld-hero{grid-template-columns:1fr;gap:18px;padding:20px 16px 18px;border-radius:16px}
+  .ld-text h1{font-size:27px;max-width:none}
+  .ld-text p{font-size:15px}
+  .ld-cta .btn{height:42px;font-size:14.5px}
+  .ld-proof{margin-top:12px}
+  .ld-map{aspect-ratio:1/1.22}
+  .ld-show{padding:12px 12px 14px}
+  .ld-steps{grid-template-columns:1fr}
+}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -1118,6 +1160,28 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 
     <!-- ========== HOME ========== -->
     <section class="page" id="pg-home" hidden>
+      <!-- the landing for a guest: the product first — a real session with the seconds left in every corner -->
+      <div class="landing" id="landing" hidden>
+        <div class="ld-hero">
+          <div class="ld-text">
+            <div class="ld-eyebrow" data-t="Racing AI for karting">Racing AI for karting</div>
+            <h1 data-t="See where your lap loses time — corner by corner">See where your lap loses time — corner by corner</h1>
+            <p data-t="Upload the file from your Alfano or any GPS logger. Hutka compares every braking point, apex and exit with the fastest drivers on the same layout — and tells you what to change.">Upload the file from your Alfano or any GPS logger. Hutka compares every braking point, apex and exit with the fastest drivers on the same layout — and tells you what to change.</p>
+            <div class="row ld-cta"><button class="btn primary" id="ldUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload a session">Upload a session</span></button><a class="btn" id="ldDemo" href="#lab"><svg><use href="#i-lab"/></svg><span data-t="Open a live example">Open a live example</span></a></div>
+            <div class="ld-proof" id="ldProof"></div>
+          </div>
+          <div class="ld-map" id="ldMap"><canvas id="ldCanvas"></canvas><div class="ld-cap" id="ldCap"></div></div>
+        </div>
+        <div class="ld-show" id="ldShow">
+          <div class="ld-slides" id="ldSlides"></div>
+          <div class="ld-dots" id="ldDots"></div>
+        </div>
+        <div class="ld-steps">
+          <div class="ld-step"><div class="n">1</div><b data-t="Export the session from your logger app">Export the session from your logger app</b><span data-t="Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — one file per session.">Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — one file per session.</span></div>
+          <div class="ld-step"><div class="n">2</div><b data-t="Upload it — the track is recognised by GPS">Upload it — the track is recognised by GPS</b><span data-t="A track that is not in Hutka yet gets its own page from your session.">A track that is not in Hutka yet gets its own page from your session.</span></div>
+          <div class="ld-step"><div class="n">3</div><b data-t="See every corner, compare, ask the coach">See every corner, compare, ask the coach</b><span data-t="Brake point, apex, throttle, exit — against the fastest; three laps on one map, a replay, an AI coach in plain words.">Brake point, apex, throttle, exit — against the fastest; three laps on one map, a replay, an AI coach in plain words.</span></div>
+        </div>
+      </div>
       <div class="home-hero card">
         <div class="t">
           <h1 data-t="See where the time is">See where the time is</h1>
@@ -3299,6 +3363,15 @@ Object.assign(I18N.RU, { 'Not in Hutka yet — looking the place up on the map�
   'GPS does not match any track in Hutka yet — it is added below with its own page, or keep the session private without a track.': 'GPS не совпал ни с одной трассой в Hutka — она добавится ниже со своей страницей, или оставь сессию приватной без трассы.',
   'GPS does not match any track in Hutka yet — sign in and upload again: the track page is created automatically.': 'GPS не совпал ни с одной трассой в Hutka — войди и загрузи снова: страница трассы создастся сама.',
   'Checking the map…': 'Сверяюсь с картой…', '{length} m, {corners} corners — mapped from a driver’s session on {date}. Know this track? Add the website, hours and a photo on the track page.': '{length} м, {corners} поворотов — снято с сессии гонщика {date}. Знаешь эту трассу? Добавь сайт, часы работы и фото на странице трассы.' });
+// v34 — the landing for guests
+Object.assign(I18N.RU, { 'Racing AI for karting': 'Гоночный ИИ для картинга', 'See where your lap loses time — corner by corner': 'Увидь, где твой круг теряет время — поворот за поворотом',
+  'Upload the file from your Alfano or any GPS logger. Hutka compares every braking point, apex and exit with the fastest drivers on the same layout — and tells you what to change.': 'Загрузи файл с Alfano или любого GPS-логгера. Hutka сравнит каждую точку торможения, апекс и выход с самыми быстрыми гонщиками на этом же лейауте — и скажет, что менять.',
+  'Upload a session': 'Загрузить сессию', 'Open a live example': 'Открыть живой пример', 'RESERVE PER CORNER': 'РЕЗЕРВ ПО ПОВОРОТАМ', '{s} s': '{s} с', 'on the table in one lap': 'на столе за один круг', 'Biggest: corner {n} · +{s} s': 'Самый большой: поворот {n} · +{s} с', 'a driver': 'гонщик',
+  'a real session: the seconds each corner leaves against the best passes on this layout': 'настоящая сессия: секунды, которые каждый поворот оставляет относительно лучших проездов на этом лейауте',
+  'tracks': 'трасс', 'laps analysed': 'кругов разобрано', 'sessions published': 'сессий опубликовано',
+  'Export the session from your logger app': 'Выгрузи сессию из приложения логгера', 'Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — one file per session.': 'Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — один файл на сессию.',
+  'Upload it — the track is recognised by GPS': 'Загрузи — трасса узнаётся по GPS', 'A track that is not in Hutka yet gets its own page from your session.': 'Трасса, которой ещё нет в Hutka, получает свою страницу из твоей сессии.',
+  'See every corner, compare, ask the coach': 'Смотри каждый поворот, сравнивай, спрашивай тренера', 'Brake point, apex, throttle, exit — against the fastest; three laps on one map, a replay, an AI coach in plain words.': 'Точка торможения, апекс, газ, выход — против самых быстрых; три круга на одной карте, реплей, ИИ-тренер простыми словами.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4749,7 +4822,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v33.7';
+const APP_VERSION = 'v34';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6583,6 +6656,83 @@ function drawPreview(cv, pv, color) {
 // the last feed render, so a card computed in the background (CARDS.run) can refresh its post in place
 const HOME = { last: null,
   refreshPost(id, card) { const L = HOME.last; if (!L || APP.route !== 'home') return; const pub = L.pubs.find(s => s.id === id), old = document.querySelector(`#homeFeed .post[data-sid="${CSS.escape(id)}"]`); if (!pub || !old) return; pub.card = card; old.replaceWith(postCard(pub, L.names, L.counts[id], { group: (L.groupOf || {})[id] || null })); } };
+// ---------- the landing for guests: a real session with the seconds left in every corner, like a product page should ----------
+const LANDING = {
+  timer: 0, idx: 0,
+  slides: [['three', 'Three laps on one map'], ['ideal', 'Best vs ideal lap'], ['coach', 'An AI coach that has read your telemetry'], ['replay', 'Press play'], ['dd2', 'Sport karts: revs, gears, shifts'], ['feed', 'The feed shows the analysis']],
+  // the session that shows the product best: enough laps, a card with a few corners worth 0.05–0.8 s, nothing absurd
+  pick(pubs) {
+    const score = (s) => { const c = s.card; if (!c || !c.corners || c.corners.length < 6 || (s.nLaps || 0) < 15) return -1; const good = c.corners.filter(q => q[3] >= 0.05 && q[3] <= 0.8).length, mx = Math.max(...c.corners.map(q => q[3])); if (mx > 1 || c.total > 8 || c.total < 0.4) return -1; return good * 10 + Math.min(s.nLaps || 0, 60) / 10; };
+    return pubs.map(s => ({ s, k: score(s) })).filter(x => x.k >= 0).sort((a, b) => b.k - a.k).map(x => x.s)[0] || null;
+  },
+  // the lap line with every corner's reserve, the three biggest called out, a magnifier on the biggest — drawn from the card alone.
+  // The top band holds the headline numbers and the magnifier; the map sits under it; labels dodge each other (the bubbles are placed first)
+  draw(cv, c) {
+    if (!cv || !c || !c.pts) return;
+    const box = cv.parentElement, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = box.clientWidth || 360, h = box.clientHeight || 340; if (w < 40) return;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cs = getComputedStyle(document.documentElement), mono = cs.getPropertyValue('--mono') || 'monospace', body = cs.getPropertyValue('--body') || 'sans-serif';
+    const small = w < 420, R = small ? 50 : 70, band = R * 2 + 26, padX = small ? 30 : 44, padB = small ? 54 : 60;
+    const corners = (c.corners || []).slice(), byRes = corners.slice().sort((a, b) => b[3] - a[3]), top = byRes.slice(0, 3).map(q => q[2]), q0 = byRes[0] && byRes[0][3] >= 0.05 ? byRes[0] : null;
+    const col = (r) => r >= 0.2 ? '#ff5c62' : r >= 0.1 ? '#ffa23a' : '#39c76f';
+    const s = Math.min((w - padX * 2) / Math.max(c.w || 1, 0.05), (h - band - padB) / Math.max(c.h || 1, 0.05)), ox = (w - (c.w || 1) * s) / 2, oy = band + (h - band - padB - (c.h || 1) * s) / 2, X = (p) => ox + p[0] * s, Y = (p) => oy + p[1] * s;
+    const path = () => { ctx.beginPath(); c.pts.forEach((p, i) => { i ? ctx.lineTo(X(p), Y(p)) : ctx.moveTo(X(p), Y(p)); }); ctx.closePath(); };
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    path(); ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = small ? 11 : 15; ctx.stroke();
+    path(); ctx.strokeStyle = '#4f8dff'; ctx.lineWidth = small ? 3 : 3.5; ctx.stroke();
+    // the bubbles first, so labels can keep clear of them
+    const placed = []; const hit = (r) => placed.some(p => !(r.x + r.w < p.x || p.x + p.w < r.x || r.y + r.h < p.y || p.y + p.h < r.y));
+    const rad = (q) => top.includes(q[2]) ? (small ? 10.5 : 13) : (small ? 7.5 : 9.5);
+    for (const q of corners) { const r = rad(q); placed.push({ x: X(q) - r - 2, y: Y(q) - r - 2, w: 2 * r + 4, h: 2 * r + 4 }); }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const q of corners.slice().sort((a, b) => a[3] - b[3])) { const big = top.includes(q[2]), r = rad(q), x = X(q), y = Y(q);
+      ctx.beginPath(); ctx.arc(x, y, r + 2, 0, Math.PI * 2); ctx.fillStyle = 'rgba(20,26,43,.92)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = col(q[3]); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = `700 ${big ? (small ? 10.5 : 12) : (small ? 8.5 : 9.5)}px ${body}`; ctx.fillText(String(q[2]), x, y + 0.5); }
+    // the labels: the biggest reserves first, each in the first free spot around its bubble (right, left, below, above); the rest stay bubbles
+    const maxLabels = small ? 7 : 10; let nl = 0;
+    for (const q of byRes) { if (q[3] < 0.05 || nl >= maxLabels) break; const big = top.includes(q[2]), r = rad(q), x = X(q), y = Y(q), tx = `+${q[3].toFixed(2)}`;
+      ctx.font = `${big ? 700 : 600} ${big ? (small ? 12.5 : 14) : (small ? 10.5 : 11.5)}px ${mono}`; const tw = ctx.measureText(tx).width + 10, th = big ? 19 : 16;
+      const cands = [[x + r + 5, y - th / 2], [x - r - 5 - tw, y - th / 2], [x - tw / 2, y + r + 4], [x - tw / 2, y - r - 4 - th]];
+      let spot = null; for (const [lx, ly] of cands) { const rr = { x: lx, y: ly, w: tw, h: th }; if (lx < 4 || ly < band - 4 || lx + tw > w - 4 || ly + th > h - padB + 24) continue; if (!hit(rr)) { spot = rr; break; } }
+      if (!spot) continue; placed.push(spot); nl++;
+      ctx.fillStyle = big ? 'rgba(20,26,43,.9)' : 'rgba(20,26,43,.72)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(spot.x, spot.y, spot.w, spot.h, 5) : ctx.rect(spot.x, spot.y, spot.w, spot.h); ctx.fill();
+      ctx.fillStyle = big ? '#fff' : 'rgba(255,255,255,.88)'; ctx.fillText(tx, spot.x + spot.w / 2, spot.y + spot.h / 2 + 0.5); }
+    // the top band: the headline on the left, the magnifier on the right
+    ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.font = `700 ${small ? 9.5 : 10.5}px ${body}`; ctx.fillText(t('RESERVE PER CORNER'), 16, 18);
+    ctx.fillStyle = '#fff'; ctx.font = `700 ${small ? 24 : 30}px ${mono}`; ctx.fillText(t('{s} s', { s: (c.total || 0).toFixed(2) }), 16, small ? 44 : 52);
+    ctx.fillStyle = 'rgba(255,255,255,.62)'; ctx.font = `500 ${small ? 11 : 12.5}px ${body}`; ctx.fillText(t('on the table in one lap'), 16, small ? 64 : 76);
+    if (q0) { ctx.fillStyle = col(q0[3]); ctx.font = `700 ${small ? 12 : 13.5}px ${body}`; ctx.fillText(t('Biggest: corner {n} · +{s} s', { n: q0[2], s: q0[3].toFixed(2) }), 16, small ? 86 : 104); }
+    if (q0) {
+      const mx = w - R - 14, my = 14 + R, zoom = small ? 3 : 3.4, cx = X(q0), cy = Y(q0);
+      ctx.save(); ctx.beginPath(); ctx.arc(mx, my, R, 0, Math.PI * 2); ctx.clip(); ctx.fillStyle = '#0f141f'; ctx.fillRect(mx - R, my - R, 2 * R, 2 * R);
+      ctx.translate(mx - cx * zoom, my - cy * zoom); ctx.scale(zoom, zoom);
+      path(); ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = (small ? 11 : 15) / zoom * 1.5; ctx.stroke(); path(); ctx.strokeStyle = '#4f8dff'; ctx.lineWidth = 3.5 / zoom * 1.4; ctx.stroke();
+      for (const m of c.marks || []) { if (Math.hypot(X(m) - cx, Y(m) - cy) > R / zoom + 4) continue; ctx.beginPath(); ctx.arc(X(m), Y(m), 2.6 / zoom * 2, 0, Math.PI * 2); ctx.fillStyle = { b: '#ff5c62', l: '#f2c94c', e: '#f2c94c', r: '#ff8c2e', t: '#39c76f', a: '#fff' }[m[2]] || '#999'; ctx.fill(); }
+      ctx.restore();
+      ctx.beginPath(); ctx.arc(mx, my, R, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(79,141,255,.22)'; ctx.lineWidth = 7; ctx.stroke();
+      ctx.beginPath(); ctx.arc(mx, my, R, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 1.5; ctx.stroke();
+      // the corner's badge on the magnifier
+      const bx = mx - R + (small ? 16 : 22), by = my - R + (small ? 16 : 22), br = small ? 11 : 13; ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI * 2); ctx.fillStyle = col(q0[3]); ctx.fill(); ctx.textAlign = 'center'; ctx.fillStyle = '#fff'; ctx.font = `700 ${small ? 10.5 : 12}px ${body}`; ctx.fillText(String(q0[2]), bx, by + 0.5);
+      ctx.textAlign = 'left'; ctx.font = `700 ${small ? 13 : 16}px ${mono}`; ctx.fillStyle = '#fff'; ctx.fillText(`+${q0[3].toFixed(2)}`, bx + br + 5, by + 0.5);
+      // a thin line from the magnifier to the corner on the map
+      ctx.beginPath(); ctx.moveTo(mx - R * 0.6, my + R * 0.8); ctx.lineTo(cx, cy); ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 1; ctx.setLineDash([3, 4]); ctx.stroke(); ctx.setLineDash([]); }
+  },
+  show(k) { const sl = $('ldSlides').children, dots = $('ldDots').children; if (!sl.length) return; LANDING.idx = (k + sl.length) % sl.length; for (let i = 0; i < sl.length; i++) { sl[i].classList.toggle('on', i === LANDING.idx); if (dots[i]) dots[i].classList.toggle('on', i === LANDING.idx); } },
+  start() { clearInterval(LANDING.timer); LANDING.timer = setInterval(() => { if (document.visibilityState === 'visible' && APP.route === 'home' && !$('landing').hidden) LANDING.show(LANDING.idx + 1); }, 4500); },
+  async render(pubs, C) {
+    const L = $('landing'); L.hidden = false;
+    $('ldUpload').onclick = () => UPLOAD.open({});
+    const ex = LANDING.pick(pubs); const trk = ex ? STORE.getTrack(ex.track) : null; const who = ex ? (await STORE.names([ex.owner]))[ex.owner] : null;
+    if (ex) { $('ldDemo').href = '#lab~' + ex.id; $('ldMap').hidden = false; requestAnimationFrame(() => LANDING.draw($('ldCanvas'), ex.card)); $('ldCap').innerHTML = `<b>${esc(trk ? trk.name : ex.trackName || '')}</b> · ${esc(who ? who.name : t('a driver'))} · ${esc(fmtMs(ex.bestMs))} · ${esc(t('{n} laps', { n: ex.nLaps || 0 }))} — ${esc(t('a real session: the seconds each corner leaves against the best passes on this layout'))}`; }
+    else { $('ldMap').hidden = true; $('ldDemo').href = '#tracks'; }
+    const pr = $('ldProof'); pr.innerHTML = ''; if (C) { for (const [v, k] of [[C.tracks, t('tracks')], [C.laps, t('laps analysed')], [C.published, t('sessions published')]]) if (v) { const sp = el('span'); sp.innerHTML = `<b>${esc(String(v))}</b> ${esc(k)}`; pr.appendChild(sp); } }
+    const box = $('ldSlides'), dots = $('ldDots'); if (!box.children.length) { LANDING.slides.forEach(([k, alt], i) => { const d = el('div', 'ld-slide' + (i === 0 ? ' on' : '')); const im = new Image(); im.src = `promo/${k}.webp?v=1`; im.alt = alt; im.loading = i === 0 ? 'eager' : 'lazy'; im.decoding = 'async'; d.appendChild(im); box.appendChild(d); const b = el('button', i === 0 ? 'on' : ''); b.type = 'button'; b.setAttribute('aria-label', alt); b.onclick = () => { LANDING.show(i); LANDING.start(); }; dots.appendChild(b); });
+      let x0 = null; box.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true }); box.addEventListener('touchend', (e) => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) { LANDING.show(LANDING.idx + (dx < 0 ? 1 : -1)); LANDING.start(); } }, { passive: true }); }
+    LANDING.start();
+    window.addEventListener('resize', () => { if (APP.route === 'home' && !$('landing').hidden && ex) LANDING.draw($('ldCanvas'), ex.card); });
+  }
+};
 async function renderHomePage() {
   $('homeSub').textContent = t('Upload a session — every corner, compared with the fastest on the same layout.');
   $('homeUpload').onclick = () => UPLOAD.open({});
@@ -6599,6 +6749,10 @@ async function renderHomePage() {
   await STORE.socialAvailable();
   const names = await STORE.names(pubs.map(s => s.owner)), counts = await STORE.socialCounts(pubs.map(s => s.id));
   for (const tid of new Set(pubs.map(s => s.track).filter(Boolean))) await STORE.getLayouts(tid);
+  // a guest sees the landing (the product first); a signed-in driver the compact hero with the counters
+  const guest = !STORE.hasIdentity && STORE.hasDb;
+  document.querySelector('#pg-home .home-hero').hidden = guest; $('landing').hidden = !guest;
+  if (guest) { try { await LANDING.render(pubs, C); } catch (e) { console.error('landing', e); } } else clearInterval(LANDING.timer);
   // hero stats
   // site-wide totals from hutka_counts; without the function (older database) — what the feed slice shows
   { const st = $('homeStats'); st.innerHTML = ''; const drivers = C ? C.drivers : new Set(pubs.map(s => s.owner)).size, laps = C ? C.laps : pubs.reduce((a, s) => a + (s.nLaps || 0), 0), nSess = C ? C.sessions : pubs.length; for (const [k, v] of [[t('Tracks'), C ? C.tracks : STORE.getTracks().length], [t('Sessions'), nSess], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="v">${v}</div><div class="k">${esc(k)}</div>`; st.appendChild(d); } }
