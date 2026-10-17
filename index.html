@@ -4858,10 +4858,11 @@ const STORE = (() => {
     adapter.event(vid, vis, name, props || {}, dev).catch((e) => { if (/hutka_event|PGRST202|42883/.test(String(e && e.message || e))) eventsOk = false; });
   }
   async function adminAnalytics(days) { if (!adapter || !adapter.adminAnalytics || !me.canEdit) return null; return adapter.adminAnalytics(days || 30); }
-  // the link preview of a published session: functions/share-page writes hutka.ai/s/<id> (title, text, the picture); the picture goes to the public bucket cards/<me>/<id>.png
+  // the link preview of a published session: functions/share-page writes hutka.ai/s/<id> (title, text, the picture); the picture goes to the public bucket
+  // cards/<owner>/<id>.png — the owner writes into their own folder, an admin draws it for other drivers' published sessions too (share.sql)
   async function sharePage(sid, remove, img) { const r = await fnCall('share-page', { id: sid, remove: !!remove, img: img || '' }); if (!r.ok) throw await errOf(r); return r.json(); }
-  async function uploadCard(sid, blob) { if (!adapter || adapter.kind !== 'supabase' || !me.id || !adapter.sb.storage) return null; const path = `${me.id}/${sid}.png`; const r = await adapter.sb.storage.from('cards').upload(path, blob, { upsert: true, contentType: 'image/png', cacheControl: '3600' }); if (r.error) { const e = new Error(r.error.message || 'upload'); e.code = r.error.statusCode || r.error.code; throw e; } return 'cards/' + path; }
-  async function removeCard(sid) { if (!adapter || adapter.kind !== 'supabase' || !me.id || !adapter.sb.storage) return; try { await adapter.sb.storage.from('cards').remove([`${me.id}/${sid}.png`]); } catch (e) {} }
+  async function uploadCard(sid, blob, owner) { if (!adapter || adapter.kind !== 'supabase' || !me.id || !adapter.sb.storage) return null; const path = `${owner || me.id}/${sid}.png`; const r = await adapter.sb.storage.from('cards').upload(path, blob, { upsert: true, contentType: 'image/png', cacheControl: '3600' }); if (r.error) { const e = new Error(r.error.message || 'upload'); e.code = r.error.statusCode || r.error.code; throw e; } return 'cards/' + path; }
+  async function removeCard(sid, owner) { if (!adapter || adapter.kind !== 'supabase' || !me.id || !adapter.sb.storage) return; try { await adapter.sb.storage.from('cards').remove([`${owner || me.id}/${sid}.png`]); } catch (e) {} }
   function profileSync(id) { return profiles.get(id) || null; }
   const ok = (r) => { if (r.error) { const e = new Error(r.error.message || 'db error'); e.code = r.error.code; throw e; } return r.data; };
   async function listReports() { if (!adapter || adapter.kind !== 'supabase') return []; return ok(await adapter.sb.from('reports').select('id,created_at,user_id,email,name,text,page,ua,screen,version,session_id,errors,shot,status').order('created_at', { ascending: false }).limit(200)) || []; }
@@ -5374,7 +5375,7 @@ async function sharePageSync(meta, img) {
   if (!own && STORE.adminShare === false) return null;   // share.sql not run: an admin builds nothing for others, or every visit would rebuild it
   const persist = async (share) => { if (own) await STORE.updateSession(meta.id, { share }); else if (!(await STORE.setShareAdmin(meta.id, share))) throw new Error('no admin share'); meta.share = share; };
   if (!meta.published) {   // unpublished: the page and the picture go, the link falls back to #lab~<id> (owner only)
-    if (meta.share) { try { await STORE.sharePage(meta.id, true); } catch (e) {} if (own) STORE.removeCard(meta.id); try { await persist(null); } catch (e) {} meta.share = null; }
+    if (meta.share) { try { await STORE.sharePage(meta.id, true); } catch (e) {} if (own || STORE.isAdmin()) STORE.removeCard(meta.id, meta.owner); try { await persist(null); } catch (e) {} meta.share = null; }
     return null;
   }
   const key = shareKey(meta), cur = meta.share || {};
@@ -5767,7 +5768,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.12.1';
+const APP_VERSION = 'v34.13';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6314,7 +6315,8 @@ const CARDS = {
       for (const m of want) {
         if (APP.route === 'lab' && LAB.loaded) break;   // not while the Lab works with the same session objects
         CARDS.tried.add(m.id);
-        const own = m.owner === me, needPic = own && m.published && STORE.aiOn && !(m.share && m.share.imgKey === shareKey(m));
+        // the picture: the owner draws their own, an admin draws other drivers' too (the bucket lets an admin write into any folder)
+        const own = m.owner === me, needPic = (own || (STORE.isAdmin() && STORE.adminShare !== false)) && m.published && STORE.aiOn && !(m.share && m.share.imgKey === shareKey(m));
         let an = null; if (noCard(m) || needPic) { try { an = await LAB.analyseMeta(m, mine); } catch (e) { continue; } }   // could not load: try again next time
         if (noCard(m)) {
           const card = an ? cardFrom(an.A.D, an.G, an.A.coach) : null, body = card || { v: CARD_V, none: true };
@@ -6322,7 +6324,7 @@ const CARDS = {
           if (saved) { m.card = body; CARDS.written++; if (card && typeof HOME !== 'undefined') HOME.refreshPost(m.id, body); }
         }
         // the link preview page (and, for my own sessions, its picture) of a published session that has none yet
-        if (noPage(m)) { let img = ''; if (needPic && an) { try { const names = await STORE.names([m.owner]); const b = await SHARE.ogBlob({ sess: an.sess, G: an.G, D: an.A.D, coach: an.A.coach, names, tid: an.tid, lid: an.lid }); if (b) img = (await STORE.uploadCard(m.id, b)) || ''; } catch (e) {} } try { await sharePageSync(m, img); } catch (e) {} }
+        if (noPage(m)) { let img = ''; if (needPic && an) { try { const names = await STORE.names([m.owner]); const b = await SHARE.ogBlob({ sess: an.sess, G: an.G, D: an.A.D, coach: an.A.coach, names, tid: an.tid, lid: an.lid }); if (b) img = (await STORE.uploadCard(m.id, b, m.owner)) || ''; } catch (e) {} } try { await sharePageSync(m, img); } catch (e) {} }
         STORE.trimSessions(LAB.sessions.map(s => s.id)); await new Promise(r => setTimeout(r, 120));
       }
     } catch (e) {} finally { CARDS.busy = false; }
@@ -6383,7 +6385,7 @@ LAB.open = async function (meta, asCmp) {
   // and the analysis card (the lap line with brake / lift / apex / throttle points, corner numbers, the biggest reserves): computed once, drawn in the feed for everyone
   if (mySession(sess) && sess.owner !== 'local' && STORE.canWrite() && !(sess.card && sess.card.v === CARD_V && !sess.card.none)) { try { const card = LAB.cardOf(); if (card) { await STORE.updateSession(sess.id, { card }); } } catch (e) {} }
   // and the link preview (hutka.ai/s/<id>): the picture and the page, when they are missing or stale
-  if (mySession(sess) && sess.published && sess.owner !== 'local' && STORE.canWrite() && shareStale(sess)) SHARE.sync(sess);
+  if ((mySession(sess) || STORE.isAdmin()) && sess.published && sess.owner !== 'local' && STORE.canWrite() && shareStale(sess)) SHARE.sync(sess);
 };
 // load one more session into the lab (as a comparison candidate) by its meta
 LAB.load = async function (meta) {
@@ -7048,7 +7050,7 @@ const SHARE = {
     if (SHARE.syncing === sess.id) return null; SHARE.syncing = sess.id;
     try {
       let img = '';
-      if (mySession(sess) && LAB.current && LAB.current.id === sess.id && LAB.G && (!(sess.share && sess.share.imgKey === shareKey(sess)) || (opts && opts.force))) { try { const b = await SHARE.ogBlob(); if (b) img = (await STORE.uploadCard(sess.id, b)) || ''; } catch (e) {} }
+      if ((mySession(sess) || STORE.isAdmin()) && LAB.current && LAB.current.id === sess.id && LAB.G && (!(sess.share && sess.share.imgKey === shareKey(sess)) || (opts && opts.force))) { try { const b = await SHARE.ogBlob(); if (b) img = (await STORE.uploadCard(sess.id, b, sess.owner)) || ''; } catch (e) {} }
       return await sharePageSync(sess, img);
     } catch (e) { return null; } finally { SHARE.syncing = null; }
   },
