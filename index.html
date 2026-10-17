@@ -5872,7 +5872,7 @@ const NATIVE = window.NATIVE = {
   },
   async onUrl(url) {
     if (!url) return; url = String(url);
-    if (/^hutka:\/\/auth/i.test(url)) { await this.closeBrowser(); try { const ok = await STORE.adapter.finishSignIn(url); if (ok) { AUTH.close(); toast(t('Signed in.')); this.haptic('success'); } } catch (e) { toast(t('Could not sign in: {e}', { e: e && e.message || e })); } return; }
+    if (/^hutka:\/\/auth/i.test(url)) { await this.closeBrowser(); try { const ok = await STORE.adapter.finishSignIn(url); if (ok) { AUTH.gated = false; AUTH.close(); this.haptic('success'); } } catch (e) { if ($('authModal').hidden) AUTH.open({ gate: AUTH.gated }); setStatus('authStatus', t('Could not sign in: {e}', { e: e && e.message || e }), 'warn'); } return; }
     if (/^(file|content):/i.test(url)) { try { const f = await this.readFile(url); if (f) { if (APP.route !== 'lab') go('lab'); setTimeout(() => UPLOAD.withFiles([f]), 400); } } catch (e) { toast(t('Could not open the file: {e}', { e: e && e.message || e })); } }
   }
 };
@@ -5974,9 +5974,9 @@ $('authEmailBtn').onclick = async () => { const email = $('authEmail').value.tri
 $('authGoogleBtn').onclick = async () => { try { await STORE.adapter.signInGoogle(); } catch (e) { setStatus('authStatus', t('Could not start Google sign-in: {e}', { e: e && e.message || e }), 'warn'); } };
 $('authAppleBtn').onclick = async () => { try { await STORE.adapter.signInApple(); } catch (e) { setStatus('authStatus', t('Could not start Apple sign-in: {e}', { e: e && e.message || e }), 'warn'); } };
 $('authPassToggle').onclick = () => AUTH.pass($('authPassField').hidden);
-$('authCodeBtn').onclick = async () => { const email = $('authEmail').value.trim(), code = $('authCode').value.replace(/\D/g, ''); if (code.length < 6) { setStatus('authStatus', t('Enter the 6-digit code from the e-mail.'), 'warn'); return; } $('authCodeBtn').disabled = true; try { await STORE.adapter.verifyEmailCode(email, code); AUTH.close(); NATIVE.haptic('success'); toast(t('Signed in.')); } catch (e) { NATIVE.haptic('error'); setStatus('authStatus', t('That code did not work — check the digits, or ask for a new e-mail.'), 'warn'); } $('authCodeBtn').disabled = false; };
+$('authCodeBtn').onclick = async () => { const email = $('authEmail').value.trim(), code = $('authCode').value.replace(/\D/g, ''); if (code.length < 6) { setStatus('authStatus', t('Enter the 6-digit code from the e-mail.'), 'warn'); return; } $('authCodeBtn').disabled = true; try { await STORE.adapter.verifyEmailCode(email, code); AUTH.gated = false; AUTH.close(); NATIVE.haptic('success'); } catch (e) { NATIVE.haptic('error'); setStatus('authStatus', t('That code did not work — check the digits, or ask for a new e-mail.'), 'warn'); } $('authCodeBtn').disabled = false; };
 $('authCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authCodeBtn').click(); });
-$('authPassBtn').onclick = async () => { const email = $('authEmail').value.trim(), pass = $('authPass').value; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !pass) { setStatus('authStatus', t('Enter the email and the password.'), 'warn'); return; } $('authPassBtn').disabled = true; try { await STORE.adapter.signInPassword(email, pass, await CAPTCHA.token()); AUTH.close(); } catch (e) { setStatus('authStatus', t('Could not sign in: {e}', { e: e && e.message || e }), 'warn'); } $('authPassBtn').disabled = false; };
+$('authPassBtn').onclick = async () => { const email = $('authEmail').value.trim(), pass = $('authPass').value; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !pass) { setStatus('authStatus', t('Enter the email and the password.'), 'warn'); return; } $('authPassBtn').disabled = true; try { await STORE.adapter.signInPassword(email, pass, await CAPTCHA.token()); AUTH.gated = false; AUTH.close(); } catch (e) { setStatus('authStatus', t('Could not sign in: {e}', { e: e && e.message || e }), 'warn'); } $('authPassBtn').disabled = false; };
 $('authPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authPassBtn').click(); });
 $('authEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authEmailBtn').click(); });
 
@@ -6012,7 +6012,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.19.2';
+const APP_VERSION = 'v34.19.3';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
