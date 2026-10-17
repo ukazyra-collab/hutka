@@ -60,6 +60,7 @@ begin
     when 'layouts' then k := 'lay'; lim := 40;
     when 'claims' then k := 'clm'; lim := 10;
     when 'chats' then k := 'chat'; lim := 100;
+    when 'device_logs' then k := 'dlog'; lim := 40;   -- v34.6 (device_logs.sql)
     else return new;
   end case;
   if not hutka_bump(k || ':' || u, lim) then raise exception 'quota' using errcode = 'P0001', detail = tg_table_name; end if;

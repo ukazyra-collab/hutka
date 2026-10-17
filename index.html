@@ -1002,6 +1002,16 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .dev-item .hint{font-size:12px}
 .hint.warn{color:var(--warn)}
 .btn.danger-text{color:var(--danger)}
+.dev-found{background:var(--surface);color:var(--fg);font:inherit;text-align:left;width:100%}
+.dev-found.fit{border-color:var(--accent)}
+.dev-found .rssi{font-family:var(--mono);letter-spacing:1px;color:var(--accent)}
+.scan-pulse{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:scanpulse 1.2s ease-in-out infinite}
+@keyframes scanpulse{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+#devScan:has(#devRescan:not([hidden])) .scan-pulse{animation:none;opacity:.25}
+.dev-ex-head{display:flex;flex-direction:column;gap:2px}
+.dev-ex-head b{font-size:15px}
+.dev-log{margin:6px 0 0;padding:10px;max-height:34vh;min-height:120px;overflow:auto;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;font-family:var(--mono);font-size:11.5px;line-height:1.45;white-space:pre-wrap;word-break:break-all}
+@media (prefers-reduced-motion:reduce){.scan-pulse{animation:none}}
 /* ---------- community safety: report / block / delete account ---------- */
 .radios{display:flex;flex-direction:column;gap:6px}
 .radios label{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
@@ -1610,12 +1620,28 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <p class="hint" data-t="Connect the lap timer over Bluetooth: Hutka reads the recorded outings out of its memory and opens them in the Lab — no vendor app, no files.">Connect the lap timer over Bluetooth: Hutka reads the recorded outings out of its memory and opens them in the Lab — no vendor app, no files.</p>
   <div class="dev-kinds" id="devKinds"></div>
   <div class="hint warn" id="devNoBt" hidden data-t="This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.">This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.</div>
+  <div id="devScan" hidden>
+    <div class="row" style="justify-content:space-between;align-items:center"><b data-t="Nearby devices">Nearby devices</b><span class="scan-pulse" aria-hidden="true"></span></div>
+    <div class="hint" id="devScanHint"></div>
+    <div class="dev-list" id="devScanList"></div>
+    <div class="hint" id="devScanEmpty" hidden data-t="Nothing yet…">Nothing yet…</div>
+    <div class="row" style="margin-top:8px;gap:8px;flex-wrap:wrap"><button class="btn xs ghost" id="devScanMore" type="button" hidden></button><button class="btn xs" id="devRescan" type="button" hidden data-t="Scan again">Scan again</button><button class="btn xs ghost" id="devScanBack" type="button" data-t="Back">Back</button></div>
+  </div>
+  <div id="devExplore" hidden>
+    <div class="dev-ex-head"><b id="devExTitle"></b><span class="hint" id="devExSub"></span></div>
+    <p class="hint" data-t="Hutka does not speak this device's language yet. Everything it says is recorded here: put it in Bluetooth mode, press its buttons, start a transfer in its menu — then send the log. That is how the download gets written.">Hutka does not speak this device's language yet. Everything it says is recorded here: put it in Bluetooth mode, press its buttons, start a transfer in its menu — then send the log. That is how the download gets written.</p>
+    <pre class="dev-log" id="devLog"></pre>
+    <div class="hint" style="text-align:right"><span id="devLogN">0</span> <span data-t="lines">lines</span></div>
+    <div id="devConsole" hidden><div class="row" style="gap:6px;flex-wrap:wrap"><select id="devChr" style="flex:1 1 180px"></select><input type="text" id="devHex" placeholder="b5 62 ff 22 00 00   or   &quot;HELLO\r\n&quot;" style="flex:2 1 220px;font-family:var(--mono)"><button class="btn xs" id="devExSend" type="button" data-t="Send">Send</button><button class="btn xs ghost" id="devExSendNr" type="button" data-t="no response" title="write without response">no response</button></div><div class="hint" id="devExSent"></div></div>
+    <div class="row" style="justify-content:space-between;margin-top:10px"><button class="btn ghost" id="devExDisc" type="button" data-t="Disconnect">Disconnect</button><button class="btn primary" id="devSendLog" type="button" data-t="Send the log to Hutka">Send the log to Hutka</button></div>
+  </div>
   <div id="devStage" hidden>
     <div class="status" id="devStatus"></div>
     <div class="progress dev-bar" id="devBar" hidden><div></div></div>
     <div class="row" id="devCodeRow" hidden><input type="text" id="devCode" inputmode="numeric" placeholder="123456" maxlength="10" style="width:140px"><button class="btn" id="devUnlock" type="button" data-t="Unlock">Unlock</button></div>
     <div class="dev-list" id="devList"></div>
     <div class="row" id="devActs" hidden style="justify-content:space-between;margin-top:10px"><button class="btn ghost danger-text" id="devErase" type="button" data-t="Erase the device memory">Erase the device memory</button><button class="btn primary" id="devImport" type="button" data-t="Open in the Lab">Open in the Lab</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn xs ghost" id="devStageBack" type="button" data-t="Another device">Another device</button></div>
   </div>
   <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="devCancel" type="button" data-t="Close">Close</button></div>
 </div></div>
@@ -2576,20 +2602,45 @@ const LOGGERS = (() => {
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const err = (code, msg) => { const e = new Error(msg || code); e.code = code; return e; };
 
-  // ---- the transport: pick (the system's device chooser), connect, notify, write, read, disconnect — the same five calls on both sides
+  // ---- the transport: scan (the app) or the browser's chooser, connect, notify, write, read, services, disconnect — the same calls on both sides
   const ble = {
     kind() { if (window.NATIVE && NATIVE.on) return 'native'; if (navigator.bluetooth && typeof navigator.bluetooth.requestDevice === 'function') return 'web'; return ''; },
+    async ready() {
+      await NATIVE.call('BluetoothLe', 'initialize', { androidNeverForLocation: true });
+      try { const en = await NATIVE.call('BluetoothLe', 'isEnabled'); if (en && en.value === false) { try { await NATIVE.call('BluetoothLe', 'requestEnable'); } catch (e) {} } } catch (e) {}
+    },
+    // the app: advertisements stream in (onHit({id, name, rssi, uuids}) for every packet) until stop(); a browser has no scan, only its chooser (pick)
+    canScan() { return this.kind() === 'native'; },
+    scanSub: null,
+    async scan(onHit) {
+      await this.ready(); await this.stopScan();
+      this.scanSub = NATIVE.listen('BluetoothLe', 'onScanResult', (r) => { if (!r || !r.device) return; onHit({ id: r.device.deviceId, name: r.device.name || r.localName || '', rssi: typeof r.rssi === 'number' ? r.rssi : null, uuids: r.uuids || r.device.uuids || [] }); });
+      await NATIVE.call('BluetoothLe', 'requestLEScan', { allowDuplicates: true, scanMode: 2 });
+    },
+    async stopScan() { const s = this.scanSub; this.scanSub = null; try { if (s) { if (s.remove) s.remove(); else if (typeof s.then === 'function') s.then(x => x && x.remove && x.remove()); } } catch (e) {} try { await NATIVE.call('BluetoothLe', 'stopLEScan'); } catch (e) {} },
+    // a device out of the scan list
+    handle(id, name) { return { kind: 'native', id, name: name || '', subs: [], chrs: {} }; },
+    // the chooser: the app's own (a name prefix) or the browser's (drivers that know their device's name filter by it; the explorer takes any device)
     async pick(drv) {
       const kind = this.kind(); if (!kind) throw err('nobt');
       if (kind === 'native') {
-        await NATIVE.call('BluetoothLe', 'initialize', { androidNeverForLocation: true });
-        try { const en = await NATIVE.call('BluetoothLe', 'isEnabled'); if (en && en.value === false) { try { await NATIVE.call('BluetoothLe', 'requestEnable'); } catch (e) {} } } catch (e) {}
-        const d = await NATIVE.call('BluetoothLe', 'requestDevice', { namePrefix: drv.namePrefixes[0], optionalServices: drv.services });
+        await this.ready();
+        const d = await NATIVE.call('BluetoothLe', 'requestDevice', Object.assign(drv.namePrefixes.length ? { namePrefix: drv.namePrefixes[0] } : {}, { optionalServices: drv.services }));
         if (!d || !d.deviceId) throw err('nodevice');
         return { kind, id: d.deviceId, name: d.name || drv.name, subs: [], chrs: {} };
       }
-      const dev = await navigator.bluetooth.requestDevice({ filters: drv.namePrefixes.map(p => ({ namePrefix: p })), optionalServices: drv.services });
+      const dev = await navigator.bluetooth.requestDevice(Object.assign(drv.namePrefixes.length ? { filters: drv.namePrefixes.map(p => ({ namePrefix: p })) } : { acceptAllDevices: true }, { optionalServices: drv.services }));
       return { kind, id: dev.id, name: dev.name || drv.name, dev, subs: [], chrs: {} };
+    },
+    // everything the device exposes: [{uuid, chrs: [{uuid, props: {read, write, writeNoRsp, notify, indicate}}]}]
+    async services(H) {
+      if (H.kind === 'native') {
+        const r = await NATIVE.call('BluetoothLe', 'getServices', { deviceId: H.id });
+        return ((r && r.services) || []).map(s => ({ uuid: String(s.uuid || '').toLowerCase(), chrs: (s.characteristics || []).map(c => { const p = c.properties || {}; return { uuid: String(c.uuid || '').toLowerCase(), props: { read: !!p.read, write: !!p.write, writeNoRsp: !!p.writeWithoutResponse, notify: !!p.notify, indicate: !!p.indicate } }; }) }));
+      }
+      const out = []; let list = []; try { list = await H.dev.gatt.getPrimaryServices(); } catch (e) { return out; }
+      for (const s of list) { let cs = []; try { cs = await s.getCharacteristics(); } catch (e) {} out.push({ uuid: s.uuid, chrs: cs.map(c => { const p = c.properties || {}; H.chrs[s.uuid + '|' + c.uuid] = c; return { uuid: c.uuid, props: { read: !!p.read, write: !!p.write, writeNoRsp: !!p.writeWithoutResponse, notify: !!p.notify, indicate: !!p.indicate } }; }) }); }
+      return out;
     },
     async connect(H, onLost) {
       H.lost = onLost || null;
@@ -2614,6 +2665,10 @@ const LOGGERS = (() => {
     async write(H, svc, chr, bytes) {
       if (H.kind === 'native') { await NATIVE.call('BluetoothLe', 'write', { deviceId: H.id, service: svc, characteristic: chr, value: hex(bytes) }); return; }
       const c = await this.chr(H, svc, chr); if (c.writeValueWithResponse) await c.writeValueWithResponse(bytes); else await c.writeValue(bytes);
+    },
+    async writeNoRsp(H, svc, chr, bytes) {
+      if (H.kind === 'native') { await NATIVE.call('BluetoothLe', 'writeWithoutResponse', { deviceId: H.id, service: svc, characteristic: chr, value: hex(bytes) }); return; }
+      const c = await this.chr(H, svc, chr); if (c.writeValueWithoutResponse) await c.writeValueWithoutResponse(bytes); else await c.writeValue(bytes);
     },
     async read(H, svc, chr) {
       if (H.kind === 'native') { const r = await NATIVE.call('BluetoothLe', 'read', { deviceId: H.id, service: svc, characteristic: chr }); return unhex(r && r.value); }
@@ -2773,14 +2828,42 @@ const LOGGERS = (() => {
     }
   };
 
-  // ---- Alfano 6 / 7 over Bluetooth 5.0: the port of Pavel's Mac downloader + decoder goes here. The device's session list → one .alf2 per
-  // session → the same ALF importer the files from the Alfano app go through. Until the protocol is in, the driver is listed but not ready.
+  // ---- Alfano 6 / 7 over Bluetooth: the protocol is not published, so the driver starts as an explorer — it connects to the device, lists every
+  // service and characteristic, subscribes to everything that notifies, reads everything readable, lets a command be typed in by hand and keeps a
+  // log of every byte in both directions. The log goes to Hutka (device_logs), and the session download is written from what the logs show.
+  const short = (u) => { const m = /^0000([0-9a-f]{4})-0000-1000-8000-00805f9b34fb$/i.exec(u || ''); return m ? '0x' + m[1].toUpperCase() : (u || ''); };
+  const printable = (u8) => { let s = ''; for (const b of u8) s += b >= 32 && b < 127 ? String.fromCharCode(b) : (b === 10 ? '⏎' : (b === 13 ? '' : '·')); return s; };
+  // the services a browser is allowed to touch must be declared up front: the usual vendor "serial over BLE" services and the standard ones
+  const CANDIDATES = ['6e400001-b5a3-f393-e0a9-e50e24dcca9e', '49535343-fe7d-4ae5-8fa9-9fafd205e455', '0000ffe0-0000-1000-8000-00805f9b34fb', '0000fff0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb', '0000ffb0-0000-1000-8000-00805f9b34fb', '0000fe59-0000-1000-8000-00805f9b34fb', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2', '00001101-0000-1000-8000-00805f9b34fb', U16(0x180a), U16(0x180f), U16(0x1800), U16(0x1801), U16(0x1805), U16(0x1816), U16(0x1819)];
+  // "command" text → bytes: hex pairs ("b5 62 ff 22 00 00"), or a quoted string ("HELLO\r\n" with \r \n \t \xNN escapes)
+  function command(text) {
+    const s = String(text || '').trim(); if (!s) return new Uint8Array(0);
+    if (/^["']/.test(s)) { const body = s.slice(1, /["']$/.test(s) ? -1 : undefined).replace(/\\x([0-9a-f]{2})/gi, (_, h) => String.fromCharCode(parseInt(h, 16))).replace(/\\r/g, '\r').replace(/\\n/g, '\n').replace(/\\t/g, '\t'); return new TextEncoder().encode(body); }
+    if (/^[0-9a-f\s,:x-]+$/i.test(s)) return unhex(s.replace(/0x/gi, ''));
+    return new TextEncoder().encode(s);
+  }
   const alfano = {
-    id: 'alfano', name: 'Alfano 6 / 7', ready: false, namePrefixes: ['ALFANO', 'Alfano'], services: [],
-    async open() { throw err('notyet'); }
+    id: 'alfano', name: 'Alfano 6 / 7', ready: true, explore: true, namePrefixes: [], services: CANDIDATES,
+    looks(name) { return /alfano|alf\b|alf[0-9]/i.test(name || ''); },
+    async open(H) {
+      const t0 = Date.now(), log = [];
+      const ex = { info: { device: H.name, id: H.id, platform: ble.kind() }, services: [], log, onLog: null, subscribed: 0, listening: false };
+      const line = (dir, svc, chr, bytes, note) => { const e = { t: Date.now() - t0, dir, svc: short(svc), chr: short(chr), hex: bytes ? hex(bytes) : '', txt: bytes ? printable(bytes) : (note || '') }; log.push(e); if (log.length > 6000) log.splice(0, 1000); if (ex.onLog) ex.onLog(e); return e; };
+      ex.services = await ble.services(H);
+      line('info', '', '', null, `${ex.services.length} services, ${ex.services.reduce((n, s) => n + s.chrs.length, 0)} characteristics`);
+      for (const s of ex.services) line('info', s.uuid, '', null, s.chrs.map(c => short(c.uuid) + ' [' + ['read', 'write', 'writeNoRsp', 'notify', 'indicate'].filter(k => c.props[k]).join(',') + ']').join('  '));
+      // everything that can talk, listened to; everything readable, read once
+      ex.listen = async () => { for (const s of ex.services) for (const c of s.chrs) if (c.props.notify || c.props.indicate) { try { await ble.notify(H, s.uuid, c.uuid, (b) => line('in', s.uuid, c.uuid, b)); ex.subscribed++; } catch (e) { line('info', s.uuid, c.uuid, null, 'subscribe failed: ' + (e && e.message || e)); } } ex.listening = true; line('info', '', '', null, `listening on ${ex.subscribed} characteristic(s)`); };
+      ex.readAll = async () => { for (const s of ex.services) for (const c of s.chrs) if (c.props.read) { try { line('read', s.uuid, c.uuid, await ble.read(H, s.uuid, c.uuid)); } catch (e) { line('info', s.uuid, c.uuid, null, 'read failed: ' + (e && e.message || e)); } } };
+      ex.writable = () => { const out = []; for (const s of ex.services) for (const c of s.chrs) if (c.props.write || c.props.writeNoRsp) out.push({ svc: s.uuid, chr: c.uuid, label: short(s.uuid) + ' / ' + short(c.uuid) + (c.props.writeNoRsp && !c.props.write ? ' (no response)' : ''), noRsp: c.props.writeNoRsp && !c.props.write }); return out; };
+      ex.send = async (svc, chr, bytes, noRsp) => { line('out', svc, chr, bytes); if (noRsp) await ble.writeNoRsp(H, svc, chr, bytes); else await ble.write(H, svc, chr, bytes); };
+      ex.report = () => ({ device: H.name, id: H.id, platform: ble.kind(), at: new Date().toISOString(), services: ex.services, log: log.slice() });
+      ex.close = async () => { await ble.disconnect(H); };
+      return ex;
+    }
   };
 
-  return { ble, drivers: { racebox, alfano }, list: [racebox, alfano], frame, framer, record, outings, csvFile, hex, unhex };
+  return { ble, drivers: { racebox, alfano }, list: [racebox, alfano], frame, framer, record, outings, csvFile, hex, unhex, command, short };
 })();
 // @@DATA-START
 // Empirical analysis of logged laps (Alfano): a frame that maps GPS metres onto layout pixels, projection of every lap onto the
@@ -3719,6 +3802,16 @@ Object.assign(I18N.RU, { 'From a device (Bluetooth)': 'С прибора (Blueto
   '{n} outing(s) on the device — tick the ones to bring into the Lab.': 'На приборе заездов: {n} — отметь, какие открыть в Лаборатории.', 'Outing {n}': 'Заезд {n}', '{min} min · {hz} Hz · up to {v} km/h': '{min} мин · {hz} Гц · до {v} км/ч', 'Tick at least one outing.': 'Отметь хотя бы один заезд.',
   'Erase the device memory?': 'Стереть память прибора?', 'Everything recorded on {name} is deleted from the device. Bring the outings you want into the Lab first — what is already in Hutka stays.': 'Всё записанное на {name} будет удалено с прибора. Сначала открой нужные заезды в Лаборатории — то, что уже в Hutka, останется.', 'Erase': 'Стереть',
   'Erasing… {p}%': 'Стираю… {p}%', 'Device memory erased.': 'Память прибора очищена.' });
+// v34.6 — nearby devices and the explorer
+Object.assign(I18N.RU, { 'Bluetooth — the explorer: Hutka listens to the device and records what it says; the download is written from these logs': 'Bluetooth — разведка: Hutka слушает прибор и записывает всё, что он говорит; по этим логам пишется скачивание',
+  'Nearby devices': 'Приборы рядом', 'Nothing yet…': 'Пока ничего…', 'Scan again': 'Искать снова', 'Back': 'Назад', 'Looking around… turn the lap timer on and put it in Bluetooth / connection mode.': 'Ищу… включи прибор и переведи его в режим Bluetooth / подключения.',
+  'Scan finished — tap the device, or scan again.': 'Поиск закончен — нажми на прибор или поищи снова.', 'Nothing in the air. Is the lap timer on and in Bluetooth mode? Scan again.': 'В эфире пусто. Прибор включён и в режиме Bluetooth? Поищи снова.',
+  '(no name)': '(без имени)', 'looks like an Alfano': 'похоже на Alfano', 'Hide unnamed devices': 'Скрыть безымянные', 'Show {n} unnamed device(s) too': 'Показать ещё безымянных: {n}',
+  "Hutka does not speak this device's language yet. Everything it says is recorded here: put it in Bluetooth mode, press its buttons, start a transfer in its menu — then send the log. That is how the download gets written.": 'Hutka ещё не говорит на языке этого прибора. Всё, что он скажет, записывается здесь: переведи его в режим Bluetooth, понажимай кнопки, запусти передачу в его меню — и отправь лог. Так пишется скачивание.',
+  'lines': 'строк', 'Send': 'Отправить', 'no response': 'без ответа', 'Disconnect': 'Отключить', 'Send the log to Hutka': 'Отправить лог в Hutka',
+  'connected': 'подключён', 'disconnected': 'отключён', '{n} service(s), {m} characteristic(s)': 'сервисов: {n}, характеристик: {m}', 'listening on {k}': 'слушаю: {k}', 'sent {n} byte(s)': 'отправлено байт: {n}', 'write failed: {e}': 'не записалось: {e}',
+  'Sign in to send the log.': 'Войди, чтобы отправить лог.', 'Log sent — thank you. {n} lines.': 'Лог отправлен — спасибо. Строк: {n}.', 'Could not send the log: {e}': 'Не удалось отправить лог: {e}' });
+Object.assign(I18N.RU, { 'Another device': 'Другой прибор' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4010,6 +4103,8 @@ const STORE = (() => {
       // the telemetry comes through hutka_session_data (limits.sql): counted per account / address; an older database without the function falls back to the table
       async getChunks(sid) { if (A.dataFn !== false) { const r = await sb.rpc('hutka_session_data', { sid, vid: visitorId() }); if (!r.error) return r.data ? [r.data] : []; if (/quota/i.test(r.error.message || '')) { const e = new Error('quota'); e.code = 'quota'; throw e; } if (!/hutka_session_data|PGRST202|42883/.test(r.error.message || '')) throw r.error; A.dataFn = false; } const rows = must(await sb.from('session_data').select('data').eq('id', sid).limit(1)); return rows.length ? [rows[0].data] : []; },
       async snapshots() { return must(await sb.rpc('hutka_snapshots')) || []; },
+      // a device explorer log (device_logs): what a lap timer exposed and said over Bluetooth — the material the drivers are written from
+      async deviceLog(o) { must(await sb.from('device_logs').insert({ owner: me.id, device: String(o.device || '').slice(0, 80), data: o })); return true; },
       async saveSession(sid, meta, chunks) { must(await sb.from('sessions').upsert({ id: sid, owner: meta.owner, track_id: meta.track || '', layout_id: meta.layout || 'custom', published: !!meta.published, best_ms: meta.bestMs, meta, updated_at: new Date().toISOString() })); must(await sb.from('session_data').upsert({ id: sid, enc: meta.enc, data: chunks.join('') })); },
       async updateSession(sid, patch) { const cur = await A.getSessionMeta(sid); if (!cur) throw new Error('missing'); const meta = Object.assign(cur, patch, { updatedAt: Date.now() }); delete meta.id; must(await sb.from('sessions').update({ meta, published: !!meta.published, track_id: meta.track || '', layout_id: meta.layout || 'custom', updated_at: new Date().toISOString() }).eq('id', sid)); },
       deleteSession: async (sid) => must(await sb.from('sessions').delete().eq('id', sid)),
@@ -4371,7 +4466,7 @@ const STORE = (() => {
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits, track, adminAnalytics,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
-    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); } };
+    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); }, deviceLog: async (o) => { if (!adapter || !adapter.deviceLog) throw new Error('not configured'); if (!me.id) throw new Error('sign in'); return adapter.deviceLog(o); } };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
 // optional model line, and (for the admin editor) the traced control points. Pan, smooth zoom, rotation, hover and click. ----------
@@ -5213,7 +5308,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.5';
+const APP_VERSION = 'v34.6';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -7049,26 +7144,28 @@ const UPLOAD = (() => {
   async function withFiles(files) { open({}); await onFiles(files); }
   return { open, close, withFiles };
 })();
-// ---------- straight from the lap timer: the device window — pick the logger, connect over Bluetooth, read its memory, tick the outings ----------
+// ---------- straight from the lap timer: the device window — pick the logger, find it nearby (the app scans; a browser has its chooser),
+// connect, read its memory, tick the outings; for Alfano the explorer: everything the device exposes and says, logged and sent to Hutka ----------
 // (device.js has the transport and the protocols; this is only the window around them)
 const DEVICE = (() => {
-  let H = null, dev = null, drv = null, items = [], busy = false;
+  let H = null, dev = null, drv = null, items = [], busy = false, seen = new Map(), scanT = null, scanning = false, showAll = false, ex = null, logT = null;
   const S = (tx, cls) => setStatus('devStatus', tx, cls);
   const when = (ms) => { if (!isFinite(ms)) return ''; return new Date(ms).toLocaleString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
+  const stage = (name) => { for (const id of ['devKinds', 'devScan', 'devStage', 'devExplore']) $(id).hidden = true; if (name) $(name).hidden = false; $('devNoBt').hidden = name !== 'devKinds' || !!LOGGERS.ble.kind(); };
   function open() {
-    if (busy || (dev && items.length)) { $('devModal').hidden = false; return; }   // a read in progress, or a device still connected with its outings listed
+    if (busy || (dev && items.length) || ex) { $('devModal').hidden = false; return; }   // a read in progress, a device still connected with its outings listed, or the explorer open
     items = []; dev = null; H = null; drv = null;
     const kinds = $('devKinds'); kinds.innerHTML = '';
     for (const d of LOGGERS.list) {
-      const b = el('button', 'dev-kind' + (d.ready ? '' : ' later')); b.type = 'button'; b.dataset.id = d.id; b.disabled = !d.ready;
-      b.innerHTML = `<b>${esc(d.name)}</b><span>${esc(d.ready ? t('Bluetooth — the recorded outings go straight into the Lab') : t('Bluetooth — in the works; for now: the Alfano app → Share → Hutka'))}</span>`;
-      b.onclick = () => connect(d); kinds.appendChild(b);
+      const b = el('button', 'dev-kind'); b.type = 'button'; b.dataset.id = d.id;
+      b.innerHTML = `<b>${esc(d.name)}</b><span>${esc(d.explore ? t('Bluetooth — the explorer: Hutka listens to the device and records what it says; the download is written from these logs') : t('Bluetooth — the recorded outings go straight into the Lab'))}</span>`;
+      b.onclick = () => choose(d); kinds.appendChild(b);
     }
-    $('devNoBt').hidden = !!LOGGERS.ble.kind(); $('devStage').hidden = true; $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true; S('');
+    stage('devKinds'); $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true; S('');
     $('devModal').hidden = false;
   }
-  function close() { $('devModal').hidden = true; }
-  async function drop() { const d = dev, h = H; dev = null; H = null; items = []; if (d) { try { await d.close(); } catch (e) {} } else if (h) { try { await LOGGERS.ble.disconnect(h); } catch (e) {} } }
+  function close() { $('devModal').hidden = true; if (scanning) stopScan(); }
+  async function drop() { const d = dev, h = H, x = ex; dev = null; H = null; ex = null; items = []; if (x) { try { await x.close(); } catch (e) {} } else if (d) { try { await d.close(); } catch (e) {} } else if (h) { try { await LOGGERS.ble.disconnect(h); } catch (e) {} } }
   function bar(done, total) { const b = $('devBar'); b.hidden = false; b.firstElementChild.style.width = total ? Math.min(100, Math.round(done / total * 100)) + '%' : '0%'; }
   function fail(e) {
     const c = e && e.code, m = (e && e.message) || String(e);
@@ -7078,14 +7175,42 @@ const DEVICE = (() => {
       : c === 'locked' ? t('The device memory is locked — enter its security code.')
       : t('Could not read the device: {e}', { e: m }), 'warn');
   }
-  async function connect(d) {
-    if (busy) return; await drop(); drv = d; busy = true;
-    $('devStage').hidden = false; $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true;
+  // ---- step 1: which device. The app scans and lists what is in the air (the driver's own devices first); a browser opens its chooser
+  async function choose(d) {
+    if (busy) return; await drop(); drv = d;
+    if (!LOGGERS.ble.kind()) { stage('devStage'); fail({ code: 'nobt' }); return; }
+    if (LOGGERS.ble.canScan()) { await startScan(); return; }
+    await connectPicked();
+  }
+  const fits = (name) => drv && (drv.namePrefixes.length ? drv.namePrefixes.some(p => (name || '').toLowerCase().startsWith(p.toLowerCase())) : (drv.looks ? drv.looks(name) : true));
+  async function startScan() {
+    seen = new Map(); showAll = false; stage('devScan'); renderScan();
+    try { scanning = true; $('devScanHint').textContent = t('Looking around… turn the lap timer on and put it in Bluetooth / connection mode.'); await LOGGERS.ble.scan((r) => { const o = seen.get(r.id) || { id: r.id, name: '', rssi: null, n: 0 }; if (r.name) o.name = r.name; if (r.rssi !== null) o.rssi = r.rssi; o.n++; o.at = Date.now(); seen.set(r.id, o); if (!renderScan.t) renderScan.t = setTimeout(() => { renderScan.t = null; renderScan(); }, 300); }); }
+    catch (e) { scanning = false; $('devScanHint').textContent = ''; stage('devStage'); fail(e); return; }
+    clearTimeout(scanT); scanT = setTimeout(() => { if (scanning) { stopScan(); $('devScanHint').textContent = seen.size ? t('Scan finished — tap the device, or scan again.') : t('Nothing in the air. Is the lap timer on and in Bluetooth mode? Scan again.'); } }, 20000);
+  }
+  async function stopScan() { scanning = false; clearTimeout(scanT); $('devRescan').hidden = false; try { await LOGGERS.ble.stopScan(); } catch (e) {} }
+  function renderScan() {
+    const box = $('devScanList'); box.innerHTML = '';
+    const all = [...seen.values()], named = all.filter(o => o.name), rows = (showAll ? all : named).sort((a, b) => (fits(b.name) ? 1 : 0) - (fits(a.name) ? 1 : 0) || (b.rssi || -999) - (a.rssi || -999));
+    for (const o of rows) {
+      const b = el('button', 'dev-item dev-found' + (fits(o.name) ? ' fit' : '')); b.type = 'button';
+      const bars = o.rssi === null ? '' : (o.rssi > -60 ? '▂▄▆█' : o.rssi > -70 ? '▂▄▆' : o.rssi > -80 ? '▂▄' : '▂');
+      b.innerHTML = `<div><b>${esc(o.name || t('(no name)'))}</b><span class="hint">${esc((fits(o.name) ? (drv.explore ? t('looks like an Alfano') : drv.name) + ' · ' : '') + (o.rssi === null ? '' : o.rssi + ' dBm '))}<span class="rssi">${bars}</span></span></div>`;
+      b.onclick = () => connectScanned(o); box.appendChild(b);
+    }
+    $('devScanMore').hidden = !(all.length > named.length); $('devScanMore').textContent = showAll ? t('Hide unnamed devices') : t('Show {n} unnamed device(s) too', { n: all.length - named.length });
+    $('devScanEmpty').hidden = rows.length > 0 || !scanning; $('devRescan').hidden = scanning;
+  }
+  async function connectScanned(o) { await stopScan(); H = LOGGERS.ble.handle(o.id, o.name); await connectH(); }
+  async function connectPicked() { stage('devStage'); S(t('Pick the device in the list…')); try { H = await LOGGERS.ble.pick(drv); } catch (e) { fail(e); return; } await connectH(); }
+  // ---- step 2: connected — the RaceBox read, or the explorer
+  async function connectH() {
+    busy = true; stage('devStage'); $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true;
     try {
-      S(t('Pick the device in the list…'));
-      H = await LOGGERS.ble.pick(drv);
-      S(t('Connecting to {name}…', { name: H.name }));
-      await LOGGERS.ble.connect(H, () => { if (busy) S(t('The connection dropped — come closer and try again.'), 'warn'); busy = false; dev = null; H = null; });
+      S(t('Connecting to {name}…', { name: H.name || drv.name }));
+      await LOGGERS.ble.connect(H, () => { if (busy || ex) S(t('The connection dropped — come closer and try again.'), 'warn'); busy = false; if (ex) { ex.live = false; renderExplore(); } dev = null; });
+      if (drv.explore) { ex = await drv.open(H); ex.live = true; await openExplorer(); busy = false; return; }
       dev = await drv.open(H);
       await readAll();
     } catch (e) { fail(e); busy = false; await drop(); }
@@ -7123,7 +7248,43 @@ const DEVICE = (() => {
     if (!ok) return; busy = true;
     try { bar(0, 100); await dev.erase((p) => { bar(p, 100); S(t('Erasing… {p}%', { p })); }); items = []; busy = false; renderList(); S(t('Device memory erased.'), 'ok'); } catch (e) { busy = false; fail(e); }
   }
+  // ---- the explorer (Alfano): the services, the live log, a command line, the log to Hutka
+  async function openExplorer() {
+    stage('devExplore'); $('devLog').textContent = ''; $('devExSent').textContent = '';
+    ex.onLog = () => { if (!logT) logT = setTimeout(() => { logT = null; renderLog(); }, 120); };
+    const w = ex.writable(); fillSelect($('devChr'), w.map((o, i) => [String(i), o.label]), w.length ? '0' : ''); $('devConsole').hidden = !w.length;
+    renderExplore(); renderLog();
+    await ex.listen(); await ex.readAll(); renderExplore(); renderLog();
+  }
+  function renderExplore() {
+    if (!ex) return; const n = ex.services.reduce((k, s) => k + s.chrs.length, 0);
+    $('devExTitle').textContent = H ? (H.name || drv.name) : '';
+    $('devExSub').textContent = (ex.live ? t('connected') : t('disconnected')) + ` · ${t('{n} service(s), {m} characteristic(s)', { n: ex.services.length, m: n })}` + (ex.listening ? ' · ' + t('listening on {k}', { k: ex.subscribed }) : '');
+    $('devExSend').disabled = !ex.live; $('devExSendNr').disabled = !ex.live;
+  }
+  function renderLog() {
+    if (!ex) return; const L = ex.log, from = Math.max(0, L.length - 400), pre = $('devLog'); const lines = [];
+    for (let i = from; i < L.length; i++) { const e = L[i]; const tag = e.dir === 'in' ? '◀' : e.dir === 'out' ? '▶' : e.dir === 'read' ? '◁' : '·'; lines.push(`${(e.t / 1000).toFixed(2).padStart(7)} ${tag} ${e.chr || e.svc || ''} ${e.hex}${e.hex && e.txt ? '  ' : ''}${e.txt}`); }
+    pre.textContent = lines.join('\n'); pre.scrollTop = pre.scrollHeight; $('devLogN').textContent = String(L.length);
+  }
+  async function sendCmd(noRsp) {
+    if (!ex || !ex.live) return; const w = ex.writable(), o = w[+$('devChr').value]; if (!o) return;
+    const bytes = LOGGERS.command($('devHex').value); if (!bytes.length) return;
+    try { await ex.send(o.svc, o.chr, bytes, noRsp || o.noRsp); $('devExSent').textContent = t('sent {n} byte(s)', { n: bytes.length }); } catch (e) { $('devExSent').textContent = t('write failed: {e}', { e: e && e.message || e }); }
+    renderLog();
+  }
+  async function sendLog() {
+    if (!ex) return; if (!STORE.hasIdentity) { toast(t('Sign in to send the log.')); return; }
+    $('devSendLog').disabled = true;
+    try { await STORE.deviceLog(ex.report()); toast(t('Log sent — thank you. {n} lines.', { n: ex.log.length })); NATIVE.haptic('success'); }
+    catch (e) { toast(t('Could not send the log: {e}', { e: e && e.message || e }), 4000); }
+    $('devSendLog').disabled = false;
+  }
+  async function disconnect() { await drop(); open(); }
   $('devImport').onclick = importSel; $('devErase').onclick = erase; $('devUnlock').onclick = unlock; $('devCancel').onclick = close;
+  $('devRescan').onclick = () => startScan(); $('devScanMore').onclick = () => { showAll = !showAll; renderScan(); }; $('devScanBack').onclick = async () => { await stopScan(); open(); };
+  $('devExSend').onclick = () => sendCmd(false); $('devExSendNr').onclick = () => sendCmd(true); $('devHex').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendCmd(false); });
+  $('devSendLog').onclick = sendLog; $('devExDisc').onclick = disconnect; $('devStageBack').onclick = async () => { if (busy && dev && dev.cancel) { try { await dev.cancel(); } catch (e) {} } busy = false; await drop(); open(); };
   $('devModal').addEventListener('click', (e) => { if (e.target === $('devModal')) close(); });
   $('uplFromDevice').onclick = () => { UPLOAD.close(); open(); };
   addEventListener('pagehide', () => { drop(); });
