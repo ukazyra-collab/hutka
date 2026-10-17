@@ -4449,6 +4449,7 @@ Object.assign(I18N.RU, { 'personal best': 'личный рекорд', 'best lap
 // v34.18 — the duel
 Object.assign(I18N.RU, { 'You vs {name}': 'Ты против {name}', 'Personal bests on the layouts you both drove, in the same kart class; the corners come from your best laps there. Compare opens the Lab with your latest session on that layout against theirs.': 'Личные рекорды на конфигурациях, где ездили оба, в одной категории картов; повороты — по вашим лучшим кругам там. «Compare» открывает Lab: твоя последняя сессия на этой конфигурации против его.',
   'Gap': 'Разрыв', 'Corners': 'Повороты', 'Compare': 'Сравнить', 'open Compare': 'открой Сравнить', '{name} faster in': '{name} быстрее в', 'you faster in': 'ты быстрее в', 'even in every corner': 'ровно во всех поворотах', 'even': 'ровно' });
+Object.assign(I18N.RU, { 'Your sign-in has expired — sign in again to ask the coach.': 'Вход истёк — войди снова, чтобы спросить тренера.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -5794,6 +5795,8 @@ const NATIVE = window.NATIVE = {
   },
   // one layer at a time, topmost first: a zoomed picture, a modal, the session picker sheet, the corner inspector, the cockpit side sheet, the full-screen map
   closeTop() {
+    // the app's sign-in gate is not a window to close: back folds the e-mail fields when the provider buttons are there, otherwise leaves the app
+    const g = $('authModal'); if (g && !g.hidden && g.classList.contains('gate')) { if (!$('authEmailBox').hidden && !$('authCol').hidden) { $('authEmailBox').hidden = true; $('authEmailOpen').hidden = false; return true; } return 'gate'; }
     const z = document.querySelector('.zoom:not([hidden])'); if (z) { z.hidden = true; return true; }
     const m = [...document.querySelectorAll('.modal:not([hidden])')].pop(); if (m) { m.hidden = true; return true; }
     const pb = $('pickbar'); if (pb && pb.classList.contains('open')) { pb.classList.remove('open', 'peek'); return true; }
@@ -5845,7 +5848,7 @@ const NATIVE = window.NATIVE = {
     try { this.listen('App', 'appUrlOpen', (e) => this.onUrl(e && e.url)); } catch (e) {}
     try { const l = await this.call('App', 'getLaunchUrl'); if (l && l.url) this.onUrl(l.url); } catch (e) {}
     try { this.listen('App', 'appStateChange', (e) => { if (e && e.isActive) { ACTIVITY.refresh(true); this.statusBar(); this.freshness(); } }); } catch (e) {}
-    try { this.listen('App', 'backButton', (e) => { if (this.closeTop()) return; if (e && e.canGoBack && history.length > 1) history.back(); else this.call('App', 'minimizeApp').catch(() => {}); }); } catch (e) {}
+    try { this.listen('App', 'backButton', (e) => { const r = this.closeTop(); if (r === 'gate') { this.call('App', 'minimizeApp').catch(() => {}); return; } if (r) return; if (e && e.canGoBack && history.length > 1) history.back(); else this.call('App', 'minimizeApp').catch(() => {}); }); } catch (e) {}
     setTimeout(() => this.freshness(), 4000);
     try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => this.statusBar()); } catch (e) {}
     await this.statusBar();
@@ -6001,7 +6004,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.18';
+const APP_VERSION = 'v34.18.1';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -7839,7 +7842,7 @@ function renderAskState() {
   if (STORE.aiOn) {
     // hosted: the coach with memory; the thread is a chat tied to this session
     if (needSignIn) { note.textContent = t('Sign in to ask the coach about your session.'); input.disabled = true; btn.disabled = true; }
-    else { input.disabled = false; btn.disabled = false; STORE.wallet(false).then(w => { if (w.off) { note.innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('The AI coach is being connected.'))}`; input.disabled = true; btn.disabled = true; } else { note.innerHTML = (w.free ? esc(t('Free beta · {u}/{d} questions today', { u: w.used_day || 0, d: w.limit_day })) : (w.plan === 'pro' ? esc(t('Pro — unlimited questions.')) : esc(t('{n} credits left · one per answer', { n: w.credits })))) + (LAB.chatId ? ` · <a href="#ai~${LAB.chatId}">${esc(t('open this chat in the AI coach'))}</a>` : ` · <a href="#ai~new~${esc(LAB.current ? LAB.current.id : '')}">${esc(t('open in the AI coach'))}</a>`); } }); }
+    else { input.disabled = false; btn.disabled = false; STORE.wallet(false).then(w => { if (w.off && /sign_in|401|jwt|expired/i.test(String(w.code || ''))) { note.textContent = t('Your sign-in has expired — sign in again to ask the coach.'); input.disabled = true; btn.disabled = true; } else if (w.off) { note.innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('The AI coach is being connected.'))}`; input.disabled = true; btn.disabled = true; } else { note.innerHTML = (w.free ? esc(t('Free beta · {u}/{d} questions today', { u: w.used_day || 0, d: w.limit_day })) : (w.plan === 'pro' ? esc(t('Pro — unlimited questions.')) : esc(t('{n} credits left · one per answer', { n: w.credits })))) + (LAB.chatId ? ` · <a href="#ai~${LAB.chatId}">${esc(t('open this chat in the AI coach'))}</a>` : ` · <a href="#ai~new~${esc(LAB.current ? LAB.current.id : '')}">${esc(t('open in the AI coach'))}</a>`); } }); }
     input.placeholder = t('Ask the coach about this session… (Ctrl+Enter to send)');
     const chips = $('askChips'); chips.innerHTML = '';
     for (const q of [t('What is the main thing to fix in this session?'), t('Where do I lose the most and why?'), t('Which three corners would give the most time?'), t('Compare me with the fastest published lap here')]) { const c = el('span', 'chip q', q); c.onclick = () => { $('askInput').value = q; askAI(); }; chips.appendChild(c); }
