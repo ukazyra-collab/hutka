@@ -2711,11 +2711,21 @@ const ALFANO7 = (() => {
     return out;
   }
   // the lap-boundary records: their size, the ordering, the flash address where every lap ends, the lap and sector times
+  // the record size: 94 bytes on every device seen so far; checked against the data (a run of records whose lap/sector bytes follow on
+  // from each other and whose bytes 2..5 are zero), the first size that holds across the probe wins — a lone byte pair cannot fool it
+  function recordSize(partiel) {
+    const valid = (t) => {
+      const n = Math.min(6, Math.floor(partiel.length / t)); if (n < 2) return false;
+      let lap = partiel[0], champ = partiel[1]; if (lap < 1 || lap > 99 || champ < 1 || champ > 6) return false;
+      for (let k = 1; k < n; k++) { const o = k * t, l = partiel[o], c = partiel[o + 1]; if (partiel[o + 2] !== 0 || partiel[o + 3] !== 0 || l < 1 || l > 99 || c < 1 || c > 6) return false; const ok = (l === lap && c === champ + 1) || (l === lap + 1 && c === 1) || (l === lap && c === champ && false); if (!ok) return false; lap = l; champ = c; }
+      return true;
+    };
+    if (valid(94)) return 94;
+    for (let t = 20; t <= 200; t++) if (valid(t)) return t;
+    return 94;
+  }
   function partielInfo(partiel, laps, nbreChamp, sectorData) {
-    let taille = 94;
-    if (partiel.length > 20 && partiel[0] >= 1 && partiel[0] <= 99) {
-      for (let t = 20; t <= Math.min(200, partiel.length - 2); t++) { const b0 = partiel[t], b1 = partiel[t + 1]; const next = (b0 === partiel[0] && b1 === partiel[1] + 1) || (b0 === partiel[0] + 1 && b1 === 1); if (next && partiel[t + 2] === 0) { taille = t; break; } }
-    }
+    const taille = recordSize(partiel);
     const typeB = partiel.length >= 2 * taille && partiel[0] === 1 && partiel[1] === 1 && partiel[taille] === 2 && partiel[taille + 1] === 1;
     const lapEnd = new Array(laps + 2).fill(0); lapEnd[0] = sectorData + 306;
     const times = []; const extra = (off) => ({ vbat: off + 90 <= partiel.length ? u16(partiel, off + 88) : 0, hdop: off + 94 <= partiel.length ? u16(partiel, off + 92) : 0 });
@@ -2741,9 +2751,10 @@ const ALFANO7 = (() => {
     if (!s.ok) throw err('header', 'the session header is not readable');
     const probe = await dev.C.bulk(s.sector0, 300);
     let info = partielInfo(probe, s.laps, s.nbreChamp, s.sectorData);
-    const partiel = await dev.C.bulk(s.sector0, info.taille * s.nbreChamp * s.laps);
+    const partiel = await dev.C.bulk(s.sector0, info.taille * Math.max(1, s.nbreChamp) * s.laps);
     info = partielInfo(partiel, s.laps, s.nbreChamp, s.sectorData);
-    for (let lap = 1; lap <= s.laps; lap++) { const start = info.lapEnd[lap - 1] + (lap > 1 ? info.skip : 0), end = info.lapEnd[lap]; const size = end - start; if (size <= 0 || size > 500000 || !end) throw err('laps', `lap ${lap} has no readable address`); }
+    const hexOf = (u) => Array.from(u || [], b => b.toString(16).padStart(2, '0')).join('');
+    for (let lap = 1; lap <= s.laps; lap++) { const start = info.lapEnd[lap - 1] + (lap > 1 ? info.skip : 0), end = info.lapEnd[lap]; const size = end - start; if (size <= 0 || size > 500000 || !end) { const e = err('laps', `lap ${lap} has no readable address`); e.diag = { session: { page: s.page, laps: s.laps, nbreChamp: s.nbreChamp, sampling: s.sampling, date: s.date, track: s.track, driver: s.driver, sectorData: s.sectorData, sector0: s.sector0, bestRaw: s.bestRaw }, info: { taille: info.taille, typeB: info.typeB, skip: info.skip, lapEnd: info.lapEnd.slice(0, 60), times: info.times.slice(0, 60) }, pageData: hexOf(s.pageData), header: hexOf(s.header), probe: hexOf(probe), partiel: hexOf(partiel), status: hexOf(dev.status), pages: Object.fromEntries(Object.entries(dev.pages || {}).map(([k, v]) => [k, hexOf(v)])), serial: dev.serial, firmware: dev.firmware }; throw e; } }
     const sizes = []; for (let lap = 1; lap <= s.laps; lap++) sizes.push(info.lapEnd[lap] - (info.lapEnd[lap - 1] + (lap > 1 ? info.skip : 0)));
     const total = sizes.reduce((a, b) => a + b, 0) + 8000; let done = 0;
     const tick = (n) => { done += n; if (onProgress) onProgress({ done: Math.min(done, total), total, lap: cur, laps: s.laps }); };
@@ -4120,6 +4131,7 @@ Object.assign(I18N.RU, { 'Bluetooth — the sessions in the device memory, strai
   '{n} session(s) on {name} — tick the ones to bring into the Lab (the newest first).': 'Сессий на {name}: {n} — отметь, какие открыть в Лаборатории (новые сверху).', 'Session {n}': 'Сессия {n}', '{n} laps': 'кругов: {n}', 'best': 'лучший', '{n} laps · header unreadable': 'кругов: {n} · заголовок не читается', 'Tick at least one session.': 'Отметь хотя бы одну сессию.',
   'Session {k} of {n}: lap {lap} of {laps}… {pct}%': 'Сессия {k} из {n}: круг {lap} из {laps}… {pct}%' });
 Object.assign(I18N.RU, { 'Alfano 7 and RaceBox Mini S / Micro — the sessions go straight from the lap timer into the Lab, no vendor app.': 'Alfano 7 и RaceBox Mini S / Micro — сессии попадают в Лабораторию прямо с прибора, без фирменных программ.' });
+Object.assign(I18N.RU, { 'diagnostics sent to Hutka, thank you.': 'диагностика отправлена в Hutka, спасибо.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -7564,7 +7576,12 @@ const DEVICE = (() => {
         const f = await dev.download(o, (p) => { bar(p.done, p.total); S(t('Session {k} of {n}: lap {lap} of {laps}… {pct}%', { k: k + 1, n: picked.length, lap: Math.min(p.lap, p.laps), laps: p.laps, pct: Math.min(100, Math.round(p.done / p.total * 100)) })); });
         files.push(f);
       }
-    } catch (e) { busy = false; $('devActs').hidden = false; fail(e); return; }
+    } catch (e) {
+      busy = false; $('devActs').hidden = false; fail(e);
+      // what the parser saw goes to Hutka by itself, so the next version reads this device right
+      if (e && e.diag && STORE.hasIdentity) { try { await STORE.deviceLog({ device: H ? H.name : drv.name, platform: LOGGERS.ble.kind(), kind: 'alfano-download', error: String(e.message || e), info: dev && dev.info, diag: e.diag, at: new Date().toISOString() }); S($('devStatus').textContent + ' — ' + t('diagnostics sent to Hutka, thank you.'), 'warn'); } catch (x) {} }
+      return;
+    }
     busy = false; STORE.track('device_import', { app: drv.id, n: files.length });
     close(); await UPLOAD.withFiles(files);
   }
