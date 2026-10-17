@@ -4150,6 +4150,22 @@ Object.assign(I18N.RU, { 'Bluetooth — the sessions in the device memory, strai
 Object.assign(I18N.RU, { 'Alfano 7 and RaceBox Mini S / Micro — the sessions go straight from the lap timer into the Lab, no vendor app.': 'Alfano 7 и RaceBox Mini S / Micro — сессии попадают в Лабораторию прямо с прибора, без фирменных программ.' });
 Object.assign(I18N.RU, { 'diagnostics sent to Hutka, thank you.': 'диагностика отправлена в Hutka, спасибо.' });
 Object.assign(I18N.RU, { 'Keep Hutka open while it reads — you can move around inside Hutka, but on a phone keep it on screen; in a browser, keep this tab open.': 'Пока идёт чтение, не закрывай Hutka: внутри Hutka ходить можно, но на телефоне держи её на экране, а в браузере — не закрывай вкладку.', 'Reading {name}: {pct}%': 'Читаю {name}: {pct}%' });
+// v34.8 — the time left while a device is read; the guide's "straight from the lap timer" card
+Object.assign(I18N.RU, { 'under a minute left': 'осталось меньше минуты', '~{m} min left': 'осталось ~{m} мин' });
+Object.assign(I18N.RU, { 'Straight from the lap timer (Bluetooth)': 'Прямо с прибора (Bluetooth)',
+  'Alfano 7 and RaceBox: no vendor app, no files — the sessions come out of the device memory straight into the Lab. In the Hutka app (iPhone, Android), or in Chrome on a Mac, Windows or Android.': 'Alfano 7 и RaceBox: без фирменных программ и файлов — сессии из памяти прибора попадают прямо в Лабораторию. В приложении Hutka (iPhone, Android) или в Chrome на Mac, Windows и Android.',
+  'Put the lap timer in Bluetooth mode': 'Переведи прибор в режим Bluetooth',
+  'Alfano 7: in its menu turn Bluetooth on (the connection / sharing mode). The screen shows a PIN and the green light comes on — the lap timer is ready to send. Hutka does not need the PIN. RaceBox: just turn it on.': 'Alfano 7: в меню включи Bluetooth (режим подключения / обмена). На экране появится PIN и загорится зелёная лампочка — прибор готов отдавать. PIN для Hutka не нужен. RaceBox: просто включи.',
+  'Upload → From a device': 'Upload → С прибора',
+  'Open hutka.ai or the Hutka app, tap Upload (the round button in the middle of the bottom bar; on a computer — “Upload session” in the Lab), then “From a device (Bluetooth)”. Sign in first if you have not.': 'Открой hutka.ai или приложение Hutka, нажми Upload (круглая кнопка в середине нижней панели; на компьютере — «Upload session» в Лаборатории), потом «С прибора (Bluetooth)». Если ещё не вошёл — сначала войди.',
+  'Pick the lap timer': 'Выбери прибор',
+  'Tap Alfano 6 / 7 (or RaceBox). The app lists what is in the air — tap yours: ALFANO-… with “looks like an Alfano”. In Chrome the browser’s own list opens instead: pick the device there and press Pair. Hutka signs in to the lap timer and reads its session list.': 'Нажми Alfano 6 / 7 (или RaceBox). Приложение покажет, что есть в эфире — нажми на свой: ALFANO-… с подписью «похоже на Alfano». В Chrome вместо этого откроется список самого браузера: выбери прибор там и нажми «Подключить». Hutka войдёт в прибор и прочитает список сессий.',
+  'Not in the list? Check the lap timer is on and in Bluetooth mode and the phone’s Bluetooth is on. On Android the app asks for the nearby-devices permission the first time — allow it.': 'Нет в списке? Проверь, что прибор включён и в режиме Bluetooth, а на телефоне Bluetooth включён. На Android приложение в первый раз спросит разрешение на устройства поблизости — разреши.',
+  'Tick the sessions, tap Open in the Lab': 'Отметь сессии, нажми «Открыть в Лаборатории»',
+  'Every session in the lap timer’s memory: date, track, laps, best lap — the newest is ticked already. Tick the ones you want (one at a time is quickest) and tap Open in the Lab.': 'Все сессии из памяти прибора: дата, трасса, круги, лучший круг — самая новая уже отмечена. Отметь нужные (быстрее всего по одной) и нажми «Открыть в Лаборатории».',
+  'Wait for the read — a few minutes': 'Подожди, пока прочитается — несколько минут',
+  'A 45-lap session takes about five minutes over Bluetooth: the screen shows the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. Then the usual window opens: check the track, tap Analyse — the Lab opens with every corner.': 'Сессия на 45 кругов читается по Bluetooth минут пять: на экране видно, какой круг читается и сколько осталось. На телефоне держи Hutka на экране (внутри Hutka ходить можно — плашка внизу показывает прогресс), в браузере не закрывай вкладку. Потом откроется обычное окно: проверь трассу, нажми Analyse — Лаборатория откроется со всеми поворотами.',
+  'The other way, without Bluetooth: the app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.': 'Другой путь, без Bluetooth: то приложение, в котором ты смотришь круги. Каждая сессия — один файл: сохраняешь его на телефон и отдаёшь Hutka.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -5191,6 +5207,10 @@ const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 // external links set by drivers (track socials, booking, websites from OSM): only http(s) goes into an href
 const safeUrl = (u) => { const s = String(u || '').trim(); return /^https?:\/\/[^\s"'<>]+$/i.test(s) ? s : ''; };
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+// a drag that starts inside a window and ends on the backdrop — selecting the session name with the mouse, the pointer slipping past the edge —
+// is not a tap on the backdrop: the browser fires that click on the common ancestor, the backdrop itself, and every window closed on it.
+// A press has to start on the backdrop for the click to count (the modals' own handlers never see the others)
+(() => { let down = null; addEventListener('pointerdown', (e) => { down = e.target; }, true); addEventListener('click', (e) => { const x = e.target; if (x instanceof Element && (x.classList.contains('modal') || x.classList.contains('zoom')) && down && down !== x) { e.stopImmediatePropagation(); e.stopPropagation(); } down = null; }, true); })();
 const svgUse = (id, cls) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); if (cls) s.setAttribute('class', cls); const u = document.createElementNS('http://www.w3.org/2000/svg', 'use'); u.setAttribute('href', '#' + id); s.appendChild(u); return s; };
 let toastT = null;
 function toast(msg, ms) { const e = $('toast'); e.textContent = msg; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { e.hidden = true; }, ms || 2600); }
@@ -5627,11 +5647,19 @@ function renderHelpPage() {
   $('helpSub').textContent = t('Three minutes the first time, thirty seconds after that.');
   const box = $('helpBody'); box.innerHTML = '';
   // a picture arrives whole or not at all: fetched as a blob with retries (a baseline JPEG cut by a dropped mobile connection stays half-grey otherwise); the box keeps the picture's shape meanwhile
-  const SIZES = { 'ada-sessions.jpg': [1400, 645] }, loadPic = async (im, url) => { for (let i = 0; i < 3; i++) { try { const r = await fetch(url); if (!r.ok) throw new Error(r.status); const b = await r.blob(); if (b.size < 1000) throw new Error('short'); im.src = URL.createObjectURL(b); return; } catch (e) { await new Promise(res => setTimeout(res, 700 * (i + 1))); } } im.src = url; };
+  const SIZES = { 'ada-sessions.jpg': [1400, 645], 'hutka-device-timer.jpg': [800, 928] }, loadPic = async (im, url) => { for (let i = 0; i < 3; i++) { try { const r = await fetch(url); if (!r.ok) throw new Error(r.status); const b = await r.blob(); if (b.size < 1000) throw new Error('short'); im.src = URL.createObjectURL(b); return; } catch (e) { await new Promise(res => setTimeout(res, 700 * (i + 1))); } } im.src = url; };
   const step = (n, title, text, img, alt) => { const d = el('div', 'hstep'); const tx = el('div', 'tx'); tx.innerHTML = `<div class="n">${n}</div><h3>${esc(title)}</h3><p>${text}</p>`; d.appendChild(tx); if (img) { const im = new Image(); const [iw, ih] = SIZES[img] || [780, 1520]; im.width = iw; im.height = ih; im.alt = alt || ''; im.decoding = 'async'; const w = el('div', 'pic'); w.appendChild(im); d.appendChild(w); loadPic(im, 'help/' + img + '?v=' + encodeURIComponent(APP_VERSION)); } return d; };
   const card = (title, sub) => { const c = el('div', 'card hcard'); c.innerHTML = `<h2>${esc(title)}</h2>${sub ? `<p class="hint">${esc(sub)}</p>` : ''}`; return c; };
+  // straight from the lap timer over Bluetooth — the quickest way
+  const b = card(t('Straight from the lap timer (Bluetooth)'), t('Alfano 7 and RaceBox: no vendor app, no files — the sessions come out of the device memory straight into the Lab. In the Hutka app (iPhone, Android), or in Chrome on a Mac, Windows or Android.'));
+  b.appendChild(step(1, t('Put the lap timer in Bluetooth mode'), esc(t('Alfano 7: in its menu turn Bluetooth on (the connection / sharing mode). The screen shows a PIN and the green light comes on — the lap timer is ready to send. Hutka does not need the PIN. RaceBox: just turn it on.')), 'hutka-device-timer.jpg'));
+  b.appendChild(step(2, t('Upload → From a device'), esc(t('Open hutka.ai or the Hutka app, tap Upload (the round button in the middle of the bottom bar; on a computer — “Upload session” in the Lab), then “From a device (Bluetooth)”. Sign in first if you have not.')), 'hutka-device.jpg'));
+  b.appendChild(step(3, t('Pick the lap timer'), `${esc(t('Tap Alfano 6 / 7 (or RaceBox). The app lists what is in the air — tap yours: ALFANO-… with “looks like an Alfano”. In Chrome the browser’s own list opens instead: pick the device there and press Pair. Hutka signs in to the lap timer and reads its session list.'))}<br><span class="hint">${esc(t('Not in the list? Check the lap timer is on and in Bluetooth mode and the phone’s Bluetooth is on. On Android the app asks for the nearby-devices permission the first time — allow it.'))}</span>`, 'hutka-device-scan.jpg'));
+  b.appendChild(step(4, t('Tick the sessions, tap Open in the Lab'), esc(t('Every session in the lap timer’s memory: date, track, laps, best lap — the newest is ticked already. Tick the ones you want (one at a time is quickest) and tap Open in the Lab.')), 'hutka-device-sessions.jpg'));
+  b.appendChild(step(5, t('Wait for the read — a few minutes'), esc(t('A 45-lap session takes about five minutes over Bluetooth: the screen shows the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. Then the usual window opens: check the track, tap Analyse — the Lab opens with every corner.')), 'hutka-device-reading.jpg'));
+  box.appendChild(b);
   // Alfano 7 — the ADA app on the phone
-  const a = card(t('Alfano 7 — the ADA app on your phone'), t('The app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.'));
+  const a = card(t('Alfano 7 — the ADA app on your phone'), t('The other way, without Bluetooth: the app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.'));
   a.appendChild(step(1, t('Open the ADA app and go to Sessions'), esc(t('In the list “Select your sessions”, tap the session you want — the row lights up. One session = one file.')), 'ada-sessions.jpg'));
   a.appendChild(step(2, t('Tap the paper plane'), esc(t('The paper-plane icon in the bottom row (2 on the picture) — that is “send the session out of the app”. The phone’s share sheet opens. (The box-with-arrow icon on the far right is import — not that one.)'))));
   a.appendChild(step(3, t('Save the file on the phone'), `<b>${esc(t('With the Hutka app:'))}</b> ${esc(t('tap Hutka in the row of apps — the session opens in the upload window straight away, steps 4–5 are not needed.'))} <span class="hint">${esc(t('Hutka at the front of that row, once and for all: iPhone — scroll the app row to the end → More → Edit → “+” next to Hutka (Favourites), then drag it to the top; Android — hold Hutka in the share sheet → Pin.'))}</span><br><b>${esc(t('Without the app:'))}</b> <b>iPhone:</b> ${esc(t('tap “Save to Files”, choose a folder (Downloads is fine), tap Save.'))} <b>Android:</b> ${esc(t('choose “Save” / “Downloads”.'))}<br><span class="hint">${esc(t('The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.'))}</span>`));
@@ -5646,7 +5674,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.7';
+const APP_VERSION = 'v34.8';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -7510,6 +7538,16 @@ const DEVICE = (() => {
   addEventListener('beforeunload', (e) => { if (busy) { e.preventDefault(); e.returnValue = ''; } });
   async function drop() { const d = dev, h = H, x = ex; dev = null; H = null; ex = null; items = []; if (x) { try { await x.close(); } catch (e) {} } else if (d) { try { await d.close(); } catch (e) {} } else if (h) { try { await LOGGERS.ble.disconnect(h); } catch (e) {} } }
   function bar(done, total) { const b = $('devBar'); b.hidden = false; b.firstElementChild.style.width = total ? Math.min(100, Math.round(done / total * 100)) + '%' : '0%'; }
+  // the time left: the pace over the last half-minute of reading, said once a few seconds of it have been measured (a read takes minutes)
+  let eta = null;
+  const etaStart = () => { eta = { t0: Date.now(), pts: [] }; };
+  function etaText(done, total) {
+    if (!eta) etaStart(); const now = Date.now(), P = eta.pts; P.push([now, done]); while (P.length > 2 && now - P[0][0] > 30000) P.shift();
+    const [ta, da] = P[0], [tb, db] = P[P.length - 1]; if (!total || done >= total || now - eta.t0 < 5000 || tb - ta < 3000 || db <= da) return '';
+    const sec = (total - done) / ((db - da) / (tb - ta)) / 1000;
+    return sec < 50 ? t('under a minute left') : t('~{m} min left', { m: Math.max(1, Math.round(sec / 60)) });
+  }
+  const withEta = (tx, left) => left ? `${tx} · ${left}` : tx;
   function fail(e) {
     const c = e && e.code, m = (e && e.message) || String(e);
     if ((e && e.name === 'NotFoundError') || /cancel/i.test(m)) { S(t('No device picked.')); return; }
@@ -7595,8 +7633,8 @@ const DEVICE = (() => {
     busy = true; $('devActs').hidden = true; $('devKeep').hidden = false; const files = [];
     try {
       for (let k = 0; k < picked.length; k++) {
-        const o = picked[k]; bar(0, 1);
-        const f = await dev.download(o, (p) => { bar(p.done, p.total); const tx = t('Session {k} of {n}: lap {lap} of {laps}… {pct}%', { k: k + 1, n: picked.length, lap: Math.min(p.lap, p.laps), laps: p.laps, pct: Math.min(100, Math.round(p.done / p.total * 100)) }); S(tx); pill(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct: Math.min(100, Math.round(p.done / p.total * 100)) })); });
+        const o = picked[k]; bar(0, 1); etaStart();
+        const f = await dev.download(o, (p) => { bar(p.done, p.total); const pct = Math.min(100, Math.round(p.done / p.total * 100)), left = etaText(p.done, p.total); S(withEta(t('Session {k} of {n}: lap {lap} of {laps}… {pct}%', { k: k + 1, n: picked.length, lap: Math.min(p.lap, p.laps), laps: p.laps, pct }), left)); pill(withEta(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct }), left)); });
         files.push(f);
       }
     } catch (e) {
@@ -7613,9 +7651,9 @@ const DEVICE = (() => {
     if (st && st.secured && !st.unlocked) { $('devCodeRow').hidden = false; S(t('The device memory is locked — enter its security code.'), 'warn'); busy = false; return; }
     if (st && st.recording) S(t('{name} is still recording — stop it (REC) and try again.', { name: H.name }), 'warn');
     else S(st ? t('{name}: {n} records in memory ({p}% full) — reading…', { name: H.name, n: st.stored, p: st.level }) : t('Reading {name}…', { name: H.name }));
-    bar(0, 1);
+    bar(0, 1); etaStart();
     $('devKeep').hidden = false;
-    const outs = await dev.download((p) => { bar(p.done, p.total); S(t('Reading the memory… {done} / {total}', { done: p.done, total: p.total })); pill(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct: p.total ? Math.min(100, Math.round(p.done / p.total * 100)) : 0 })); });
+    const outs = await dev.download((p) => { bar(p.done, p.total); const left = etaText(p.done, p.total); S(withEta(t('Reading the memory… {done} / {total}', { done: p.done, total: p.total }), left)); pill(withEta(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct: p.total ? Math.min(100, Math.round(p.done / p.total * 100)) : 0 }), left)); });
     bar(1, 1); items = outs; busy = false; $('devKeep').hidden = true; pill(''); renderList();
   }
   async function unlock() { const code = $('devCode').value.trim(); if (!code || !dev || busy) return; busy = true; try { await dev.unlock(code); $('devCodeRow').hidden = true; await readAll(); } catch (e) { busy = false; fail(e); } }
@@ -7729,7 +7767,7 @@ const HOME = { last: null,
 // ---------- the landing for guests: a real session on the satellite picture of its track — the Lab's own map, live — then the promo pictures ----------
 const LANDING = {
   timer: 0, idx: 0, slides: [], ex: null, live: null, wired: false, capHtml: '', fellBack: false, waitT: 0, promoT: 0,
-  promo: [['three', 'Three laps on one map'], ['ideal', 'Best vs ideal lap'], ['coach', 'An AI coach that has read your telemetry'], ['replay', 'Press play'], ['dd2', 'Sport karts: revs, gears, shifts']],
+  promo: [['device', 'Straight from the lap timer'], ['three', 'Three laps on one map'], ['ideal', 'Best vs ideal lap'], ['coach', 'An AI coach that has read your telemetry'], ['replay', 'Press play'], ['dd2', 'Sport karts: revs, gears, shifts']],
   col: (r) => r >= 0.2 ? '#ff5c62' : r >= 0.1 ? '#ffa23a' : '#39c76f',
   bandH: () => Math.max(0, $('ldBand').offsetHeight - 14), capH: () => Math.max(0, $('ldCap').offsetHeight - 16),   // the map may run a little under the gradients
   // the session that shows the product best: enough laps, a card with a few corners worth 0.05–0.8 s, nothing absurd
