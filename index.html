@@ -1000,6 +1000,7 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .dev-item div{display:flex;flex-direction:column;gap:2px;min-width:0}
 .dev-item b{font-size:14px}
 .dev-item .hint{font-size:12px}
+.dev-item.dim{opacity:.55}
 .hint.warn{color:var(--warn)}
 .btn.danger-text{color:var(--danger)}
 .dev-found{background:var(--surface);color:var(--fg);font:inherit;text-align:left;width:100%}
@@ -1593,7 +1594,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div class="box">
     <h3 data-t="Upload session">Upload session</h3>
     <div class="upl-drop" id="uplDrop"><div><b data-t="Choose session files">Choose session files</b></div><div class="hint" data-t="Alfano .alf2 (the reference) or an Alfano 6 export (.zip, with revs and temperatures on sport karts), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.">Alfano .alf2 (the reference) or an Alfano 6 export (.zip, with revs and temperatures on sport karts), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.</div><input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden></div>
-    <div class="row dev-row"><button class="btn" id="uplFromDevice" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg><span data-t="From a device (Bluetooth)">From a device (Bluetooth)</span></button><span class="hint" data-t="RaceBox Mini S / Micro now, Alfano 6 / 7 next — the outings go straight from the lap timer into the Lab.">RaceBox Mini S / Micro now, Alfano 6 / 7 next — the outings go straight from the lap timer into the Lab.</span></div>
+    <div class="row dev-row"><button class="btn" id="uplFromDevice" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg><span data-t="From a device (Bluetooth)">From a device (Bluetooth)</span></button><span class="hint" data-t="Alfano 7 and RaceBox Mini S / Micro — the sessions go straight from the lap timer into the Lab, no vendor app.">Alfano 7 and RaceBox Mini S / Micro — the sessions go straight from the lap timer into the Lab, no vendor app.</span></div>
     <div class="hint" style="margin-top:-4px"><a href="#help" id="uplHelpLink" data-t="How do I get the file from my Alfano? — step by step">How do I get the file from my Alfano? — step by step</a></div>
     <div class="status" id="uplStatus"></div>
     <div id="uplForm" hidden>
@@ -2590,6 +2591,254 @@ const IMPORT = (() => {
   }
   return { parse, alignToStart, APP_NAMES };
 })();
+// ---------- Alfano 7 over a serial pipe: the device's own command protocol and the decoder that writes the ZIP the Alfano app exports ----------
+// The lap timer talks through a Microchip RN4678 module — a plain serial bridge reachable as Bluetooth Classic SPP (what the Alfano app uses)
+// or as the module's BLE "transparent UART" (what Hutka uses: Chrome, the iOS and Android apps). Either way the bytes are the same.
+// Protocol (PROTOCOL.md, from the decompiled Alfano app and github.com/TheAngryRaven/alfano-bt-spec): every command is a 258-byte frame —
+// opcode, arguments, zero padding to byte 256, XOR checksum; answers are a one-byte ack, 129-byte EEPROM pages or n × (256 data + 1 XOR) flash packets.
+// Sessions live in EEPROM pages 0xB4.. (one page each: flash addresses, laps, best time); each session's flash holds a 306-byte header
+// (PARAMETRE.dat), the lap-boundary records (PARTIEL) and the 22-byte telemetry samples at 10 Hz.
+const ALFANO7 = (() => {
+  const OP = { PASSWORD: 0x2d, STATUS: 0x36, PAGE: 0x2b, FETCH: 0x17 };
+  const PASSWORD = [0x30, 0x30, 0x30, 0x30, 0x30, 0x30], STATUS_ARGS = [0x07, 0x01, 0x00, 0x00, 0x00, 0x50, 0x09, 0x00];
+  const u16 = (d, o) => d[o] | (d[o + 1] << 8), u24 = (d, o) => d[o] | (d[o + 1] << 8) | (d[o + 2] << 16), u32 = (d, o) => (d[o] | (d[o + 1] << 8) | (d[o + 2] << 16) | (d[o + 3] << 24)) >>> 0;
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const err = (code, msg) => { const e = new Error(msg || code); e.code = code; return e; };
+  function frame(op, args) {
+    const body = new Uint8Array(257); body[0] = op; if (args) body.set(args, 1);
+    let x = 0; for (const b of body) x ^= b;
+    const f = new Uint8Array(258); f.set(body); f[257] = x; return f;
+  }
+  // every 257th byte of a flash answer is the packet's XOR: dropped
+  function stripXor(raw) { const out = new Uint8Array(raw.length - Math.floor((raw.length + 0) / 257)); let k = 0; for (let i = 0; i < raw.length; i++) if (i % 257 !== 256) out[k++] = raw[i]; return out.subarray(0, k); }
+  const concat = (parts) => { let n = 0; for (const p of parts) n += p.length; const out = new Uint8Array(n); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; } return out; };
+
+  // ---- the client: one command at a time over a pipe { send(bytes) → Promise, onData(cb) } — the answer is collected until the expected
+  // length is in, or the timeout passes (then whatever came is returned, as the Alfano app does)
+  function client(pipe, opts) {
+    const o = Object.assign({ gapMs: 30, log: null }, opts || {});
+    let parts = [], got = 0, want = 0, wake = null;
+    pipe.onData((bytes) => { if (!bytes || !bytes.length) return; parts.push(bytes); got += bytes.length; if (wake && got >= want) wake(); });
+    async function cmd(op, args, expect, timeoutMs) {
+      parts = []; got = 0; want = expect;
+      await pipe.send(frame(op, args));
+      const t0 = Date.now();
+      while (got < want && Date.now() - t0 < timeoutMs) { await new Promise((res) => { wake = res; setTimeout(res, Math.min(100, Math.max(5, timeoutMs - (Date.now() - t0)))); }); wake = null; }
+      const out = concat(parts); if (o.log) o.log(op, args, out);
+      await sleep(o.gapMs);
+      return out;
+    }
+    const C = {
+      cmd,
+      async password() { const r = await cmd(OP.PASSWORD, PASSWORD, 1, 3000); return r.length > 0 && r[0] === 0xff; },
+      async status() { return cmd(OP.STATUS, STATUS_ARGS, 16, 3000); },
+      async page(p) { const r = await cmd(OP.PAGE, [p & 0xff, (p >> 8) & 0xff, 0x00, 0x80], 129, 3000); return r.length >= 129 ? r.subarray(0, 129) : r; },
+      async fetch(addr, packets) { return cmd(OP.FETCH, [addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, packets, 0x00], packets * 257, 10000); },
+      // a stretch of flash, 512 bytes a command, checksums dropped; stops early when the device sends nothing (stopOnEmpty) or on the caller's say-so
+      async bulk(addr, total, more) {
+        const m = Object.assign({ stopOnEmpty: false, onChunk: null, stopWhen: null }, more || {});
+        const out = []; let a = addr, left = total, empties = 0;
+        while (left > 0) {
+          const chunk = Math.min(left, 512), packets = Math.ceil(chunk / 256);
+          const raw = await C.fetch(a, packets);
+          if (!raw.length) { if (m.stopOnEmpty || ++empties >= 3) break; continue; }
+          const data = stripXor(raw), use = Math.min(data.length, left), piece = data.subarray(0, use);
+          out.push(piece); a += use; left -= use; empties = 0;
+          if (m.onChunk) m.onChunk(use);
+          if (m.stopWhen && m.stopWhen(piece)) break;
+          if (data.length < chunk) break;   // short answer: the end of what is there
+        }
+        return concat(out);
+      }
+    };
+    return C;
+  }
+
+  // ---- names in the header: bytes 0..9 are digits, 0x20..0x7E ASCII, 0xFF ends the name (0x00 is the digit 0, not an end)
+  function decodeName(raw, off, max) { let s = ''; for (let i = 0; i < max && off + i < raw.length; i++) { const b = raw[off + i]; if (b === 0xff) break; s += b < 10 ? String.fromCharCode(b + 48) : (b >= 0x20 && b <= 0x7e ? String.fromCharCode(b) : '_'); } return s.trim(); }
+  function transformName(buf, start, max) { let end = start; for (let i = start; i < Math.min(start + max, buf.length); i++) { const b = buf[i]; if (b === 0xff) break; if (b !== 0x20) end = i + 1; } for (let i = start; i < end; i++) { const b = buf[i]; if (b < 10) buf[i] = b + 48; else if (b === 0x20 || b === 0x2d || b < 0x20 || b > 0x7e) buf[i] = 95; } }
+  const pad2 = (n) => String(n).padStart(2, '0');
+  // the session page (129 bytes) and the stripped flash header → what the list shows and what the decoder needs
+  function describe(page, header, serial) {
+    if (!page || page.length < 10) return null;
+    const laps = page[6]; if (laps < 1 || laps > 99) return null;
+    const s = { laps, sectorData: u24(page, 0), sector0: u24(page, 3), bestRaw: Math.floor(u24(page, 7) / 10), serial: serial || 0, header: null, ok: false };
+    s.bestMin = Math.floor(s.bestRaw / 6000); s.bestSec = Math.floor((s.bestRaw % 6000) / 100); s.bestCs = s.bestRaw % 100;
+    if (header && header.length >= 306 && header[0] === 0x80 && header[1] === 0xff && header[2] === 0xfe && header[3] === 0xfd) {
+      const day = header[10], month = header[11];
+      if (day >= 1 && day <= 31 && month >= 1 && month <= 12) {
+        Object.assign(s, { header, hour: header[7], minute: header[8], day, month, year: header[12], sampling: header[23], nbreChamp: header[276], track: decodeName(header, 108, 50), driver: decodeName(header, 288, 15), ok: true });
+        if (!s.serial) s.serial = u16(header, 233);
+        s.date = `20${pad2(s.year)}-${pad2(s.month)}-${pad2(s.day)} ${pad2(s.hour)}:${pad2(s.minute)}`;
+        s.base = `SN${s.serial}_${pad2(s.day)}${pad2(s.month)}${pad2(s.year)}_${pad2(s.hour)}H${pad2(s.minute)}_${s.driver}_${s.track.replace(/[ \-*/]/g, '_')}_${s.laps}_${s.bestRaw}`;
+        s.name = 'ALFANO7_LAP_' + s.base;
+      }
+    }
+    return s;
+  }
+
+  // ---- the device: sign in, list the sessions (newest first), read one session's flash
+  async function open(C, onStep) {
+    await sleep(300);
+    let okPw = false; for (let k = 0; k < 3 && !okPw; k++) { okPw = await C.password(); if (!okPw) await sleep(800); }
+    if (!okPw) throw err('auth', 'the device did not accept the password');
+    const status = await C.status();
+    const pages = {}; for (const p of [0x0e, 0x0f, 0x10, 0x11]) pages[p] = await C.page(p);
+    const serial = pages[0x0e] && pages[0x0e].length >= 2 ? u16(pages[0x0e], 0) : 0;
+    const firmware = status.length >= 3 ? status[1] * 100 + status[2] : 0;
+    const driver = pages[0x11] && pages[0x11].length > 20 ? decodeName(pages[0x11], 0, 16) : '';
+    if (onStep) onStep('signed in');
+    return { C, status, pages, serial, firmware, driver };
+  }
+  async function list(dev, onStep) {
+    const found = []; let empty = 0;
+    for (let p = 0xb4; p <= 0xf9; p++) {
+      const page = await dev.C.page(p);
+      if (onStep) onStep('scan', p - 0xb4, found.length);
+      if (page.length < 10) continue;
+      const laps = page[6];
+      if (laps >= 1 && laps <= 99) { found.push({ page: p, pageData: page }); empty = 0; } else if (++empty >= 5) break;
+    }
+    found.reverse();   // the highest page is the newest session
+    const out = [];
+    for (const f of found) {
+      const raw = await dev.C.fetch(u24(f.pageData, 0), 2);
+      const header = raw.length >= 514 ? stripXor(raw) : null;
+      const s = describe(f.pageData, header, dev.serial); if (!s) continue;
+      s.page = f.page; s.pageData = f.pageData; s.headerRaw = raw; out.push(s);
+      if (onStep) onStep('session', out.length, found.length);
+    }
+    return out;
+  }
+  // the lap-boundary records: their size, the ordering, the flash address where every lap ends, the lap and sector times
+  function partielInfo(partiel, laps, nbreChamp, sectorData) {
+    let taille = 94;
+    if (partiel.length > 20 && partiel[0] >= 1 && partiel[0] <= 99) {
+      for (let t = 20; t <= Math.min(200, partiel.length - 2); t++) { const b0 = partiel[t], b1 = partiel[t + 1]; const next = (b0 === partiel[0] && b1 === partiel[1] + 1) || (b0 === partiel[0] + 1 && b1 === 1); if (next && partiel[t + 2] === 0) { taille = t; break; } }
+    }
+    const typeB = partiel.length >= 2 * taille && partiel[0] === 1 && partiel[1] === 1 && partiel[taille] === 2 && partiel[taille + 1] === 1;
+    const lapEnd = new Array(laps + 2).fill(0); lapEnd[0] = sectorData + 306;
+    const times = []; const extra = (off) => ({ vbat: off + 90 <= partiel.length ? u16(partiel, off + 88) : 0, hdop: off + 94 <= partiel.length ? u16(partiel, off + 92) : 0 });
+    if (typeB) {
+      const ch1 = new Array(laps + 1).fill(0);
+      for (let i = 0; i < laps; i++) { const off = i * taille; if (off + 16 > partiel.length) break; const lap = partiel[off], champ = partiel[off + 1]; if (champ === 1 && lap >= 1 && lap <= laps && !ch1[lap]) ch1[lap] = u24(partiel, off + 10); let t = u24(partiel, off + 13); if (t > 900000) t = 0; times.push(Object.assign({ time: t, sectors: [t, 0, 0, 0, 0, 0] }, extra(off))); }
+      for (let lap = 1; lap <= laps; lap++) lapEnd[lap] = ch1[lap];
+    } else {
+      const index = new Map(); const total = nbreChamp * laps;
+      for (let i = 0; i < total; i++) { const off = i * taille; if (off + 16 > partiel.length) break; const lap = partiel[off], champ = partiel[off + 1]; if (lap >= 1 && lap <= laps && champ >= 1 && champ <= nbreChamp && !index.has(lap * 100 + champ)) index.set(lap * 100 + champ, off); }
+      for (let lap = 1; lap <= laps; lap++) {
+        const sectors = []; for (let ch = 1; ch <= nbreChamp; ch++) { const off = index.get(lap * 100 + ch); let t = 0; if (off !== undefined && off + 16 <= partiel.length) { t = u24(partiel, off + 13); if (t > 900000) t = 0; } sectors.push(t); }
+        while (sectors.length < 6) sectors.push(0);
+        const off = index.get(lap * 100 + nbreChamp); if (off !== undefined) lapEnd[lap] = u24(partiel, off + 10) - 7;
+        times.push(Object.assign({ time: sectors.reduce((a, b) => a + b, 0), sectors }, off !== undefined ? extra(off) : { vbat: 0, hdop: 0 }));
+      }
+    }
+    return { taille, typeB, lapEnd, times, skip: typeB ? 0 : 7, champ: typeB ? 1 : nbreChamp };
+  }
+  // the pit-in samples end where the GPS goes blank or the numbers turn to nonsense
+  const pitGarbage = (lat, lon, speed, orient) => (lat === 0 && lon === 0) || lat >= 0xffffff00 || lon >= 0xffffff00 || speed > 3000 || orient > 36000;
+  async function download(dev, s, onProgress) {
+    if (!s.ok) throw err('header', 'the session header is not readable');
+    const probe = await dev.C.bulk(s.sector0, 300);
+    let info = partielInfo(probe, s.laps, s.nbreChamp, s.sectorData);
+    const partiel = await dev.C.bulk(s.sector0, info.taille * s.nbreChamp * s.laps);
+    info = partielInfo(partiel, s.laps, s.nbreChamp, s.sectorData);
+    for (let lap = 1; lap <= s.laps; lap++) { const start = info.lapEnd[lap - 1] + (lap > 1 ? info.skip : 0), end = info.lapEnd[lap]; const size = end - start; if (size <= 0 || size > 500000 || !end) throw err('laps', `lap ${lap} has no readable address`); }
+    const sizes = []; for (let lap = 1; lap <= s.laps; lap++) sizes.push(info.lapEnd[lap] - (info.lapEnd[lap - 1] + (lap > 1 ? info.skip : 0)));
+    const total = sizes.reduce((a, b) => a + b, 0) + 8000; let done = 0;
+    const tick = (n) => { done += n; if (onProgress) onProgress({ done: Math.min(done, total), total, lap: cur, laps: s.laps }); };
+    let cur = 0; const laps = [];
+    for (let lap = 1; lap <= s.laps; lap++) { cur = lap; const start = info.lapEnd[lap - 1] + (lap > 1 ? info.skip : 0); laps.push(await dev.C.bulk(start, sizes[lap - 1], { onChunk: tick })); }
+    // the drive back to the pits: at most 30 000 bytes, stopped as soon as the samples go blank
+    cur = s.laps + 1; let pit = new Uint8Array(0);
+    if (info.lapEnd[s.laps] > 0) { const got = []; pit = await dev.C.bulk(info.lapEnd[s.laps] + info.skip, 30000, { stopOnEmpty: true, onChunk: tick, stopWhen: (piece) => { got.push(piece); const rows = lapRows(concat(got)); return rows.some(r => pitGarbage(r.lat, r.lon, r.speed, r.orient)); } }); }
+    if (onProgress) onProgress({ done: total, total, lap: s.laps + 1, laps: s.laps });
+    return { partiel, info, laps, pit };
+  }
+
+  // ---- the decoder: the lap files → rows → the CSVs, the G-forces computed the way the Alfano app computes them (integer maths and all)
+  function lapRows(data) {
+    const rows = []; let off = 0, partiel = 1, boundary = true;
+    while (off + 22 <= data.length) {
+      if (off + 7 <= data.length && data[off] === 0x80 && data[off + 1] === 0x80 && data[off + 2] === 0x80 && data[off + 3] === 0x80 && data[off + 6] === 0x00) { partiel++; off += 7; boundary = true; continue; }
+      rows.push({ partiel, rpm: u16(data, off), speed: u16(data, off + 2), orient: u16(data, off + 4), speed25: u16(data, off + 6), lat25: u16(data, off + 8), lon25: u16(data, off + 10), lat: u32(data, off + 12), lon: u32(data, off + 16), alt: u16(data, off + 20), gfx: 1000, gfy: 1000, boundary });
+      boundary = false; off += 22;
+    }
+    return rows;
+  }
+  // (the sector-boundary rows are ordinary rows here — that is what the Alfano app's own files show)
+  function gforce(rows) {
+    const n = rows.length; if (n < 5) return;
+    const rawX = new Array(n).fill(1000);
+    for (let i = 1; i < n; i++) {
+      const v = rows[i].speed / 36.0, v2 = v * v; const oc = rows[i].orient, op = rows[i - 1].orient; let d = oc - op;
+      if (d > 18000) d = (oc - 36000) - op; else if (d < -18000) d = (36000 - op) + oc;
+      let raw = v2 * d * 8.0e-4 + 1000.0; raw = Math.max(600.0, Math.min(1400.0, raw)); rawX[i] = Math.trunc(raw);
+    }
+    rawX[0] = n > 1 ? rawX[1] : 1000;
+    const smX = rawX.slice(); for (let i = 0; i < n - 4; i++) { let t = 0; for (let j = 0; j < 5; j++) t += rawX[i + j]; smX[i] = Math.trunc(Math.trunc(t) / 5.0); }
+    const rawY = new Array(n).fill(1000); let prev = 1000;
+    for (let i = 1; i < n; i++) {
+      const raw = ((rows[i].speed - rows[i - 1].speed) * (-100000.0)) / 35316.0 + 1000.0;
+      if (i === 1) prev = Math.trunc(raw);
+      const d = raw - prev; let g; if (d > 60.0) g = prev + 60; else if (d < -40.0) g = prev - 40; else g = Math.trunc(raw);
+      g = Math.max(600, Math.min(1400, g)); rawY[i] = g; prev = g;
+    }
+    const smY = rawY.slice(); for (let i = 0; i < n - 2; i++) { const t = rawY[i] + rawY[i + 1] + rawY[i + 2]; smY[i] = Math.trunc(Math.trunc(t) / 3.0); }
+    for (let i = 0; i < n; i++) { rows[i].gfx = smX[i]; rows[i].gfy = smY[i]; }
+  }
+  const LAP_HEAD = 'Partiel,RPM,Speed GPS,Orientation,Speed GPS 25Hz,Lat. 25Hz,Lon. 25Hz,Lat.,Lon.,Altitude,Gf. X,Gf. Y';
+  const rowLine = (r) => `${r.partiel},${r.rpm},${r.speed},${r.orient},${r.speed25},${r.lat25},${r.lon25},${r.lat},${r.lon},${r.alt},${r.gfx},${r.gfy}`;
+  function decode(s, raw, pages, now) {
+    const enc = new TextEncoder(); const files = [];
+    const header = new Uint8Array(s.header.subarray(0, 306)); transformName(header, 108, 50); transformName(header, 288, 15);
+    files.push({ name: `PARAMETRE${s.name}.dat`, data: header });
+    const dateStr = `${pad2(s.day)}-${pad2(s.month)}-20${pad2(s.year)}`, timeStr = `${pad2(s.hour)}:${pad2(s.minute)}`;
+    const lines = [`${dateStr},${timeStr},${pad2(s.laps)},${s.serial},${s.track},${s.driver},${pad2(s.bestMin)},',${pad2(s.bestSec)},'',${pad2(s.bestCs)},ALFANO 7,END,${raw.info.champ},0, ,no delete partiel,,${s.sampling},NOT USED,NOT USED,${dateStr},${timeStr},${s.track},${s.driver},NOT USED,NOT USED`,
+      'lap,time lap,time partiel 1,time partiel 2,time partiel 3,time partiel 4,time partiel 5,time partiel 6,Min RPM,Max RPM,Min Speed GPS,Max Speed GPS,Min T1,Max T1,Min T2,Max T2,Min T3,Max T3,Min T4,Max T4,Min Speed sensor,Max Speed sensor, RPM max gear,Type de champs,Vbattery,max EGT,Hdop'];
+    raw.info.times.forEach((lt, i) => { const sc = lt.sectors; lines.push(`${i + 1},${lt.time},${sc[0]},${sc[1]},${sc[2]},${sc[3]},${sc[4]},${sc[5]},0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,${(1 << raw.info.champ) - 1},${lt.vbat || 0},0,${lt.hdop || 0}`); });
+    files.push({ name: `${s.base}.csv`, data: enc.encode(lines.join('\n') + '\n') });
+    const lapFiles = raw.laps.map((d, i) => [i + 1, d]); if (raw.pit && raw.pit.length >= 22) lapFiles.push([s.laps + 1, raw.pit]);
+    let bestIdx = 0; raw.info.times.forEach((lt, i) => { const b = raw.info.times[bestIdx]; const tb = b.time > 0 ? b.time : 999999, ti = lt.time > 0 ? lt.time : 999999; if (ti < tb) bestIdx = i; });
+    for (const [n, data] of lapFiles) {
+      if (data.length < 22) continue;
+      let rows = lapRows(data);
+      if (n > s.laps) { const keep = []; for (const r of rows) { if (pitGarbage(r.lat, r.lon, r.speed, r.orient)) break; keep.push(r); } rows = keep; if (!rows.length) continue; }
+      gforce(rows);
+      files.push({ name: `LAP_${n}_${s.name}.csv`, data: enc.encode([LAP_HEAD].concat(rows.map(rowLine)).join('\n') + '\n') });
+      if (n === bestIdx + 1) files.push({ name: 'lap_theorique.csv', data: enc.encode([`${raw.info.times[bestIdx].time},RPM,Speed GPS,Orientation,Speed GPS 25Hz,Lat. 25Hz,Lon. 25Hz,Lat.,Lon.,Altitude,Gf. X,Gf. Y`].concat(rows.map(rowLine)).join('\n') + '\n') });
+    }
+    const d = now || new Date();
+    files.push({ name: 'temps_moteur.csv', data: enc.encode(`date ,${dateStr},${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())},ALFANO 7,${s.serial}\nMoteur 1,1,0,,\nMoteur 2,1,0,,\nMoteur 3,1,0,,\nMoteur 4,1,0,,\nMoteur 5,0,0,,\n`) });
+    if (pages && pages[0x0e]) files.push({ name: 'EEPROM_PAGE_14.dat', data: new Uint8Array(pages[0x0e].subarray(0, 128)) });
+    if (pages && pages[0x10]) files.push({ name: 'EEPROM_PAGE_16.dat', data: new Uint8Array(pages[0x10].subarray(0, 128)) });
+    files.push({ name: 'meteo.txt', data: enc.encode('Temperature  \t\t\t: 0 °C\nApparent Temperature\t: 0 °C\nPressure       \t\t: 0 hPa\nHumidity       \t\t: 0 %\nDew Point      \t\t: 0 °C\nVisibility     \t\t\t: 0 m\nAverage Wind Speed\t: 0 km/h\nWind Gusts         \t\t: 0 km/h\nWind Direction  \t\t: 0 °\nicon_meteo 00\n') });
+    files.push({ name: 'info software.txt', data: enc.encode('Android ADA CLASSIQUE\n5.4.8\n') });
+    files.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    return { name: s.name, files };
+  }
+
+  // ---- a ZIP with stored entries (the importer reads stored and deflated alike)
+  const CRC = (() => { const t = new Int32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c; } return t; })();
+  const crc32 = (u8) => { let c = -1; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 0xff] ^ (c >>> 8); return (c ^ -1) >>> 0; };
+  function zip(files, when) {
+    const d = when || new Date(), dosTime = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)) & 0xffff, dosDate = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate()) & 0xffff;
+    const enc = new TextEncoder(), locals = [], centrals = []; let off = 0;
+    const le16 = (v) => [v & 0xff, (v >> 8) & 0xff], le32 = (v) => [v & 0xff, (v >> 8) & 0xff, (v >> 16) & 0xff, (v >>> 24) & 0xff];
+    for (const f of files) {
+      const name = enc.encode(f.name), crc = crc32(f.data), n = f.data.length;
+      const local = Uint8Array.from([0x50, 0x4b, 0x03, 0x04, 20, 0, 0, 0, 0, 0, ...le16(dosTime), ...le16(dosDate), ...le32(crc), ...le32(n), ...le32(n), ...le16(name.length), 0, 0]);
+      locals.push(local, name, f.data);
+      centrals.push(Uint8Array.from([0x50, 0x4b, 0x01, 0x02, 20, 0, 20, 0, 0, 0, 0, 0, ...le16(dosTime), ...le16(dosDate), ...le32(crc), ...le32(n), ...le32(n), ...le16(name.length), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...le32(off)]), name);
+      off += local.length + name.length + n;
+    }
+    const cd = concat(centrals), eocd = Uint8Array.from([0x50, 0x4b, 0x05, 0x06, 0, 0, 0, 0, ...le16(files.length), ...le16(files.length), ...le32(cd.length), ...le32(off), 0, 0]);
+    return concat([...locals, cd, eocd]);
+  }
+
+  return { OP, frame, stripXor, client, open, list, download, describe, partielInfo, lapRows, gforce, decode, zip, decodeName, u16, u24, u32 };
+})();
+if (typeof module !== "undefined" && module.exports) module.exports = ALFANO7;
 // ---------- loggers over Bluetooth: the Lab reads sessions straight out of the lap timer, no vendor app in between ----------
 // One small transport (Web Bluetooth in Chrome on Android / a computer, the BluetoothLe plugin inside the Hutka app on iOS and Android)
 // and one driver per logger. RaceBox Mini S / Micro speak the protocol RaceBox publishes (BLE Protocol Documentation rev. 9, Aug 2026):
@@ -2845,10 +3094,38 @@ const LOGGERS = (() => {
     if (/^[0-9a-f\s,:x-]+$/i.test(s)) return unhex(s.replace(/0x/gi, ''));
     return new TextEncoder().encode(s);
   }
+  // the Alfano 7's serial pipe: the Microchip RN4678 transparent UART (RX 8841… takes bytes, TX 1E4D… notifies answers). A command frame goes out
+  // in 20-byte pieces (what any Bluetooth link accepts without asking); the answers are collected by the protocol client (alfano7.js)
+  const UART_SVC = '49535343-fe7d-4ae5-8fa9-9fafd205e455', UART_RX = '49535343-8841-43f4-a8d4-ecbe34729bb3', UART_TX = '49535343-1e4d-4bd9-ba61-23c647249616';
+  function serialPipe(H, svc, rx, tx, onBytes) {
+    const subs = []; let piece = 20;
+    return {
+      async start() { await ble.notify(H, svc, tx, (b) => { for (const cb of subs) cb(b); if (onBytes) onBytes('in', b); }); },
+      async send(bytes) { for (let i = 0; i < bytes.length; i += piece) { await ble.writeNoRsp(H, svc, rx, bytes.subarray(i, i + piece)); await sleep(6); } if (onBytes) onBytes('out', bytes); },
+      onData(cb) { subs.push(cb); }
+    };
+  }
   const alfano = {
-    id: 'alfano', name: 'Alfano 6 / 7', ready: true, explore: true, namePrefixes: [], services: CANDIDATES,
+    id: 'alfano', name: 'Alfano 6 / 7', ready: true, sessions: true, namePrefixes: [], services: CANDIDATES,
     looks(name) { return /alfano|alf\b|alf[0-9]/i.test(name || ''); },
+    // the session reader: sign in with the device's password, list what it holds, read a session and turn it into the Alfano app's own ZIP
     async open(H) {
+      const svcs = await ble.services(H);
+      const uart = svcs.find(s => s.uuid === UART_SVC);
+      if (!uart || !uart.chrs.some(c => c.uuid === UART_RX) || !uart.chrs.some(c => c.uuid === UART_TX)) { const e = err('nouart', 'no serial service on this device'); e.services = svcs; throw e; }
+      const pipe = serialPipe(H, UART_SVC, UART_RX, UART_TX, null); await pipe.start();
+      const C = ALFANO7.client(pipe, { gapMs: 30 });
+      const dev = await ALFANO7.open(C);
+      const me = {
+        info: { serial: dev.serial, firmware: dev.firmware, driver: dev.driver }, kind: 'sessions',
+        async list(onStep) { return ALFANO7.list(dev, onStep); },
+        async download(s, onProgress) { const raw = await ALFANO7.download(dev, s, onProgress); const dec = ALFANO7.decode(s, raw, dev.pages); const z = ALFANO7.zip(dec.files); return new File([z], dec.name + '.alf2', { type: 'application/zip', lastModified: Date.now() }); },
+        async close() { await ble.disconnect(H); }
+      };
+      return me;
+    },
+    // the explorer (when the device does not answer the password): everything it exposes and says, a command line, the log to Hutka
+    async explore(H) {
       const t0 = Date.now(), log = [];
       const ex = { info: { device: H.name, id: H.id, platform: ble.kind() }, services: [], log, onLog: null, subscribed: 0, listening: false };
       const line = (dir, svc, chr, bytes, note) => { const e = { t: Date.now() - t0, dir, svc: short(svc), chr: short(chr), hex: bytes ? hex(bytes) : '', txt: bytes ? printable(bytes) : (note || '') }; log.push(e); if (log.length > 6000) log.splice(0, 1000); if (ex.onLog) ex.onLog(e); return e; };
@@ -3837,6 +4114,12 @@ Object.assign(I18N.RU, { "The browser could not open any of this device's servic
 Object.assign(I18N.RU, { 'Try the PIN': 'Попробовать PIN', "A code on the device's screen? Hutka sends it the common ways and listens for an answer.": 'На экране прибора код? Hutka отправит его всеми обычными способами и послушает ответ.', 'PIN {k}/{n}: {how}': 'PIN {k}/{n}: {how}', 'PIN tried {n} ways — see what came back above, then send the log.': 'PIN отправлен {n} способами — смотри ответы выше и отправь лог.' });
 Object.assign(I18N.RU, { 'This version of the app has no Bluetooth yet — update the Hutka app.': 'В этой версии приложения ещё нет Bluetooth — обнови приложение Hutka.' });
 Object.assign(I18N.RU, { 'Alfano handshake': 'Рукопожатие Alfano', 'Handshake sent — see the answers above, then send the log.': 'Рукопожатие отправлено — смотри ответы выше и отправь лог.' });
+Object.assign(I18N.RU, { 'Bluetooth — the sessions in the device memory, straight into the Lab': 'Bluetooth — сессии из памяти прибора, сразу в Лабораторию', 'Connected to {name} — signing in…': 'Подключено к {name} — вхожу…',
+  '{name} did not accept the password — exploring the device instead. Send the log when done.': '{name} не принял пароль — вместо этого разведка. В конце отправь лог.', 'No serial service on {name} — exploring the device instead. Send the log when done.': 'У {name} нет последовательного сервиса — вместо этого разведка. В конце отправь лог.',
+  'Signed in — reading the session list…': 'Вошёл — читаю список сессий…', 'Looking through the memory… {k}': 'Просматриваю память… {k}', 'Session headers… {k} / {n}': 'Заголовки сессий… {k} / {n}', 'No sessions in the device memory.': 'В памяти прибора нет сессий.',
+  '{n} session(s) on {name} — tick the ones to bring into the Lab (the newest first).': 'Сессий на {name}: {n} — отметь, какие открыть в Лаборатории (новые сверху).', 'Session {n}': 'Сессия {n}', '{n} laps': 'кругов: {n}', 'best': 'лучший', '{n} laps · header unreadable': 'кругов: {n} · заголовок не читается', 'Tick at least one session.': 'Отметь хотя бы одну сессию.',
+  'Session {k} of {n}: lap {lap} of {laps}… {pct}%': 'Сессия {k} из {n}: круг {lap} из {laps}… {pct}%' });
+Object.assign(I18N.RU, { 'Alfano 7 and RaceBox Mini S / Micro — the sessions go straight from the lap timer into the Lab, no vendor app.': 'Alfano 7 и RaceBox Mini S / Micro — сессии попадают в Лабораторию прямо с прибора, без фирменных программ.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -5333,7 +5616,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.6';
+const APP_VERSION = 'v34.7';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -7183,7 +7466,7 @@ const DEVICE = (() => {
     const kinds = $('devKinds'); kinds.innerHTML = '';
     for (const d of LOGGERS.list) {
       const b = el('button', 'dev-kind'); b.type = 'button'; b.dataset.id = d.id;
-      b.innerHTML = `<b>${esc(d.name)}</b><span>${esc(d.explore ? t('Bluetooth — the explorer: Hutka listens to the device and records what it says; the download is written from these logs') : t('Bluetooth — the recorded outings go straight into the Lab'))}</span>`;
+      b.innerHTML = `<b>${esc(d.name)}</b><span>${esc(d.sessions ? t('Bluetooth — the sessions in the device memory, straight into the Lab') : t('Bluetooth — the recorded outings go straight into the Lab'))}</span>`;
       b.onclick = () => choose(d); kinds.appendChild(b);
     }
     stage('devKinds'); $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true; S('');
@@ -7222,7 +7505,7 @@ const DEVICE = (() => {
     for (const o of rows) {
       const b = el('button', 'dev-item dev-found' + (fits(o.name) ? ' fit' : '')); b.type = 'button';
       const bars = o.rssi === null ? '' : (o.rssi > -60 ? '▂▄▆█' : o.rssi > -70 ? '▂▄▆' : o.rssi > -80 ? '▂▄' : '▂');
-      b.innerHTML = `<div><b>${esc(o.name || t('(no name)'))}</b><span class="hint">${esc((fits(o.name) ? (drv.explore ? t('looks like an Alfano') : drv.name) + ' · ' : '') + (o.rssi === null ? '' : o.rssi + ' dBm '))}<span class="rssi">${bars}</span></span></div>`;
+      b.innerHTML = `<div><b>${esc(o.name || t('(no name)'))}</b><span class="hint">${esc((fits(o.name) ? (drv.sessions ? t('looks like an Alfano') : drv.name) + ' · ' : '') + (o.rssi === null ? '' : o.rssi + ' dBm '))}<span class="rssi">${bars}</span></span></div>`;
       b.onclick = () => connectScanned(o); box.appendChild(b);
     }
     $('devScanMore').hidden = !(all.length > named.length); $('devScanMore').textContent = showAll ? t('Hide unnamed devices') : t('Show {n} unnamed device(s) too', { n: all.length - named.length });
@@ -7236,10 +7519,54 @@ const DEVICE = (() => {
     try {
       S(t('Connecting to {name}…', { name: H.name || drv.name }));
       await LOGGERS.ble.connect(H, () => { if (busy || ex) S(t('The connection dropped — come closer and try again.'), 'warn'); busy = false; if (ex) { ex.live = false; renderExplore(); } dev = null; });
-      if (drv.explore) { ex = await drv.open(H); ex.live = true; await openExplorer(); busy = false; return; }
+      if (drv.sessions) {
+        S(t('Connected to {name} — signing in…', { name: H.name || drv.name }));
+        try { dev = await drv.open(H); }
+        catch (e) {   // the device did not take the password, or has no serial service: look at it instead, and say why
+          if (!H) throw e;
+          S(e.code === 'auth' ? t('{name} did not accept the password — exploring the device instead. Send the log when done.', { name: H.name }) : t('No serial service on {name} — exploring the device instead. Send the log when done.', { name: H.name }), 'warn');
+          await reconnect(); ex = await drv.explore(H); ex.live = true; ex.note = $('devStatus').textContent; await openExplorer(); busy = false; return;
+        }
+        await listSessions(); return;
+      }
       dev = await drv.open(H);
       await readAll();
     } catch (e) { fail(e); busy = false; await drop(); }
+  }
+  async function reconnect() { const h = H; try { await LOGGERS.ble.disconnect(h); } catch (e) {} h.subs = []; h.chrs = {}; h.lost = null; await new Promise(r => setTimeout(r, 400)); await LOGGERS.ble.connect(h, () => { if (ex) { ex.live = false; renderExplore(); } }); }
+  // ---- a logger that keeps sessions (Alfano): the list from its memory, the chosen ones read and handed to the upload window as the app's own files
+  async function listSessions() {
+    S(t('Signed in — reading the session list…'));
+    bar(0, 1);
+    const outs = await dev.list((what, k, n) => { if (what === 'scan') { bar(k, 70); S(t('Looking through the memory… {k}', { k: k + 1 })); } else if (what === 'session') { bar(k, n); S(t('Session headers… {k} / {n}', { k, n })); } });
+    bar(1, 1); items = outs; busy = false; renderSessions();
+  }
+  const whenStr = (iso) => { const ms = Date.parse(String(iso || '').replace(' ', 'T')); return isFinite(ms) ? new Date(ms).toLocaleString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : String(iso || ''); };
+  function renderSessions() {
+    const box = $('devList'); box.innerHTML = '';
+    if (!items.length) { S(t('No sessions in the device memory.'), 'warn'); $('devActs').hidden = false; $('devImport').hidden = true; $('devErase').hidden = true; return; }
+    S(t('{n} session(s) on {name} — tick the ones to bring into the Lab (the newest first).', { n: items.length, name: H ? H.name : drv.name }), 'ok');
+    items.forEach((o, i) => {
+      const lab = el('label', 'dev-item' + (o.ok ? '' : ' dim')); const cb = el('input'); cb.type = 'checkbox'; cb.checked = i === 0 && o.ok; cb.disabled = !o.ok; cb.dataset.i = i;
+      const best = `${o.bestMin}:${String(o.bestSec).padStart(2, '0')}.${String(o.bestCs).padStart(2, '0')}`;
+      const tx = el('div'); tx.innerHTML = `<b>${esc(o.ok ? whenStr(o.date) : t('Session {n}', { n: i + 1 }))}</b><span class="hint">${esc(o.ok ? `${o.track}${o.driver ? ' · ' + o.driver : ''} · ${t('{n} laps', { n: o.laps })} · ${t('best')} ${best}` : t('{n} laps · header unreadable', { n: o.laps }))}</span>`;
+      lab.appendChild(cb); lab.appendChild(tx); box.appendChild(lab);
+    });
+    $('devActs').hidden = false; $('devImport').hidden = false; $('devErase').hidden = true;
+  }
+  async function importSessions() {
+    const picked = [...$('devList').querySelectorAll('input:checked')].map(c => items[+c.dataset.i]).filter(o => o && o.ok);
+    if (!picked.length) { S(t('Tick at least one session.'), 'warn'); return; }
+    busy = true; $('devActs').hidden = true; const files = [];
+    try {
+      for (let k = 0; k < picked.length; k++) {
+        const o = picked[k]; bar(0, 1);
+        const f = await dev.download(o, (p) => { bar(p.done, p.total); S(t('Session {k} of {n}: lap {lap} of {laps}… {pct}%', { k: k + 1, n: picked.length, lap: Math.min(p.lap, p.laps), laps: p.laps, pct: Math.min(100, Math.round(p.done / p.total * 100)) })); });
+        files.push(f);
+      }
+    } catch (e) { busy = false; $('devActs').hidden = false; fail(e); return; }
+    busy = false; STORE.track('device_import', { app: drv.id, n: files.length });
+    close(); await UPLOAD.withFiles(files);
   }
   async function readAll() {
     let st = null; try { st = await dev.status(); } catch (e) {}
@@ -7263,6 +7590,7 @@ const DEVICE = (() => {
     $('devActs').hidden = false; $('devImport').hidden = false; $('devErase').hidden = !(dev && dev.erase);
   }
   async function importSel() {
+    if (dev && dev.kind === 'sessions') return importSessions();
     const files = [...$('devList').querySelectorAll('input:checked')].map(c => items[+c.dataset.i].file);
     if (!files.length) { S(t('Tick at least one outing.'), 'warn'); return; }
     STORE.track('device_import', { app: drv.id, n: files.length });
