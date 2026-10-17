@@ -2598,6 +2598,7 @@ const IMPORT = (() => {
 const LOGGERS = (() => {
   const U16 = (n) => `0000${n.toString(16).padStart(4, '0')}-0000-1000-8000-00805f9b34fb`;
   const hex = (u8) => Array.from(u8, b => b.toString(16).padStart(2, '0')).join(' ');
+  const hexN = (u8) => Array.from(u8, b => b.toString(16).padStart(2, '0')).join('');   // the native plugin wants the pairs without spaces: a space in the string crashes the app (Android require / iOS fatalError)
   const unhex = (s) => { const out = []; let v = -1; for (const ch of String(s || '')) { const d = parseInt(ch, 16); if (isNaN(d)) continue; if (v < 0) v = d; else { out.push(v * 16 + d); v = -1; } } return Uint8Array.from(out); };
   const toU8 = (v) => v instanceof Uint8Array ? v : (v && v.buffer ? new Uint8Array(v.buffer, v.byteOffset || 0, v.byteLength) : (typeof v === 'string' ? unhex(v) : new Uint8Array(0)));
   const text = (u8) => { try { return new TextDecoder().decode(u8).replace(/\0+$/, '').trim(); } catch (e) { return ''; } };
@@ -2665,11 +2666,11 @@ const LOGGERS = (() => {
       const c = await this.chr(H, svc, chr), k = svc + '|' + chr; c.addEventListener('characteristicvaluechanged', (e) => { if (H.reading === k) return; cb(toU8(e.target.value)); }); await c.startNotifications();
     },
     async write(H, svc, chr, bytes) {
-      if (H.kind === 'native') { await NATIVE.call('BluetoothLe', 'write', { deviceId: H.id, service: svc, characteristic: chr, value: hex(bytes) }); return; }
+      if (H.kind === 'native') { await NATIVE.call('BluetoothLe', 'write', { deviceId: H.id, service: svc, characteristic: chr, value: hexN(bytes) }); return; }
       const c = await this.chr(H, svc, chr); if (c.writeValueWithResponse) await c.writeValueWithResponse(bytes); else await c.writeValue(bytes);
     },
     async writeNoRsp(H, svc, chr, bytes) {
-      if (H.kind === 'native') { await NATIVE.call('BluetoothLe', 'writeWithoutResponse', { deviceId: H.id, service: svc, characteristic: chr, value: hex(bytes) }); return; }
+      if (H.kind === 'native') { await NATIVE.call('BluetoothLe', 'writeWithoutResponse', { deviceId: H.id, service: svc, characteristic: chr, value: hexN(bytes) }); return; }
       const c = await this.chr(H, svc, chr); if (c.writeValueWithoutResponse) await c.writeValueWithoutResponse(bytes); else await c.writeValue(bytes);
     },
     async read(H, svc, chr) {
