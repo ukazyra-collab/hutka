@@ -2883,9 +2883,15 @@ const LOGGERS = (() => {
   // ---- the transport: scan (the app) or the browser's chooser, connect, notify, write, read, services, disconnect — the same calls on both sides
   const ble = {
     kind() { if (window.NATIVE && NATIVE.on) return 'native'; if (navigator.bluetooth && typeof navigator.bluetooth.requestDevice === 'function') return 'web'; return ''; },
+    // the plugin up, the permission granted, the radio on — each says what is missing: 'noperm' (the app may not use Bluetooth — iPhone:
+    // Settings → Hutka; Android: Nearby devices), 'btoff' (the radio is off; Android asks to turn it on, iOS cannot)
     async ready() {
-      await NATIVE.call('BluetoothLe', 'initialize', { androidNeverForLocation: true });
-      try { const en = await NATIVE.call('BluetoothLe', 'isEnabled'); if (en && en.value === false) { try { await NATIVE.call('BluetoothLe', 'requestEnable'); } catch (e) {} } } catch (e) {}
+      try { await NATIVE.call('BluetoothLe', 'initialize', { androidNeverForLocation: true }); }
+      catch (e) { const m = String(e && e.message || e); if (/permission|unauthori[sz]ed|denied/i.test(m)) throw err('noperm', m); throw e; }
+      const enabled = async () => { try { const en = await NATIVE.call('BluetoothLe', 'isEnabled'); return !(en && en.value === false); } catch (e) { return true; } };
+      if (await enabled()) return;
+      if (NATIVE.platform !== 'ios') { try { await NATIVE.call('BluetoothLe', 'requestEnable'); } catch (e) {} for (let i = 0; i < 10; i++) { if (await enabled()) return; await sleep(300); } }   // the radio takes a moment to come up
+      throw err('btoff');
     },
     // the app: advertisements stream in (onHit({id, name, rssi, uuids}) for every packet) until stop(); a browser has no scan, only its chooser (pick)
     canScan() { return this.kind() === 'native'; },
@@ -2893,7 +2899,8 @@ const LOGGERS = (() => {
     async scan(onHit) {
       await this.ready(); await this.stopScan();
       this.scanSub = NATIVE.listen('BluetoothLe', 'onScanResult', (r) => { if (!r || !r.device) return; onHit({ id: r.device.deviceId, name: r.device.name || r.localName || '', rssi: typeof r.rssi === 'number' ? r.rssi : null, uuids: r.uuids || r.device.uuids || [] }); });
-      await NATIVE.call('BluetoothLe', 'requestLEScan', { allowDuplicates: true, scanMode: 2 });
+      try { await NATIVE.call('BluetoothLe', 'requestLEScan', { allowDuplicates: true, scanMode: 2 }); }
+      catch (e) { if (!/already scanning/i.test(String(e && e.message || e))) throw e; await sleep(400); await NATIVE.call('BluetoothLe', 'requestLEScan', { allowDuplicates: true, scanMode: 2 }); }   // a scan still winding down (a quick second tap): once more
     },
     async stopScan() { const s = this.scanSub; this.scanSub = null; try { if (s) { if (s.remove) s.remove(); else if (typeof s.then === 'function') s.then(x => x && x.remove && x.remove()); } } catch (e) {} try { await NATIVE.call('BluetoothLe', 'stopLEScan'); } catch (e) {} },
     // a device out of the scan list
@@ -4166,6 +4173,7 @@ Object.assign(I18N.RU, { 'Straight from the lap timer (Bluetooth)': 'Прямо 
   'Wait for the read — a few minutes': 'Подожди, пока прочитается — несколько минут',
   'A 45-lap session takes about five minutes over Bluetooth: the screen shows the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. Then the usual window opens: check the track, tap Analyse — the Lab opens with every corner.': 'Сессия на 45 кругов читается по Bluetooth минут пять: на экране видно, какой круг читается и сколько осталось. На телефоне держи Hutka на экране (внутри Hutka ходить можно — плашка внизу показывает прогресс), в браузере не закрывай вкладку. Потом откроется обычное окно: проверь трассу, нажми Analyse — Лаборатория откроется со всеми поворотами.',
   'The other way, without Bluetooth: the app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.': 'Другой путь, без Bluetooth: то приложение, в котором ты смотришь круги. Каждая сессия — один файл: сохраняешь его на телефон и отдаёшь Hutka.' });
+Object.assign(I18N.RU, { 'Hutka may not use Bluetooth yet — allow it: iPhone — Settings → Hutka → Bluetooth; Android — Settings → Apps → Hutka → Permissions → Nearby devices.': 'Hutka пока нельзя пользоваться Bluetooth — разреши: iPhone — Настройки → Hutka → Bluetooth; Android — Настройки → Приложения → Hutka → Разрешения → Устройства поблизости.', 'Bluetooth is off — turn it on in the phone settings and try again.': 'Bluetooth выключен — включи его в настройках телефона и попробуй снова.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -7553,6 +7561,8 @@ const DEVICE = (() => {
     if ((e && e.name === 'NotFoundError') || /cancel/i.test(m)) { S(t('No device picked.')); return; }
     S(c === 'nobt' ? t('Bluetooth works in the Hutka app and in Chrome on Android or a computer — not in this browser.')
       : /unable to find plugin|not implemented|no bridge/i.test(m) ? t('This version of the app has no Bluetooth yet — update the Hutka app.')
+      : c === 'noperm' ? t('Hutka may not use Bluetooth yet — allow it: iPhone — Settings → Hutka → Bluetooth; Android — Settings → Apps → Hutka → Permissions → Nearby devices.')
+      : c === 'btoff' ? t('Bluetooth is off — turn it on in the phone settings and try again.')
       : c === 'timeout' ? t('The device stopped answering — bring the phone closer and try again.')
       : c === 'locked' ? t('The device memory is locked — enter its security code.')
       : t('Could not read the device: {e}', { e: m }), 'warn');
@@ -7568,8 +7578,9 @@ const DEVICE = (() => {
   async function startScan() {
     seen = new Map(); showAll = false; stage('devScan'); renderScan();
     try { scanning = true; $('devScanHint').textContent = t('Looking around… turn the lap timer on and put it in Bluetooth / connection mode.'); await LOGGERS.ble.scan((r) => { const o = seen.get(r.id) || { id: r.id, name: '', rssi: null, n: 0 }; if (r.name) o.name = r.name; if (r.rssi !== null) o.rssi = r.rssi; o.n++; o.at = Date.now(); seen.set(r.id, o); if (!renderScan.t) renderScan.t = setTimeout(() => { renderScan.t = null; renderScan(); }, 300); }); }
-    catch (e) { scanning = false; $('devScanHint').textContent = ''; stage('devStage'); fail(e); return; }
-    clearTimeout(scanT); scanT = setTimeout(() => { if (scanning) { stopScan(); $('devScanHint').textContent = seen.size ? t('Scan finished — tap the device, or scan again.') : t('Nothing in the air. Is the lap timer on and in Bluetooth mode? Scan again.'); } }, 20000);
+    catch (e) { scanning = false; $('devScanHint').textContent = ''; stage('devStage'); fail(e); STORE.track('device_scan', { os: NATIVE.platform, err: String((e && (e.code || e.message)) || e).slice(0, 80) }); return; }
+    // what the scan found goes to the analytics (counts only): a phone that sees nothing is a bug to chase
+    clearTimeout(scanT); scanT = setTimeout(() => { if (scanning) { stopScan(); const all = [...seen.values()]; STORE.track('device_scan', { os: NATIVE.platform, found: all.length, named: all.filter(o => o.name).length, fit: all.filter(o => fits(o.name)).length }); $('devScanHint').textContent = seen.size ? t('Scan finished — tap the device, or scan again.') : t('Nothing in the air. Is the lap timer on and in Bluetooth mode? Scan again.'); } }, 20000);
   }
   async function stopScan() { scanning = false; clearTimeout(scanT); $('devRescan').hidden = false; try { await LOGGERS.ble.stopScan(); } catch (e) {} }
   function renderScan() {
@@ -7604,7 +7615,7 @@ const DEVICE = (() => {
       }
       dev = await drv.open(H);
       await readAll();
-    } catch (e) { fail(e); busy = false; await drop(); }
+    } catch (e) { fail(e); busy = false; await drop(); STORE.track('device_fail', { os: NATIVE.platform, step: 'connect', err: String((e && (e.code || e.message)) || e).slice(0, 80) }); }
   }
   async function reconnect() { const h = H; try { await LOGGERS.ble.disconnect(h); } catch (e) {} h.subs = []; h.chrs = {}; h.lost = null; await new Promise(r => setTimeout(r, 400)); await LOGGERS.ble.connect(h, () => { if (ex) { ex.live = false; renderExplore(); } }); }
   // ---- a logger that keeps sessions (Alfano): the list from its memory, the chosen ones read and handed to the upload window as the app's own files
