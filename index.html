@@ -892,7 +892,8 @@ body.cockpit .legend,body.cockpit .map-title,body.cockpit .readout,body.cockpit 
 body.cockpit #hero .map-bar{display:none;position:absolute;left:var(--sl);right:calc(var(--sr) + 48px);bottom:calc(var(--sb) + 68px);z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);backdrop-filter:blur(10px);padding:5px 6px;gap:4px;overflow-x:auto;justify-content:flex-start;flex-wrap:nowrap;scrollbar-width:none}
 body.cockpit.ck-tools #hero .map-bar{display:flex}
 body.cockpit #hero .map-bar .btn{height:30px;padding:0 9px;font-size:12px;background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.16);flex:none}
-body.cockpit #hero .map-bar .seg{border-color:rgba(255,255,255,.16)}
+body.cockpit #hero .map-bar .seg,body.cockpit .align-bar .seg{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16)}   /* the button groups keep the light theme's white box otherwise: white text on white */
+body.cockpit #hero .map-bar .seg .btn,body.cockpit .align-bar .seg .btn{border-right-color:rgba(255,255,255,.16)}
 body.cockpit #hero .map-bar .btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 body.cockpit #hero .map-bar #btnFull,body.cockpit #hero .map-bar #tglTiles{display:none}
 body.cockpit .align-bar{position:absolute;left:var(--sl);right:calc(var(--sr) + 48px);top:calc(var(--st) + 62px);z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);color:#fff;backdrop-filter:blur(10px);font-size:12px}
@@ -3286,14 +3287,17 @@ const DATA = (() => {
     // engine channels (a sport kart with an Alfano 6): revs, temperature and the gear of every station, plus the station of every sample
     const eng = M > 0 && L.pts[0].rpm !== undefined, rsum = eng ? new Float64Array(N) : null, t1sum = eng && L.pts[0].t1 !== undefined ? new Float64Array(N) : null, gearAt = eng ? new Int8Array(N).fill(-1) : null, gl = eng && L._gear ? L._gear.gear : null, pj = new Int32Array(M).fill(-1);
     const back = Math.round(12 / ds), fwd = Math.round(60 / ds);
-    let prev = 0;
+    // the first sample is looked for on the whole loop: another session's S/F line (its own Alfano setting) can sit anywhere on this layout.
+    // After that each sample is looked for just ahead of the previous one; while the kart is off the centreline (a glitch, or a stretch where
+    // this driver's layout differs from the reference) the search window is moved on by dead reckoning, so it is there when the kart comes back
+    let prev = 0, s0 = 0;
     for (let j = 0; j < M; j++) {
       const x = L.px[j][0] * mpp, y = L.px[j][1] * mpp; let bi = prev, bd = Infinity;
-      const lo = j === 0 ? -Math.round(25 / ds) : -back, hi = j === 0 ? Math.round(40 / ds) : fwd;
-      for (let o = lo; o <= hi; o++) { const i = (prev + o + N) % N, d = (tr.cx[i] - x) ** 2 + (tr.cy[i] - y) ** 2; if (d < bd) { bd = d; bi = i; } }
+      if (j === 0) { for (let i = 0; i < N; i++) { const d = (tr.cx[i] - x) ** 2 + (tr.cy[i] - y) ** 2; if (d < bd) { bd = d; bi = i; } } s0 = bi; }
+      else for (let o = -back; o <= fwd; o++) { const i = (prev + o + N) % N, d = (tr.cx[i] - x) ** 2 + (tr.cy[i] - y) ** 2; if (d < bd) { bd = d; bi = i; } }
+      if (bd > 400) { prev = (prev + Math.max(1, Math.round((L.pts[j].v || 0) * dtS / ds))) % N; continue; }   // > 20 m from the centreline: not this layout's line here; the window rolls on at the kart's speed
       prev = bi;
-      if (bd > 400) continue;                       // > 20 m from the centreline: GPS glitch
-      if (j > M * 0.8 && bi < N * 0.1) continue;    // closing samples back at the S/F belong to the lap end, not to station 0
+      if (j > M * 0.8 && ((bi - s0 + N) % N) < N * 0.1) continue;    // closing samples back at the S/F belong to the lap end, not to the stations just after the start
       pj[j] = bi;
       sum[bi] += L.pts[j].v; cnt[bi] += 1; tsum[bi] += j * dtS; osum[bi] += (x - tr.cx[bi]) * tr.nx[bi] + (y - tr.cy[bi]) * tr.ny[bi]; gsum[bi] += Math.abs(L.pts[j].gx || 0);
       if (eng) { rsum[bi] += L.pts[j].rpm || 0; if (t1sum) t1sum[bi] += L.pts[j].t1 || 0; if (gl && gl[j] >= 0) gearAt[bi] = gl[j]; }
@@ -3302,6 +3306,12 @@ const DATA = (() => {
     const rpm = eng ? new Float64Array(N) : null, t1 = t1sum ? new Float64Array(N) : null;
     for (let i = 0; i < N; i++) if (cnt[i]) { idx.push(i); v[i] = sum[i] / cnt[i]; t[i] = tsum[i] / cnt[i]; o[i] = osum[i] / cnt[i]; g[i] = gsum[i] / cnt[i]; if (eng) { rpm[i] = rsum[i] / cnt[i]; if (t1) t1[i] = t1sum[i] / cnt[i]; } }
     if (idx.length < 20) return null;
+    // the lap's clock re-based to station 0 (the layout's S/F), whatever this session's own S/F line: every lap's time trace then starts at the
+    // same place, which is what the comparisons assume. t0 = when the lap passed station 0; the lap's own start is somewhere on the loop
+    let t0 = 0;
+    if (cnt[0]) t0 = t[0]; else { const a = idx[idx.length - 1], b = idx[0], span = (b - a + N) % N || N; let d = t[b] - t[a]; if (d < -T / 2) d += T; t0 = t[a] + d * (((N - a) % N) / span); }
+    t0 = ((t0 % T) + T) % T;
+    for (const i of idx) { t[i] = t[i] - t0; if (t[i] < -1e-6) t[i] += T; else if (t[i] < 0) t[i] = 0; }   // a hair below zero is rounding, not the end of the lap
     for (let k = 0; k < idx.length; k++) {
       const a = idx[k], b = idx[(k + 1) % idx.length], span = ((b - a) % N + N) % N || N, tb = k + 1 < idx.length ? t[b] : T + t[b];
       for (let q = 1; q < span; q++) { const i = (a + q) % N, f = q / span; v[i] = v[a] + (v[b] - v[a]) * f; o[i] = o[a] + (o[b] - o[a]) * f; g[i] = g[a] + (g[b] - g[a]) * f; let tt = t[a] + (tb - t[a]) * f; if (i < a) tt -= T; t[i] = tt; if (eng) { rpm[i] = rpm[a] + (rpm[b] - rpm[a]) * f; if (t1) t1[i] = t1[a] + (t1[b] - t1[a]) * f; if (gearAt) gearAt[i] = gearAt[a]; } }
@@ -3309,7 +3319,15 @@ const DATA = (() => {
     for (let i = 1; i < N; i++) if (t[i] < t[i - 1]) t[i] = t[i - 1];
     t[N] = T;
     const vs = smooth(v, N, Math.max(1, Math.round(2 / ds))), os = smooth(o, N, Math.max(1, Math.round(4 / ds))), gs = smooth(g, N, Math.max(1, Math.round(3 / ds)));
-    const P = { key, N, ds, T, v: vs, t, o: os, a: accelFrom(vs, N, ds), g: gs, lap: L, pj };
+    // the lap's own position at every station (metres in the frame) — what the map draws: the recorded path read at the moment the lap
+    // reached the station (t[i] grows with i, so the path is walked in order). The centreline plus the lateral offset was drawn before, and
+    // where the reference centreline wiggles with a radius smaller than a lap's offset from it, that offset curve folds into a zig-zag
+    const xs = new Float64Array(N), ys = new Float64Array(N);
+    for (let i = 0; i < N; i++) { const jf = (((Math.max(0, Math.min(T, t[i])) + t0) % T) / dtS), j = Math.min(M - 1, Math.floor(jf)), k = Math.min(M - 1, j + 1), f = Math.min(1, jf - j); xs[i] = (L.px[j][0] + (L.px[k][0] - L.px[j][0]) * f) * mpp; ys[i] = (L.px[j][1] + (L.px[k][1] - L.px[j][1]) * f) * mpp; }
+    // the join of the lap's end with its start is two different passes of the S/F: a light smoothing (±1.5 m) rounds that notch
+    const kxy = Math.max(1, Math.round(1.5 / ds)), xsm = smooth(xs, N, kxy), ysm = smooth(ys, N, kxy);
+    let lost = 0; for (let j = 0; j < M; j++) if (pj[j] < 0) lost++;
+    const P = { key, N, ds, T, v: vs, t, o: os, x: xsm, y: ysm, t0, s0, lost: lost / M, a: accelFrom(vs, N, ds), g: gs, lap: L, pj };
     if (eng) { P.rpm = smooth(rpm, N, Math.max(1, Math.round(2 / ds))); if (t1) P.t1 = t1; if (gearAt) { for (let i = 0; i < N; i++) if (gearAt[i] < 0) gearAt[i] = gearAt[(i - 1 + N) % N]; P.gear = gearAt; } P.shifts = shiftsOnTrack(L, pj, N); }
     L._proj = P; return P;
   }
@@ -3471,9 +3489,9 @@ const DATA = (() => {
   }
   // the "typical" lap: per-station mean of the other laps
   function avgProjection(projs, tr, name) {
-    const N = tr.N, v = new Float64Array(N), t = new Float64Array(N + 1), o = new Float64Array(N), g = new Float64Array(N), n = projs.length;
-    for (const P of projs) { for (let i = 0; i < N; i++) { v[i] += P.v[i] / n; o[i] += P.o[i] / n; g[i] += P.g[i] / n; t[i] += P.t[i] / n; } t[N] += P.T / n; }
-    const out = { key: 'avg', N, ds: tr.ds, T: t[N], v, t, o, a: accelFrom(v, N, tr.ds), g, lap: null, n, name: name || null };
+    const N = tr.N, v = new Float64Array(N), t = new Float64Array(N + 1), o = new Float64Array(N), g = new Float64Array(N), n = projs.length, xy = projs.every(P => P.x), x = xy ? new Float64Array(N) : null, y = xy ? new Float64Array(N) : null;
+    for (const P of projs) { for (let i = 0; i < N; i++) { v[i] += P.v[i] / n; o[i] += P.o[i] / n; g[i] += P.g[i] / n; t[i] += P.t[i] / n; if (xy) { x[i] += P.x[i] / n; y[i] += P.y[i] / n; } } t[N] += P.T / n; }
+    const out = { key: 'avg', N, ds: tr.ds, T: t[N], v, t, o, x, y, a: accelFrom(v, N, tr.ds), g, lap: null, n, name: name || null };
     // engine channels averaged too (revs, temperature); the gear of the average is the most common one at each station
     if (projs.every(P => P.rpm)) { const rpm = new Float64Array(N); for (const P of projs) for (let i = 0; i < N; i++) rpm[i] += P.rpm[i] / n; out.rpm = rpm; }
     if (projs.every(P => P.t1)) { const t1 = new Float64Array(N); for (const P of projs) for (let i = 0; i < N; i++) t1[i] += P.t1[i] / n; out.t1 = t1; }
@@ -3554,7 +3572,9 @@ const DATA = (() => {
     if (f && Math.abs(f.corr) >= 0.35) s += '. ' + t('What matters most here is {f}: {rule}', { f: f.name, rule: f.unit === 'kmh' ? t('+1 km/h ≈ {s} s', { s: sg(f.slope, 3) }) : t('+1 m (later) ≈ {s} s', { s: sg(f.slope, 3) }) });
     return s + '.';
   }
-  return { MERC, applyT, parseAlfName, newFrame, distFromFrame, lapXY, lapPx, gpsLayout, sessionStats, projectLap, trackCurv, autoCorners, cornerWindows, windowMetrics, metricsText, diffs, compareWindow, buildComparison, buildCoach, coachText, avgProjection, buildComparisonP, tw, kmh, accelFrom };
+  // where a projected lap is at station i, in frame metres: its own position when the projection carries one, else the centreline plus the offset
+  const lapXYAt = (tr, P, i) => P.x ? [P.x[i], P.y[i]] : [tr.cx[i] + P.o[i] * tr.nx[i], tr.cy[i] + P.o[i] * tr.ny[i]];
+  return { lapXYAt, MERC, applyT, parseAlfName, newFrame, distFromFrame, lapXY, lapPx, gpsLayout, sessionStats, projectLap, trackCurv, autoCorners, cornerWindows, windowMetrics, metricsText, diffs, compareWindow, buildComparison, buildCoach, coachText, avgProjection, buildComparisonP, tw, kmh, accelFrom };
 })();
 // @@DATA-END
 // ---------- i18n: English is the source text, Russian is a dictionary keyed by the English string ----------
@@ -4192,6 +4212,7 @@ Object.assign(I18N.RU, { 'Straight from the lap timer (Bluetooth)': 'Прямо 
   'A 45-lap session takes about five minutes over Bluetooth: the screen shows the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. Then the usual window opens: check the track, tap Analyse — the Lab opens with every corner.': 'Сессия на 45 кругов читается по Bluetooth минут пять: на экране видно, какой круг читается и сколько осталось. На телефоне держи Hutka на экране (внутри Hutka ходить можно — плашка внизу показывает прогресс), в браузере не закрывай вкладку. Потом откроется обычное окно: проверь трассу, нажми Analyse — Лаборатория откроется со всеми поворотами.',
   'The other way, without Bluetooth: the app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.': 'Другой путь, без Bluetooth: то приложение, в котором ты смотришь круги. Каждая сессия — один файл: сохраняешь его на телефон и отдаёшь Hutka.' });
 Object.assign(I18N.RU, { 'Hutka may not use Bluetooth yet — allow it: iPhone — Settings → Hutka → Bluetooth; Android — Settings → Apps → Hutka → Permissions → Nearby devices.': 'Hutka пока нельзя пользоваться Bluetooth — разреши: iPhone — Настройки → Hutka → Bluetooth; Android — Настройки → Приложения → Hutka → Разрешения → Устройства поблизости.', 'Bluetooth is off — turn it on in the phone settings and try again.': 'Bluetooth выключен — включи его в настройках телефона и попробуй снова.' });
+Object.assign(I18N.RU, { '{p}% of the lap runs away from the “{layout}” line — a different configuration of the track? Pick the right layout under the session name, or ask an admin to add it; the corners along that part are not comparable here.': '{p}% круга проходит в стороне от линии конфигурации «{layout}» — другая конфигурация трассы? Выбери нужную под названием сессии или попроси админа добавить её; повороты на этом участке здесь не сравнить.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4948,7 +4969,7 @@ function createMapView(canvas, host) {
   function draw() { if (drawReq) return; drawReq = true; requestAnimationFrame(() => { drawReq = false; paint(); if (host.afterDraw) host.afterDraw(); }); }
   function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
   function arrow(ctx, x1, y1, x2, y2, col) { const a = Math.atan2(y2 - y1, x2 - x1), L = 9; ctx.strokeStyle = 'rgba(0,0,0,0.8)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.moveTo(x2, y2); ctx.lineTo(x2 - L * Math.cos(a - 0.5), y2 - L * Math.sin(a - 0.5)); ctx.moveTo(x2, y2); ctx.lineTo(x2 - L * Math.cos(a + 0.5), y2 - L * Math.sin(a + 0.5)); ctx.stroke(); ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke(); }
-  const lapPos = (tr, P, i) => [(tr.cx[i] + P.o[i] * tr.nx[i]) / tr.mpp, (tr.cy[i] + P.o[i] * tr.ny[i]) / tr.mpp];
+  const lapPos = (tr, P, i) => { const [x, y] = DATA.lapXYAt(tr, P, i); return [x / tr.mpp, y / tr.mpp]; };
   // the phone turned: the map stays where it is on the device (as if taped to it) and only the interface re-lays out — so the
   // picture rotates the other way in screen coordinates and the point that was in the middle of the screen stays in the middle
   let centreImg = null, turnFix = null, lastW = 0, lastH = 0;
@@ -5033,7 +5054,8 @@ function createMapView(canvas, host) {
       const N = tr.N, role = O.role || 'ref';
       const laps = [{ P: D.R, col: C.actual, role: 'ref', n: 1, m: (r) => r.R }]; if (D.O) laps.push({ P: D.O, col: C.cmp, role: 'cmp', n: 2, m: (r) => r.O }); if (D.P3) laps.push({ P: D.P3, col: C.cmp2, role: 'third', n: 3, m: (r) => r.M3 });
       const mainL = laps.find(l => l.role === role) || laps[0], main = mainL.P, mainCol = mainL.col, mOf = mainL.m;
-      const path = (P, a, len) => { ctx.beginPath(); if (a === undefined) { for (let i = 0; i < N; i++) { const [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } else { for (let k = 0; k <= len; k++) { const i = (a + k) % N, [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } } };
+      // a whole lap is its recorded path, every sample (an average lap has none: its stations); a stretch of it (a corner) goes by stations
+      const path = (P, a, len) => { ctx.beginPath(); if (a === undefined) { const raw = P.lap && P.lap.px; if (raw && raw.length > 2) { for (let j = 0; j < raw.length; j++) { const [x, y] = T(raw[j][0], raw[j][1]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } else { for (let i = 0; i < N; i++) { const [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } } else { for (let k = 0; k <= len; k++) { const i = (a + k) % N, [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } } };
       const pxm = sc / mpp, lw = clamp(1.3 + pxm * 0.22, 1.8, 3.4);   // ≈ a wheel's width on the ground, never a fat ribbon
       for (const l of laps) if (l !== mainL) { path(l.P); ctx.lineWidth = Math.max(1.2, lw * 0.7) + 1; ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.stroke(); ctx.lineWidth = Math.max(1.2, lw * 0.7); ctx.strokeStyle = l.col; ctx.stroke(); }
       path(main); ctx.lineWidth = lw + 1.6; ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.stroke(); ctx.lineWidth = lw; ctx.strokeStyle = mainCol; ctx.stroke();
@@ -5700,7 +5722,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.9';
+const APP_VERSION = 'v34.10';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6264,7 +6286,7 @@ const CARDS = {
 function cardFrom(D, G, coach) {
   if (!D || !G || !D.R || !D.ref || D.ref.avg) return null;
   const tr = G.track, R = D.R, N = tr.N; let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-  const lp = (i) => [tr.cx[i] + R.o[i] * tr.nx[i], tr.cy[i] + R.o[i] * tr.ny[i]];
+  const lp = (i) => DATA.lapXYAt(tr, R, i);
   for (let i = 0; i < N; i++) { const [x, y] = lp(i); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
   const pad = (G.widthM || 8) * 2.2; x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
   const sc = Math.max(x1 - x0, y1 - y0) || 1, nx = (x) => Math.round((x - x0) / sc * 1000) / 1000, ny = (y) => Math.round((y - y0) / sc * 1000) / 1000;
@@ -6308,6 +6330,9 @@ LAB.open = async function (meta, asCmp) {
   else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : 'none'; }   // best lap against the session average by default
   LAB.loaded = true; LAB.needFit = true; if (APP.route === 'lab') { LAB.map.fit(); LAB.needFit = false; } labRender();
   setStatus('labStatus', G.fitNote || '', 'ok');
+  // a session that leaves this layout's line for a good part of the lap was driven on another configuration of the track: say so — the
+  // corners along that part cannot be compared with anyone here (the map still draws the lap as it was driven)
+  { const bl = bestLap(sess), BP = bl && bl.px ? DATA.projectLap(bl, G.track, G.rev) : null; if (BP && BP.lost > 0.12) setStatus('labStatus', t('{p}% of the lap runs away from the “{layout}” line — a different configuration of the track? Pick the right layout under the session name, or ask an admin to add it; the corners along that part are not comparable here.', { p: Math.round(BP.lost * 100), layout: (STORE.getLayout(LAB.tid, LAB.lid) || {}).name || LAB.lid }), 'warn'); }
   // older sessions have no shape preview for the feed: add one the first time the owner opens them
   if (mySession(sess) && !sess.preview && sess.owner !== 'local' && STORE.canWrite()) { try { const pv = STORE.previewOf(sess); if (pv) { await STORE.updateSession(sess.id, { preview: pv }); } } catch (e) {} }
   // and the analysis card (the lap line with brake / lift / apex / throttle points, corner numbers, the biggest reserves): computed once, drawn in the feed for everyone
@@ -7849,7 +7874,7 @@ const LANDING = {
     // the card's corner positions are the lap's bounding box normalised (cardFrom): undo that on the live lap, then take the nearest live corner —
     // the card was computed against more sessions, so its numbering can differ from tonight's
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-    for (let i = 0; i < N; i++) { const x = tr.cx[i] + R.o[i] * tr.nx[i], y = tr.cy[i] + R.o[i] * tr.ny[i]; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    for (let i = 0; i < N; i++) { const [x, y] = DATA.lapXYAt(tr, R, i); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
     const pad = (G.widthM || 8) * 2.2; x0 -= pad; y0 -= pad; x1 += pad; y1 += pad; const sc = Math.max(x1 - x0, y1 - y0) || 1;
     const rows = D.rows.map(r => { const i = r.w.apex, side = r.w.dir === 'L' ? 1 : -1; return { r, x: tr.cx[i] + tr.nx[i] * side * off, y: tr.cy[i] + tr.ny[i] * side * off, res: -1 }; });
     for (const q of c.corners) { const mx = q[0] * sc + x0, my = q[1] * sc + y0; let best = null, bd = 30; for (const w of rows) { const d = Math.hypot(w.x - mx, w.y - my); if (d < bd) { bd = d; best = w; } } if (best && best.res < 0) best.res = q[3]; }
