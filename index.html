@@ -1630,6 +1630,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div id="devExplore" hidden>
     <div class="dev-ex-head"><b id="devExTitle"></b><span class="hint" id="devExSub"></span></div>
     <p class="hint" data-t="Hutka does not speak this device's language yet. Everything it says is recorded here: put it in Bluetooth mode, press its buttons, start a transfer in its menu — then send the log. That is how the download gets written.">Hutka does not speak this device's language yet. Everything it says is recorded here: put it in Bluetooth mode, press its buttons, start a transfer in its menu — then send the log. That is how the download gets written.</p>
+    <div class="hint warn" id="devExNone" hidden data-t="The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.">The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.</div>
     <pre class="dev-log" id="devLog"></pre>
     <div class="hint" style="text-align:right"><span id="devLogN">0</span> <span data-t="lines">lines</span></div>
     <div id="devConsole" hidden><div class="row" style="gap:6px;flex-wrap:wrap"><select id="devChr" style="flex:1 1 180px"></select><input type="text" id="devHex" placeholder="b5 62 ff 22 00 00   or   &quot;HELLO\r\n&quot;" style="flex:2 1 220px;font-family:var(--mono)"><button class="btn xs" id="devExSend" type="button" data-t="Send">Send</button><button class="btn xs ghost" id="devExSendNr" type="button" data-t="no response" title="write without response">no response</button></div><div class="hint" id="devExSent"></div></div>
@@ -3812,6 +3813,7 @@ Object.assign(I18N.RU, { 'Bluetooth — the explorer: Hutka listens to the devic
   'connected': 'подключён', 'disconnected': 'отключён', '{n} service(s), {m} characteristic(s)': 'сервисов: {n}, характеристик: {m}', 'listening on {k}': 'слушаю: {k}', 'sent {n} byte(s)': 'отправлено байт: {n}', 'write failed: {e}': 'не записалось: {e}',
   'Sign in to send the log.': 'Войди, чтобы отправить лог.', 'Log sent — thank you. {n} lines.': 'Лог отправлен — спасибо. Строк: {n}.', 'Could not send the log: {e}': 'Не удалось отправить лог: {e}' });
 Object.assign(I18N.RU, { 'Another device': 'Другой прибор' });
+Object.assign(I18N.RU, { "The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.": 'Браузер не смог открыть ни одного сервиса этого прибора — Chrome достаёт только до сервисов, которые знает заранее, а у этого прибора свои. Приложение Hutka на телефоне видит всё: для этого прибора используй его.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -7250,7 +7252,7 @@ const DEVICE = (() => {
   }
   // ---- the explorer (Alfano): the services, the live log, a command line, the log to Hutka
   async function openExplorer() {
-    stage('devExplore'); $('devLog').textContent = ''; $('devExSent').textContent = '';
+    stage('devExplore'); $('devLog').textContent = ''; $('devExSent').textContent = ''; $('devExNone').hidden = !(ex.services.length === 0 && LOGGERS.ble.kind() === 'web');
     ex.onLog = () => { if (!logT) logT = setTimeout(() => { logT = null; renderLog(); }, 120); };
     const w = ex.writable(); fillSelect($('devChr'), w.map((o, i) => [String(i), o.label]), w.length ? '0' : ''); $('devConsole').hidden = !w.length;
     renderExplore(); renderLog();
