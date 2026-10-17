@@ -230,6 +230,12 @@ td .gr,.crow .gr{margin-right:5px}.insp-head .gr{margin-left:6px;font-size:11px;
 .auth-email{display:flex;flex-direction:column;gap:10px;padding-top:12px;border-top:1px solid var(--line)}.auth-foot{justify-content:center}
 .modal.auth.gate{background:var(--bg);padding:0}.modal.auth.gate .box.auth-box{box-shadow:none;border:0;border-radius:0;width:100%;max-width:440px;min-height:100%;justify-content:center;padding:max(24px,var(--sa-top,0px)) 24px max(24px,var(--sa-bottom,0px))}.modal.auth.gate .auth-foot{display:none}
 html.native .modal.auth.gate .box.auth-box{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:0}
+/* the app's opening: a full-screen overlay over everything, the mark in the middle (where the native splash left it), the lap under it */
+.intro{position:fixed;inset:0;z-index:95;background:var(--bg);display:block;opacity:1;transition:opacity .45s ease;touch-action:none;-webkit-user-select:none;user-select:none}.intro.out{opacity:0;pointer-events:none}
+.intro-cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.intro-brand{position:absolute;left:0;right:0;top:50%;transform:translateY(0) scale(1);transform-origin:50% 50%;display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:-27.5vw;will-change:transform}
+.intro-logo{width:74vw;max-width:340px;height:auto;display:block}.intro-tag{font-size:22px}.intro-tag{font:600 18px/1.3 var(--body);color:var(--fg);letter-spacing:.01em;opacity:0;text-align:center}
+@media (min-width:700px){.intro-brand{margin-top:-130px}.intro-logo{width:340px}}
 /* the progress chart: best and average lap by session */
 .prog{margin:4px 0 14px}.prog-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px;font-size:13.5px}.prog-head b{font-weight:600}.prog-cv{display:block;width:100%;height:156px}
 .mark-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--fg);min-width:0}.mark-row .tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mark-row .tx b{font-weight:600}.mark-row .tm{font:600 12.5px var(--mono);color:var(--muted);white-space:nowrap}.mark-row .x{color:var(--muted);font-size:15px;line-height:1;padding:2px 6px;border-radius:6px}.mark-row .x:hover{background:var(--line);color:var(--fg)}#labMarks .list{display:grid;gap:6px}
@@ -4450,6 +4456,7 @@ Object.assign(I18N.RU, { 'personal best': 'личный рекорд', 'best lap
 Object.assign(I18N.RU, { 'You vs {name}': 'Ты против {name}', 'Personal bests on the layouts you both drove, in the same kart class; the corners come from your best laps there. Compare opens the Lab with your latest session on that layout against theirs.': 'Личные рекорды на конфигурациях, где ездили оба, в одной категории картов; повороты — по вашим лучшим кругам там. «Compare» открывает Lab: твоя последняя сессия на этой конфигурации против его.',
   'Gap': 'Разрыв', 'Corners': 'Повороты', 'Compare': 'Сравнить', 'open Compare': 'открой Сравнить', '{name} faster in': '{name} быстрее в', 'you faster in': 'ты быстрее в', 'even in every corner': 'ровно во всех поворотах', 'even': 'ровно' });
 Object.assign(I18N.RU, { 'Your sign-in has expired — sign in again to ask the coach.': 'Вход истёк — войди снова, чтобы спросить тренера.' });
+Object.assign(I18N.RU, { 'See where the time is': 'Увидь, где время' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -6004,7 +6011,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.18.1';
+const APP_VERSION = 'v34.19';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6114,6 +6121,76 @@ function renderProgress(box, list, opts) {
   }
   return groups.length;
 }
+// ---------- the opening of the app: the brand intro ----------
+// The native splash (the H mark on white) hands over to this overlay: the mark settles up, under it the lap line of a real Dubai
+// Kartdrome lap draws itself — brake, apex and throttle points popping as the line passes them, the corner numbers after — and the
+// tagline fades in; then the whole thing fades out over whatever is behind (the sign-in gate or Home). About 2.8 s, a tap skips it.
+// Only in the app (NATIVE.on), once per app session; on the web with ?intro=1 for a look. Reduced motion: the mark and the tagline, no drawing.
+const INTRO = (() => {
+  // the lap: 220 points of the line (per mille of the card's width 0.831 × height 1), the action points, the corner numbers
+  const PTS = [765,721,764,741,763,761,761,781,755,803,748,822,739,840,728,857,713,874,699,888,683,901,663,913,644,921,625,927,606,932,583,933,563,928,547,915,538,896,542,871,555,854,574,844,597,839,616,833,634,823,646,806,652,784,648,764,637,747,621,734,601,724,581,718,561,713,539,708,519,702,499,697,480,691,458,684,438,677,419,671,399,665,376,661,355,660,334,665,313,677,299,694,292,714,291,734,288,758,281,776,266,791,248,799,225,796,208,786,195,770,184,750,177,731,172,712,168,692,165,669,164,649,165,628,166,608,168,585,171,565,174,544,178,521,182,501,187,481,193,462,201,440,210,421,221,403,235,388,254,374,274,366,295,365,319,371,336,382,351,397,362,414,374,433,387,449,404,462,422,471,444,477,464,478,484,476,508,474,528,475,548,481,566,492,582,510,588,529,587,549,580,567,566,584,550,595,532,604,511,615,495,627,481,642,469,659,458,680,451,698,443,717,438,737,431,759,425,778,418,798,410,819,401,838,390,855,376,870,357,885,339,895,320,902,300,905,276,906,256,905,236,902,214,895,195,889,177,881,159,871,140,858,124,845,110,831,98,814,87,794,79,775,73,756,69,733,67,712,66,692,67,672,70,648,72,628,75,608,79,588,82,565,86,545,89,525,93,502,97,482,100,462,104,442,108,419,111,398,114,378,117,358,121,335,124,315,128,295,131,272,135,252,138,232,141,212,145,188,148,168,151,148,156,128,164,106,175,88,191,74,214,66,235,71,251,84,259,101,264,122,263,142,263,163,268,184,283,203,300,214,320,217,342,212,358,201,377,191,397,186,422,186,442,189,462,188,480,180,499,168,517,155,537,149,562,149,582,158,598,172,608,190,613,213,612,233,606,252,596,270,581,287,567,301,555,318,544,340,540,360,540,380,544,401,554,422,566,439,579,453,595,466,614,479,632,490,649,501,668,514,684,527,698,542,710,559,723,579,732,597,739,616,746,635,753,658,758,677,762,697];
+  const MARKS = [[765,726,"t"],[765,726,"a"],[551,859,"t"],[542,871,"a"],[645,756,"t"],[647,762,"a"],[315,675,"r"],[298,697,"a"],[385,662,"b"],[225,796,"t"],[236,799,"a"],[291,734,"l"],[332,379,"t"],[249,377,"r"],[310,368,"a"],[210,421,"b"],[378,438,"t"],[373,431,"a"],[587,549,"t"],[569,494,"r"],[588,541,"a"],[525,475,"b"],[529,605,"t"],[529,605,"a"],[276,906,"t"],[323,901,"a"],[243,76,"t"],[227,68,"r"],[235,71,"a"],[143,200,"b"],[336,213,"t"],[328,216,"a"],[298,213,"l"],[397,186,"t"],[389,187,"a"],[480,180,"t"],[462,188,"a"],[574,153,"t"],[543,148,"a"],[514,157,"e"],[565,304,"t"],[565,304,"a"],[647,499,"t"],[647,499,"a"]];
+  const CORNERS = [[805,815,1],[515,950,2],[699,802,3],[253,686,4],[251,847,5],[326,325,6],[410,519,7],[638,529,8],[453,601,9],[393,917,10],[280,42,11],[284,261,12],[364,150,13],[461,239,14],[571,106,15],[492,375,16],[732,509,17]];
+  const W = 831, H = 1000, N = PTS.length / 2;
+  const KIND = { b: ['#e0343a', 4.4], l: ['#e0a000', 4.4], e: ['#e0a000', 3.4], r: ['#2f6bf0', 2.8], a: ['#ffffff', 2.8], t: ['#1f8f4f', 3.4] };
+  let played = false; try { played = sessionStorage.getItem('hutka.intro') === '1'; } catch (e) {}
+  const wants = () => (NATIVE.on || /[?&]intro=1\b/.test(location.search)) && !played;
+  const ease = (x) => 1 - Math.pow(1 - x, 3), clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  function build() {
+    const o = document.createElement('div'); o.id = 'intro'; o.className = 'intro';
+    o.innerHTML = `<canvas class="intro-cv"></canvas><div class="intro-brand"><img class="intro-logo" src="logo.png?v=2" alt=""><div class="intro-tag">${esc(t('See where the time is'))}</div></div>`;
+    document.body.appendChild(o); return o;
+  }
+  // the cumulative length along the line, for the drawing head
+  const cum = [0]; for (let i = 1; i < N; i++) cum.push(cum[i - 1] + Math.hypot(PTS[2 * i] - PTS[2 * i - 2], PTS[2 * i + 1] - PTS[2 * i - 1])); const LEN = cum[N - 1] + Math.hypot(PTS[0] - PTS[2 * N - 2], PTS[1] - PTS[2 * N - 1]);
+  // where along the line each mark and corner sits (the nearest point), so they pop as the head passes
+  const nearest = (x, y) => { let bi = 0, bd = 1e9; for (let i = 0; i < N; i++) { const d = (PTS[2 * i] - x) ** 2 + (PTS[2 * i + 1] - y) ** 2; if (d < bd) { bd = d; bi = i; } } return cum[bi] / LEN; };
+  const markAt = MARKS.map(m => nearest(m[0], m[1])), cornerAt = CORNERS.map(c => nearest(c[0], c[1]));
+  function play() {
+    if (!wants()) return Promise.resolve(false);
+    try { sessionStorage.setItem('hutka.intro', '1'); } catch (e) {}
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const o = build(), cv = o.querySelector('canvas'), brand = o.querySelector('.intro-brand'), tag = o.querySelector('.intro-tag');
+    const T_DRAW0 = 0.35, T_DRAW1 = 2.05, T_TAG = 1.7, T_END = reduced ? 1.3 : 2.75, T_FADE = 0.45;
+    let t0 = 0, raf = 0, ending = false; const popAt = new Map();   // when each mark / corner first showed, for its pop and fade
+    const dark = document.documentElement.classList.contains('dark') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && !document.documentElement.classList.contains('light'));
+    const line = dark ? '#8fb0ff' : '#1a2237', faint = dark ? 'rgba(143,176,255,0.18)' : 'rgba(26,34,55,0.12)';
+    const finish = () => { if (ending) return; ending = true; cancelAnimationFrame(raf); o.classList.add('out'); setTimeout(() => { o.remove(); }, T_FADE * 1000 + 50); };
+    o.addEventListener('pointerdown', finish, { once: true });
+    const frame = (now) => {
+      if (!t0) t0 = now; const s = (now - t0) / 1000;
+      // the mark: from the splash size in the middle up to its place above the lap
+      const k = ease(clamp(s / 0.7, 0, 1)); brand.style.transform = `translateY(${(-21 * k).toFixed(2)}vh) scale(${(1 - 0.5 * k).toFixed(3)})`;
+      tag.style.opacity = clamp((s - T_TAG) / 0.5, 0, 1);
+      if (!reduced) {
+        const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = o.clientWidth, h = o.clientHeight;
+        if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+        const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+        // the lap in the lower part of the screen, under the mark
+        const box = { x: w * 0.12, y: h * 0.44, w: w * 0.76, h: h * 0.46 }, sc = Math.min(box.w / W, box.h / H), ox = box.x + (box.w - W * sc) / 2, oy = box.y + (box.h - H * sc) / 2;
+        const X = (i) => ox + PTS[2 * i] * sc, Y = (i) => oy + PTS[2 * i + 1] * sc;
+        const p = ease(clamp((s - T_DRAW0) / (T_DRAW1 - T_DRAW0), 0, 1)), headLen = p * LEN;
+        // the faint whole line, then the drawn part
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.beginPath(); for (let i = 0; i < N; i++) i ? ctx.lineTo(X(i), Y(i)) : ctx.moveTo(X(i), Y(i)); ctx.closePath(); ctx.strokeStyle = faint; ctx.lineWidth = 2; ctx.stroke();
+        ctx.beginPath(); let last = 0; for (let i = 0; i < N; i++) { if (cum[i] > headLen) break; i ? ctx.lineTo(X(i), Y(i)) : ctx.moveTo(X(i), Y(i)); last = i; }
+        if (p >= 1) ctx.closePath(); ctx.strokeStyle = line; ctx.lineWidth = 3.2; ctx.stroke();
+        // the head: a glowing dot
+        if (p > 0 && p < 1) { ctx.beginPath(); ctx.arc(X(last), Y(last), 5, 0, Math.PI * 2); ctx.fillStyle = '#e0343a'; ctx.shadowColor = 'rgba(224,52,58,0.6)'; ctx.shadowBlur = 12; ctx.fill(); ctx.shadowBlur = 0; }
+        // the action points pop once the head has passed them
+        for (let m = 0; m < MARKS.length; m++) { const at = markAt[m]; if (p < at) continue; if (!popAt.has('m' + m)) popAt.set('m' + m, s); const age = clamp((s - popAt.get('m' + m)) / 0.3, 0, 1), pop = 1 + 0.6 * (1 - age), [col, r] = KIND[MARKS[m][2]] || KIND.a; const x = ox + MARKS[m][0] * sc, y = oy + MARKS[m][1] * sc; ctx.beginPath(); ctx.arc(x, y, r * pop, 0, Math.PI * 2); ctx.fillStyle = col; ctx.globalAlpha = 0.95; ctx.fill(); ctx.lineWidth = 1; ctx.strokeStyle = col === '#ffffff' ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.9)'; ctx.stroke(); ctx.globalAlpha = 1; }
+        // the corner numbers after the line has passed
+        ctx.font = `700 10px ${getComputedStyle(document.documentElement).getPropertyValue('--mono') || 'ui-monospace, monospace'}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        for (let c = 0; c < CORNERS.length; c++) { const at = cornerAt[c]; if (p < at) continue; if (!popAt.has('c' + c)) popAt.set('c' + c, s); const a = clamp((s - popAt.get('c' + c)) / 0.25, 0, 1); const x = ox + CORNERS[c][0] * sc, y = oy + CORNERS[c][1] * sc; ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(x, y, 8.5, 0, Math.PI * 2); ctx.fillStyle = dark ? '#dfe7ff' : '#1a2237'; ctx.fill(); ctx.fillStyle = dark ? '#1a2237' : '#fff'; ctx.fillText(String(CORNERS[c][2]), x, y + 0.5); ctx.globalAlpha = 1; }
+      }
+      if (s >= T_END) { finish(); return; }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return new Promise((res) => { const tick = () => { if (ending) res(true); else setTimeout(tick, 60); }; tick(); });
+  }
+  return { play, wants };
+})();
 // ---------- layout geometry: the track line for a layout, from its reference session (GPS), from an admin trace, or both ----------
 const GEOM = (() => {
   const cache = new Map();
@@ -9297,6 +9374,7 @@ const ADMIN = (() => {
 (async () => {
   I18N.applyStatic();
   $('q').placeholder = t('Search tracks, drivers...');
+  try { if (typeof INTRO !== 'undefined') INTRO.play(); } catch (e) {}   // the app's opening plays over the start-up (the gate or Home appear under it)
   try { await STORE.init(); } catch (e) {}
   try { STORE.visit(); } catch (e) {}   // visitors & retention for the admin panel (visits.sql)
   renderShell(); I18N.applyStatic();
