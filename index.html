@@ -983,6 +983,25 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 @media (max-height:480px){ .share-pv canvas{width:auto;max-height:46vh;max-width:100%} .modal .box{padding:12px 16px;gap:10px} .modal h3{font-size:16px} }
 .captcha{min-height:0;display:flex;justify-content:center}
 .captcha:empty{display:none}
+/* ---------- a lap timer over Bluetooth: the device window ---------- */
+.dev-row{align-items:center;gap:10px;margin-top:-2px}
+.dev-row .btn{display:inline-flex;align-items:center;gap:7px;flex:none}
+.dev-row .hint{font-size:12.5px;flex:1 1 200px}
+.dev-kinds{display:grid;gap:8px}
+.dev-kind{display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font:inherit;cursor:pointer}
+.dev-kind:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.dev-kind b{font-size:15px}
+.dev-kind span{font-size:12.5px;color:var(--muted);line-height:1.4}
+.dev-kind:disabled{cursor:default;opacity:.6}
+.dev-bar{margin:8px 0 4px}
+.dev-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;max-height:40vh;overflow:auto}
+.dev-item{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.dev-item input{width:18px;height:18px;flex:none}
+.dev-item div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dev-item b{font-size:14px}
+.dev-item .hint{font-size:12px}
+.hint.warn{color:var(--warn)}
+.btn.danger-text{color:var(--danger)}
 /* ---------- community safety: report / block / delete account ---------- */
 .radios{display:flex;flex-direction:column;gap:6px}
 .radios label{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
@@ -1564,6 +1583,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div class="box">
     <h3 data-t="Upload session">Upload session</h3>
     <div class="upl-drop" id="uplDrop"><div><b data-t="Choose session files">Choose session files</b></div><div class="hint" data-t="Alfano .alf2 (the reference) or an Alfano 6 export (.zip, with revs and temperatures on sport karts), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.">Alfano .alf2 (the reference) or an Alfano 6 export (.zip, with revs and temperatures on sport karts), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.</div><input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden></div>
+    <div class="row dev-row"><button class="btn" id="uplFromDevice" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg><span data-t="From a device (Bluetooth)">From a device (Bluetooth)</span></button><span class="hint" data-t="RaceBox Mini S / Micro now, Alfano 6 / 7 next — the outings go straight from the lap timer into the Lab.">RaceBox Mini S / Micro now, Alfano 6 / 7 next — the outings go straight from the lap timer into the Lab.</span></div>
     <div class="hint" style="margin-top:-4px"><a href="#help" id="uplHelpLink" data-t="How do I get the file from my Alfano? — step by step">How do I get the file from my Alfano? — step by step</a></div>
     <div class="status" id="uplStatus"></div>
     <div id="uplForm" hidden>
@@ -1585,6 +1605,20 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <div class="row" style="justify-content:flex-end"><button class="btn" id="uplCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="uplGo" type="button" disabled data-t="Analyse">Analyse</button></div>
   </div>
 </div>
+<!-- the device window: a lap timer over Bluetooth -->
+<div class="modal" id="devModal" hidden><div class="box" style="width:min(560px,100%)"><h3 data-t="From a device">From a device</h3>
+  <p class="hint" data-t="Connect the lap timer over Bluetooth: Hutka reads the recorded outings out of its memory and opens them in the Lab — no vendor app, no files.">Connect the lap timer over Bluetooth: Hutka reads the recorded outings out of its memory and opens them in the Lab — no vendor app, no files.</p>
+  <div class="dev-kinds" id="devKinds"></div>
+  <div class="hint warn" id="devNoBt" hidden data-t="This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.">This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.</div>
+  <div id="devStage" hidden>
+    <div class="status" id="devStatus"></div>
+    <div class="progress dev-bar" id="devBar" hidden><div></div></div>
+    <div class="row" id="devCodeRow" hidden><input type="text" id="devCode" inputmode="numeric" placeholder="123456" maxlength="10" style="width:140px"><button class="btn" id="devUnlock" type="button" data-t="Unlock">Unlock</button></div>
+    <div class="dev-list" id="devList"></div>
+    <div class="row" id="devActs" hidden style="justify-content:space-between;margin-top:10px"><button class="btn ghost danger-text" id="devErase" type="button" data-t="Erase the device memory">Erase the device memory</button><button class="btn primary" id="devImport" type="button" data-t="Open in the Lab">Open in the Lab</button></div>
+  </div>
+  <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="devCancel" type="button" data-t="Close">Close</button></div>
+</div></div>
 <!-- SWS import modal -->
 <div class="modal" id="swsModal" hidden><div class="box" style="width:min(680px,100%)"><h3 data-t="Import your SWS results">Import your SWS results</h3>
   <p class="hint" id="swsIntro"></p>
@@ -2427,7 +2461,7 @@ const IMPORT = (() => {
     // speed from position when the file has none
     if (!rows.some(r => isFinite(r.v))) fillSpeed(rows);
     const low = text.slice(0, 1500).toLowerCase(), fn = (fileName || '').toLowerCase();
-    let app = 'csv'; if (/racechrono/.test(low) || /racechrono/.test(fn)) app = 'racechrono'; else if (/trackaddict|racerender/.test(low) || /trackaddict/.test(fn)) app = 'trackaddict'; else if (/aim|race ?studio|beacon markers/.test(low)) app = 'aim'; else if (/laptimer|harry/.test(low) || /laptimer/.test(fn)) app = 'harrys'; else if (/garmin|catalyst/.test(low)) app = 'garmin'; else if (/apex pro|apexpro/.test(low)) app = 'apexpro';
+    let app = 'csv'; if (/racebox/.test(low) || /racebox/.test(fn)) app = 'racebox'; else if (/racechrono/.test(low) || /racechrono/.test(fn)) app = 'racechrono'; else if (/trackaddict|racerender/.test(low) || /trackaddict/.test(fn)) app = 'trackaddict'; else if (/aim|race ?studio|beacon markers/.test(low)) app = 'aim'; else if (/laptimer|harry/.test(low) || /laptimer/.test(fn)) app = 'harrys'; else if (/garmin|catalyst/.test(low)) app = 'garmin'; else if (/apex pro|apexpro/.test(low)) app = 'apexpro';
     // AiM: lap boundaries from the beacon markers (seconds from the start)
     let beacons = null; for (const k in meta) if (/beacon/.test(k)) { const nums = meta[k].split(/[\s,;]+/).map(Number).filter(isFinite); if (nums.length) beacons = nums; }
     return { rows, app, beacons };
@@ -2498,7 +2532,7 @@ const IMPORT = (() => {
     }
     return { pts, timeMs: Math.round(T * 1000) };
   }
-  const APP_NAMES = { racechrono: 'RaceChrono', trackaddict: 'TrackAddict', aim: 'AiM', harrys: "Harry's LapTimer", garmin: 'Garmin Catalyst', apexpro: 'Apex Pro', vbox: 'VBOX', gpx: 'GPX', csv: 'GPS CSV' };
+  const APP_NAMES = { racebox: 'RaceBox', racechrono: 'RaceChrono', trackaddict: 'TrackAddict', aim: 'AiM', harrys: "Harry's LapTimer", garmin: 'Garmin Catalyst', apexpro: 'Apex Pro', vbox: 'VBOX', gpx: 'GPX', csv: 'GPS CSV' };
   function grade(hz, app) { const g = hz >= 9 ? 'high' : (hz >= 4 ? 'medium' : 'low'); return { hz: Math.round(hz * 10) / 10, grade: g, app, appName: APP_NAMES[app] || app }; }
   async function parse(file) {
     const name = file.name || 'session', text = await file.text(); let src = null;
@@ -2527,6 +2561,226 @@ const IMPORT = (() => {
     return true;
   }
   return { parse, alignToStart, APP_NAMES };
+})();
+// ---------- loggers over Bluetooth: the Lab reads sessions straight out of the lap timer, no vendor app in between ----------
+// One small transport (Web Bluetooth in Chrome on Android / a computer, the BluetoothLe plugin inside the Hutka app on iOS and Android)
+// and one driver per logger. RaceBox Mini S / Micro speak the protocol RaceBox publishes (BLE Protocol Documentation rev. 9, Aug 2026):
+// UBX-style frames over the Nordic UART service, the recorded memory streamed as 80-byte records. Alfano 6 / 7 is the port of Pavel's
+// Mac downloader + decoder: the slot is here, the protocol lands with his code (see capapp/README.md, "Alfano over Bluetooth").
+const LOGGERS = (() => {
+  const U16 = (n) => `0000${n.toString(16).padStart(4, '0')}-0000-1000-8000-00805f9b34fb`;
+  const hex = (u8) => Array.from(u8, b => b.toString(16).padStart(2, '0')).join(' ');
+  const unhex = (s) => { const out = []; let v = -1; for (const ch of String(s || '')) { const d = parseInt(ch, 16); if (isNaN(d)) continue; if (v < 0) v = d; else { out.push(v * 16 + d); v = -1; } } return Uint8Array.from(out); };
+  const toU8 = (v) => v instanceof Uint8Array ? v : (v && v.buffer ? new Uint8Array(v.buffer, v.byteOffset || 0, v.byteLength) : (typeof v === 'string' ? unhex(v) : new Uint8Array(0)));
+  const text = (u8) => { try { return new TextDecoder().decode(u8).replace(/\0+$/, '').trim(); } catch (e) { return ''; } };
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const err = (code, msg) => { const e = new Error(msg || code); e.code = code; return e; };
+
+  // ---- the transport: pick (the system's device chooser), connect, notify, write, read, disconnect — the same five calls on both sides
+  const ble = {
+    kind() { if (window.NATIVE && NATIVE.on) return 'native'; if (navigator.bluetooth && typeof navigator.bluetooth.requestDevice === 'function') return 'web'; return ''; },
+    async pick(drv) {
+      const kind = this.kind(); if (!kind) throw err('nobt');
+      if (kind === 'native') {
+        await NATIVE.call('BluetoothLe', 'initialize', { androidNeverForLocation: true });
+        try { const en = await NATIVE.call('BluetoothLe', 'isEnabled'); if (en && en.value === false) { try { await NATIVE.call('BluetoothLe', 'requestEnable'); } catch (e) {} } } catch (e) {}
+        const d = await NATIVE.call('BluetoothLe', 'requestDevice', { namePrefix: drv.namePrefixes[0], optionalServices: drv.services });
+        if (!d || !d.deviceId) throw err('nodevice');
+        return { kind, id: d.deviceId, name: d.name || drv.name, subs: [], chrs: {} };
+      }
+      const dev = await navigator.bluetooth.requestDevice({ filters: drv.namePrefixes.map(p => ({ namePrefix: p })), optionalServices: drv.services });
+      return { kind, id: dev.id, name: dev.name || drv.name, dev, subs: [], chrs: {} };
+    },
+    async connect(H, onLost) {
+      H.lost = onLost || null;
+      if (H.kind === 'native') {
+        H.subs.push(NATIVE.listen('BluetoothLe', 'disconnected|' + H.id, () => { if (H.lost) H.lost(); }));
+        await NATIVE.call('BluetoothLe', 'connect', { deviceId: H.id, timeout: 20000 });
+        if (NATIVE.platform === 'android') { try { await NATIVE.call('BluetoothLe', 'requestConnectionPriority', { deviceId: H.id, connectionPriority: 1 }); } catch (e) {} }   // a fast link for the download
+        return;
+      }
+      H.dev.addEventListener('gattserverdisconnected', () => { if (H.lost) H.lost(); });
+      await H.dev.gatt.connect();
+    },
+    async chr(H, svc, chr) { const k = svc + '|' + chr; if (!H.chrs[k]) { const s = await H.dev.gatt.getPrimaryService(svc); H.chrs[k] = await s.getCharacteristic(chr); } return H.chrs[k]; },
+    async notify(H, svc, chr, cb) {
+      if (H.kind === 'native') {
+        H.subs.push(NATIVE.listen('BluetoothLe', `notification|${H.id}|${svc}|${chr}`, (e) => cb(unhex(e && e.value))));
+        await NATIVE.call('BluetoothLe', 'startNotifications', { deviceId: H.id, service: svc, characteristic: chr });
+        return;
+      }
+      const c = await this.chr(H, svc, chr); c.addEventListener('characteristicvaluechanged', (e) => cb(toU8(e.target.value))); await c.startNotifications();
+    },
+    async write(H, svc, chr, bytes) {
+      if (H.kind === 'native') { await NATIVE.call('BluetoothLe', 'write', { deviceId: H.id, service: svc, characteristic: chr, value: hex(bytes) }); return; }
+      const c = await this.chr(H, svc, chr); if (c.writeValueWithResponse) await c.writeValueWithResponse(bytes); else await c.writeValue(bytes);
+    },
+    async read(H, svc, chr) {
+      if (H.kind === 'native') { const r = await NATIVE.call('BluetoothLe', 'read', { deviceId: H.id, service: svc, characteristic: chr }); return unhex(r && r.value); }
+      const c = await this.chr(H, svc, chr); return toU8(await c.readValue());
+    },
+    async disconnect(H) {
+      if (!H) return; H.lost = null;
+      for (const s of H.subs) { try { if (s && s.remove) s.remove(); else if (s && typeof s.then === 'function') s.then(x => x && x.remove && x.remove()); } catch (e) {} }
+      H.subs = [];
+      try { if (H.kind === 'native') await NATIVE.call('BluetoothLe', 'disconnect', { deviceId: H.id }); else if (H.dev && H.dev.gatt && H.dev.gatt.connected) H.dev.gatt.disconnect(); } catch (e) {}
+    }
+  };
+
+  // ---- UBX-style framing shared by the RaceBox family: B5 62 | class | id | len (u16 le) | payload | CK_A CK_B (Fletcher over class..payload)
+  function frame(cls, id, payload) {
+    const p = payload || new Uint8Array(0), out = new Uint8Array(8 + p.length);
+    out[0] = 0xb5; out[1] = 0x62; out[2] = cls; out[3] = id; out[4] = p.length & 0xff; out[5] = (p.length >> 8) & 0xff; out.set(p, 6);
+    let a = 0, b = 0; for (let i = 2; i < out.length - 2; i++) { a = (a + out[i]) & 0xff; b = (b + a) & 0xff; } out[out.length - 2] = a; out[out.length - 1] = b;
+    return out;
+  }
+  // a byte FIFO: notifications split and merge frames, so bytes are collected and whole, checksummed frames handed on
+  function framer(onFrame) {
+    let buf = new Uint8Array(0);
+    return (chunk) => {
+      const c = toU8(chunk); if (!c.length) return;
+      const nb = new Uint8Array(buf.length + c.length); nb.set(buf); nb.set(c, buf.length); buf = nb;
+      let i = 0;
+      while (i + 8 <= buf.length) {
+        if (buf[i] !== 0xb5 || buf[i + 1] !== 0x62) { i++; continue; }
+        const len = buf[i + 4] | (buf[i + 5] << 8); if (len > 504) { i++; continue; }
+        if (i + 8 + len > buf.length) break;
+        let a = 0, b = 0; for (let k = i + 2; k < i + 6 + len; k++) { a = (a + buf[k]) & 0xff; b = (b + a) & 0xff; }
+        if (a !== buf[i + 6 + len] || b !== buf[i + 7 + len]) { i += 2; continue; }
+        onFrame({ cls: buf[i + 2], id: buf[i + 3], payload: buf.slice(i + 6, i + 6 + len) });
+        i += 8 + len;
+      }
+      buf = buf.slice(i);
+    };
+  }
+  const u32 = (p, o) => (p[o] | (p[o + 1] << 8) | (p[o + 2] << 16) | (p[o + 3] << 24)) >>> 0;
+  const leU32 = (n) => Uint8Array.of(n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >>> 24) & 0xff);
+
+  // ---- RaceBox Mini S / Micro: the 80-byte record (live 0xFF 0x01 and history 0xFF 0x21 share it)
+  function record(p) {
+    if (p.length < 80) return null;
+    const dv = new DataView(p.buffer, p.byteOffset, p.byteLength);
+    const valid = p[11], fix = p[20], flags = p[21];
+    const year = dv.getUint16(4, true), mo = p[6], day = p[7], h = p[8], mi = p[9], s = p[10], ns = dv.getInt32(16, true);
+    const dated = (valid & 3) === 3 && year >= 2020 && mo >= 1 && mo <= 12 && day >= 1 && day <= 31;
+    return {
+      itow: u32(p, 0) / 1000, ms: dated ? Date.UTC(year, mo - 1, day, h, mi, s) + ns / 1e6 : NaN,
+      ok: fix >= 2 && (flags & 1) === 1, sats: p[23],
+      lon: dv.getInt32(24, true) / 1e7, lat: dv.getInt32(28, true) / 1e7, alt: dv.getInt32(36, true) / 1000, hacc: u32(p, 40) / 1000,
+      v: dv.getInt32(48, true) / 1000, hdg: dv.getInt32(52, true) / 1e5, gx: dv.getInt16(68, true) / 1000, gy: dv.getInt16(70, true) / 1000, gz: dv.getInt16(72, true) / 1000
+    };
+  }
+  // the downloaded stream → outings: a recording-start marker or a silence longer than two minutes opens a new one; records without a fix are dropped
+  function outings(events) {
+    const out = []; let cur = null, lastT = null, lastState = -1, base = 0, prevItow = null;
+    const start = () => { cur = { recs: [] }; out.push(cur); lastT = null; };
+    for (const e of events) {
+      if (e.kind === 'state') { if (e.state === 1 && lastState !== 2) cur = null; lastState = e.state; continue; }   // a fresh start (not a resume after a pause) ends the outing
+      const r = e.rec; if (!r || !r.ok) continue;
+      if (prevItow !== null && r.itow < prevItow - 1000) base += 604800;   // the GPS week rolled over mid-recording
+      prevItow = r.itow; r.t = base + r.itow;
+      if (!cur || (lastT !== null && r.t - lastT > 120)) start();
+      cur.recs.push(r); lastT = r.t;
+    }
+    return out.filter(o => o.recs.length >= 200 && (o.recs[o.recs.length - 1].t - o.recs[0].t) >= 30).map((o) => {
+      const recs = o.recs, t0 = recs[0].t, span = recs[recs.length - 1].t - t0, hz = span > 0 ? Math.round((recs.length - 1) / span * 10) / 10 : 0;
+      const dated = recs.find(r => isFinite(r.ms)); const startMs = dated ? dated.ms - (dated.t - t0) * 1000 : NaN;
+      let vmax = 0; for (const r of recs) if (r.v > vmax) vmax = r.v;
+      return { recs, t0, span, hz, startMs, vmax, n: recs.length };
+    });
+  }
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const stamp = (ms) => { if (!isFinite(ms)) return ''; const d = new Date(ms); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}.${pad2(d.getMinutes())}`; };
+  // an outing as the CSV the universal importer reads (RaceBox columns, 25 Hz): the file is what gets stored, so a session can be re-read later like any other upload
+  function csvFile(o, info) {
+    const head = `# RaceBox ${info.model || 'Mini S'} ${info.serial || ''} — ${o.hz} Hz — read by Hutka over Bluetooth\n` + 'timestamp (s),latitude,longitude,speed (m/s),bearing,gforce_x,gforce_y,gforce_z,altitude (m),sats,hacc (m)\n';
+    const rows = new Array(o.recs.length);
+    for (let i = 0; i < o.recs.length; i++) { const r = o.recs[i]; rows[i] = `${(r.t - o.t0).toFixed(3)},${r.lat.toFixed(7)},${r.lon.toFixed(7)},${r.v.toFixed(3)},${r.hdg.toFixed(2)},${r.gx.toFixed(3)},${r.gy.toFixed(3)},${r.gz.toFixed(3)},${r.alt.toFixed(1)},${r.sats},${r.hacc.toFixed(2)}`; }
+    const name = `RaceBox ${stamp(o.startMs) || 'session'}${info.serial ? ' ' + info.serial.slice(-4) : ''}.csv`;
+    return new File([head + rows.join('\n') + '\n'], name, { type: 'text/csv', lastModified: isFinite(o.startMs) ? o.startMs : Date.now() });
+  }
+  const racebox = {
+    id: 'racebox', name: 'RaceBox Mini S / Micro', ready: true, namePrefixes: ['RaceBox'],
+    UART: '6e400001-b5a3-f393-e0a9-e50e24dcca9e', RX: '6e400002-b5a3-f393-e0a9-e50e24dcca9e', TX: '6e400003-b5a3-f393-e0a9-e50e24dcca9e',
+    DIS: U16(0x180a), MODEL: U16(0x2a24), SERIAL: U16(0x2a25), FW: U16(0x2a26),
+    get services() { return [this.UART, this.DIS]; },
+    // a connected device: status, unlock, download (→ outings with their CSV files), erase
+    async open(H) {
+      const RB = this; let sink = null;
+      await ble.notify(H, RB.UART, RB.TX, framer((f) => { if (sink) sink(f); }));
+      const info = {}; for (const [k, c] of [['model', RB.MODEL], ['serial', RB.SERIAL], ['fw', RB.FW]]) { try { info[k] = text(await ble.read(H, RB.DIS, c)); } catch (e) {} }
+      if (!info.serial) { const m = /(\d{6,})\s*$/.exec(H.name || ''); if (m) info.serial = m[1]; }
+      if (!info.model) info.model = (H.name || '').replace(/\s*\d{6,}\s*$/, '').replace(/^RaceBox\s*/i, '') || 'Mini S';
+      const send = (cls, id, payload) => ble.write(H, RB.UART, RB.RX, frame(cls, id, payload));
+      // one command, one answer: the frame the predicate accepts, or a timeout; live records keep flowing past
+      const ask = (cls, id, payload, pred, ms) => new Promise((res, rej) => {
+        const tm = setTimeout(() => { sink = null; rej(err('timeout')); }, ms || 6000);
+        sink = (f) => { if (pred(f)) { clearTimeout(tm); sink = null; res(f); } };
+        send(cls, id, payload).catch((e) => { clearTimeout(tm); sink = null; rej(e); });
+      });
+      const isAck = (f, c, i) => f.cls === 0xff && f.id === 0x02 && f.payload[0] === c && f.payload[1] === i;
+      const isNack = (f, c, i) => f.cls === 0xff && f.id === 0x03 && f.payload[0] === c && f.payload[1] === i;
+      const dev = {
+        info,
+        async status() {
+          const f = await ask(0xff, 0x22, null, (x) => x.cls === 0xff && x.id === 0x22 && x.payload.length >= 12, 6000);
+          const p = f.payload; return { recording: !!p[0], level: p[1], secured: !!(p[2] & 1), unlocked: !!(p[2] & 2), stored: u32(p, 4), capacity: u32(p, 8) };
+        },
+        async unlock(code) {
+          const f = await ask(0xff, 0x30, leU32(+code >>> 0), (x) => isAck(x, 0xff, 0x30) || isNack(x, 0xff, 0x30), 6000);
+          if (!isAck(f, 0xff, 0x30)) throw err('locked');
+          return true;
+        },
+        // the whole memory, record by record; onProgress({done, total}) as it streams; the outings when the device sends its final ACK
+        async download(onProgress) {
+          const events = []; let total = 0, done = 0, lastTick = 0;
+          const f0 = await ask(0xff, 0x23, null, (x) => (x.cls === 0xff && x.id === 0x23 && x.payload.length >= 4) || isNack(x, 0xff, 0x23), 8000);
+          if (isNack(f0, 0xff, 0x23)) throw err('locked');
+          total = u32(f0.payload, 0);
+          if (onProgress) onProgress({ done: 0, total });
+          if (total === 0) { await new Promise((res) => { const tm = setTimeout(() => { sink = null; res(); }, 2500); sink = (f) => { if (isAck(f, 0xff, 0x23)) { clearTimeout(tm); sink = null; res(); } }; }); return []; }
+          await new Promise((res, rej) => {
+            let tm = setTimeout(() => { sink = null; rej(err('timeout')); }, 20000);
+            const bump = () => { clearTimeout(tm); tm = setTimeout(() => { sink = null; rej(err('timeout')); }, 20000); };
+            sink = (f) => {
+              if (f.cls !== 0xff) return;
+              if (f.id === 0x21) { const r = record(f.payload); if (r) events.push({ kind: 'rec', rec: r }); done++; bump(); const now = Date.now(); if (onProgress && now - lastTick > 150) { lastTick = now; onProgress({ done, total }); } }
+              else if (f.id === 0x26) { events.push({ kind: 'state', state: f.payload[0] }); bump(); }
+              else if (isAck(f, 0xff, 0x23)) { clearTimeout(tm); sink = null; res(); }
+              else if (isNack(f, 0xff, 0x23)) { clearTimeout(tm); sink = null; rej(err('locked')); }
+            };
+          });
+          if (onProgress) onProgress({ done, total: Math.max(total, done) });
+          return outings(events).map((o) => Object.assign(o, { file: csvFile(o, info) }));
+        },
+        async cancel() { try { await send(0xff, 0x23, Uint8Array.of(1)); } catch (e) {} sink = null; },
+        async erase(onProgress) {
+          await new Promise((res, rej) => {
+            let tm = setTimeout(() => { sink = null; rej(err('timeout')); }, 30000);
+            sink = (f) => {
+              if (f.cls !== 0xff) return;
+              if (f.id === 0x24 && f.payload.length >= 1) { clearTimeout(tm); tm = setTimeout(() => { sink = null; rej(err('timeout')); }, 30000); if (onProgress) onProgress(f.payload[0]); }
+              else if (isAck(f, 0xff, 0x24)) { clearTimeout(tm); sink = null; res(); }
+              else if (isNack(f, 0xff, 0x24)) { clearTimeout(tm); sink = null; rej(err('locked')); }
+            };
+            send(0xff, 0x24, null).catch((e) => { clearTimeout(tm); sink = null; rej(e); });
+          });
+          return true;
+        },
+        async close() { sink = null; await ble.disconnect(H); }
+      };
+      return dev;
+    }
+  };
+
+  // ---- Alfano 6 / 7 over Bluetooth 5.0: the port of Pavel's Mac downloader + decoder goes here. The device's session list → one .alf2 per
+  // session → the same ALF importer the files from the Alfano app go through. Until the protocol is in, the driver is listed but not ready.
+  const alfano = {
+    id: 'alfano', name: 'Alfano 6 / 7', ready: false, namePrefixes: ['ALFANO', 'Alfano'], services: [],
+    async open() { throw err('notyet'); }
+  };
+
+  return { ble, drivers: { racebox, alfano }, list: [racebox, alfano], frame, framer, record, outings, csvFile, hex, unhex };
 })();
 // @@DATA-START
 // Empirical analysis of logged laps (Alfano): a frame that maps GPS metres onto layout pixels, projection of every lap onto the
@@ -3451,6 +3705,20 @@ Object.assign(I18N.RU, { 'Report': 'Пожаловаться', 'Reported ✓': '
 Object.assign(I18N.RU, { 'My sessions': 'Мои сессии', 'sessions': 'сессий', 'drivers': 'гонщиков' });
 Object.assign(I18N.RU, { 'Daily limit of sessions reached — more tomorrow.': 'Дневной лимит сессий исчерпан — ещё завтра.', 'Daily limit for guests reached — sign in to keep going.': 'Дневной лимит для гостей исчерпан — войди, чтобы продолжить.', 'Daily limit reached — try again tomorrow.': 'Дневной лимит исчерпан — попробуй завтра.', 'Daily upload limit reached — the rest tomorrow.': 'Дневной лимит загрузок исчерпан — остальное завтра.',
   'Nightly snapshots': 'Ночные копии', 'a copy of every table inside the database, 02:20 UTC': 'копия всех таблиц внутри базы, 02:20 UTC', 'Not set up yet (supabase/limits.sql).': 'Ещё не настроено (supabase/limits.sql).', 'No snapshots yet — the first one is taken tonight at 02:20 UTC.': 'Копий ещё нет — первая будет сегодня ночью в 02:20 UTC.', '{n} tables': '{n} таблиц', 'Telemetry copies are kept 3 days, the rest 7. To restore a table: Supabase → SQL editor → insert … select from backup.dYYYYMMDD_<table>.': 'Копии телеметрии хранятся 3 дня, остальное 7. Восстановить таблицу: Supabase → SQL editor → insert … select from backup.dYYYYMMDD_<таблица>.' });
+// v34.5 — a lap timer over Bluetooth
+Object.assign(I18N.RU, { 'From a device (Bluetooth)': 'С прибора (Bluetooth)', 'RaceBox Mini S / Micro now, Alfano 6 / 7 next — the outings go straight from the lap timer into the Lab.': 'Сейчас RaceBox Mini S / Micro, следом Alfano 6 / 7 — заезды попадают в Лабораторию прямо с прибора.',
+  'From a device': 'С прибора', 'Connect the lap timer over Bluetooth: Hutka reads the recorded outings out of its memory and opens them in the Lab — no vendor app, no files.': 'Подключи прибор по Bluetooth: Hutka сама вычитает записанные заезды из его памяти и откроет в Лаборатории — без фирменных программ и файлов.',
+  'This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.': 'В этом браузере нет Bluetooth — открой приложение Hutka или Chrome на Android / компьютере.',
+  'Bluetooth — the recorded outings go straight into the Lab': 'Bluetooth — записанные заезды сразу в Лабораторию', 'Bluetooth — in the works; for now: the Alfano app → Share → Hutka': 'Bluetooth — в работе; пока: приложение Alfano → Поделиться → Hutka',
+  'Unlock': 'Разблокировать', 'Erase the device memory': 'Стереть память прибора', 'Open in the Lab': 'Открыть в Лаборатории', 'Close': 'Закрыть',
+  'No device picked.': 'Прибор не выбран.', 'Bluetooth works in the Hutka app and in Chrome on Android or a computer — not in this browser.': 'Bluetooth работает в приложении Hutka и в Chrome на Android или компьютере — но не в этом браузере.',
+  'The device stopped answering — bring the phone closer and try again.': 'Прибор перестал отвечать — поднеси телефон ближе и попробуй ещё раз.', 'The device memory is locked — enter its security code.': 'Память прибора закрыта кодом — введи его.',
+  'Could not read the device: {e}': 'Не удалось прочитать прибор: {e}', 'Pick the device in the list…': 'Выбери прибор в списке…', 'Connecting to {name}…': 'Подключаюсь к {name}…', 'The connection dropped — come closer and try again.': 'Связь оборвалась — подойди ближе и попробуй ещё раз.',
+  '{name} is still recording — stop it (REC) and try again.': '{name} ещё пишет — останови запись (REC) и попробуй снова.', '{name}: {n} records in memory ({p}% full) — reading…': '{name}: в памяти {n} записей ({p}% заполнено) — читаю…', 'Reading {name}…': 'Читаю {name}…',
+  'Reading the memory… {done} / {total}': 'Читаю память… {done} / {total}', 'Nothing recorded on the device yet — press its REC button before the next outing.': 'На приборе пока ничего не записано — перед следующим заездом нажми REC.',
+  '{n} outing(s) on the device — tick the ones to bring into the Lab.': 'На приборе заездов: {n} — отметь, какие открыть в Лаборатории.', 'Outing {n}': 'Заезд {n}', '{min} min · {hz} Hz · up to {v} km/h': '{min} мин · {hz} Гц · до {v} км/ч', 'Tick at least one outing.': 'Отметь хотя бы один заезд.',
+  'Erase the device memory?': 'Стереть память прибора?', 'Everything recorded on {name} is deleted from the device. Bring the outings you want into the Lab first — what is already in Hutka stays.': 'Всё записанное на {name} будет удалено с прибора. Сначала открой нужные заезды в Лаборатории — то, что уже в Hutka, останется.', 'Erase': 'Стереть',
+  'Erasing… {p}%': 'Стираю… {p}%', 'Device memory erased.': 'Память прибора очищена.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4945,7 +5213,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.4';
+const APP_VERSION = 'v34.5';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6781,9 +7049,89 @@ const UPLOAD = (() => {
   async function withFiles(files) { open({}); await onFiles(files); }
   return { open, close, withFiles };
 })();
+// ---------- straight from the lap timer: the device window — pick the logger, connect over Bluetooth, read its memory, tick the outings ----------
+// (device.js has the transport and the protocols; this is only the window around them)
+const DEVICE = (() => {
+  let H = null, dev = null, drv = null, items = [], busy = false;
+  const S = (tx, cls) => setStatus('devStatus', tx, cls);
+  const when = (ms) => { if (!isFinite(ms)) return ''; return new Date(ms).toLocaleString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
+  function open() {
+    if (busy || (dev && items.length)) { $('devModal').hidden = false; return; }   // a read in progress, or a device still connected with its outings listed
+    items = []; dev = null; H = null; drv = null;
+    const kinds = $('devKinds'); kinds.innerHTML = '';
+    for (const d of LOGGERS.list) {
+      const b = el('button', 'dev-kind' + (d.ready ? '' : ' later')); b.type = 'button'; b.dataset.id = d.id; b.disabled = !d.ready;
+      b.innerHTML = `<b>${esc(d.name)}</b><span>${esc(d.ready ? t('Bluetooth — the recorded outings go straight into the Lab') : t('Bluetooth — in the works; for now: the Alfano app → Share → Hutka'))}</span>`;
+      b.onclick = () => connect(d); kinds.appendChild(b);
+    }
+    $('devNoBt').hidden = !!LOGGERS.ble.kind(); $('devStage').hidden = true; $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true; S('');
+    $('devModal').hidden = false;
+  }
+  function close() { $('devModal').hidden = true; }
+  async function drop() { const d = dev, h = H; dev = null; H = null; items = []; if (d) { try { await d.close(); } catch (e) {} } else if (h) { try { await LOGGERS.ble.disconnect(h); } catch (e) {} } }
+  function bar(done, total) { const b = $('devBar'); b.hidden = false; b.firstElementChild.style.width = total ? Math.min(100, Math.round(done / total * 100)) + '%' : '0%'; }
+  function fail(e) {
+    const c = e && e.code, m = (e && e.message) || String(e);
+    if ((e && e.name === 'NotFoundError') || /cancel/i.test(m)) { S(t('No device picked.')); return; }
+    S(c === 'nobt' ? t('Bluetooth works in the Hutka app and in Chrome on Android or a computer — not in this browser.')
+      : c === 'timeout' ? t('The device stopped answering — bring the phone closer and try again.')
+      : c === 'locked' ? t('The device memory is locked — enter its security code.')
+      : t('Could not read the device: {e}', { e: m }), 'warn');
+  }
+  async function connect(d) {
+    if (busy) return; await drop(); drv = d; busy = true;
+    $('devStage').hidden = false; $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true;
+    try {
+      S(t('Pick the device in the list…'));
+      H = await LOGGERS.ble.pick(drv);
+      S(t('Connecting to {name}…', { name: H.name }));
+      await LOGGERS.ble.connect(H, () => { if (busy) S(t('The connection dropped — come closer and try again.'), 'warn'); busy = false; dev = null; H = null; });
+      dev = await drv.open(H);
+      await readAll();
+    } catch (e) { fail(e); busy = false; await drop(); }
+  }
+  async function readAll() {
+    let st = null; try { st = await dev.status(); } catch (e) {}
+    if (st && st.secured && !st.unlocked) { $('devCodeRow').hidden = false; S(t('The device memory is locked — enter its security code.'), 'warn'); busy = false; return; }
+    if (st && st.recording) S(t('{name} is still recording — stop it (REC) and try again.', { name: H.name }), 'warn');
+    else S(st ? t('{name}: {n} records in memory ({p}% full) — reading…', { name: H.name, n: st.stored, p: st.level }) : t('Reading {name}…', { name: H.name }));
+    bar(0, 1);
+    const outs = await dev.download((p) => { bar(p.done, p.total); S(t('Reading the memory… {done} / {total}', { done: p.done, total: p.total })); });
+    bar(1, 1); items = outs; busy = false; renderList();
+  }
+  async function unlock() { const code = $('devCode').value.trim(); if (!code || !dev || busy) return; busy = true; try { await dev.unlock(code); $('devCodeRow').hidden = true; await readAll(); } catch (e) { busy = false; fail(e); } }
+  function renderList() {
+    const box = $('devList'); box.innerHTML = '';
+    if (!items.length) { S(t('Nothing recorded on the device yet — press its REC button before the next outing.'), 'warn'); $('devActs').hidden = false; $('devImport').hidden = true; $('devErase').hidden = true; return; }
+    S(t('{n} outing(s) on the device — tick the ones to bring into the Lab.', { n: items.length }), 'ok');
+    items.forEach((o, i) => {
+      const lab = el('label', 'dev-item'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = true; cb.dataset.i = i;
+      const tx = el('div'); tx.innerHTML = `<b>${esc(when(o.startMs) || t('Outing {n}', { n: i + 1 }))}</b><span class="hint">${esc(t('{min} min · {hz} Hz · up to {v} km/h', { min: Math.max(1, Math.round(o.span / 60)), hz: o.hz, v: Math.round(o.vmax * 3.6) }))}</span>`;
+      lab.appendChild(cb); lab.appendChild(tx); box.appendChild(lab);
+    });
+    $('devActs').hidden = false; $('devImport').hidden = false; $('devErase').hidden = !(dev && dev.erase);
+  }
+  async function importSel() {
+    const files = [...$('devList').querySelectorAll('input:checked')].map(c => items[+c.dataset.i].file);
+    if (!files.length) { S(t('Tick at least one outing.'), 'warn'); return; }
+    STORE.track('device_import', { app: drv.id, n: files.length });
+    close(); await UPLOAD.withFiles(files);
+  }
+  async function erase() {
+    if (!dev || !dev.erase || busy) return;
+    const ok = await confirmDlg(t('Erase the device memory?'), t('Everything recorded on {name} is deleted from the device. Bring the outings you want into the Lab first — what is already in Hutka stays.', { name: H.name }), t('Erase'));
+    if (!ok) return; busy = true;
+    try { bar(0, 100); await dev.erase((p) => { bar(p, 100); S(t('Erasing… {p}%', { p })); }); items = []; busy = false; renderList(); S(t('Device memory erased.'), 'ok'); } catch (e) { busy = false; fail(e); }
+  }
+  $('devImport').onclick = importSel; $('devErase').onclick = erase; $('devUnlock').onclick = unlock; $('devCancel').onclick = close;
+  $('devModal').addEventListener('click', (e) => { if (e.target === $('devModal')) close(); });
+  $('uplFromDevice').onclick = () => { UPLOAD.close(); open(); };
+  addEventListener('pagehide', () => { drop(); });
+  return { open, close };
+})();
 // OSM opening_hours → the track's open / close fields, only when the tag is one plain daily range ("10:00-22:00", "Mo-Su 10:00-23:00"); anything else stays empty
 function parseHours(h) { const m = /^(?:Mo-Su\s+)?(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/.exec(String(h || '').trim()); return m ? { open: m[1].padStart(5, '0'), close: m[2].padStart(5, '0') } : {}; }
-const fileDate = (f) => { try { const d = new Date(f.lastModified || Date.now()); return d.toISOString().slice(0, 16).replace('T', ' '); } catch (e) { return ''; } };
+const fileDate = (f) => { try { const d = new Date(f.lastModified || Date.now()); const p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; } catch (e) { return ''; } };   // local time, like the loggers write it
 // ---------- home: the feed of published sessions, where people drive, who is fastest ----------
 // the analysis card from the session meta (LAB.cardOf): the lap line, the Lab's points, the corner numbers — y grows downwards
 function drawCard(cv, c) {

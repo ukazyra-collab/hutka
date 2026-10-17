@@ -175,6 +175,26 @@ Hutka 1.2
 • Share a session through the system share sheet — picture, text and link.
 ```
 
+## 4d. Версия 1.3 (17 окт 2026) — прибор по Bluetooth
+
+Сайт (v34.5) умеет читать заезды прямо из памяти лап-таймера: Лаборатория → Загрузить сессию → **С прибора (Bluetooth)**. В браузере это Web Bluetooth (Chrome на Android и на компьютере; Safari не умеет), в приложении — плагин `@capacitor-community/bluetooth-le` (iOS и Android). Сайт зовёт его через тот же мост (`BluetoothLe`: `initialize`, `requestDevice`, `connect`, `startNotifications`, `write`, `read`, `disconnect`), JS-рантайм плагина в бандл не входит.
+
+Что уже сделано в `app/`: зависимость в `package.json`, разрешения Bluetooth в `AndroidManifest.xml` (Android 12+ без геолокации — `neverForLocation`), тексты `NSBluetoothAlwaysUsageDescription` / `NSBluetoothPeripheralUsageDescription` в `Info.plist`.
+
+Пересобрать (один раз, обе платформы):
+```
+cd app && npm install && npx cap sync
+```
+iOS: Xcode → Version 1.3, Build +1 → Archive → Upload. Android: `versionCode` +1 (`versionName "1.3"`) в `android/app/build.gradle` → Build → Generate Signed App Bundle → новый `.aab` в Play Console. Без пересборки кнопка в приложении говорит «Bluetooth работает в приложении Hutka…» и ничего не делает; на сайте в Chrome работает уже сейчас.
+
+Драйверы приборов живут на сайте в `device.js` (`LOGGERS`):
+- **RaceBox Mini S / Micro** — готов. Протокол опубликован производителем (RaceBox BLE Protocol Documentation rev. 9): UART-сервис `6E400001-…`, кадры B5 62 | class | id | len | payload | CK_A CK_B; статус памяти `FF 22`, разблокировка `FF 30` (4 байта кода), выгрузка `FF 23` → поток записей `FF 21` (80 байт, как live-сообщение) и меток старт/стоп `FF 26` → ACK `FF 02 [FF 23]`, стирание `FF 24`. Записи режутся на заезды по меткам старта и паузам > 2 мин, идут в универсальный импорт как CSV 25 Гц (`RaceBox <дата>.csv`), круги режутся по замыканию петли и выравниваются по S/F разметки.
+- **Alfano 6 / 7** — слот есть (`LOGGERS.drivers.alfano`, `ready: false`), протокола пока нет. Это порт скачивальщика + декодера Паши (Pavel Go-ski) с Mac. Чтобы перенести, нужно от него одно из:
+  1. исходники (Swift / Python / что угодно) — лучше всего: и BLE-часть, и декодер;
+  2. или описание протокола: имя/префикс прибора в эфире, UUID сервиса и характеристик (запись / уведомления), последовательность команд (рукопожатие, список сессий, скачивание одной сессии, подтверждения), формат ответов, как выглядит конец передачи, нужен ли MTU/пейринг, что отличается у Alfano 6 и 7;
+  3. плюс пару сырых дампов: байты, пришедшие с прибора за одну сессию, и файл `.alf2`, который из них делает его декодер (если декодер пишет именно `.alf2` — наш `alf.js` возьмёт его как есть; если другой формат — переносим и декодер).
+  С этим драйвер — это `open(H)` в `device.js`: `list()` → `[{id, name, date, laps, best}]`, `download(item, onProgress)` → `File` (`.alf2`) → тот же `UPLOAD.withFiles`. Окно, прогресс, выбор заездов, iOS/Android/Chrome — уже общие.
+
 ## 5. Обновления
 
 - **Сайт** (почти всё): просто деплой на GitHub Pages — приложение подхватит само.
@@ -188,4 +208,4 @@ Hutka 1.2
 - `ios/App/App/Info.plist` — URL-схема `hutka`, типы документов `.alf2/.gpx/.vbo/.csv` («Открыть в Hutka»), тексты разрешений на фото/камеру, все ориентации, `ITSAppUsesNonExemptEncryption=false`.
 - `android/app/src/main/AndroidManifest.xml` — intent-filter'ы для `hutka://auth` и файлов; `MainActivity.java` переупаковывает «Поделиться» (ACTION_SEND) в ACTION_VIEW, который Capacitor отдаёт сайту событием `appUrlOpen`.
 - На стороне сайта всё в `NATIVE` (`app_core.js`): `appUrlOpen` → либо `finishSignIn(url)` (токены из `hutka://auth#…` или `?code=` → сессия Supabase), либо чтение файла через плагин Filesystem → `UPLOAD.withFiles`. Вход через Google/Apple в приложении идёт через плагин Browser (`skipBrowserRedirect`).
-- Плагины: `@capacitor/app`, `browser`, `filesystem`, `share`, `splash-screen`, `status-bar`, `push-notifications`, `haptics`, `@capawesome/capacitor-badge`. Сайт вызывает их через мост, который оболочка внедряет в страницу (`Capacitor.nativePromise(plugin, method, options)` и `Capacitor.addListener(plugin, event, cb)`), поэтому JS-рантайм Capacitor в бандл сайта не входит — сайт остаётся обычным сайтом для браузеров.
+- Плагины: `@capacitor/app`, `browser`, `filesystem`, `share`, `splash-screen`, `status-bar`, `push-notifications`, `haptics`, `@capawesome/capacitor-badge`, `@capacitor-community/bluetooth-le` (прибор по Bluetooth, см. 4d). Сайт вызывает их через мост, который оболочка внедряет в страницу (`Capacitor.nativePromise(plugin, method, options)` и `Capacitor.addListener(plugin, event, cb)`), поэтому JS-рантайм Capacitor в бандл сайта не входит — сайт остаётся обычным сайтом для браузеров.

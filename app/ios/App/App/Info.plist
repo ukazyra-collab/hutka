@@ -72,6 +72,10 @@
 	<string>Pick a photo for your driver profile or a track page.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Take a photo for your driver profile or a track page.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Read your recorded outings straight out of your lap timer (RaceBox, Alfano) over Bluetooth.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Read your recorded outings straight out of your lap timer (RaceBox, Alfano) over Bluetooth.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
