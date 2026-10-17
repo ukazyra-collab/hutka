@@ -2667,7 +2667,7 @@ const ALFANO7 = (() => {
     if (header && header.length >= 306 && header[0] === 0x80 && header[1] === 0xff && header[2] === 0xfe && header[3] === 0xfd) {
       const day = header[10], month = header[11];
       if (day >= 1 && day <= 31 && month >= 1 && month <= 12) {
-        Object.assign(s, { header, hour: header[7], minute: header[8], day, month, year: header[12], sampling: header[23], nbreChamp: header[276], track: decodeName(header, 108, 50), driver: decodeName(header, 288, 15), ok: true });
+        Object.assign(s, { header, hour: header[7], minute: header[8], day, month, year: header[12], sampling: header[13], nbreChamp: header[276], track: decodeName(header, 108, 50), driver: decodeName(header, 288, 15), ok: true });
         if (!s.serial) s.serial = u16(header, 233);
         s.date = `20${pad2(s.year)}-${pad2(s.month)}-${pad2(s.day)} ${pad2(s.hour)}:${pad2(s.minute)}`;
         s.base = `SN${s.serial}_${pad2(s.day)}${pad2(s.month)}${pad2(s.year)}_${pad2(s.hour)}H${pad2(s.minute)}_${s.driver}_${s.track.replace(/[ \-*/]/g, '_')}_${s.laps}_${s.bestRaw}`;
@@ -2714,13 +2714,19 @@ const ALFANO7 = (() => {
   // the record size: 94 bytes on every device seen so far; checked against the data (a run of records whose lap/sector bytes follow on
   // from each other and whose bytes 2..5 are zero), the first size that holds across the probe wins — a lone byte pair cannot fool it
   function recordSize(partiel) {
+    // every record starts with lap, sector and then eight bytes that are the same in every record of the table (zeros on one firmware,
+    // a signature on another); the lap/sector pairs chain on from each other. The first size that holds across the probe is it.
     const valid = (t) => {
       const n = Math.min(6, Math.floor(partiel.length / t)); if (n < 2) return false;
       let lap = partiel[0], champ = partiel[1]; if (lap < 1 || lap > 99 || champ < 1 || champ > 6) return false;
-      for (let k = 1; k < n; k++) { const o = k * t, l = partiel[o], c = partiel[o + 1]; if (partiel[o + 2] !== 0 || partiel[o + 3] !== 0 || l < 1 || l > 99 || c < 1 || c > 6) return false; const ok = (l === lap && c === champ + 1) || (l === lap + 1 && c === 1) || (l === lap && c === champ && false); if (!ok) return false; lap = l; champ = c; }
+      for (let k = 1; k < n; k++) {
+        const o = k * t, l = partiel[o], c = partiel[o + 1]; if (l < 1 || l > 99 || c < 1 || c > 6) return false;
+        for (let j = 2; j < 10; j++) if (partiel[o + j] !== partiel[j]) return false;
+        if (!((l === lap && c === champ + 1) || (l === lap + 1 && c === 1))) return false;
+        lap = l; champ = c;
+      }
       return true;
     };
-    if (valid(94)) return 94;
     for (let t = 20; t <= 200; t++) if (valid(t)) return t;
     return 94;
   }
@@ -2728,7 +2734,7 @@ const ALFANO7 = (() => {
     const taille = recordSize(partiel);
     const typeB = partiel.length >= 2 * taille && partiel[0] === 1 && partiel[1] === 1 && partiel[taille] === 2 && partiel[taille + 1] === 1;
     const lapEnd = new Array(laps + 2).fill(0); lapEnd[0] = sectorData + 306;
-    const times = []; const extra = (off) => ({ vbat: off + 90 <= partiel.length ? u16(partiel, off + 88) : 0, hdop: off + 94 <= partiel.length ? u16(partiel, off + 92) : 0 });
+    const times = []; const extra = (off) => ({ vbat: off + taille <= partiel.length ? u16(partiel, off + taille - 6) : 0, hdop: off + taille <= partiel.length ? u16(partiel, off + taille - 2) : 0 });   // the record's tail: …, battery (mV), 0, HDOP
     if (typeB) {
       const ch1 = new Array(laps + 1).fill(0);
       for (let i = 0; i < laps; i++) { const off = i * taille; if (off + 16 > partiel.length) break; const lap = partiel[off], champ = partiel[off + 1]; if (champ === 1 && lap >= 1 && lap <= laps && !ch1[lap]) ch1[lap] = u24(partiel, off + 10); let t = u24(partiel, off + 13); if (t > 900000) t = 0; times.push(Object.assign({ time: t, sectors: [t, 0, 0, 0, 0, 0] }, extra(off))); }
@@ -2805,7 +2811,8 @@ const ALFANO7 = (() => {
     const header = new Uint8Array(s.header.subarray(0, 306)); transformName(header, 108, 50); transformName(header, 288, 15);
     files.push({ name: `PARAMETRE${s.name}.dat`, data: header });
     const dateStr = `${pad2(s.day)}-${pad2(s.month)}-20${pad2(s.year)}`, timeStr = `${pad2(s.hour)}:${pad2(s.minute)}`;
-    const lines = [`${dateStr},${timeStr},${pad2(s.laps)},${s.serial},${s.track},${s.driver},${pad2(s.bestMin)},',${pad2(s.bestSec)},'',${pad2(s.bestCs)},ALFANO 7,END,${raw.info.champ},0, ,no delete partiel,,${s.sampling},NOT USED,NOT USED,${dateStr},${timeStr},${s.track},${s.driver},NOT USED,NOT USED`,
+    const drv = s.driver.replace(/ /g, '_');   // the app writes the driver with underscores in the summary (the track as is)
+    const lines = [`${dateStr},${timeStr},${pad2(s.laps)},${s.serial},${s.track},${drv},${pad2(s.bestMin)},',${pad2(s.bestSec)},'',${pad2(s.bestCs)},ALFANO 7,END,${raw.info.champ},0, ,no delete partiel,,${s.sampling},NOT USED,NOT USED,${dateStr},${timeStr},${s.track},${drv},NOT USED,NOT USED`,
       'lap,time lap,time partiel 1,time partiel 2,time partiel 3,time partiel 4,time partiel 5,time partiel 6,Min RPM,Max RPM,Min Speed GPS,Max Speed GPS,Min T1,Max T1,Min T2,Max T2,Min T3,Max T3,Min T4,Max T4,Min Speed sensor,Max Speed sensor, RPM max gear,Type de champs,Vbattery,max EGT,Hdop'];
     raw.info.times.forEach((lt, i) => { const sc = lt.sectors; lines.push(`${i + 1},${lt.time},${sc[0]},${sc[1]},${sc[2]},${sc[3]},${sc[4]},${sc[5]},0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,${(1 << raw.info.champ) - 1},${lt.vbat || 0},0,${lt.hdop || 0}`); });
     files.push({ name: `${s.base}.csv`, data: enc.encode(lines.join('\n') + '\n') });
