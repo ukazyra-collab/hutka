@@ -219,6 +219,10 @@ textarea{min-height:90px;resize:vertical}
 /* the corner grade against the best passes: a letter chip, the same colours as the numbers on the map */
 .gr{display:inline-block;min-width:17px;padding:0 4px;border-radius:5px;font:700 10.5px/17px var(--mono);color:#fff;text-align:center;vertical-align:1px}.gr.gA{background:#1f8f4f}.gr.gB{background:#5a9e2f}.gr.gC{background:#c48a00}.gr.gD{background:#e0661c}.gr.gE{background:#d12f3a}
 td .gr,.crow .gr{margin-right:5px}.insp-head .gr{margin-left:6px;font-size:11px;line-height:18px}
+/* bookmarks and favourites: the star */
+.star{color:#e0a000}.btn.fav{font-size:17px;line-height:1;padding:6px 10px;color:var(--muted)}.btn.fav.on{color:#e0a000}td .star,.crow .star,.cmp-row .star{margin-right:3px;font-size:12px}
+.insp-mark{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.insp-mark input{flex:1 1 160px;min-width:0;font:13px var(--body);padding:6px 9px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface);color:var(--fg)}.insp-mark .note{font-weight:600}.insp-mark a{color:var(--muted);text-decoration:underline;cursor:pointer}
+.mark-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--fg);min-width:0}.mark-row .tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mark-row .tx b{font-weight:600}.mark-row .tm{font:600 12.5px var(--mono);color:var(--muted);white-space:nowrap}.mark-row .x{color:var(--muted);font-size:15px;line-height:1;padding:2px 6px;border-radius:6px}.mark-row .x:hover{background:var(--line);color:var(--fg)}#labMarks .list{display:grid;gap:6px}
 .pill.ok{background:var(--ok);border-color:var(--ok);color:#fff}
 .pill.off{background:var(--surface-3);border-color:var(--surface-3)}
 .pill.warn{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
@@ -1353,10 +1357,11 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <!-- ========== LAYOUT ========== -->
     <!-- ========== LAB ========== -->
     <section class="page" id="pg-lab" hidden>
-      <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn" id="btnShare" type="button" hidden><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="btnModerate" type="button" hidden></button><button class="btn" id="btnTransfer" type="button" hidden data-t="Transfer to…">Transfer to…</button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
+      <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn fav" id="btnFav" type="button" hidden title="Favourite">☆</button><button class="btn" id="btnShare" type="button" hidden><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="btnModerate" type="button" hidden></button><button class="btn" id="btnTransfer" type="button" hidden data-t="Transfer to…">Transfer to…</button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
       <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div><button class="btn primary sm" id="labSignIn" style="margin-left:auto;flex:none" hidden data-t="Sign in">Sign in</button></div>
       <div id="labStart" hidden>
         <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="labMineSub"></span></h2><div id="labMine"></div><div class="hint" id="labMineHint"></div></div>
+        <div class="card" id="labMarksCard" hidden><h2><span class="star">★</span><span data-t="Bookmarks and favourites">Bookmarks and favourites</span><span class="sub" id="labMarksSub"></span></h2><div id="labMarks"></div><div class="hint" data-t="A star on a session keeps it here; a bookmark on a corner (in the corner inspector) keeps that corner with your note.">A star on a session keeps it here; a bookmark on a corner (in the corner inspector) keeps that corner with your note.</div></div>
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
         <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><div class="row" style="margin-top:10px"><button class="btn primary" id="labUpload2" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#help"><span data-t="How to get the file — step by step">How to get the file — step by step</span></a></div></div>
       </div>
@@ -4403,6 +4408,11 @@ Object.assign(I18N.RU, { 'Pedals': 'Педали', 'The average lap': 'Сред�
   'line: on the throttle': 'линия: на газу', 'braking': 'торможение', 'coasting': 'накат', 'Colour the lap by what the kart is doing: throttle, brake, coasting': 'Раскрасить круг по тому, что делает карт: газ, тормоз, накат',
   'brake point {lo}–{hi} m (wanders {d} m)': 'точка торможения {lo}–{hi} м (гуляет на {d} м)', 'lift point {lo}–{hi} m (wanders {d} m)': 'точка сброса {lo}–{hi} м (гуляет на {d} м)', 'apex {lo}–{hi} km/h': 'апекс {lo}–{hi} км/ч', 'corner time {lo}–{hi} s': 'время поворота {lo}–{hi} с',
   'Across {n} clean laps': 'По {n} чистым кругам', 'The dots on the map are those laps’ brake and apex points.': 'Точки на карте — точки торможения и апексы этих кругов.' });
+// v34.16 — bookmarks and favourites
+Object.assign(I18N.RU, { 'Bookmarks and favourites': 'Закладки и избранное', 'A star on a session keeps it here; a bookmark on a corner (in the corner inspector) keeps that corner with your note.': 'Звезда на сессии оставляет её здесь; закладка на поворот (в инспекторе поворота) — сам поворот с твоей заметкой.',
+  'In your favourites — tap to remove': 'В избранном — нажми, чтобы убрать', 'Add to favourites': 'В избранное', 'Removed from favourites.': 'Убрано из избранного.', 'In your favourites — the Lab start page lists them.': 'В избранном — список на стартовой странице Лаборатории.',
+  'Bookmarked T{n}.': 'Закладка на T{n}.', 'Bookmarked': 'В закладках', 'edit': 'изменить', 'remove': 'убрать', 'A note for this corner — what to try next time': 'Заметка к повороту — что попробовать в следующий раз', 'Save': 'Сохранить',
+  'Keep this corner with a note — the Lab start page lists your bookmarks': 'Оставить этот поворот с заметкой — закладки лежат на стартовой странице Лаборатории', 'Bookmark this corner': 'Закладка на этот поворот', 'Remove from favourites': 'Убрать из избранного', 'Remove the bookmark': 'Убрать закладку' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -4757,6 +4767,10 @@ const STORE = (() => {
       deleteComment: async (id) => must(await sb.from('comments').delete().eq('id', +id)),
       async followersOf(uid) { return must(await sb.from('follows').select('follower').eq('followee', uid).limit(1000)).map(r => r.follower); },
       async followingOf(uid) { return must(await sb.from('follows').select('followee').eq('follower', uid).limit(1000)).map(r => r.followee); },
+      // bookmarks and favourites (marks.sql): a driver's own rows only
+      async marksOf(uid) { return must(await sb.from('marks').select('session_id,corner,note,created_at').eq('user_id', uid).limit(1000)).map(r => ({ sid: r.session_id, corner: r.corner, note: r.note || '', at: Date.parse(r.created_at) || 0 })); },
+      async setMark(uid, sid, corner, note) { return must(await sb.from('marks').upsert({ user_id: uid, session_id: sid, corner, note: note || '' })); },
+      async removeMark(uid, sid, corner) { return must(await sb.from('marks').delete().eq('user_id', uid).eq('session_id', sid).eq('corner', corner)); },
       follow: async (a, b) => must(await sb.from('follows').upsert({ follower: a, followee: b })),
       unfollow: async (a, b) => must(await sb.from('follows').delete().eq('follower', a).eq('followee', b)),
       async sessionsByOwners(ids) { if (!ids.length) return []; return must(await sb.from('sessions').select('id,meta').in('owner', ids.slice(0, 100)).eq('published', true).order('updated_at', { ascending: false }).limit(60)).map(r => Object.assign({ id: r.id }, r.meta)); },
@@ -4939,6 +4953,14 @@ const STORE = (() => {
     followCache.set(uid, out); return out;
   }
   async function toggleFollow(uid) { if (!adapter || !me.id) throw new Error('sign in'); if (uid === me.id) return followInfo(uid); const cur = await followInfo(uid); if (cur.iFollow) await adapter.unfollow(me.id, uid); else await adapter.follow(me.id, uid); followCache.clear(); return followInfo(uid, true); }
+  // bookmarks and favourites: corner 0 = the session is a favourite, corner n = a bookmark on that corner with a note (marks.sql);
+  // false once the table is found missing, so the stars stay hidden instead of failing on every click
+  let marksCache = null, marksOk;
+  const noMarks = (e) => /relation .*marks|PGRST205|42P01|schema cache/i.test(String(e && e.message || e) + ' ' + (e && e.code || ''));
+  async function marks() { if (!adapter || !adapter.marksOf || !me.id || marksOk === false) return []; if (marksCache) return marksCache; try { marksCache = await adapter.marksOf(me.id); marksOk = true; } catch (e) { if (noMarks(e)) marksOk = false; marksCache = []; } return marksCache; }
+  function markOf(sid, corner) { return (marksCache || []).find(m => m.sid === sid && m.corner === (corner || 0)) || null; }
+  async function setMark(sid, corner, note) { if (!adapter || !adapter.setMark || !me.id) throw new Error('sign in'); note = String(note || '').slice(0, 200); await marks(); if (marksOk === false) throw new Error('marks'); if ((marksCache || []).length >= 300 && !markOf(sid, corner)) throw new Error('too many'); await adapter.setMark(me.id, sid, corner || 0, note); marksCache = (marksCache || []).filter(m => !(m.sid === sid && m.corner === (corner || 0))).concat([{ sid, corner: corner || 0, note, at: Date.now() }]); track(corner ? 'bookmark' : 'fav', { sid, n: corner || 0 }); }
+  async function removeMark(sid, corner) { if (!adapter || !adapter.removeMark || !me.id) throw new Error('sign in'); await adapter.removeMark(me.id, sid, corner || 0); marksCache = (marksCache || []).filter(m => !(m.sid === sid && m.corner === (corner || 0))); }
   async function followingIds() { if (!adapter || !me.id) return []; try { return await adapter.followingOf(me.id); } catch (e) { return []; } }
   async function feed() { const ids = await followingIds(); if (!ids.length) return []; try { await blocked(); return notBlocked((await adapter.sessionsByOwners(ids)).sort(byDate)).slice(0, 30); } catch (e) { return []; } }
   // the home-page counter: site-wide totals (hutka_counts, public); null when the function is not there yet — the page then counts what it has
@@ -5057,7 +5079,7 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits, track, adminAnalytics,
+    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, marks, markOf, setMark, removeMark, get marksOn() { return marksOk !== false && !!(adapter && adapter.marksOf && me.id); }, visit, adminVisits, track, adminAnalytics,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); }, deviceLog: async (o) => { if (!adapter || !adapter.deviceLog) throw new Error('not configured'); if (!me.id) throw new Error('sign in'); return adapter.deviceLog(o); } };
@@ -5317,6 +5339,7 @@ function createMapView(canvas, host) {
         ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(bx, by); ctx.stroke();
         ctx.beginPath(); ctx.arc(bx, by, rad, 0, Math.PI * 2); ctx.fillStyle = hi ? ring : (gr ? DATA.GRADE_COLORS[gr.g] : 'rgba(14,17,22,0.72)'); ctx.globalAlpha = hi || !gr ? 1 : 0.92; ctx.fill(); ctx.globalAlpha = 1; ctx.lineWidth = hi ? 2.5 : 1.4; ctx.strokeStyle = hi ? '#fff' : (gr ? 'rgba(255,255,255,0.85)' : ring); ctx.stroke();
         ctx.fillStyle = hi ? (m.kind === 'brake' ? '#fff' : '#111') : 'rgba(255,255,255,0.95)'; ctx.font = `${hi ? 700 : 600} ${hi ? 12 : 10}px ${C.mono}`; ctx.fillText(String(w0.n), bx, by + 0.5);
+        if (O.marked && O.marked.has(w0.n)) { ctx.font = `700 ${hi ? 11 : 9}px ${C.body}`; ctx.lineWidth = 2.5; ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.strokeText('★', bx + rad * 0.85, by - rad * 0.8); ctx.fillStyle = '#ffc233'; ctx.fillText('★', bx + rad * 0.85, by - rad * 0.8); }   // bookmarked
         M.badges.push({ row: r, x: bx, y: by, r: rad });
       }
       const I = labels.length ? inset(w, h) : null;   // labels keep to the free part of the canvas (the cockpit HUD, the landing band and caption sit outside it)
@@ -5930,7 +5953,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.15';
+const APP_VERSION = 'v34.16';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6551,7 +6574,7 @@ LAB.open = async function (meta, asCmp) {
     const before = own.filter(earlier).sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || 0) - (a.createdAt || 0));
     if (before.length) { const pm = before[0]; let ps = sessOf(pm.id); if (!ps) { const x = await STORE.loadSession(pm); if (add(x)) ps = x; } const pbs = before.map(m => +m.bestMs).filter(x => x > 0); if (ps) LAB.prev = { sess: ps, pb: pbs.length ? Math.min(...pbs) : 0, n: before.length }; }
   } catch (e) { LAB.prev = null; }
-  LAB.names = await STORE.names(LAB.sessions.map(s => s.owner));
+  LAB.names = await STORE.names(LAB.sessions.map(s => s.owner)); await STORE.marks();   // the stars (favourite, bookmarked corners) are drawn from the cache
   LAB.sessions.sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.createdAt || 0) - (b.createdAt || 0));
   const reopen = !!(LAB.current && LAB.current.id === sess.id);
   LAB.current = sess; LAB.selN = 0; LAB.ckInsp = false; LAB.scrubIdx = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = reopen && LAB.pickerOpen; LAB.social = null; LAB.breakOpen = false; LAB.cmp2 = reopen ? LAB.cmp2 : 'none'; LAB.scrubT = 0; replayPlay(false);
@@ -6757,7 +6780,7 @@ function labEnsureMap() {
     getImage: () => { if (!LAB.G) return null; const im = LAB.G.image; if (LAB.G.source === 'gps' && SAT.can(LAB.G) && LAB.opts.tiles) return null; return im && LAB.G.source !== 'gps' ? im : (LAB.opts.aerial ? im : null); },
     getTiles: () => { const G = LAB.G; if (!G) return null; const b = G.sat || { dx: 0, dy: 0 }; return SAT.layer(G, LAB.opts.tiles, { dx: b.dx + LAB.satAdj.dx, dy: b.dy + LAB.satAdj.dy }); },
     onSatMove: (dxPx, dyPx) => { if (!LAB.G) return; const mpp = LAB.G.track.mpp; LAB.satAdj.dx += dxPx * mpp; LAB.satAdj.dy -= dyPx * mpp; saveSatAdj(); renderAlignBar(); },
-    getOverlay: () => ({ D: LAB.dcmp, coach: LAB.coach, role: roleNow(), hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, pedals: LAB.opts.pedals, lapsAll: LAB.dcmp && LAB.G ? LAB.dcmp.sess.laps.filter(L => L.clean && L.px) : null, rev: LAB.G ? LAB.G.rev : '', model: null, modelOn: false, corridor: LAB.corridor, marks: labMarks(), markScale: LAB.markScale || 1 }),
+    getOverlay: () => ({ D: LAB.dcmp, coach: LAB.coach, role: roleNow(), hiRow: activeRow(), marked: LAB.dcmp && LAB.current ? new Set(LAB.dcmp.rows.filter(r => STORE.markOf(LAB.current.id, r.w.n)).map(r => r.w.n)) : null, band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, pedals: LAB.opts.pedals, lapsAll: LAB.dcmp && LAB.G ? LAB.dcmp.sess.laps.filter(L => L.clean && L.px) : null, rev: LAB.G ? LAB.G.rev : '', model: null, modelOn: false, corridor: LAB.corridor, marks: labMarks(), markScale: LAB.markScale || 1 }),
     viewInset: ckInset,
     onHover: (i) => { if (i < 0 && isCockpit()) { hoverOff(); return; } LAB.hoverIdx = i; hoverChanged(); },
     onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); if (isCockpit()) { if (i >= 0) LAB.scrubIdx = i; LAB.ckInsp = !!row && LAB.selN !== row.w.n; } LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
@@ -6880,6 +6903,20 @@ function labEnsureMap() {
   $('rpPlay').onclick = () => replayPlay(!LAB.playing);
   $('labUpload').onclick = () => UPLOAD.open({ track: LAB.tid, layout: LAB.lid }); $('labUpload2').onclick = () => UPLOAD.open({});
   $('btnPublish').onclick = labTogglePublish; $('labBack').onclick = () => LAB.close();
+  $('btnFav').onclick = async () => { const s = LAB.current; if (!s) return; const b = $('btnFav'); b.classList.add('busy'); try { if (STORE.markOf(s.id, 0)) { await STORE.removeMark(s.id, 0); toast(t('Removed from favourites.')); } else { await STORE.setMark(s.id, 0, ''); NATIVE.haptic('light'); toast(t('In your favourites — the Lab start page lists them.')); } } catch (e) { toast(t('Could not save.')); } b.classList.remove('busy'); labRender(); };
+  // a bookmark on the chosen corner: the note is typed in the inspector
+  $('inspBody').addEventListener('click', async (e) => {
+    const a = e.target.closest('[data-mark]'); if (!a) return; e.preventDefault(); const s = LAB.current, n = +a.dataset.n; if (!s || !n) return;
+    const box = a.closest('.insp-mark'), input = box && box.querySelector('input');
+    try {
+      if (a.dataset.mark === 'save') { await STORE.setMark(s.id, n, input ? input.value.trim() : ''); NATIVE.haptic('light'); toast(t('Bookmarked T{n}.', { n })); }
+      else if (a.dataset.mark === 'remove') { await STORE.removeMark(s.id, n); }
+      else if (a.dataset.mark === 'edit') { LAB.markEdit = n; renderInspector(); const i = $('inspBody').querySelector('.insp-mark input'); if (i) i.focus(); return; }
+      else if (a.dataset.mark === 'add') { LAB.markEdit = n; renderInspector(); const i = $('inspBody').querySelector('.insp-mark input'); if (i) i.focus(); return; }
+    } catch (e) { toast(t('Could not save.')); }
+    LAB.markEdit = 0; renderInspector(); renderCornersTable(); LAB.map.draw();
+  });
+  $('inspBody').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('.insp-mark input')) { e.preventDefault(); const b = e.target.closest('.insp-mark').querySelector('[data-mark="save"]'); if (b) b.click(); } });
   $('btnEditSess').onclick = () => { const s = LAB.current; if (s) SESSEDIT.open(s, () => { LAB.invalidate(s.id); go('lab~' + s.id); }); };
   $('btnFollowOwner').onclick = async () => { const s = LAB.current; if (!s || mySession(s)) return; if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to follow drivers.')); return; } const b = $('btnFollowOwner'); b.classList.add('busy'); try { await STORE.toggleFollow(s.owner); await renderOwnerRow(); } catch (e) { toast(t('Could not save.')); } b.classList.remove('busy'); };
   $('commentBtn').onclick = postComment; $('commentInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); postComment(); } });
@@ -6922,6 +6959,7 @@ function selectCorner(n, scroll) { NATIVE.haptic('light'); LAB.selN = (LAB.selN 
 async function renderLabStart() {
   const box = $('labMine');
   await renderMySessionsTable(box, { hint: $('labMineHint'), sub: $('labMineSub'), compact: true });
+  await renderMarksCard();
   const feedCard = $('labFeedCard'), feedBox = $('labFeed'); feedBox.innerHTML = '';
   if (!STORE.hasIdentity || !STORE.hasDb || !(await STORE.socialAvailable())) { feedCard.hidden = true; return; }
   let items = []; try { items = await STORE.feed(); } catch (e) { items = []; }
@@ -6932,9 +6970,25 @@ async function renderLabStart() {
   feedBox.appendChild(list);
 }
 
+// the bookmarks card on the Lab start page: favourite sessions, then bookmarked corners grouped by session — each a link into the Lab
+async function renderMarksCard() {
+  const card = $('labMarksCard'), box = $('labMarks'); if (!STORE.marksOn) { card.hidden = true; return; }
+  const list = await STORE.marks(); if (!list.length) { card.hidden = true; return; }
+  const metas = {}; for (const sid of [...new Set(list.map(m => m.sid))]) { try { metas[sid] = await STORE.getSessionMeta(sid); } catch (e) { metas[sid] = null; } }
+  const alive = list.filter(m => metas[m.sid]); if (!alive.length) { card.hidden = true; return; }
+  card.hidden = false; $('labMarksSub').textContent = String(alive.length); box.innerHTML = '';
+  const names = await STORE.names(Object.values(metas).filter(Boolean).map(m => m.owner)), who = (m) => m.owner === STORE.me.id ? '' : ((names[m.owner] || {}).name || t('Driver')) + ' · ';
+  const where = (m) => { const tr = STORE.getTrack(m.track); return `${tr ? tr.name : (m.trackName || t('Custom'))}${m.layout && m.layout !== 'custom' ? ' · ' + m.layout : ''}`; };
+  const wrap = el('div', 'list');
+  const row = (href, html, tm, onX, title) => { const a = el('a', 'mark-row'); a.href = href; const tx = el('span', 'tx'); tx.innerHTML = html; a.appendChild(tx); if (tm) a.appendChild(el('span', 'tm', tm)); const x = el('span', 'x', '×'); x.title = title; x.onclick = async (e) => { e.preventDefault(); e.stopPropagation(); try { await onX(); } catch (err) {} renderMarksCard(); }; a.appendChild(x); wrap.appendChild(a); };
+  for (const mk of alive.filter(m => m.corner === 0).sort((a, b) => b.at - a.at)) { const m = metas[mk.sid]; row('#lab~' + m.id, `<span class="star">★</span> <b>${esc(who(m) + (m.label || m.name))}</b> · ${esc(where(m))} · ${esc(fmtDate(m.date))}`, fmtMs(m.bestMs), () => STORE.removeMark(m.id, 0), t('Remove from favourites')); }
+  const bySess = new Map(); for (const mk of alive.filter(m => m.corner > 0).sort((a, b) => a.corner - b.corner)) { if (!bySess.has(mk.sid)) bySess.set(mk.sid, []); bySess.get(mk.sid).push(mk); }
+  for (const [sid, mks] of bySess) { const m = metas[sid]; for (const mk of mks) row(`#lab~${sid}~t${mk.corner}`, `<span class="star">★</span> <b>T${mk.corner}</b>${mk.note ? ' — ' + esc(mk.note) : ''} <span class="hint">· ${esc(who(m) + (m.label || m.name))} · ${esc(fmtDate(m.date))}</span>`, '', () => STORE.removeMark(sid, mk.corner), t('Remove the bookmark')); }
+  box.appendChild(wrap);
+}
 function labRender() {
   const G = LAB.G, has = !!(G && LAB.sessions.length && allLaps().length && LAB.current);
-  $('labStart').hidden = has; $('labBack').hidden = !has; if (!has) $('btnShare').hidden = true; for (const id of ['pickbar', 'pickSentinel', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open', 'peek'); }
+  $('labStart').hidden = has; $('labBack').hidden = !has; if (!has) { for (const id of ['btnShare', 'btnFav', 'btnPublish', 'btnEditSess', 'btnModerate', 'btnTransfer', 'voteBox', 'lowRated']) $(id).hidden = true; } for (const id of ['pickbar', 'pickSentinel', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open', 'peek'); }
   $('labEmptyText').textContent = t('Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.');
   $('labSub').textContent = has ? `${LAB.trackName}${G.layout ? ' · ' + G.layout.name : (LAB.lid === 'custom' ? ' · ' + t('custom layout') : '')}` : t('Session analysis');
   $('hero').classList.toggle('with-insp', has); $('pg-lab').classList.toggle('has', has); syncLand();
@@ -7018,6 +7072,7 @@ function labRender() {
   $('youColHead').textContent = D.ref.mine ? (refIsAvg ? `${t('You')} · ${refName}` : t('You')) : `${whoOf(sess) || shortSess(sess)} · ${refName}`; $('cmpColHead').textContent = D.O ? nameOf(D.O) : t('Comparison');
   // this session: publish, edit, like
   const pb = $('btnPublish'); pb.hidden = !(STORE.canWrite() && mySession(sess) && sess.owner !== 'local'); $('btnShare').hidden = false;
+  { const fb = $('btnFav'); fb.hidden = !(STORE.marksOn && sess.owner !== 'local'); if (!fb.hidden) { const on = !!STORE.markOf(sess.id, 0); fb.classList.toggle('on', on); fb.textContent = on ? '★' : '☆'; fb.title = on ? t('In your favourites — tap to remove') : t('Add to favourites'); } }
   if (!pb.hidden) { pb.textContent = sess.published ? t('Unpublish') : t('Publish to track page'); pb.classList.toggle('active', !!sess.published); pb.disabled = !sess.track; pb.title = sess.track ? '' : t('Assign a track first (Edit).');
     if (sess.moderated && !sess.published && !STORE.isAdmin()) { pb.disabled = true; pb.textContent = t('Hidden by admins'); pb.title = t('The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine, or ask them.'); } }
   $('btnTransfer').hidden = !(STORE.isAdmin() && STORE.hasDb && sess.owner !== 'local');
@@ -7072,13 +7127,14 @@ function renderCmpPicker() {
     if (LAB.tid) { const pubs = await STORE.sessionsFor(LAB.tid, LAB.lid); for (const m of pubs) if (m.id !== sess.id && !sessOf(m.id) && !rows.some(r => r.meta.id === m.id)) { if (sameKart(m)) push(m, false, true, false); else hidden++; } }
     if (hidden || LAB.allKarts) { const h = $('cmpPickerHint'); h.textContent = (LAB.allKarts ? t('Showing every kart — different karts are not comparable corner by corner.') : t('{n} session(s) on another kart are hidden (different karts are not comparable corner by corner).', { n: hidden })) + ' '; const a = el('a', 'tref', LAB.allKarts ? t('Hide them') : t('Show anyway')); a.href = '#'; a.onclick = async (e) => { e.preventDefault(); LAB.allKarts = !LAB.allKarts; LAB.pickerOpen = true; await LAB.open(LAB.current, false); }; h.appendChild(a); }
     const names = await STORE.names(rows.map(r => r.meta.owner));
-    rows.sort((a, b) => (b.same - a.same) || (b.mine - a.mine) || (b.meta.date || '').localeCompare(a.meta.date || ''));
+    const fav = (r) => STORE.markOf(r.meta.id, 0) ? 1 : 0;
+    rows.sort((a, b) => (b.same - a.same) || (fav(b) - fav(a)) || (b.mine - a.mine) || (b.meta.date || '').localeCompare(a.meta.date || ''));
     list.innerHTML = '';
     if (!rows.length) { list.appendChild(el('div', 'hint', t('No other sessions yet. Upload another stint or wait for other drivers to publish on this layout.'))); return; }
     for (const r of rows) {
       const m = r.meta, b = el('button', 'cmp-row'); b.type = 'button'; if (!r.same) b.disabled = true;
       const tr = STORE.getTrack(m.track); const who = el('span', 'who', r.mine ? t('You') : ((names[m.owner] || {}).name || t('Driver')));
-      const nm = el('span', 'nm', `${m.label || m.name} · ${fmtDate(m.date)}${!r.same ? ` · ${tr ? tr.name : (m.trackName || t('Custom'))}` : ''}`);
+      const nm = el('span', 'nm', `${m.label || m.name} · ${fmtDate(m.date)}${!r.same ? ` · ${tr ? tr.name : (m.trackName || t('Custom'))}` : ''}`); if (fav(r)) nm.prepend(el('span', 'star', '★'));
       const pill = el('span', 'pill ' + (r.same ? 'ok' : 'off'), r.same ? t('same layout') : t('other layout'));
       const pills = el('span', 'pills'); pills.appendChild(pill); if (m.kart || kartClassOf(m) !== kartClassOf(sess)) pills.appendChild(el('span', 'pill ' + (kartCompatible(m, sess) ? '' : 'off'), kartLabel(m)));
       b.append(who, nm, el('span', 'tm', fmtMs(m.bestMs)), pills);   // on a phone the pills take a second line, so the name and the session read
@@ -7439,6 +7495,7 @@ function renderCornersTable() {
     const d3 = r.M3 ? m.time - r.M3.time : null, gr = c ? DATA.gradeCorner(m, c) : null;
     const cells = [['T' + w.n, ''], [`${w.dir === 'L' ? t('left') : t('right')} · ${kindWord(m)}`, kindCls(m)], [short(m), 'txt'], [r.O ? (r.pick ? t('lap {n}', { n: r.pick.L.n }) + ' · ' : '') + short(r.O) : '—', 'txt'], [r.cmp ? sg(r.cmp.dt) + (d3 !== null ? `\n3: ${sg(d3)}` : '') : '—', (r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm') + ' num' + (d3 !== null ? ' two' : '')], [c ? (res > 0.03 ? res.toFixed(2) + ' ' + t('s') : t('ok')) : '—', (res > 0.1 ? 'loss' : 'm') + ' num', gr], [main, 'txt']];
     for (const [tx, cl, g] of cells) { const td = el('td'); if (g) { td.appendChild(gradeChip(g)); td.appendChild(document.createTextNode(tx)); } else td.textContent = tx; if (cl) td.className = cl; tr.appendChild(td); }
+    if (STORE.markOf(D.sess.id, w.n)) { const st = el('span', 'star', '★'); st.title = STORE.markOf(D.sess.id, w.n).note || t('Bookmarked'); tr.firstChild.prepend(st); }
     tr.onclick = () => selectCorner(w.n, true); const labels = ['#', t('Type'), $('youColHead').textContent, $('cmpColHead').textContent, 'Δt', t('Reserve'), t('Main difference')]; Array.from(tr.children).forEach((td, i) => { td.dataset.label = labels[i] || ''; });
     tr.addEventListener('mouseenter', () => { LAB.hoverIdx = w.apex; LAB.map.setHover(w.apex); renderInspector(); }); tr.addEventListener('mouseleave', () => { LAB.hoverIdx = -1; LAB.map.setHover(-1); renderInspector(); });
     tb.appendChild(tr);
@@ -7447,7 +7504,7 @@ function renderCornersTable() {
   const mob = $('cornersMob'); mob.innerHTML = '';
   for (const r of D.rows) { const w = r.w, m = r.R, c = coachOf(w.n), res = c ? Math.max(0, m.time - c.tTop) : 0, gr = c ? DATA.gradeCorner(m, c) : null; const b = el('button', 'crow' + (LAB.selN === w.n ? ' sel' : '')); b.type = 'button';
     const main = r.cmp && Math.abs(r.cmp.dt) >= 0.04 && r.cmp.items[0] ? r.cmp.items[0].t : (c && c.infl && c.infl[0] && Math.abs(c.infl[0].corr) >= 0.35 ? t('what matters here is {f}', { f: c.infl[0].name }) : '');
-    b.innerHTML = `<b>T${w.n}</b><span class="ty ${kindCls(m)}">${esc((w.dir === 'L' ? t('left') : t('right')) + ' · ' + kindWord(m))}</span><span class="d ${r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm'}">${r.cmp ? sg(r.cmp.dt) + (r.M3 ? ` <small>3: ${sg(m.time - r.M3.time)}</small>` : '') : m.time.toFixed(2) + ' ' + t('s')}</span><span class="r ${res > 0.1 ? 'hot' : ''}">${gr ? gradeChip(gr).outerHTML : ''}${c ? (res > 0.03 ? t('reserve') + ' ' + res.toFixed(2) : t('ok')) : ''}</span><span class="k">${esc(short(m))}${main ? ' — ' + esc(main) : ''}</span>`;
+    b.innerHTML = `<b>${STORE.markOf(D.sess.id, w.n) ? '<span class="star">★</span>' : ''}T${w.n}</b><span class="ty ${kindCls(m)}">${esc((w.dir === 'L' ? t('left') : t('right')) + ' · ' + kindWord(m))}</span><span class="d ${r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm'}">${r.cmp ? sg(r.cmp.dt) + (r.M3 ? ` <small>3: ${sg(m.time - r.M3.time)}</small>` : '') : m.time.toFixed(2) + ' ' + t('s')}</span><span class="r ${res > 0.1 ? 'hot' : ''}">${gr ? gradeChip(gr).outerHTML : ''}${c ? (res > 0.03 ? t('reserve') + ' ' + res.toFixed(2) : t('ok')) : ''}</span><span class="k">${esc(short(m))}${main ? ' — ' + esc(main) : ''}</span>`;
     b.onclick = () => selectCorner(w.n, false); mob.appendChild(b); }
   if (isLand() && LAB.selN) { const s = mob.querySelector('.crow.sel'); if (s && s.scrollIntoView) s.scrollIntoView({ block: 'nearest' }); }
 }
@@ -7496,6 +7553,10 @@ function renderInspector() {
   const sM = (x) => x >= 0 ? x.toFixed(0) + ' ' + t('m') : '—', K = t('km/h');
   const gr = coach ? DATA.gradeCorner(R, coach) : null;
   let html = `<div class="insp-head"><b>T${w.n}</b>${gr ? gradeChip(gr).outerHTML : ''}<span class="hint">${w.dir === 'L' ? t('left') : t('right')} · R ${w.Rmin.toFixed(0)} ${t('m')} · ${t('apex {s} m from S/F', { s: R.sApex.toFixed(0) })}</span>${pill}</div>`;
+  if (STORE.marksOn && D.sess.owner !== 'local') { const mk = STORE.markOf(D.sess.id, w.n); const editing = LAB.markEdit === w.n;
+    if (mk && !editing) html += `<div class="insp-mark"><span class="star">★</span><span class="note">${esc(mk.note || t('Bookmarked'))}</span><a data-mark="edit" data-n="${w.n}">${esc(t('edit'))}</a><a data-mark="remove" data-n="${w.n}">${esc(t('remove'))}</a></div>`;
+    else if (editing) html += `<div class="insp-mark"><span class="star">☆</span><input maxlength="200" placeholder="${esc(t('A note for this corner — what to try next time'))}" value="${esc(mk ? mk.note : '')}"><button class="btn sm primary" type="button" data-mark="save" data-n="${w.n}">${esc(t('Save'))}</button></div>`;
+    else html += `<div class="insp-mark"><a data-mark="add" data-n="${w.n}" title="${esc(t('Keep this corner with a note — the Lab start page lists your bookmarks'))}">☆ ${esc(t('Bookmark this corner'))}</a></div>`; }
   html += `<div class="insp-wrap"><table class="insp-table${O3 ? ' three' : ''}"><tr><th></th><th class="you">1 · ${esc(youHead)}</th>${O ? `<th class="cmp">2 · ${esc(r.pick ? `${oName} · ${t('lap {n}', { n: r.pick.L.n })}` : oName)}</th>` : ''}${O3 ? `<th class="third">3 · ${esc(D.name3)}</th>` : ''}</tr>`;
   html += row(t('entry'), `${kmh(R.vEntry)} ${K}`, O ? `${kmh(O.vEntry)} ${K}` : '', O3 ? `${kmh(O3.vEntry)} ${K}` : '');
   html += row(t('pedal'), pedalText(R), O ? pedalText(O) : '', O3 ? pedalText(O3) : '');
