@@ -506,7 +506,7 @@ body.onboarding #toast{z-index:90}
 .cmp-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cmp-row .tm{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
 .cmp-row .pills{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-@media (max-width:700px){.cmp-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:8px;row-gap:6px}.cmp-row .who{max-width:38%}.cmp-row .pills{grid-column:1/-1}}
+@media (max-width:700px){.cmp-row{display:grid;grid-template-columns:fit-content(45%) minmax(0,1fr) auto;column-gap:8px;row-gap:6px}.cmp-row .who{max-width:none}.cmp-row .pills{grid-column:1/-1}}
 .cmp-row .pill{flex:none}
 .charts.under{border-top:1px solid var(--line);padding:4px 10px 8px;background:var(--surface)}
 .charts.under .chart{cursor:crosshair}
@@ -5763,7 +5763,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.11';
+const APP_VERSION = 'v34.11.1';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
