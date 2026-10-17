@@ -3825,6 +3825,7 @@ Object.assign(I18N.RU, { 'Bluetooth — the explorer: Hutka listens to the devic
 Object.assign(I18N.RU, { 'Another device': 'Другой прибор' });
 Object.assign(I18N.RU, { "The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.": 'Браузер не смог открыть ни одного сервиса этого прибора — Chrome достаёт только до сервисов, которые знает заранее, а у этого прибора свои. Приложение Hutka на телефоне видит всё: для этого прибора используй его.' });
 Object.assign(I18N.RU, { 'Try the PIN': 'Попробовать PIN', "A code on the device's screen? Hutka sends it the common ways and listens for an answer.": 'На экране прибора код? Hutka отправит его всеми обычными способами и послушает ответ.', 'PIN {k}/{n}: {how}': 'PIN {k}/{n}: {how}', 'PIN tried {n} ways — see what came back above, then send the log.': 'PIN отправлен {n} способами — смотри ответы выше и отправь лог.' });
+Object.assign(I18N.RU, { 'This version of the app has no Bluetooth yet — update the Hutka app.': 'В этой версии приложения ещё нет Bluetooth — обнови приложение Hutka.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -7184,6 +7185,7 @@ const DEVICE = (() => {
     const c = e && e.code, m = (e && e.message) || String(e);
     if ((e && e.name === 'NotFoundError') || /cancel/i.test(m)) { S(t('No device picked.')); return; }
     S(c === 'nobt' ? t('Bluetooth works in the Hutka app and in Chrome on Android or a computer — not in this browser.')
+      : /unable to find plugin|not implemented|no bridge/i.test(m) ? t('This version of the app has no Bluetooth yet — update the Hutka app.')
       : c === 'timeout' ? t('The device stopped answering — bring the phone closer and try again.')
       : c === 'locked' ? t('The device memory is locked — enter its security code.')
       : t('Could not read the device: {e}', { e: m }), 'warn');
