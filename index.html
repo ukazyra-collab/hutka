@@ -981,6 +981,8 @@ body.cockpit.lab-land.ck-side #hero .map-bar,body.cockpit.lab-land.ck-insp #hero
 body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pickbar #pickClose{right:calc(10px + var(--sa-right));top:calc(8px + var(--sa-top))}
 /* a phone sideways: the share sheet's preview fits above the buttons, so the buttons are in view without scrolling */
 @media (max-height:480px){ .share-pv canvas{width:auto;max-height:46vh;max-width:100%} .modal .box{padding:12px 16px;gap:10px} .modal h3{font-size:16px} }
+.captcha{min-height:0;display:flex;justify-content:center}
+.captcha:empty{display:none}
 /* ---------- community safety: report / block / delete account ---------- */
 .radios{display:flex;flex-direction:column;gap:6px}
 .radios label{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
@@ -1537,6 +1539,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
               <div class="map-wrap"><div class="map-bar"><div class="seg"><button class="btn" id="eRotL" type="button">↺</button><button class="btn" id="eRotR" type="button">↻</button></div><div class="seg"><button class="btn" id="eZoomOut" type="button">−</button><button class="btn" id="eZoomIn" type="button">+</button><button class="btn" id="eZoomFit" type="button">⌂</button></div></div><div style="position:relative"><canvas id="emap"></canvas><div class="readout" id="eReadout" hidden></div></div></div>
             </div>
           </div>
+        <div class="card" id="admSnapCard" hidden><h2><svg><use href="#i-info"/></svg><span data-t="Nightly snapshots">Nightly snapshots</span><span class="sub" data-t="a copy of every table inside the database, 02:20 UTC">a copy of every table inside the database, 02:20 UTC</span></h2><div class="hint" id="admSnap"></div></div>
         <div class="card" id="admModCard" hidden><h2><svg><use href="#i-info"/></svg><span data-t="Hidden sessions">Hidden sessions</span><span class="sub" data-t="hidden by admins — the owners keep them">hidden by admins — the owners keep them</span></h2><div class="list" id="admMod"></div></div>
         <div class="card" id="admFlagsCard" hidden><h2><svg><use href="#i-flag"/></svg><span data-t="Reports on content and drivers">Reports on content and drivers</span><span class="sub" id="admFlagsSub"></span></h2><div class="list" id="admFlags"></div><div class="hint" id="admFlagsHint" style="margin-top:8px"></div></div>
         <div class="card" id="admReportsCard" hidden><h2><svg><use href="#i-info"/></svg><span data-t="Bug reports">Bug reports</span><span class="sub" id="admReportsSub"></span></h2><div class="list" id="admReports"></div><div class="hint" id="admReportsHint" style="margin-top:8px"></div></div>
@@ -1616,7 +1619,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="seCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="seSave" type="button" data-t="Save">Save</button></div>
 </div></div>
 <!-- sign-in modal (standalone hosting) -->
-<div class="modal" id="authModal" hidden><div class="box" style="width:min(440px,100%)"><h3 data-t="Sign in to Hutka">Sign in to Hutka</h3><p class="hint" data-t="A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.">A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.</p><div class="field"><label>Email</label><input type="text" id="authEmail" placeholder="you@example.com" autocomplete="email"></div><div class="field" id="authPassField" hidden><label data-t="Password">Password</label><input type="password" id="authPass" autocomplete="current-password"></div><div class="field" id="authCodeField" hidden><label data-t="Code from the e-mail">Code from the e-mail</label><input type="text" id="authCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456"></div><div class="row"><button class="btn primary" id="authEmailBtn" type="button" data-t="Email me a link">Email me a link</button><button class="btn primary" id="authCodeBtn" type="button" hidden data-t="Confirm code">Confirm code</button><button class="btn primary" id="authPassBtn" type="button" hidden data-t="Sign in">Sign in</button><button class="btn" id="authAppleBtn" type="button" hidden> Apple</button><button class="btn" id="authGoogleBtn" type="button" hidden>Google</button><button class="btn ghost" id="authCancel" type="button" data-t="Cancel">Cancel</button></div><div class="row"><button class="btn xs ghost" id="authPassToggle" type="button" data-t="I have a password">I have a password</button></div><div class="status" id="authStatus"></div></div></div>
+<div class="modal" id="authModal" hidden><div class="box" style="width:min(440px,100%)"><h3 data-t="Sign in to Hutka">Sign in to Hutka</h3><p class="hint" data-t="A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.">A sign-in keeps your sessions in one library on every device and lets you publish them on track pages. No password: we email you a link.</p><div class="field"><label>Email</label><input type="text" id="authEmail" placeholder="you@example.com" autocomplete="email"></div><div class="field" id="authPassField" hidden><label data-t="Password">Password</label><input type="password" id="authPass" autocomplete="current-password"></div><div class="field" id="authCodeField" hidden><label data-t="Code from the e-mail">Code from the e-mail</label><input type="text" id="authCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456"></div><div class="row"><button class="btn primary" id="authEmailBtn" type="button" data-t="Email me a link">Email me a link</button><button class="btn primary" id="authCodeBtn" type="button" hidden data-t="Confirm code">Confirm code</button><button class="btn primary" id="authPassBtn" type="button" hidden data-t="Sign in">Sign in</button><button class="btn" id="authAppleBtn" type="button" hidden> Apple</button><button class="btn" id="authGoogleBtn" type="button" hidden>Google</button><button class="btn ghost" id="authCancel" type="button" data-t="Cancel">Cancel</button></div><div id="authCaptcha" class="captcha" hidden></div><div class="row"><button class="btn xs ghost" id="authPassToggle" type="button" data-t="I have a password">I have a password</button></div><div class="status" id="authStatus"></div></div></div>
 <div class="modal" id="onbModal" hidden><div class="box onb" style="width:min(560px,100%)">
   <div class="onb-head"><div><h3 data-t="Welcome to Hutka">Welcome to Hutka</h3><p class="hint" data-t="Set up your driver profile — other drivers see it next to your laps. One minute, and you can change it later in Profile.">Set up your driver profile — other drivers see it next to your laps. One minute, and you can change it later in Profile.</p></div></div>
   <div class="onb-photo"><img class="avatar" id="onbAvatar" alt="" style="width:84px;height:84px"><div><label class="btn sm filebtn"><span data-t="Add photo">Add photo</span><input type="file" id="onbPhoto" accept="image/*"></label><div class="hint" style="margin-top:6px" data-t="Optional, but a face next to a lap time looks a lot better than a grey circle.">Optional, but a face next to a lap time looks a lot better than a grey circle.</div></div></div>
@@ -3446,6 +3449,8 @@ Object.assign(I18N.RU, { 'Report': 'Пожаловаться', 'Reported ✓': '
   'Reports on content and drivers': 'Жалобы на контент и гонщиков', 'Run supabase/safety.sql in the SQL editor once — reports on sessions, comments and drivers appear here.': 'Выполни supabase/safety.sql в SQL-редакторе один раз — жалобы на сессии, комментарии и гонщиков появятся здесь.', 'No reports. The "Report" buttons on sessions, comments, driver pages and coach answers send them here.': 'Жалоб нет. Кнопки «Пожаловаться» на сессиях, комментариях, страницах гонщиков и ответах тренера присылают их сюда.',
   '(session gone)': '(сессии уже нет)', '(comment gone)': '(комментария уже нет)', 'comment': 'комментарий', 'Coach': 'Тренер', 'reported by {n}': 'пожаловался {n}', 'a driver': 'гонщик', 'Delete comment': 'Удалить комментарий', 'Delete this comment?': 'Удалить этот комментарий?', 'Hide session': 'Скрыть сессию', 'It disappears from the feed and the track page. The owner keeps it, unpublished.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется, неопубликованной.' });
 Object.assign(I18N.RU, { 'My sessions': 'Мои сессии', 'sessions': 'сессий', 'drivers': 'гонщиков' });
+Object.assign(I18N.RU, { 'Daily limit of sessions reached — more tomorrow.': 'Дневной лимит сессий исчерпан — ещё завтра.', 'Daily limit for guests reached — sign in to keep going.': 'Дневной лимит для гостей исчерпан — войди, чтобы продолжить.', 'Daily limit reached — try again tomorrow.': 'Дневной лимит исчерпан — попробуй завтра.', 'Daily upload limit reached — the rest tomorrow.': 'Дневной лимит загрузок исчерпан — остальное завтра.',
+  'Nightly snapshots': 'Ночные копии', 'a copy of every table inside the database, 02:20 UTC': 'копия всех таблиц внутри базы, 02:20 UTC', 'Not set up yet (supabase/limits.sql).': 'Ещё не настроено (supabase/limits.sql).', 'No snapshots yet — the first one is taken tonight at 02:20 UTC.': 'Копий ещё нет — первая будет сегодня ночью в 02:20 UTC.', '{n} tables': '{n} таблиц', 'Telemetry copies are kept 3 days, the rest 7. To restore a table: Supabase → SQL editor → insert … select from backup.dYYYYMMDD_<table>.': 'Копии телеметрии хранятся 3 дня, остальное 7. Восстановить таблицу: Supabase → SQL editor → insert … select from backup.dYYYYMMDD_<таблица>.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -3734,7 +3739,9 @@ const STORE = (() => {
       async sessionsFor(tid, lid) { let q = sb.from('sessions').select('id,meta').eq('track_id', tid).eq('published', true); if (lid) q = q.eq('layout_id', lid); return must(await q.limit(500)).map(r => Object.assign({ id: r.id }, r.meta)); },
       async myOnTrack(id, tid) { return must(await sb.from('sessions').select('id,meta').eq('owner', id).eq('track_id', tid)).map(r => Object.assign({ id: r.id }, r.meta)); },
       async getSessionMeta(sid) { const rows = must(await sb.from('sessions').select('id,meta').eq('id', sid).limit(1)); return rows.length ? Object.assign({ id: rows[0].id }, rows[0].meta) : null; },
-      async getChunks(sid) { const rows = must(await sb.from('session_data').select('data').eq('id', sid).limit(1)); return rows.length ? [rows[0].data] : []; },
+      // the telemetry comes through hutka_session_data (limits.sql): counted per account / address; an older database without the function falls back to the table
+      async getChunks(sid) { if (A.dataFn !== false) { const r = await sb.rpc('hutka_session_data', { sid, vid: visitorId() }); if (!r.error) return r.data ? [r.data] : []; if (/quota/i.test(r.error.message || '')) { const e = new Error('quota'); e.code = 'quota'; throw e; } if (!/hutka_session_data|PGRST202|42883/.test(r.error.message || '')) throw r.error; A.dataFn = false; } const rows = must(await sb.from('session_data').select('data').eq('id', sid).limit(1)); return rows.length ? [rows[0].data] : []; },
+      async snapshots() { return must(await sb.rpc('hutka_snapshots')) || []; },
       async saveSession(sid, meta, chunks) { must(await sb.from('sessions').upsert({ id: sid, owner: meta.owner, track_id: meta.track || '', layout_id: meta.layout || 'custom', published: !!meta.published, best_ms: meta.bestMs, meta, updated_at: new Date().toISOString() })); must(await sb.from('session_data').upsert({ id: sid, enc: meta.enc, data: chunks.join('') })); },
       async updateSession(sid, patch) { const cur = await A.getSessionMeta(sid); if (!cur) throw new Error('missing'); const meta = Object.assign(cur, patch, { updatedAt: Date.now() }); delete meta.id; must(await sb.from('sessions').update({ meta, published: !!meta.published, track_id: meta.track || '', layout_id: meta.layout || 'custom', updated_at: new Date().toISOString() }).eq('id', sid)); },
       deleteSession: async (sid) => must(await sb.from('sessions').delete().eq('id', sid)),
@@ -3801,10 +3808,10 @@ const STORE = (() => {
       async socialCounts(ids, me) { const out = {}; for (const id of ids) out[id] = { likes: 0, down: 0, comments: 0, liked: false, mine: 0 }; if (!ids.length) return out; try { let r = await sb.from('likes').select('session_id,user_id,vote').in('session_id', ids).limit(5000); if (r.error && noCol(r.error)) { A.votes = false; r = await sb.from('likes').select('session_id,user_id').in('session_id', ids).limit(5000); } for (const x of must(r)) { const o = out[x.session_id]; if (o) { const v = x.vote === -1 ? -1 : 1; if (v === -1) o.down++; else o.likes++; if (me && x.user_id === me) { o.mine = v; o.liked = v === 1; } } } } catch (e) {} try { for (const r of must(await sb.from('comments').select('session_id').in('session_id', ids).limit(5000))) { const o = out[r.session_id]; if (o) o.comments++; } } catch (e) {} return out; },
       // auth
       // inside the native app the browser comes back to hutka://auth (a deep link); on the web, to this page
-      signInEmail: async (email) => must(await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: (window.NATIVE && window.NATIVE.on) ? window.NATIVE.redirect : location.origin + location.pathname } })),
+      signInEmail: async (email, captchaToken) => must(await sb.auth.signInWithOtp({ email, options: Object.assign({ emailRedirectTo: (window.NATIVE && window.NATIVE.on) ? window.NATIVE.redirect : location.origin + location.pathname }, captchaToken ? { captchaToken } : {}) })),
       signInGoogle: async () => { if (window.NATIVE && window.NATIVE.on) { const r = must(await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.NATIVE.redirect, skipBrowserRedirect: true } })); if (r && r.url) await window.NATIVE.openUrl(r.url); return r; } return must(await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } })); },
       signInApple: async () => { const native = window.NATIVE && window.NATIVE.on; const r = must(await sb.auth.signInWithOAuth({ provider: 'apple', options: native ? { redirectTo: window.NATIVE.redirect, skipBrowserRedirect: true } : { redirectTo: location.origin + location.pathname } })); if (native && r && r.url) await window.NATIVE.openUrl(r.url); return r; },
-      signInPassword: async (email, password) => must(await sb.auth.signInWithPassword({ email, password })),
+      signInPassword: async (email, password, captchaToken) => must(await sb.auth.signInWithPassword(Object.assign({ email, password }, captchaToken ? { options: { captchaToken } } : {}))),
       verifyEmailCode: async (email, code) => must(await sb.auth.verifyOtp({ email, token: code, type: 'email' })),   // the 6-digit code from the magic-link e-mail ({{ .Token }} in the template)
       finishSignIn: async (url) => { const u = new URL(String(url).replace(/^hutka:\/\//i, 'https://hutka.app/')); const code = u.searchParams.get('code'); if (code) { must(await sb.auth.exchangeCodeForSession(code)); return true; } const h = new URLSearchParams((u.hash || '').replace(/^#/, '')); const at = h.get('access_token'), rt = h.get('refresh_token'); if (at && rt) { must(await sb.auth.setSession({ access_token: at, refresh_token: rt })); return true; } const err = h.get('error_description') || u.searchParams.get('error_description'); if (err) throw new Error(err); return false; },
       signOut: async () => { await sb.auth.signOut(); },
@@ -3880,7 +3887,7 @@ const STORE = (() => {
     let chunks = [];
     if (adapter && meta.owner !== 'local') chunks = await adapter.getChunks(meta.id);
     else { const rec = await LDB.get('sessions', meta.id); chunks = rec ? rec.chunks : []; }
-    if (!chunks.length) throw new Error('no data');
+    if (!chunks.length) throw new Error('no data');   // a quota error passes through from getChunks (e.code === 'quota')
     const laps = await unpackSession(meta, chunks);
     const sess = Object.assign({}, meta, { laps }); for (const L of laps) L._sess = sess;
     if (typeof GEAR !== 'undefined') GEAR.prepare(sess);   // engine channels → gears and shifts (no-op for a GPS-only session)
@@ -4074,6 +4081,8 @@ const STORE = (() => {
   async function claim(tid, text) { if (!adapter) throw new Error('offline'); await adapter.addClaim({ track: tid, by: me.id || 'local', text: text || '', createdAt: Date.now() }); }
   async function claims() { if (!adapter) return []; try { return (await adapter.listClaims()).sort((a, b) => b.createdAt - a.createdAt); } catch (e) { return []; } }
   async function deleteClaim(id) { if (adapter) await adapter.deleteClaim(id); }
+  // a write refused by the daily quota (limits.sql) reads 'quota' in the error; the pages show one line for it
+  const isQuota = (e) => /quota/i.test(String(e && (e.message || e.code || e) || ''));
   // ----- community safety: blocked drivers vanish from what I see; reports go to the admins; the account can be deleted -----
   let blockedIds = null, flagged = null;
   async function blocked(fresh) { if (!adapter || !adapter.blocksOf || !me.id) return []; if (blockedIds && !fresh) return blockedIds; try { blockedIds = await adapter.blocksOf(me.id); } catch (e) { blockedIds = blockedIds || []; } return blockedIds; }
@@ -4094,7 +4103,7 @@ const STORE = (() => {
     mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, visit, adminVisits, track, adminAnalytics,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
-    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount };
+    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); } };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
 // optional model line, and (for the admin editor) the traced control points. Pan, smooth zoom, rotation, hover and click. ----------
@@ -4650,7 +4659,7 @@ function voteButtons(sid, cnt, onChange) {
     if (busy) return; busy = true; const prev = Object.assign({}, st);
     if (st.mine === v) { st.mine = 0; if (v === 1) st.likes--; else st.down--; } else { if (st.mine === 1) st.likes--; if (st.mine === -1) st.down--; st.mine = v; if (v === 1) st.likes++; else st.down++; }
     NATIVE.haptic(v === 1 && st.mine === 1 ? 'medium' : 'light'); paint(); b.classList.add('pop'); setTimeout(() => b.classList.remove('pop'), 350); if (onChange) onChange(Object.assign({}, st));
-    try { const r = await STORE.vote(sid, v); Object.assign(st, { likes: r.likes || 0, down: r.down || 0, mine: r.mine || 0, comments: r.comments || st.comments }); } catch (e) { Object.assign(st, prev); toast(t('Could not save the vote.')); }
+    try { const r = await STORE.vote(sid, v); Object.assign(st, { likes: r.likes || 0, down: r.down || 0, mine: r.mine || 0, comments: r.comments || st.comments }); } catch (e) { Object.assign(st, prev); toast(STORE.isQuota(e) ? t('Daily limit reached — try again tomorrow.') : t('Could not save the vote.')); }
     paint(); if (onChange) onChange(Object.assign({}, st)); busy = false;
   };
   up.onclick = () => tap(1, up); dn.onclick = () => tap(-1, dn); paint(); wrap.append(up, dn); return wrap;
@@ -4883,19 +4892,32 @@ async function renderActivity() { await ACTIVITY.render(); }
 // Google and Apple buttons follow config.js; inside the native app a social button is shown only when Apple sign-in is set up too
 // (App Store rule 4.8: an app that offers Google must offer Sign in with Apple). A password sign-in is there for accounts created with one
 // (the App Store review account, for instance) — it stays folded away behind "I have a password".
+// bot protection on sign-in (Cloudflare Turnstile): config.js → turnstileSiteKey, and the secret in Supabase → Auth → Attack protection. Without the key nothing changes.
+const CAPTCHA = { id: null, loading: null,
+  get on() { return !!((window.HUTKA_CONFIG || {}).turnstileSiteKey); },
+  load() { if (!CAPTCHA.on) return Promise.resolve(false); if (window.turnstile) return Promise.resolve(true); if (CAPTCHA.loading) return CAPTCHA.loading; CAPTCHA.loading = new Promise((res) => { const sc = document.createElement('script'); sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async = true; sc.onload = () => res(true); sc.onerror = () => res(false); document.head.appendChild(sc); }); return CAPTCHA.loading; },
+  // a token for one sign-in call; the widget is invisible unless Cloudflare wants an interaction
+  async token() {
+    if (!CAPTCHA.on || !(await CAPTCHA.load()) || !window.turnstile) return '';
+    const box = $('authCaptcha'); box.hidden = false;
+    return new Promise((res) => { let done = false; const fin = (v) => { if (!done) { done = true; res(v || ''); } };
+      try { if (CAPTCHA.id !== null) window.turnstile.remove(CAPTCHA.id); CAPTCHA.id = window.turnstile.render(box, { sitekey: (window.HUTKA_CONFIG || {}).turnstileSiteKey, appearance: 'interaction-only', callback: (tok) => fin(tok), 'error-callback': () => fin(''), 'expired-callback': () => fin('') }); } catch (e) { fin(''); }
+      setTimeout(() => fin(''), 90000); });
+  }
+};
 const AUTH = {
   open() { const cfg = window.HUTKA_CONFIG || {}, apple = !!cfg.appleAuth, google = !!cfg.googleAuth; $('authStatus').textContent = ''; $('authEmail').value = ''; $('authPass').value = ''; $('authCode').value = ''; $('authCodeField').hidden = true; $('authCodeBtn').hidden = true; $('authGoogleBtn').hidden = !google; $('authAppleBtn').hidden = !apple; $('authEmailBtn').disabled = false; AUTH.pass(false); $('authModal').hidden = false; if (!NATIVE.on) $('authEmail').focus(); },
   pass(on) { $('authPassField').hidden = !on; $('authPassBtn').hidden = !on; $('authEmailBtn').hidden = !!on; $('authPassToggle').textContent = on ? t('Email me a link instead') : t('I have a password'); if (on) $('authPass').focus(); },
   close() { $('authModal').hidden = true; }
 };
 $('btnSignIn').onclick = AUTH.open; $('authCancel').onclick = AUTH.close; $('authModal').addEventListener('click', (e) => { if (e.target === $('authModal')) AUTH.close(); });
-$('authEmailBtn').onclick = async () => { const email = $('authEmail').value.trim(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setStatus('authStatus', t('Enter a valid email.'), 'warn'); return; } $('authEmailBtn').disabled = true; try { await STORE.adapter.signInEmail(email); setStatus('authStatus', NATIVE.on ? t('Check your inbox: type the 6-digit code from the e-mail here (or tap the link in it).') : t('Check your inbox: open the link in the email, or type the 6-digit code from it here.'), 'ok'); $('authCodeField').hidden = false; $('authCodeBtn').hidden = false; $('authEmailBtn').hidden = true; $('authCode').focus(); } catch (e) { setStatus('authStatus', t('Could not send the link: {e}', { e: e && e.message || e }), 'warn'); } $('authEmailBtn').disabled = false; };
+$('authEmailBtn').onclick = async () => { const email = $('authEmail').value.trim(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setStatus('authStatus', t('Enter a valid email.'), 'warn'); return; } $('authEmailBtn').disabled = true; try { await STORE.adapter.signInEmail(email, await CAPTCHA.token()); setStatus('authStatus', NATIVE.on ? t('Check your inbox: type the 6-digit code from the e-mail here (or tap the link in it).') : t('Check your inbox: open the link in the email, or type the 6-digit code from it here.'), 'ok'); $('authCodeField').hidden = false; $('authCodeBtn').hidden = false; $('authEmailBtn').hidden = true; $('authCode').focus(); } catch (e) { setStatus('authStatus', t('Could not send the link: {e}', { e: e && e.message || e }), 'warn'); } $('authEmailBtn').disabled = false; };
 $('authGoogleBtn').onclick = async () => { try { await STORE.adapter.signInGoogle(); } catch (e) { setStatus('authStatus', t('Could not start Google sign-in: {e}', { e: e && e.message || e }), 'warn'); } };
 $('authAppleBtn').onclick = async () => { try { await STORE.adapter.signInApple(); } catch (e) { setStatus('authStatus', t('Could not start Apple sign-in: {e}', { e: e && e.message || e }), 'warn'); } };
 $('authPassToggle').onclick = () => AUTH.pass($('authPassField').hidden);
 $('authCodeBtn').onclick = async () => { const email = $('authEmail').value.trim(), code = $('authCode').value.replace(/\D/g, ''); if (code.length < 6) { setStatus('authStatus', t('Enter the 6-digit code from the e-mail.'), 'warn'); return; } $('authCodeBtn').disabled = true; try { await STORE.adapter.verifyEmailCode(email, code); AUTH.close(); NATIVE.haptic('success'); toast(t('Signed in.')); } catch (e) { NATIVE.haptic('error'); setStatus('authStatus', t('That code did not work — check the digits, or ask for a new e-mail.'), 'warn'); } $('authCodeBtn').disabled = false; };
 $('authCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authCodeBtn').click(); });
-$('authPassBtn').onclick = async () => { const email = $('authEmail').value.trim(), pass = $('authPass').value; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !pass) { setStatus('authStatus', t('Enter the email and the password.'), 'warn'); return; } $('authPassBtn').disabled = true; try { await STORE.adapter.signInPassword(email, pass); AUTH.close(); } catch (e) { setStatus('authStatus', t('Could not sign in: {e}', { e: e && e.message || e }), 'warn'); } $('authPassBtn').disabled = false; };
+$('authPassBtn').onclick = async () => { const email = $('authEmail').value.trim(), pass = $('authPass').value; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !pass) { setStatus('authStatus', t('Enter the email and the password.'), 'warn'); return; } $('authPassBtn').disabled = true; try { await STORE.adapter.signInPassword(email, pass, await CAPTCHA.token()); AUTH.close(); } catch (e) { setStatus('authStatus', t('Could not sign in: {e}', { e: e && e.message || e }), 'warn'); } $('authPassBtn').disabled = false; };
 $('authPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authPassBtn').click(); });
 $('authEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authEmailBtn').click(); });
 
@@ -4923,7 +4945,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.3';
+const APP_VERSION = 'v34.4';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -5510,7 +5532,7 @@ LAB.close = function () { replayPlay(false); LAB.cmp2 = 'none'; LAB.scrubT = 0; 
 LAB.open = async function (meta, asCmp) {
   labEnsureMap(); setStatus('labStatus', t('Loading session…'));
   if (!(LAB.current && LAB.current.id === meta.id)) LAB.allKarts = false;
-  let sess; try { sess = await STORE.loadSession(meta); } catch (e) { setStatus('labStatus', t('Could not load this session.'), 'warn'); return; }
+  let sess; try { sess = await STORE.loadSession(meta); } catch (e) { setStatus('labStatus', STORE.isQuota(e) ? (STORE.hasIdentity ? t('Daily limit of sessions reached — more tomorrow.') : t('Daily limit for guests reached — sign in to keep going.')) : t('Could not load this session.'), 'warn'); return; }
   STORE.track('lab', { sid: meta.id, mine: meta.owner === STORE.me.id, cmp: !!asCmp });
   LAB.tid = meta.track || ''; LAB.lid = meta.layout || 'custom'; LAB.trackName = (STORE.getTrack(LAB.tid) || {}).name || meta.trackName || t('Custom track'); loadSatAdj(); if (LAB.aligning) setAligning(false);
   let G = null; try { G = await GEOM.build(LAB.tid, LAB.lid, sess); } catch (e) { G = null; }
@@ -6074,12 +6096,13 @@ async function renderDiscussion() {
     const tx = el('div'); tx.textContent = c.text; body.append(head, tx); d.append(im, body); list.appendChild(d);
   }
 }
+const quotaOr = (e, fallback) => STORE.isQuota(e) ? t('Daily limit reached — try again tomorrow.') : fallback;   // the write quotas of limits.sql
 async function postComment() {
   const s = LAB.current, inp = $('commentInput'); if (!s) return; const text = inp.value.trim(); if (!text) return;
   if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); return; }
   STORE.track('comment', { sid: s.id });
   const b = $('commentBtn'); b.classList.add('busy');
-  try { LAB.social = Object.assign({ sid: s.id }, await STORE.addComment(s.id, text)); inp.value = ''; renderDiscussion(); NATIVE.haptic('success'); } catch (e) { NATIVE.haptic('error'); toast(t('Could not post the comment.')); }
+  try { LAB.social = Object.assign({ sid: s.id }, await STORE.addComment(s.id, text)); inp.value = ''; renderDiscussion(); NATIVE.haptic('success'); } catch (e) { NATIVE.haptic('error'); toast(quotaOr(e, t('Could not post the comment.'))); }
   b.classList.remove('busy');
 }
 const fmtWhen = (ms) => { if (!ms) return ''; const d = new Date(ms), diff = (Date.now() - ms) / 60000; if (diff < 1) return t('just now'); if (diff < 60) return t('{n} min ago', { n: Math.round(diff) }); if (diff < 60 * 24) return t('{n} h ago', { n: Math.round(diff / 60) }); return d.toLocaleDateString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short' }); };
@@ -6746,7 +6769,7 @@ const UPLOAD = (() => {
       for (const L of sess.laps) L._sess = sess;
       // loggers without a start/finish beacon: start every lap at the layout's S/F so corners line up with everyone else's
       if (sess.source && sess.source.app !== 'alfano' && tid && lid !== 'custom') { try { const G = await GEOM.build(tid, lid); IMPORT.alignToStart(sess, G); } catch (e) {} }
-      try { await STORE.saveSession(sess); if (!first) first = sess; } catch (e) { setStatus('uplStatus', t('Could not save the session: {e}', { e: e && e.message || e }), 'warn'); $('uplGo').disabled = false; return; }
+      try { await STORE.saveSession(sess); if (!first) first = sess; } catch (e) { setStatus('uplStatus', STORE.isQuota(e) ? t('Daily upload limit reached — the rest tomorrow.') : t('Could not save the session: {e}', { e: e && e.message || e }), 'warn'); $('uplGo').disabled = false; return; }
       // the first session on a brand-new layout defines its track line for everyone who comes after; the page gets the length and the corner count
       if (k === 0 && tr && tr.community && lid !== 'custom') { const l = STORE.getLayout(tid, lid); if (l && !l.refSession && STORE.canEditTrack(tr)) { try { await STORE.saveLayout(tid, Object.assign({}, l, { refSession: sess.id })); GEOM.invalidate();
             const G = await GEOM.build(tid, lid, sess, { noMedia: true }); if (G && G.track) { const corners = GEOM.apexes(G, null).length, lengthM = Math.round(G.lengthM || G.track.lengthM || l.lengthM || 0); const l2 = STORE.getLayout(tid, lid) || l; await STORE.saveLayout(tid, Object.assign({}, l2, { refSession: sess.id, lengthM, corners }));
@@ -7504,6 +7527,7 @@ const ADMIN = (() => {
     $('admReportsCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderReports();
     $('admFlagsCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderFlags();
     $('admModCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderModerated();
+    $('admSnapCard').hidden = !(admin && STORE.hasDb); if (admin && STORE.hasDb) renderSnapshots();
     $('admImportCard').hidden = !admin; if (admin && !$('osmCountry').options.length) { fillCountries($('osmCountry'), false); $('osmCountry').value = 'AE'; }
     if (tid && STORE.getTrack(tid)) { A.tid = tid; A.lid = lid || null; await renderTrackForm(); await renderLayouts(); if (lid) await renderLayoutEditor(); else $('admLayoutCard').hidden = true; }
     else { A.tid = null; A.lid = null; $('admEmpty').hidden = false; $('admTrackCard').hidden = true; $('admLayoutsCard').hidden = true; $('admLayoutCard').hidden = true; }
@@ -7511,6 +7535,14 @@ const ADMIN = (() => {
   async function addTrack() { const id = await STORE.saveTrack({ name: t('New track'), city: '', country: 'AE', lat: 25.2, lon: 55.3, createdAt: Date.now() }); go('admin~' + id); }
   // bug reports (reports.sql + the `report` function)
   // sessions hidden by admins (moderate.sql): show one again from here — the normal policies do not let an admin open someone's unpublished session
+  // limits.sql: the nightly in-database copies, by day
+  async function renderSnapshots() {
+    const box = $('admSnap'); box.textContent = '';
+    let list = []; try { list = await STORE.snapshots(); } catch (e) { box.textContent = /hutka_snapshots|PGRST202|42883/.test(String(e && e.message || e)) ? t('Not set up yet (supabase/limits.sql).') : t('Could not load: {e}', { e: e && e.message || e }); return; }
+    if (!list.length) { box.textContent = t('No snapshots yet — the first one is taken tonight at 02:20 UTC.'); return; }
+    const days = new Map(); for (const r of list) { const d = days.get(r.day) || { n: 0, bytes: 0 }; d.n++; d.bytes += +r.bytes || 0; days.set(r.day, d); }
+    box.innerHTML = [...days.entries()].map(([day, d]) => `<div>${esc(day.slice(0, 4) + '-' + day.slice(4, 6) + '-' + day.slice(6))} · ${esc(t('{n} tables', { n: d.n }))} · ${esc((d.bytes / 1048576).toFixed(1))} MB</div>`).join('') + `<div style="margin-top:6px">${esc(t('Telemetry copies are kept 3 days, the rest 7. To restore a table: Supabase → SQL editor → insert … select from backup.dYYYYMMDD_<table>.'))}</div>`;
+  }
   async function renderModerated() {
     const box = $('admMod'); box.innerHTML = ''; let list = [];
     try { list = await STORE.moderatedList(); } catch (e) { box.appendChild(el('div', 'hint', /hutka_moderated|PGRST202|42883/.test(String(e && e.message || e)) ? t('Run supabase/moderate.sql in the SQL editor once — then admins can hide broken sessions from the feed (the Hide button on a post or in the Lab).') : t('Could not load: {e}', { e: e && e.message || e }))); return; }
