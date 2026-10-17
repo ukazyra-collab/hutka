@@ -3322,12 +3322,13 @@ const DATA = (() => {
     // the lap's own position at every station (metres in the frame) — what the map draws: the recorded path read at the moment the lap
     // reached the station (t[i] grows with i, so the path is walked in order). The centreline plus the lateral offset was drawn before, and
     // where the reference centreline wiggles with a radius smaller than a lap's offset from it, that offset curve folds into a zig-zag
+    const at = (tau) => { const jf = ((((tau % T) + T) % T + t0) % T) / dtS, j = Math.min(M - 1, Math.floor(jf)), k = Math.min(M - 1, j + 1), f = Math.min(1, jf - j); return [(L.px[j][0] + (L.px[k][0] - L.px[j][0]) * f) * mpp, (L.px[j][1] + (L.px[k][1] - L.px[j][1]) * f) * mpp]; };
     const xs = new Float64Array(N), ys = new Float64Array(N);
-    for (let i = 0; i < N; i++) { const jf = (((Math.max(0, Math.min(T, t[i])) + t0) % T) / dtS), j = Math.min(M - 1, Math.floor(jf)), k = Math.min(M - 1, j + 1), f = Math.min(1, jf - j); xs[i] = (L.px[j][0] + (L.px[k][0] - L.px[j][0]) * f) * mpp; ys[i] = (L.px[j][1] + (L.px[k][1] - L.px[j][1]) * f) * mpp; }
+    for (let i = 0; i < N; i++) { const [x, y] = at(Math.max(0, Math.min(T, t[i]))); xs[i] = x; ys[i] = y; }
     // the join of the lap's end with its start is two different passes of the S/F: a light smoothing (±1.5 m) rounds that notch
     const kxy = Math.max(1, Math.round(1.5 / ds)), xsm = smooth(xs, N, kxy), ysm = smooth(ys, N, kxy);
     let lost = 0; for (let j = 0; j < M; j++) if (pj[j] < 0) lost++;
-    const P = { key, N, ds, T, v: vs, t, o: os, x: xsm, y: ysm, t0, s0, lost: lost / M, a: accelFrom(vs, N, ds), g: gs, lap: L, pj };
+    const P = { key, N, ds, T, v: vs, t, o: os, x: xsm, y: ysm, at, t0, s0, lost: lost / M, a: accelFrom(vs, N, ds), g: gs, lap: L, pj };
     if (eng) { P.rpm = smooth(rpm, N, Math.max(1, Math.round(2 / ds))); if (t1) P.t1 = t1; if (gearAt) { for (let i = 0; i < N; i++) if (gearAt[i] < 0) gearAt[i] = gearAt[(i - 1 + N) % N]; P.gear = gearAt; } P.shifts = shiftsOnTrack(L, pj, N); }
     L._proj = P; return P;
   }
@@ -3488,10 +3489,24 @@ const DATA = (() => {
     return { dt, dIn, dOut, head, where, items, adv, text };
   }
   // the "typical" lap: per-station mean of the other laps
+  // the drawn path of a lap built from others (the average, the ideal): between every two stations the source laps' recorded paths are
+  // followed by their own clocks and averaged, so a stretch where the layout line and the laps part (another configuration of the track)
+  // still draws as the laps drove it, not as a polygon through the few stations the projection could place there. Metres, x/y pairs
+  function builtPath(N, srcAt) {
+    const out = [];
+    for (let i = 0; i < N; i++) {
+      const S = srcAt(i); if (!S || !S.length || !S[0].at) continue;
+      const j = i + 1;   // t has N + 1 entries: t[N] is the lap's end, the S/F again
+      let gap = 0; for (const P of S) { const a = P.at(P.t[i]), b = P.at(P.t[j]); gap = Math.max(gap, Math.hypot(b[0] - a[0], b[1] - a[1])); }
+      const m = Math.min(60, Math.max(1, Math.ceil(gap / 0.7)));
+      for (let q = 0; q < m; q++) { let x = 0, y = 0; for (const P of S) { const [px, py] = P.at(P.t[i] + (P.t[j] - P.t[i]) * q / m); x += px / S.length; y += py / S.length; } out.push(x, y); }
+    }
+    return Float64Array.from(out);
+  }
   function avgProjection(projs, tr, name) {
     const N = tr.N, v = new Float64Array(N), t = new Float64Array(N + 1), o = new Float64Array(N), g = new Float64Array(N), n = projs.length, xy = projs.every(P => P.x), x = xy ? new Float64Array(N) : null, y = xy ? new Float64Array(N) : null;
     for (const P of projs) { for (let i = 0; i < N; i++) { v[i] += P.v[i] / n; o[i] += P.o[i] / n; g[i] += P.g[i] / n; t[i] += P.t[i] / n; if (xy) { x[i] += P.x[i] / n; y[i] += P.y[i] / n; } } t[N] += P.T / n; }
-    const out = { key: 'avg', N, ds: tr.ds, T: t[N], v, t, o, x, y, a: accelFrom(v, N, tr.ds), g, lap: null, n, name: name || null };
+    const out = { key: 'avg', N, ds: tr.ds, T: t[N], v, t, o, x, y, a: accelFrom(v, N, tr.ds), g, lap: null, n, name: name || null, path: xy ? builtPath(N, () => projs) : null };
     // engine channels averaged too (revs, temperature); the gear of the average is the most common one at each station
     if (projs.every(P => P.rpm)) { const rpm = new Float64Array(N); for (const P of projs) for (let i = 0; i < N; i++) rpm[i] += P.rpm[i] / n; out.rpm = rpm; }
     if (projs.every(P => P.t1)) { const t1 = new Float64Array(N); for (const P of projs) for (let i = 0; i < N; i++) t1[i] += P.t1[i] / n; out.t1 = t1; }
@@ -3574,7 +3589,7 @@ const DATA = (() => {
   }
   // where a projected lap is at station i, in frame metres: its own position when the projection carries one, else the centreline plus the offset
   const lapXYAt = (tr, P, i) => P.x ? [P.x[i], P.y[i]] : [tr.cx[i] + P.o[i] * tr.nx[i], tr.cy[i] + P.o[i] * tr.ny[i]];
-  return { lapXYAt, MERC, applyT, parseAlfName, newFrame, distFromFrame, lapXY, lapPx, gpsLayout, sessionStats, projectLap, trackCurv, autoCorners, cornerWindows, windowMetrics, metricsText, diffs, compareWindow, buildComparison, buildCoach, coachText, avgProjection, buildComparisonP, tw, kmh, accelFrom };
+  return { lapXYAt, builtPath, MERC, applyT, parseAlfName, newFrame, distFromFrame, lapXY, lapPx, gpsLayout, sessionStats, projectLap, trackCurv, autoCorners, cornerWindows, windowMetrics, metricsText, diffs, compareWindow, buildComparison, buildCoach, coachText, avgProjection, buildComparisonP, tw, kmh, accelFrom };
 })();
 // @@DATA-END
 // ---------- i18n: English is the source text, Russian is a dictionary keyed by the English string ----------
@@ -5055,7 +5070,7 @@ function createMapView(canvas, host) {
       const laps = [{ P: D.R, col: C.actual, role: 'ref', n: 1, m: (r) => r.R }]; if (D.O) laps.push({ P: D.O, col: C.cmp, role: 'cmp', n: 2, m: (r) => r.O }); if (D.P3) laps.push({ P: D.P3, col: C.cmp2, role: 'third', n: 3, m: (r) => r.M3 });
       const mainL = laps.find(l => l.role === role) || laps[0], main = mainL.P, mainCol = mainL.col, mOf = mainL.m;
       // a whole lap is its recorded path, every sample (an average lap has none: its stations); a stretch of it (a corner) goes by stations
-      const path = (P, a, len) => { ctx.beginPath(); if (a === undefined) { const raw = P.lap && P.lap.px; if (raw && raw.length > 2) { for (let j = 0; j < raw.length; j++) { const [x, y] = T(raw[j][0], raw[j][1]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } else { for (let i = 0; i < N; i++) { const [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } } else { for (let k = 0; k <= len; k++) { const i = (a + k) % N, [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } } };
+      const path = (P, a, len) => { ctx.beginPath(); if (a === undefined) { const raw = P.lap && P.lap.px; if (P.path && P.path.length > 4) { for (let q = 0; q < P.path.length; q += 2) { const [x, y] = T(P.path[q] / mpp, P.path[q + 1] / mpp); q ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } else if (raw && raw.length > 2) { for (let j = 0; j < raw.length; j++) { const [x, y] = T(raw[j][0], raw[j][1]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } else { for (let i = 0; i < N; i++) { const [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } } else { for (let k = 0; k <= len; k++) { const i = (a + k) % N, [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } } };
       const pxm = sc / mpp, lw = clamp(1.3 + pxm * 0.22, 1.8, 3.4);   // ≈ a wheel's width on the ground, never a fat ribbon
       for (const l of laps) if (l !== mainL) { path(l.P); ctx.lineWidth = Math.max(1.2, lw * 0.7) + 1; ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.stroke(); ctx.lineWidth = Math.max(1.2, lw * 0.7); ctx.strokeStyle = l.col; ctx.stroke(); }
       path(main); ctx.lineWidth = lw + 1.6; ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.stroke(); ctx.lineWidth = lw; ctx.strokeStyle = mainCol; ctx.stroke();
@@ -5722,7 +5737,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.10';
+const APP_VERSION = 'v34.10.1';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6186,16 +6201,16 @@ function sessIdeal(sess, R, apexes) {
   const key = `${G.rev}|${R.key}|${wins.map(w => w.a).join(',')}`;
   if (sess._ideal && sess._ideal.key === key) return sess._ideal.P;
   const projs = laps.map(L => DATA.projectLap(L, tr, G.rev)).filter(Boolean); if (projs.length < 2) return null;
-  const v = new Float64Array(N), o = new Float64Array(N), g = new Float64Array(N), dt = new Float64Array(N), picks = [];
+  const v = new Float64Array(N), o = new Float64Array(N), g = new Float64Array(N), dt = new Float64Array(N), picks = [], src = new Array(N).fill(null);
   const eng = projs.every(P => P.rpm), rpm = eng ? new Float64Array(N) : null, gear = eng && projs.every(P => P.gear) ? new Int8Array(N) : null, shifts = [];
   for (const w of wins) {
     const ranked = projs.map(P => ({ P, L: P.lap, time: DATA.tw(P, w.b, w.a) })).sort((a, b) => a.time - b.time), best = ranked[0].P, bt = ranked[0].time;
-    for (let k = 0; k < w.len; k++) { const i = (w.a + k) % N; v[i] = best.v[i]; o[i] = best.o[i]; g[i] = best.g[i]; dt[i] = DATA.tw(best, (i + 1) % N, i); if (rpm) rpm[i] = best.rpm[i]; if (gear) gear[i] = best.gear[i]; }
+    for (let k = 0; k < w.len; k++) { const i = (w.a + k) % N; v[i] = best.v[i]; o[i] = best.o[i]; g[i] = best.g[i]; dt[i] = DATA.tw(best, (i + 1) % N, i); src[i] = best; if (rpm) rpm[i] = best.rpm[i]; if (gear) gear[i] = best.gear[i]; }
     if (eng && best.shifts) for (const sh of best.shifts) { const off = ((sh.st - w.a) % N + N) % N; if (off < w.len) shifts.push(sh); }
     picks.push({ n: w.n, L: best.lap, time: bt, top: ranked.slice(0, 3).map(x => ({ L: x.L, time: x.time })) });
   }
   const tt = new Float64Array(N + 1); for (let i = 0; i < N; i++) tt[i + 1] = tt[i] + dt[i];
-  const P = { key: 'ideal:' + sess.id, N, ds: tr.ds, T: tt[N], v, t: tt, o, a: DATA.accelFrom(v, N, tr.ds), g, lap: null, n: projs.length, name: t('ideal lap'), ideal: true, picks, sess, nLapsUsed: new Set(picks.map(p => p.L.n)).size };
+  const P = { key: 'ideal:' + sess.id, N, ds: tr.ds, T: tt[N], v, t: tt, o, a: DATA.accelFrom(v, N, tr.ds), g, lap: null, n: projs.length, name: t('ideal lap'), ideal: true, picks, sess, nLapsUsed: new Set(picks.map(p => p.L.n)).size, path: DATA.builtPath(N, (i) => src[i] ? [src[i]] : null) };
   if (rpm) { P.rpm = rpm; if (gear) P.gear = gear; P.shifts = shifts.sort((a, b) => a.st - b.st); }
   sess._ideal = { key, P }; return P;
 }
