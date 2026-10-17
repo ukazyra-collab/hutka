@@ -216,6 +216,9 @@ textarea{min-height:90px;resize:vertical}
 .status{font-size:12.5px;color:var(--muted);min-height:1.2em}
 .status.ok{color:var(--ok)}.status.warn{color:var(--warn)}.status.err{color:var(--danger)}
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--muted);white-space:nowrap}
+/* the corner grade against the best passes: a letter chip, the same colours as the numbers on the map */
+.gr{display:inline-block;min-width:17px;padding:0 4px;border-radius:5px;font:700 10.5px/17px var(--mono);color:#fff;text-align:center;vertical-align:1px}.gr.gA{background:#1f8f4f}.gr.gB{background:#5a9e2f}.gr.gC{background:#c48a00}.gr.gD{background:#e0661c}.gr.gE{background:#d12f3a}
+td .gr,.crow .gr{margin-right:5px}.insp-head .gr{margin-left:6px;font-size:11px;line-height:18px}
 .pill.ok{background:var(--ok);border-color:var(--ok);color:#fff}
 .pill.off{background:var(--surface-3);border-color:var(--surface-3)}
 .pill.warn{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
@@ -1384,6 +1387,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
             <button class="btn" id="optBand" type="button" data-t="Track edges">Track edges</button>
             <button class="btn" id="optTicks" type="button" data-t="Markers">Markers</button>
             <button class="btn" id="optLabels" type="button" data-t="Labels">Labels</button>
+            <button class="btn" id="optPedals" type="button" data-t="Pedals" title="Colour the lap by what the kart is doing: throttle, brake, coasting">Pedals</button>
             <div class="seg"><button class="btn" id="rotL" type="button" title="Rotate">↺</button><button class="btn" id="rotR" type="button" title="Rotate">↻</button></div>
             <div class="seg"><button class="btn" id="zoomOut" type="button">−</button><button class="btn" id="zoomIn" type="button">+</button><button class="btn" id="zoomFit" type="button">⌂</button></div>
             <button class="btn" id="btnFull" type="button" title="Full screen"><svg><use href="#i-full"/></svg><span data-t="Full screen">Full screen</span></button>
@@ -3614,9 +3618,117 @@ const DATA = (() => {
     if (f && Math.abs(f.corr) >= 0.35) s += '. ' + t('What matters most here is {f}: {rule}', { f: f.name, rule: f.unit === 'kmh' ? t('+1 km/h ≈ {s} s', { s: sg(f.slope, 3) }) : t('+1 m (later) ≈ {s} s', { s: sg(f.slope, 3) }) });
     return s + '.';
   }
+  // The grade of a lap in a corner against the best passes (the coach's top quarter): A–E on the time behind their median — A ≤ 0.05 s,
+  // B ≤ 0.12, C ≤ 0.25, D ≤ 0.45, E beyond — and the weak part of the corner: the entry (the brake / lift point against theirs, metres),
+  // the apex (minimum speed against theirs) or the exit (exit speed, and the throttle point when it is late). Each part gets a letter
+  // of its own; `weak` is the worst of them, `why` says it in words. Null without a coach for this corner.
+  const GRADES = 'ABCDE';
+  const letter = (x, steps) => { for (let k = 0; k < steps.length; k++) if (x <= steps[k]) return GRADES[k]; return 'E'; };
+  function gradeCorner(m, c) {
+    if (!m || !c || !isFinite(c.tTop) || !isFinite(m.time)) return null;
+    const d = m.time - c.tTop, g = letter(d, [0.05, 0.12, 0.25, 0.45]), K = t('km/h'), parts = {};
+    // the entry: the pedal point against the best passes (+ = later along the track); braking where they do not is a fault of its own
+    if (c.kind === 'brake' && c.brake) {
+      if (m.kind === 'brake') { const dm = m.sBrake - c.brake.med, a = Math.abs(dm); parts.entry = { g: letter(a, [3, 6, 10, 15]), text: a >= 3 ? t('brake {d} m {dir} than the best passes', { d: a.toFixed(0), dir: dm > 0 ? t('later') : t('earlier') }) : t('brake point as the best passes') }; }
+      else parts.entry = { g: m.vEntry >= (c.entry ? c.entry.med : m.vEntry) - 1 ? 'B' : 'C', text: t('no brake where the best passes brake') };
+    } else if (c.kind === 'lift' && c.lift) {
+      if (m.kind === 'lift') { const dm = m.sLift - c.lift.med, a = Math.abs(dm); parts.entry = { g: letter(a, [4, 8, 12, 18]), text: a >= 4 ? t('lift {d} m {dir} than the best passes', { d: a.toFixed(0), dir: dm > 0 ? t('later') : t('earlier') }) : t('lift point as the best passes') }; }
+      else if (m.kind === 'brake') parts.entry = { g: d > 0.12 ? 'D' : 'C', text: t('brakes where the best passes only lift') };
+      else parts.entry = { g: 'A', text: t('no lift — flat, like the quickest passes') };
+    } else if (c.kind === 'flat') {
+      if (m.kind === 'brake') parts.entry = { g: d > 0.12 ? 'E' : 'D', text: t('brakes where the best passes stay flat') };
+      else if (m.kind === 'lift' || m.kind === 'ease') parts.entry = { g: d > 0.12 ? 'D' : 'C', text: t('lifts where the best passes stay flat') };
+      else parts.entry = { g: 'A', text: t('flat out, like the best passes') };
+    }
+    if (c.apex) { const dv = (c.apex.med - m.vApex) * 3.6; parts.apex = { g: letter(dv, [1, 2, 4, 6]), text: dv >= 1 ? t('apex {a} km/h against {b} of the best passes', { a: kmh(m.vApex), b: kmh(c.apex.med) }) : t('apex speed as the best passes') }; }
+    if (c.exit) {
+      const dv = (c.exit.med - m.vExit) * 3.6, dthr = c.thr && m.sThr >= 0 ? m.sThr - c.thr.med : 0;
+      const bits = []; if (dv >= 1) bits.push(t('exit {a} km/h against {b}', { a: kmh(m.vExit), b: kmh(c.exit.med) })); if (dthr >= 3) bits.push(t('throttle {d} m later', { d: dthr.toFixed(0) }));
+      parts.exit = { g: letter(Math.max(dv, dthr >= 3 ? 1 + dthr / 4 : 0), [1, 2, 4, 6]), text: bits.length ? bits.join(', ') : t('exit as the best passes') };
+    }
+    const order = ['entry', 'apex', 'exit'].filter(k => parts[k]); let weak = null;
+    for (const k of order) if (!weak || GRADES.indexOf(parts[k].g) > GRADES.indexOf(parts[weak].g)) weak = k;
+    const names = { entry: t('entry'), apex: t('apex'), exit: t('exit') };
+    const flag = g !== 'A' && weak && parts[weak].g !== 'A';   // an A corner names no weak part: it is among the best passes
+    const why = flag ? `${names[weak]}: ${parts[weak].text}` : (g === 'A' ? t('among the best passes') : t('the difference is in smoothness'));
+    return { g, d, parts, weak: flag ? weak : null, why, weakName: weak ? names[weak] : '' };
+  }
+  const GRADE_COLORS = { A: '#1f8f4f', B: '#5a9e2f', C: '#c48a00', D: '#e0661c', E: '#d12f3a' };
+  // ----- the kart itself: how strong the kart of a session was, measured where the driver has no say -----
+  // The longest full-throttle stretch of the lap (the main straight, from the throttle point of one corner to the pedal point of the
+  // next). Two numbers per lap: the time from a lower to a higher speed inside the stretch (acceleration) and the top speed on it; the
+  // medians over the clean laps stand for the session, so a slipstream or a traffic lap does not count. The stretch and the speed band
+  // are fixed by the reference lap of the session the Lab looks at, and every lap of every session on the layout is measured over the
+  // same metres and the same speeds — only then are the sessions comparable.
+  function kartStraight(P, wins, tr) {
+    if (!P || !wins || wins.length < 2) return null;
+    const N = tr.N, ds = tr.ds, fwd = (a, b) => ((b - a) % N + N) % N, ms = wins.map(w => windowMetrics(P, w, tr));
+    let best = null;
+    for (let k = 0; k < wins.length; k++) {
+      const m = ms[k]; if (m.tk < 0) continue; const s0 = (wins[k].a + m.tk) % N;
+      // the stretch ends at the first corner ahead that brakes or lifts; flat corners are part of the straight
+      let s1 = -1; for (let q = 1; q <= wins.length; q++) { const j = (k + q) % wins.length, mj = ms[j], pk = mj.kind === 'brake' ? mj.bk : (mj.kind === 'lift' ? mj.lk : (mj.kind === 'ease' ? mj.ek : -1)); if (pk >= 0) { s1 = (wins[j].a + pk) % N; break; } }
+      if (s1 < 0) continue; const len = fwd(s0, s1) * ds; if (len < 60) continue;
+      if (!best || len > best.len) best = { s0, s1, len };
+    }
+    if (!best) return null;
+    // the speed band: from a round number just above the speed where the stretch starts to a round number just under its top speed
+    let vmax = 0; for (let i = 0; i <= fwd(best.s0, best.s1); i++) vmax = Math.max(vmax, P.v[(best.s0 + i) % N]);
+    const lo = Math.ceil((P.v[best.s0] * 3.6 + 2) / 5) * 5, hi = Math.min(lo + 20, Math.floor((vmax * 3.6 - 2) / 5) * 5);
+    if (hi - lo < 10) return null;
+    return Object.assign(best, { lo, hi });
+  }
+  // one lap: on the stretch, every station that is accelerating gives a point (v², a); a = p − k·v² (engine pull less drag) is fitted to
+  // them, and the time from the lower to the higher speed of the band comes out of the fit — so a lap whose exit speed is already
+  // above the band, or that does not quite reach its top, is still measured over the same speeds as every other lap
+  function kartMeasure(P, st, tr) {
+    if (!P || !st) return null;
+    const N = tr.N, fwd = (a, b) => ((b - a) % N + N) % N, n = fwd(st.s0, st.s1), lo = st.lo / 3.6, hi = st.hi / 3.6;
+    const xs = [], ys = []; let vmin = Infinity, vmax = 0;
+    for (let k = 0; k <= n; k++) { const i = (st.s0 + k) % N, v = P.v[i], a = P.a[i]; vmax = Math.max(vmax, v); if (a > 0.05 && v > 5) { xs.push(v * v); ys.push(a); vmin = Math.min(vmin, v); } }
+    if (xs.length < 10 || Math.sqrt(xs[xs.length - 1]) - vmin < 2) return null;
+    const mx = xs.reduce((a, b) => a + b, 0) / xs.length, my = ys.reduce((a, b) => a + b, 0) / ys.length; let sxx = 0, sxy = 0;
+    for (let q = 0; q < xs.length; q++) { sxx += (xs[q] - mx) ** 2; sxy += (xs[q] - mx) * (ys[q] - my); }
+    const kd = sxx > 1e-9 ? Math.max(0, -sxy / sxx) : 0, pw = my + kd * mx; if (!(pw > 0.05)) return null;
+    let dt; if (kd < 1e-9) dt = (hi - lo) / pw; else { const c = Math.sqrt(pw / kd); if (hi >= 0.98 * c) return null; const F = (v) => Math.log((c + v) / (c - v)); dt = (F(hi) - F(lo)) / (2 * Math.sqrt(pw * kd)); }
+    if (!(dt > 0.3) || !isFinite(dt)) return null;
+    // the time the lap spends at full throttle — accelerating, or holding its top speed — is what a stronger or weaker engine scales
+    let tFull = 0, vl = 0; for (let i = 0; i < N; i++) vl = Math.max(vl, P.v[i]); for (let i = 0; i < N; i++) if (P.a[i] >= 0.2 || (Math.abs(P.a[i]) < 0.2 && P.v[i] > 0.9 * vl)) tFull += P.t[i + 1] - P.t[i];
+    return { dt, vmax: vmax * 3.6, tFull, p: pw, k: kd };
+  }
+  // ----- pedals: what the kart is doing at every station — on the throttle (accelerating, or holding its top speed), braking, or coasting
+  // (neither: a lift, a roll through the apex, a half throttle). Coasting metres are the beginner's hidden loss: the fastest passes brake,
+  // turn and go, the slow ones roll. Modes: 1 throttle, 2 brake, 0 coast; runs shorter than 2 m are merged into their neighbours.
+  function pedalModes(P, tr) {
+    const N = tr.N, ds = tr.ds, modes = new Int8Array(N); let vmax = 0; for (let i = 0; i < N; i++) vmax = Math.max(vmax, P.v[i]);
+    for (let i = 0; i < N; i++) { const a = P.a[i], v = P.v[i]; modes[i] = a <= -1.5 ? 2 : (a >= 0.25 || (Math.abs(a) < 0.25 && v >= 0.9 * vmax) ? 1 : 0); }
+    const minRun = Math.max(1, Math.round(2 / ds));
+    for (let pass = 0; pass < 2; pass++) { let i = 0; while (i < N) { let j = i; while (j < N && modes[j] === modes[i]) j++; if (j - i < minRun && (i > 0 || j < N)) { const fill = i > 0 ? modes[i - 1] : modes[j]; for (let k = i; k < j; k++) modes[k] = fill; } i = j; } }
+    const m = [0, 0, 0]; for (let i = 0; i < N; i++) m[modes[i]] += ds;
+    return { modes, coast: m[0], throttle: m[1], brake: m[2], L: N * ds };
+  }
+  // coasting metres inside a corner window
+  function coastIn(PM, w, tr) { const N = tr.N; let s = 0; for (let k = 0; k < w.len; k++) if (PM.modes[(w.a + k) % N] === 0) s += tr.ds; return s; }
+  const KART_MASS = 160, KART_REF_W = 75;   // a rental kart with fuel, kg; the driver weight every acceleration is normalised to
+  // one session: the medians over its laps, the acceleration normalised to a 75 kg driver when the driver's weight is known
+  function kartSession(laps, st, tr, key, weightKg) {
+    const rows = laps.map(L => kartMeasure(projectLap(L, tr, key), st, tr)).filter(Boolean); if (rows.length < 3) return null;
+    const med = (a) => { const s = a.slice().sort((p, q) => p - q); return s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2; };
+    const w = weightKg > 30 && weightKg < 200 ? weightKg : 0, dt = med(rows.map(r => r.dt)), dtN = w ? dt * (KART_MASS + KART_REF_W) / (KART_MASS + w) : dt;
+    return { dt, dtN, vmax: med(rows.map(r => r.vmax)), tFull: med(rows.map(r => r.tFull)), n: rows.length, weight: w };
+  }
+  // the session against the other sessions on the layout in the same kart class: percent to the median kart, a 1–10 mark, seconds a lap
+  function kartRating(mine, others) {
+    if (!mine || !others || others.length < 3) return null;
+    const med = (a) => { const s = a.slice().sort((p, q) => p - q); return s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2; };
+    const bDt = med(others.map(o => o.dtN)), bV = med(others.map(o => o.vmax));
+    const accel = (bDt / mine.dtN - 1) * 100, top = (mine.vmax / bV - 1) * 100, pct = 0.6 * accel + 0.4 * top;
+    const mark = Math.max(1, Math.min(10, Math.round(5 + pct)));   // one mark per percent around the median kart (5 = average)
+    return { pct, accel, top, mark, secPerLap: -mine.tFull * pct / 100, n: others.length, bDt, bV };
+  }
   // where a projected lap is at station i, in frame metres: its own position when the projection carries one, else the centreline plus the offset
   const lapXYAt = (tr, P, i) => P.x ? [P.x[i], P.y[i]] : [tr.cx[i] + P.o[i] * tr.nx[i], tr.cy[i] + P.o[i] * tr.ny[i]];
-  return { lapXYAt, builtPath, MERC, applyT, parseAlfName, newFrame, distFromFrame, lapXY, lapPx, gpsLayout, sessionStats, projectLap, trackCurv, autoCorners, cornerWindows, windowMetrics, metricsText, diffs, compareWindow, buildComparison, buildCoach, coachText, avgProjection, buildComparisonP, tw, kmh, accelFrom };
+  return { lapXYAt, builtPath, MERC, applyT, parseAlfName, newFrame, distFromFrame, lapXY, lapPx, gpsLayout, sessionStats, projectLap, trackCurv, autoCorners, cornerWindows, windowMetrics, metricsText, diffs, compareWindow, buildComparison, buildCoach, coachText, avgProjection, buildComparisonP, tw, kmh, accelFrom, gradeCorner, GRADE_COLORS, kartStraight, kartMeasure, kartSession, kartRating, pedalModes, coastIn };
 })();
 // @@DATA-END
 // ---------- i18n: English is the source text, Russian is a dictionary keyed by the English string ----------
@@ -4256,6 +4368,41 @@ Object.assign(I18N.RU, { 'Straight from the lap timer (Bluetooth)': 'Прямо 
 Object.assign(I18N.RU, { 'Hutka may not use Bluetooth yet — allow it: iPhone — Settings → Hutka → Bluetooth; Android — Settings → Apps → Hutka → Permissions → Nearby devices.': 'Hutka пока нельзя пользоваться Bluetooth — разреши: iPhone — Настройки → Hutka → Bluetooth; Android — Настройки → Приложения → Hutka → Разрешения → Устройства поблизости.', 'Bluetooth is off — turn it on in the phone settings and try again.': 'Bluetooth выключен — включи его в настройках телефона и попробуй снова.' });
 Object.assign(I18N.RU, { '{p}% of the lap runs away from the “{layout}” line — a different configuration of the track? Pick the right layout under the session name, or ask an admin to add it; the corners along that part are not comparable here.': '{p}% круга проходит в стороне от линии конфигурации «{layout}» — другая конфигурация трассы? Выбери нужную под названием сессии или попроси админа добавить её; повороты на этом участке здесь не сравнить.' });
 Object.assign(I18N.RU, { 'The device answers came back damaged ({e}) — try again, closer to the lap timer.': 'Ответы прибора пришли повреждёнными ({e}) — попробуй ещё раз, ближе к прибору.' });
+// v34.14 — the comparison picked by default
+Object.assign(I18N.RU, { 'fastest among the drivers you follow': 'самый быстрый среди тех, на кого ты подписан', 'fastest on this layout': 'самый быстрый на этой конфигурации',
+  '{o} is the fastest lap on this layout among the drivers you follow — the comparison picked for you; any other lap, the session average or the ideal lap can be chosen above.': '{o} — самый быстрый круг на этой конфигурации среди тех, на кого ты подписан; сравнение выбрано за тебя, выше можно взять любой другой круг, средний круг сессии или идеальный.',
+  '{o} is the fastest published lap on this layout in this kart class — the comparison picked for you; any other lap, the session average or the ideal lap can be chosen above.': '{o} — самый быстрый опубликованный круг на этой конфигурации в этой категории картов; сравнение выбрано за тебя, выше можно взять любой другой круг, средний круг сессии или идеальный.' });
+// v34.14 — corner grades
+Object.assign(I18N.RU, { 'brake {d} m {dir} than the best passes': 'тормоз на {d} м {dir}, чем у лучших проездов', 'later': 'позже', 'earlier': 'раньше', 'brake point as the best passes': 'точка торможения как у лучших проездов', 'no brake where the best passes brake': 'без торможения там, где лучшие проезды тормозят',
+  'lift {d} m {dir} than the best passes': 'сброс газа на {d} м {dir}, чем у лучших проездов', 'lift point as the best passes': 'сброс газа как у лучших проездов', 'brakes where the best passes only lift': 'торможение там, где лучшие проезды только сбрасывают газ', 'no lift — flat, like the quickest passes': 'без сброса — в пол, как самые быстрые проезды',
+  'brakes where the best passes stay flat': 'торможение там, где лучшие проезды едут в пол', 'lifts where the best passes stay flat': 'сброс газа там, где лучшие проезды едут в пол', 'flat out, like the best passes': 'в пол, как лучшие проезды',
+  'apex {a} km/h against {b} of the best passes': 'апекс {a} км/ч против {b} у лучших проездов', 'apex speed as the best passes': 'скорость в апексе как у лучших проездов', 'exit {a} km/h against {b}': 'выход {a} км/ч против {b}', 'throttle {d} m later': 'газ на {d} м позже', 'exit as the best passes': 'выход как у лучших проездов',
+  'among the best passes': 'среди лучших проездов', 'the difference is in smoothness': 'разница в плавности', '{g} against the best passes — {why}': '{g} против лучших проездов — {why}', 'Grade {g}': 'Оценка {g}',
+  'number — corner from the S/F line, its colour the grade against the best passes: A green … E red': 'номер — поворот от линии старт/финиш, цвет — оценка против лучших проездов: A зелёный … E красный' });
+// v34.14 — since last time
+Object.assign(I18N.RU, { 'Since last time': 'С прошлого раза', 'your previous session': 'твоей прошлой сессии', '{who}’s previous session': 'прошлой сессии ({who})',
+  'Since {who} on this layout ({d}): best lap {b} ({t0} → {t1}), average clean lap {a}.': 'С {who} на этой конфигурации ({d}): лучший круг {b} ({t0} → {t1}), средний чистый круг {a}.',
+  'Faster in {list}.': 'Быстрее в {list}.', 'Slower in {list}.': 'Медленнее в {list}.', 'No corner moved by 0.1 s or more — the best laps of the two sessions are driven alike.': 'Ни один поворот не сдвинулся на 0,1 с и больше — лучшие круги двух сессий проеханы одинаково.',
+  'A personal best on this layout — faster than all {n} of your earlier sessions here.': 'Личный рекорд на этой конфигурации — быстрее всех {n} твоих прошлых сессий здесь.', 'A personal best on this layout.': 'Личный рекорд на этой конфигурации.' });
+// v34.14 — the kart mark
+Object.assign(I18N.RU, { 'Kart': 'Карт', 'rental': 'прокат', 'The kart against the median kart on this layout in this class: {p}% ({n} sessions) — see the digest.': 'Карт против среднего карта на этой конфигурации в этой категории: {p}% ({n} сессий) — подробнее в дайджесте.',
+  'This kart: {lo}→{hi} km/h in {dt} s on the main straight, top speed {v} km/h (median of {n} clean laps{w}).': 'Этот карт: {lo}→{hi} км/ч за {dt} с на главной прямой, максимум {v} км/ч (медиана по {n} чистым кругам{w}).',
+  ', the acceleration normalised from {kg} kg to a 75 kg driver': ', разгон пересчитан с {kg} кг на пилота 75 кг',
+  'Against the median kart on this layout in this class ({n} sessions): acceleration {a}%, top speed {b}% — {mark}/10, about {s} s a lap {dir}.': 'Против среднего карта на этой конфигурации в этой категории ({n} сессий): разгон {a}%, максимальная скорость {b}% — {mark}/10, около {s} с на круге {dir}.',
+  'in its favour': 'в его пользу', 'against it': 'против него', 'Within ±1 % it is an ordinary kart — the measure is good to about a percent.': 'В пределах ±1 % это обычный карт — точность измерения около процента.',
+  'The mark against the other karts appears once three or more other sessions on this layout in this kart class are loaded (now {n}).': 'Оценка против других картов появится, когда на этой конфигурации в этой категории будет три и больше других сессий (сейчас {n}).',
+  '{o} drove a kart of the same strength{mk} — the gap is the driving.': '{o} ехал на карте той же силы{mk} — разница в пилотировании.',
+  '{o} drove a kart {p}% stronger than yours{mk}: about {s} s of the gap is the kart, not the driving.': '{o} ехал на карте на {p}% сильнее твоего{mk}: около {s} с разницы — карт, а не пилотирование.',
+  '{o} drove a kart {p}% weaker than yours{mk}: about {s} s a lap in your favour comes from the kart.': '{o} ехал на карте на {p}% слабее твоего{mk}: около {s} с на круге в твою пользу даёт карт.' });
+// v34.15 — pedals view, coasting, the scatter of laps through a corner
+Object.assign(I18N.RU, { 'Pedals': 'Педали', 'The average lap': 'Средний круг', 'The reference lap': 'Референсный круг',
+  '{ref}: on the throttle {a} m, braking {b} m, coasting {c} m — {p}% of the lap (neither braking nor accelerating: a lift, a roll through the apex, half throttle).': '{ref}: на газу {a} м, торможение {b} м, накат {c} м — {p}% круга (ни тормоза, ни разгона: сброс газа, качение через апекс, полгаза).',
+  'The fastest quarter of the {n} loaded laps coasts {d} m — {x} m less: that is where the time hides.': 'Самая быстрая четверть из {n} загруженных кругов катится {d} м — на {x} м меньше: там и прячется время.',
+  'The fastest quarter of the {n} loaded laps coasts {d} m — this lap coasts no more than they do.': 'Самая быстрая четверть из {n} загруженных кругов катится {d} м — этот круг катится не больше.',
+  'Most coasting in {list}.': 'Больше всего наката в {list}.', 'Shown on the map': 'Показано на карте', 'Show on the map': 'Показать на карте',
+  'line: on the throttle': 'линия: на газу', 'braking': 'торможение', 'coasting': 'накат', 'Colour the lap by what the kart is doing: throttle, brake, coasting': 'Раскрасить круг по тому, что делает карт: газ, тормоз, накат',
+  'brake point {lo}–{hi} m (wanders {d} m)': 'точка торможения {lo}–{hi} м (гуляет на {d} м)', 'lift point {lo}–{hi} m (wanders {d} m)': 'точка сброса {lo}–{hi} м (гуляет на {d} м)', 'apex {lo}–{hi} km/h': 'апекс {lo}–{hi} км/ч', 'corner time {lo}–{hi} s': 'время поворота {lo}–{hi} с',
+  'Across {n} clean laps': 'По {n} чистым кругам', 'The dots on the map are those laps’ brake and apex points.': 'Точки на карте — точки торможения и апексы этих кругов.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -5102,10 +5249,23 @@ function createMapView(canvas, host) {
       const mainL = laps.find(l => l.role === role) || laps[0], main = mainL.P, mainCol = mainL.col, mOf = mainL.m;
       // a whole lap is its recorded path, every sample (an average lap has none: its stations); a stretch of it (a corner) goes by stations
       const path = (P, a, len) => { ctx.beginPath(); if (a === undefined) { const raw = P.lap && P.lap.px; if (P.path && P.path.length > 4) { for (let q = 0; q < P.path.length; q += 2) { const [x, y] = T(P.path[q] / mpp, P.path[q + 1] / mpp); q ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } else if (raw && raw.length > 2) { for (let j = 0; j < raw.length; j++) { const [x, y] = T(raw[j][0], raw[j][1]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } else { for (let i = 0; i < N; i++) { const [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); } } else { for (let k = 0; k <= len; k++) { const i = (a + k) % N, [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } } };
-      const pxm = sc / mpp, lw = clamp(1.3 + pxm * 0.22, 1.8, 3.4);   // ≈ a wheel's width on the ground, never a fat ribbon
+      const pxm = sc / mpp, lw = clamp(1.3 + pxm * 0.22, 1.8, 3.4), rsz0 = (p) => clamp(0.75 + p * 0.06, 0.75, 1.25);   // ≈ a wheel's width on the ground, never a fat ribbon
       for (const l of laps) if (l !== mainL) { path(l.P); ctx.lineWidth = Math.max(1.2, lw * 0.7) + 1; ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.stroke(); ctx.lineWidth = Math.max(1.2, lw * 0.7); ctx.strokeStyle = l.col; ctx.stroke(); }
       path(main); ctx.lineWidth = lw + 1.6; ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.stroke(); ctx.lineWidth = lw; ctx.strokeStyle = mainCol; ctx.stroke();
+      // the pedals view: the chosen lap repainted station by station — throttle, brake, coasting — over its own line
+      if (O.pedals && DATA.pedalModes) {
+        const PM = DATA.pedalModes(main, tr), cols = [C.lift, C.throttle, C.brake];
+        let i = 0; while (i < N) { let j = i; while (j < N && PM.modes[j] === PM.modes[i]) j++; ctx.beginPath(); for (let k = i; k <= Math.min(j, N - 1); k++) { const [px, py] = lapPos(tr, main, k), [x, y] = T(px, py); k === i ? ctx.moveTo(x, y) : ctx.lineTo(x, y); } if (j < N) { const [px, py] = lapPos(tr, main, j), [x, y] = T(px, py); ctx.lineTo(x, y); } ctx.lineWidth = lw + 0.6; ctx.strokeStyle = cols[PM.modes[i]]; ctx.stroke(); i = j; }
+      }
       const hiRow = O.hiRow || null, showAll = !!O.labelsAll;
+      // every clean lap of the session through the chosen corner: its brake (or lift) point and its apex as small dots — the scatter shows how repeatable the corner is
+      if (hiRow && O.lapsAll && O.lapsAll.length > 1 && DATA.windowMetrics) {
+        const w0 = hiRow.w, at = (k) => ((w0.a + k) % N + N) % N;
+        for (const L of O.lapsAll) { const P = DATA.projectLap(L, tr, O.rev); if (!P) continue; const key = `${O.rev}|${w0.n}|${w0.a}`; if (!L._wm || L._wm.key !== key) L._wm = { key, m: DATA.windowMetrics(P, w0, tr) }; const m = L._wm.m;
+          const dot = (i, col, r) => { const [px, py] = lapPos(tr, P, i), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = col; ctx.globalAlpha = 0.75; ctx.fill(); ctx.globalAlpha = 1; ctx.lineWidth = 0.8; ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.stroke(); };
+          const pk = m.kind === 'brake' && !m.inherited ? m.bk : (m.kind === 'lift' ? m.lk : -1); if (pk >= 0) dot(at(pk), m.kind === 'brake' ? C.brake : C.lift, 2.4 * rsz0(pxm));
+          dot(at(m.apK), '#fff', 2.2 * rsz0(pxm)); }
+      }
       if (hiRow) { path(main, hiRow.w.a, hiRow.w.len); ctx.lineWidth = lw + 5; ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.stroke(); ctx.lineWidth = lw + 0.8; ctx.strokeStyle = '#fff'; ctx.globalAlpha = 0.9; ctx.stroke(); ctx.globalAlpha = 1; }
       const mk = (i, r, col, ink, lwS) => { const [px, py] = lapPos(tr, main, i), [x, y] = T(px, py); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.globalAlpha = 0.92; ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = lwS || 1.1; ctx.strokeStyle = ink || 'rgba(255,255,255,0.9)'; ctx.stroke(); ctx.globalAlpha = 1; return [x, y]; };
       const placed = [], labels = [], rsz = clamp(0.75 + pxm * 0.06, 0.75, 1.25), K = t('km/h');
@@ -5152,8 +5312,10 @@ function createMapView(canvas, host) {
         do { bx = x + out * snx * off; by = y + out * sny * off; rect = [bx - rad, by - rad, 2 * rad, 2 * rad]; off += rad + 4; tries++; } while (tries < 4 && placed.some(p => rect[0] < p[0] + p[2] && rect[0] + rect[2] > p[0] && rect[1] < p[1] + p[3] && rect[1] + rect[3] > p[1]));
         placed.push(rect);
         const ring = m.kind === 'brake' ? C.brake : (m.kind === 'flat' ? C.throttle : C.lift);
+        // the number is filled with the corner's grade against the best passes (A green … E red) when a coach is there; dark without one
+        const gr = O.coach && DATA.gradeCorner ? DATA.gradeCorner(m, O.coach.corners.find(c => c.n === w0.n) || null) : null;
         ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(bx, by); ctx.stroke();
-        ctx.beginPath(); ctx.arc(bx, by, rad, 0, Math.PI * 2); ctx.fillStyle = hi ? ring : 'rgba(14,17,22,0.72)'; ctx.fill(); ctx.lineWidth = hi ? 2.5 : 1.4; ctx.strokeStyle = hi ? '#fff' : ring; ctx.stroke();
+        ctx.beginPath(); ctx.arc(bx, by, rad, 0, Math.PI * 2); ctx.fillStyle = hi ? ring : (gr ? DATA.GRADE_COLORS[gr.g] : 'rgba(14,17,22,0.72)'); ctx.globalAlpha = hi || !gr ? 1 : 0.92; ctx.fill(); ctx.globalAlpha = 1; ctx.lineWidth = hi ? 2.5 : 1.4; ctx.strokeStyle = hi ? '#fff' : (gr ? 'rgba(255,255,255,0.85)' : ring); ctx.stroke();
         ctx.fillStyle = hi ? (m.kind === 'brake' ? '#fff' : '#111') : 'rgba(255,255,255,0.95)'; ctx.font = `${hi ? 700 : 600} ${hi ? 12 : 10}px ${C.mono}`; ctx.fillText(String(w0.n), bx, by + 0.5);
         M.badges.push({ row: r, x: bx, y: by, r: rad });
       }
@@ -5768,7 +5930,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.13';
+const APP_VERSION = 'v34.15';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6173,7 +6335,7 @@ async function renderSessionsTable(box, pubs, subEl) {
 // One session is the reference; a comparison (another lap, the session average, or another session on the same layout) is optional.
 const LAB = {
   tid: '', lid: '', G: null, sessions: [], ref: null, cmp: 'none', cmp2: 'none', mapLap: 'you', selN: 0, hoverIdx: -1, scrubT: 0, playing: false, chat: [], dcmp: null, coach: null, map: null, loaded: false, social: null, pickerOpen: false,
-  opts: { band: false, ticks: true, labelsAll: false, aerial: true, tiles: SAT.pref() }
+  opts: { band: false, ticks: true, labelsAll: false, pedals: false, aerial: true, tiles: SAT.pref() }
 };
 const lapKey = (sess, L) => sess.id + '|' + L.n;
 const isAvgKey = (k) => String(k || '').startsWith('avg:');
@@ -6368,13 +6530,33 @@ LAB.open = async function (meta, asCmp) {
   // the coach ("reserve", best passes) learns from every lap on this layout: my other sessions and the published ones
   const mine = (await STORE.mySessions()).filter(m => m.id !== sess.id && sameKart(m) && (STORE.hasDb ? (m.track === LAB.tid && m.layout === LAB.lid) : true));
   for (const m of mine.slice(0, 12)) { try { add(await STORE.loadSession(m)); } catch (e) {} }
-  if (LAB.tid) { const all = (await STORE.sessionsFor(LAB.tid, LAB.lid)).filter(m => !LAB.sessions.some(x => x.id === m.id) && !(G.refSess && m.id === G.refSess.id)); const pubs = all.filter(sameKart); LAB.otherKarts += all.length - pubs.length; for (const m of pubs.slice(-10)) { try { add(await STORE.loadSession(m)); } catch (e) {} } }
+  let pool = [];   // every published session on the layout in the same kart class (meta) — the default comparison is picked from here
+  if (LAB.tid) { const every = await STORE.sessionsFor(LAB.tid, LAB.lid); pool = every.filter(sameKart); const all = every.filter(m => !LAB.sessions.some(x => x.id === m.id) && !(G.refSess && m.id === G.refSess.id)); const pubs = all.filter(sameKart); LAB.otherKarts += all.length - pubs.length; for (const m of pubs.slice(-10)) { try { add(await STORE.loadSession(m)); } catch (e) {} } }
+  // the comparison by default: the fastest published lap of another driver on this layout in the same kart class — a driver you follow
+  // first, then anyone — when it is faster than this session's best; otherwise the session's own average, as before
+  LAB.cmpAuto = null;
+  const autoCmp = async () => {
+    const my = bestLap(sess).timeMs, cand = pool.filter(m => m.id !== sess.id && m.owner !== sess.owner && m.bestMs > 0 && m.bestMs < my); if (!cand.length) return null;
+    const fastest = (list) => list.reduce((a, b) => (!a || b.bestMs < a.bestMs) ? b : a, null);
+    const fol = new Set(await STORE.followingIds()); let m = fastest(cand.filter(x => fol.has(x.owner))), why = 'followed'; if (!m) { m = fastest(cand); why = 'fastest'; }
+    let s = sessOf(m.id); if (!s) { try { const x = await STORE.loadSession(m); if (add(x)) s = x; } catch (e) {} } if (!s) return null;
+    const L = bestLap(s); if (!L.px) return null; return { key: lapKey(s, L), why };
+  };
+  if (!asCmp) LAB.cmpAuto = await autoCmp();
+  // the owner's previous session on this layout in the same kart class (and their best before this one): the digest says what changed
+  LAB.prev = null;
+  try {
+    const own = (mySession(sess) ? mine : pool.filter(m => m.owner === sess.owner && m.id !== sess.id)).filter(m => m.id !== sess.id);
+    const earlier = (m) => (m.date || '') < (sess.date || '') || ((m.date || '') === (sess.date || '') && (m.createdAt || 0) < (sess.createdAt || 0));
+    const before = own.filter(earlier).sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || 0) - (a.createdAt || 0));
+    if (before.length) { const pm = before[0]; let ps = sessOf(pm.id); if (!ps) { const x = await STORE.loadSession(pm); if (add(x)) ps = x; } const pbs = before.map(m => +m.bestMs).filter(x => x > 0); if (ps) LAB.prev = { sess: ps, pb: pbs.length ? Math.min(...pbs) : 0, n: before.length }; }
+  } catch (e) { LAB.prev = null; }
   LAB.names = await STORE.names(LAB.sessions.map(s => s.owner));
   LAB.sessions.sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.createdAt || 0) - (b.createdAt || 0));
   const reopen = !!(LAB.current && LAB.current.id === sess.id);
   LAB.current = sess; LAB.selN = 0; LAB.ckInsp = false; LAB.scrubIdx = 0; LAB.chat = []; LAB.chatId = null; LAB.mapLap = 'you'; LAB.pickerOpen = reopen && LAB.pickerOpen; LAB.social = null; LAB.breakOpen = false; LAB.cmp2 = reopen ? LAB.cmp2 : 'none'; LAB.scrubT = 0; replayPlay(false);
   if (asCmp) { const my = LAB.sessions.filter(s => mySession(s) && s.id !== sess.id).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]; if (my) { LAB.ref = lapKey(my, bestLap(my)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : lapKey(sess, bestLap(sess)); LAB.current = my; } else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = 'none'; } }
-  else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = sessAvg(sess) ? 'avg:' + sess.id : 'none'; }   // best lap against the session average by default
+  else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = LAB.cmpAuto ? LAB.cmpAuto.key : (sessAvg(sess) ? 'avg:' + sess.id : 'none'); }   // best lap against the fastest driver here, else the session average
   LAB.loaded = true; LAB.needFit = true; if (APP.route === 'lab') { LAB.map.fit(); LAB.needFit = false; } labRender();
   setStatus('labStatus', G.fitNote || '', 'ok');
   // a session that leaves this layout's line for a good part of the lap was driven on another configuration of the track: say so — the
@@ -6575,7 +6757,7 @@ function labEnsureMap() {
     getImage: () => { if (!LAB.G) return null; const im = LAB.G.image; if (LAB.G.source === 'gps' && SAT.can(LAB.G) && LAB.opts.tiles) return null; return im && LAB.G.source !== 'gps' ? im : (LAB.opts.aerial ? im : null); },
     getTiles: () => { const G = LAB.G; if (!G) return null; const b = G.sat || { dx: 0, dy: 0 }; return SAT.layer(G, LAB.opts.tiles, { dx: b.dx + LAB.satAdj.dx, dy: b.dy + LAB.satAdj.dy }); },
     onSatMove: (dxPx, dyPx) => { if (!LAB.G) return; const mpp = LAB.G.track.mpp; LAB.satAdj.dx += dxPx * mpp; LAB.satAdj.dy -= dyPx * mpp; saveSatAdj(); renderAlignBar(); },
-    getOverlay: () => ({ D: LAB.dcmp, role: roleNow(), hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, model: null, modelOn: false, corridor: LAB.corridor, marks: labMarks(), markScale: LAB.markScale || 1 }),
+    getOverlay: () => ({ D: LAB.dcmp, coach: LAB.coach, role: roleNow(), hiRow: activeRow(), band: LAB.opts.band, ticks: LAB.opts.ticks, labelsAll: LAB.opts.labelsAll, pedals: LAB.opts.pedals, lapsAll: LAB.dcmp && LAB.G ? LAB.dcmp.sess.laps.filter(L => L.clean && L.px) : null, rev: LAB.G ? LAB.G.rev : '', model: null, modelOn: false, corridor: LAB.corridor, marks: labMarks(), markScale: LAB.markScale || 1 }),
     viewInset: ckInset,
     onHover: (i) => { if (i < 0 && isCockpit()) { hoverOff(); return; } LAB.hoverIdx = i; hoverChanged(); },
     onClick: (i, b) => { const row = b || (i >= 0 ? cornerAt(i) : null); if (isCockpit()) { if (i >= 0) LAB.scrubIdx = i; LAB.ckInsp = !!row && LAB.selN !== row.w.n; } LAB.selN = row ? (LAB.selN === row.w.n ? 0 : row.w.n) : 0; afterSelect(false); } });
@@ -6603,7 +6785,7 @@ function labEnsureMap() {
   $('landHintClose').onclick = () => { try { localStorage.setItem('hutka.landHint', '1'); } catch (e) {} $('landHint').hidden = true; };
   $('rotL').onclick = () => LAB.map.rotateBy(-Math.PI / 12); $('rotR').onclick = () => LAB.map.rotateBy(Math.PI / 12);
   $('zoomIn').onclick = () => LAB.map.zoomCenter(1.3); $('zoomOut').onclick = () => LAB.map.zoomCenter(1 / 1.3); $('zoomFit').onclick = () => { LAB.map.fit(); LAB.map.draw(); };
-  $('optBand').onclick = () => { LAB.opts.band = !LAB.opts.band; syncOpts(); }; $('optTicks').onclick = () => { LAB.opts.ticks = !LAB.opts.ticks; syncOpts(); }; $('optLabels').onclick = () => { LAB.opts.labelsAll = !LAB.opts.labelsAll; syncOpts(); };
+  $('optBand').onclick = () => { LAB.opts.band = !LAB.opts.band; syncOpts(); }; $('optTicks').onclick = () => { LAB.opts.ticks = !LAB.opts.ticks; syncOpts(); }; $('optLabels').onclick = () => { LAB.opts.labelsAll = !LAB.opts.labelsAll; syncOpts(); }; $('optPedals').onclick = () => { LAB.opts.pedals = !LAB.opts.pedals; if (LAB.opts.pedals) STORE.track('pedals', {}); syncOpts(); renderLegend(); };
   $('tglSat').onclick = () => { LAB.opts.aerial = !LAB.opts.aerial; syncOpts(); };
   $('tglTiles').onclick = () => { LAB.opts.tiles = !LAB.opts.tiles; SAT.setPref(LAB.opts.tiles); if (!LAB.opts.tiles) setAligning(false); syncOpts(); };
   // moving the picture under the line: for this device, or saved on the layout by whoever may edit the track
@@ -6701,7 +6883,7 @@ function labEnsureMap() {
   $('btnEditSess').onclick = () => { const s = LAB.current; if (s) SESSEDIT.open(s, () => { LAB.invalidate(s.id); go('lab~' + s.id); }); };
   $('btnFollowOwner').onclick = async () => { const s = LAB.current; if (!s || mySession(s)) return; if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to follow drivers.')); return; } const b = $('btnFollowOwner'); b.classList.add('busy'); try { await STORE.toggleFollow(s.owner); await renderOwnerRow(); } catch (e) { toast(t('Could not save.')); } b.classList.remove('busy'); };
   $('commentBtn').onclick = postComment; $('commentInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); postComment(); } });
-  $('digest').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); LAB.selN = +a.dataset.n; LAB.ckInsp = true; if (isCockpit() && LAB.side) setSide(false); afterSelect(true); if (!isCockpit()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+  $('digest').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); if (a.classList.contains('pedals')) { LAB.opts.pedals = !LAB.opts.pedals; syncOpts(); renderLegend(); a.textContent = LAB.opts.pedals ? t('Shown on the map') : t('Show on the map'); if (!isCockpit() && LAB.opts.pedals) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); return; } LAB.selN = +a.dataset.n; LAB.ckInsp = true; if (isCockpit() && LAB.side) setSide(false); afterSelect(true); if (!isCockpit()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
   $('inspClose').onclick = () => { LAB.selN = 0; LAB.ckInsp = false; LAB.hoverIdx = -1; LAB.map.setHover(-1); afterSelect(true); };
   $('inspEmpty').addEventListener('click', (e) => { const a = e.target.closest('.tref'); if (!a) return; e.preventDefault(); selectCorner(+a.dataset.n, false); });
   $('askBtn').onclick = askAI; $('askStop').onclick = () => { if (askCtl) askCtl.abort(); };
@@ -6733,7 +6915,7 @@ function syncOpts() {
   const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles); $('ckSat').hidden = !sat; $('ckSat').classList.toggle('active', sat && LAB.opts.tiles); $('tglAlign').hidden = !(sat && LAB.opts.tiles); if (!(sat && LAB.opts.tiles) && LAB.aligning) setAligning(false);
   $('satNote').hidden = true; $('tglAlign').textContent = t('Move imagery'); renderSatPill();
   if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; $('ckSat').hidden = true; LAB.map.draw(); } });
-  $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').hidden = !!(sat && LAB.opts.tiles); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))) || !!(sat && LAB.opts.tiles && !(LAB.G && LAB.G.aerial)); LAB.map.draw(); }
+  $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').hidden = !!(sat && LAB.opts.tiles); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('optPedals').classList.toggle('active', LAB.opts.pedals); $('optPedals').textContent = t('Pedals'); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))) || !!(sat && LAB.opts.tiles && !(LAB.G && LAB.G.aerial)); LAB.map.draw(); }
 function selectCorner(n, scroll) { NATIVE.haptic('light'); LAB.selN = (LAB.selN === n) ? 0 : n; LAB.ckInsp = !!LAB.selN; if (isCockpit() && LAB.side && LAB.selN) setSide(false); afterSelect(true); if (scroll && LAB.selN && !isCockpit()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 
 // ----- the start screen: my sessions and what the drivers I follow have published -----
@@ -6780,7 +6962,7 @@ function labRender() {
   LAB.cmp = cmp;
   const cmpOn = cmp !== 'none';
   $('cmpField').hidden = !cmpOn; $('lapSegField').hidden = !cmpOn;
-  if (cmpOn) { const laps = cs.laps.filter(x => x.px), av = sessAvg(cs), ide = cs === sess && !refIsAvg ? sessIdeal(cs, R, apexes) : null; const o = []; if (av) o.push(['avg:' + cs.id, `${t('average clean lap')} · ${fmtLap(av.T)} (${laps.filter(x => x.clean).length})`]); if (ide) o.push(['ideal:' + cs.id, `${t('ideal lap')} · ${fmtLap(ide.T)} (${t('best corners, approximate')})`]); for (const x of laps) o.push([lapKey(cs, x), lapLabel(cs, x)]); LAB.cmp = fillSelect($('cmpSel'), o.filter(x => x[0] !== LAB.ref), cmp); $('cmpLbl').textContent = cs === sess ? t('Compare with — this session') : t('Compare with · {s}', { s: shortSess(cs) }); }
+  if (cmpOn) { const laps = cs.laps.filter(x => x.px), av = sessAvg(cs), ide = cs === sess && !refIsAvg ? sessIdeal(cs, R, apexes) : null; const o = []; if (av) o.push(['avg:' + cs.id, `${t('average clean lap')} · ${fmtLap(av.T)} (${laps.filter(x => x.clean).length})`]); if (ide) o.push(['ideal:' + cs.id, `${t('ideal lap')} · ${fmtLap(ide.T)} (${t('best corners, approximate')})`]); for (const x of laps) o.push([lapKey(cs, x), lapLabel(cs, x)]); LAB.cmp = fillSelect($('cmpSel'), o.filter(x => x[0] !== LAB.ref), cmp); $('cmpLbl').textContent = (cs === sess ? t('Compare with — this session') : t('Compare with · {s}', { s: shortSess(cs) })) + (LAB.cmpAuto && LAB.cmp === LAB.cmpAuto.key ? ' · ' + (LAB.cmpAuto.why === 'followed' ? t('fastest among the drivers you follow') : t('fastest on this layout')) : ''); }
   // the third lap: a visual comparison (map, charts, replay, a Δt column) — any lap or average of a loaded session; the field shows once a comparison is on
   let c2 = String(LAB.cmp2 || 'none'); if (c2 === LAB.ref || c2 === LAB.cmp || isIdealKey(c2)) c2 = 'none';
   let cs2 = cmpSessOf(c2); if (c2 !== 'none' && (!cs2 || (isAvgKey(c2) && !sessAvg(cs2)) || (!isAvgKey(c2) && !(findLap(c2) && findLap(c2).L.px)))) { c2 = 'none'; cs2 = null; }
@@ -6809,6 +6991,7 @@ function labRender() {
   D.ideal = (D.O && D.O.ideal) ? D.O : ((LAB.breakOpen && cs === sess && !refIsAvg) ? sessIdeal(cs, R, apexes) : null);   // the breakdown stays open while a lap picked from it is the comparison
   markCombos(D);
   LAB.coach = DATA.buildCoach(G.track, D.wins, attached.filter(x => x.L.clean).map(x => x.L), G.rev);
+  try { LAB.kart = kartAnalysis(D); } catch (e) { LAB.kart = null; }
   LAB.corridor = null;
   if (LAB.selN && !D.rows.some(r => r.w.n === LAB.selN)) LAB.selN = 0;
   if (!D.O) LAB.mapLap = 'you'; if (LAB.mapLap === 'third' && !D.P3) LAB.mapLap = 'you';
@@ -6825,7 +7008,7 @@ function labRender() {
   chip(t('max'), kmh(vmax) + ' ' + t('km/h')); chip(t('min'), kmh(vmin) + ' ' + t('km/h')); chip('S1', s1.toFixed(2)); chip('S2', (s2 - s1).toFixed(2)); chip('S3', (D.R.T - s2).toFixed(2));
   if (D.O) chip(t('comparison'), fmtLap(D.O.T) + ' · ' + sg(D.total)); if (D.P3) chip(t('third lap'), fmtLap(D.P3.T) + ' · ' + sg(D.R.T - D.P3.T));
   if (sess.source && sess.source.app !== 'alfano') chip(t('source'), sourceLabel(sess.source));
-  if (sess.kart || sess.kartClass === 'sport') chip(t('kart'), kartLabel(sess));
+  if (sess.kart || sess.kartClass === 'sport' || (LAB.kart && LAB.kart.rating)) { const kr = LAB.kart && LAB.kart.rating; chip(t('kart'), (sess.kart || sess.kartClass === 'sport' ? kartLabel(sess) : t('rental')) + (kr ? ` · ${kr.mark}/10` : '')); if (kr) chips.lastChild.title = t('The kart against the median kart on this layout in this class: {p}% ({n} sessions) — see the digest.', { p: sg(kr.pct, 1), n: kr.n }); }
   if (box) { chip(t('rpm max'), fmtRpm(box.rpmMax)); if (box.kind !== 'single') chip(t('gears'), `${box.gears}${box.kind === 'dd2' ? ' · DD2' : ''}`); const lg = L && L._gear; if (lg && box.kind !== 'single') chip(t('shifts'), `${lg.shifts.filter(x => x.kind === 'up').length} ▲ · ${lg.shifts.filter(x => x.kind === 'down').length} ▼`); if (box.t1) chip(t('water'), `${box.t1.min.toFixed(0)}–${box.t1.max.toFixed(0)} °C`); }
   if (!sess.sws && resultText(sess)) chip(t('session'), resultText(sess));
   if (sess.sws) chip('SWS', [sess.sws.race, sess.sws.pos ? 'P' + String(sess.sws.pos).replace(/^P/i, '') : '', sess.sws.best].filter(Boolean).join(' · '));
@@ -6841,11 +7024,27 @@ function labRender() {
   { const mod = $('btnModerate'); mod.hidden = !(STORE.isAdmin() && STORE.hasDb && !mySession(sess) && sess.owner !== 'local'); if (!mod.hidden) { mod.textContent = sess.published ? t('Hide from public') : (sess.moderated ? t('Show again') : t('Unpublished by owner')); mod.disabled = !sess.published && !sess.moderated; mod.classList.toggle('active', !!sess.moderated); mod.title = t('Admins: hide a broken or wrongly placed session from the feed and the track page — its owner keeps it.'); } }
   $('btnEditSess').hidden = !mySession(sess);
   STORE.socialAvailable().then(on => { if (LAB.current !== sess) return; $('voteBox').hidden = !(on && STORE.hasDb && sess.owner !== 'local'); if ($('voteBox').hidden) $('lowRated').hidden = true; $('discussPanel').hidden = !on; if (on) { renderSocialBits(); renderDiscussion(); } renderOwnerRow(); });
-  $('legendData').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span>${box && box.kind !== 'single' ? `<span><span class="dot tri up"></span>${t('upshift')}</span><span><span class="dot tri down"></span>${t('downshift')}</span>` : ''}${lapList(D).map(l => `<span class="lapkey"><i style="background:${l.col}"></i><b style="color:${l.col}">${l.n}</b> ${esc(l.name)}</span>`).join('')}<span>${t('number — corner from the S/F line')}</span>`;
+  renderLegend();
   $('mapNote').hidden = true;
   syncOpts(); renderDigest(); renderCornersTable(); renderInspector(); renderCornerNav(); renderAskState(); showReadout(); drawDataCharts(); renderHud(); drawScrub(); renderReplay(true);
 }
+// the kart of the session: measured on the reference lap's main straight (data2 kartStraight), every loaded session of the same kart class
+// the same way — the median kart of the others is the baseline, the comparison lap's session is measured too (was he on a stronger kart?)
+function kartAnalysis(D) {
+  const G = LAB.G, sess = D && D.sess; if (!G || !D || !D.R || !sess) return null;
+  const tr = G.track, st = DATA.kartStraight(D.R, D.wins, tr); if (!st) return null;
+  const key = `${G.rev}|${st.s0}|${st.s1}|${st.lo}|${st.hi}`;
+  const measure = (s) => { if (s._kart && s._kart.key === key) return s._kart.m; const pr = STORE.profileSync(s.owner); const m = DATA.kartSession(s.laps.filter(L => L.clean && L.px), st, tr, G.rev, pr && pr.weightKg); s._kart = { key, m }; return m; };
+  const mine = measure(sess); if (!mine) return null;
+  const same = LAB.sessions.filter(s => s !== sess && kartCompatible(s, sess));
+  const others = same.map(measure).filter(Boolean), rating = DATA.kartRating(mine, others);
+  const cs = D.O ? (D.O.lap ? D.O.lap._sess : D.O.sess) : null, cmp = cs && cs !== sess ? measure(cs) : null;
+  let vs = null; if (cmp) { const rel = 0.6 * (mine.dtN / cmp.dtN - 1) * 100 + 0.4 * (cmp.vmax / mine.vmax - 1) * 100; vs = { sess: cs, m: cmp, rel, sec: cmp.tFull * rel / 100, rating: DATA.kartRating(cmp, LAB.sessions.filter(s => s !== cs && kartCompatible(s, cs)).map(measure).filter(Boolean)) }; }
+  return { st, mine, others, rating, vs };
+}
 // linked corners: a loss in one corner that buys a bigger gain in the next (early brake, early throttle) is not a mistake
+// the legend under the map: the action points, the laps on the screen, the numbers — and the line colours of the pedals view when it is on
+function renderLegend() { const D = LAB.dcmp, sess = LAB.current; if (!D || !sess) return; const box = sess._box && sess._box.box; $('legendData').innerHTML = `<span><span class="dot" style="background:var(--brake)"></span>${t('brake')}</span><span><span class="dot" style="background:var(--lift)"></span>${t('lift')}</span><span><span class="dot" style="background:var(--limit)"></span>${t('brake released')}</span><span><span class="dot" style="background:#fff"></span>${t('apex')}</span><span><span class="dot" style="background:var(--throttle)"></span>${t('throttle')}</span>${box && box.kind !== 'single' ? `<span><span class="dot tri up"></span>${t('upshift')}</span><span><span class="dot tri down"></span>${t('downshift')}</span>` : ''}${lapList(D).map(l => `<span class="lapkey"><i style="background:${l.col}"></i><b style="color:${l.col}">${l.n}</b> ${esc(l.name)}</span>`).join('')}<span>${LAB.coach ? t('number — corner from the S/F line, its colour the grade against the best passes: A green … E red') : t('number — corner from the S/F line')}</span>${LAB.opts.pedals ? `<span class="lapkey"><i style="background:var(--throttle)"></i>${t('line: on the throttle')}</span><span class="lapkey"><i style="background:var(--brake)"></i>${t('braking')}</span><span class="lapkey"><i style="background:var(--lift)"></i>${t('coasting')}</span>` : ''}`; }
 function markCombos(D) {
   const rows = D.rows, N = LAB.G.track.N, ds = LAB.G.track.ds;
   for (const r of rows) { r.combo = null; r.comboPrev = null; }
@@ -7135,6 +7334,44 @@ function renderDigest() {
   const P = [];
   if (sess.source && sess.source.app !== 'alfano') P.push(`<p class="hint"><span class="lbl">${t('Data source')}</span><br>${esc(t('{s}. Alfano at 10 Hz is the reference; at {hz} Hz braking, release and throttle points are accurate to about ±{m} m and apex speeds are smoothed. Treat small differences with care.', { s: sourceLabel(sess.source), hz: sess.source.hz, m: sess.source.hz >= 9 ? 2 : (sess.source.hz >= 4 ? 4 : 10) }))}</p>`);
   P.push(`<p><span class="lbl">${t('Session')}</span><br>${esc(shortSess(sess))}: ${t('{n} laps, {c} of them clean (no slower than the best by 1.5 %)', { n: sess.laps.length, c: clean.length })}. ${t('Best — lap {n}, {t}', { n: bestLap(sess).n, t: fmtMs(bestLap(sess).timeMs) })}. ${t('Average clean lap — {t}', { t: fmtLap(avg) })}. ${t('Five fastest: {list}', { list: fastest.map(x => `${x.n} (${fmtMs(x.timeMs)})`).join(', ') })}.${D.ref.avg ? ' ' + t('The reference now is the average clean lap of this session, {t}: its points are a “typical” pass.', { t: fmtLap(D.R.T) }) : (L !== bestLap(sess) ? ' ' + t('The reference now is lap {n}, {t}.', { n: L.n, t: fmtLap(D.R.T) }) : '')}</p>`);
+  // what changed since the owner's previous session on this layout: best and average lap, the corners that moved by 0.1 s or more (best lap vs best lap), a personal best
+  if (LAB.prev && LAB.prev.sess !== sess && LAB.G) {
+    const ps = LAB.prev.sess, G = LAB.G, PL = bestLap(ps), BL = bestLap(sess), PP = PL && PL.px ? DATA.projectLap(PL, G.track, G.rev) : null, RB = (L === BL && !D.ref.avg) ? D.R : (BL && BL.px ? DATA.projectLap(BL, G.track, G.rev) : null);
+    const pClean = ps.laps.filter(x => x.clean), pAvg = pClean.length ? pClean.reduce((a, x) => a + x.timeMs, 0) / pClean.length / 1000 : 0;
+    const dBest = (BL.timeMs - PL.timeMs) / 1000, dAvg = pAvg && times.length ? avg - pAvg : NaN;
+    const who = mySession(sess) ? t('your previous session') : t('{who}\u2019s previous session', { who: whoOf(ps) || shortSess(ps) });
+    let tx = `<p><span class="lbl">${esc(t('Since last time'))}</span><br>${esc(t('Since {who} on this layout ({d}): best lap {b} ({t0} → {t1}), average clean lap {a}.', { who, d: fmtDate(ps.date), b: sg(dBest), t0: fmtMs(PL.timeMs), t1: fmtMs(BL.timeMs), a: isFinite(dAvg) ? sg(dAvg) : '—' }))}`;
+    if (PP && RB) {
+      const moved = D.wins.map((w, k) => ({ n: w.n, dt: DATA.windowMetrics(RB, w, G.track).time - DATA.windowMetrics(PP, w, G.track).time })).filter(x => isFinite(x.dt));
+      const faster = moved.filter(x => x.dt <= -0.1).sort((a, b) => a.dt - b.dt).slice(0, 4), slower = moved.filter(x => x.dt >= 0.1).sort((a, b) => b.dt - a.dt).slice(0, 4);
+      if (faster.length) tx += ' ' + t('Faster in {list}.', { list: faster.map(x => `${tref(x.n)} (${x.dt.toFixed(2)} ${t('s')})`).join(', ') });
+      if (slower.length) tx += ' ' + t('Slower in {list}.', { list: slower.map(x => `${tref(x.n)} (+${x.dt.toFixed(2)} ${t('s')})`).join(', ') });
+      if (!faster.length && !slower.length) tx += ' ' + esc(t('No corner moved by 0.1 s or more — the best laps of the two sessions are driven alike.'));
+    }
+    if (LAB.prev.pb && BL.timeMs < LAB.prev.pb) tx += ' <b>' + esc(mySession(sess) ? t('A personal best on this layout — faster than all {n} of your earlier sessions here.', { n: LAB.prev.n }) : t('A personal best on this layout.')) + '</b>';
+    P.push(tx + '</p>');
+  }
+  // the kart: acceleration and top speed on the main straight, the mark against the median kart here, the comparison driver's kart
+  if (LAB.kart) {
+    const K = LAB.kart, m = K.mine, r = K.rating, pr = (x) => `${x > 0 ? '+' : ''}${x.toFixed(1)}`;
+    let tx = `<p><span class="lbl">${esc(t('Kart'))}</span><br>${esc(t('This kart: {lo}→{hi} km/h in {dt} s on the main straight, top speed {v} km/h (median of {n} clean laps{w}).', { lo: K.st.lo, hi: K.st.hi, dt: m.dt.toFixed(2), v: m.vmax.toFixed(0), n: m.n, w: m.weight ? t(', the acceleration normalised from {kg} kg to a 75 kg driver', { kg: m.weight }) : '' }))}`;
+    if (r) { tx += ' ' + esc(t('Against the median kart on this layout in this class ({n} sessions): acceleration {a}%, top speed {b}% — {mark}/10, about {s} s a lap {dir}.', { n: r.n, a: pr(r.accel), b: pr(r.top), mark: r.mark, s: Math.abs(r.secPerLap).toFixed(2), dir: r.pct >= 0 ? t('in its favour') : t('against it') })); if (Math.abs(r.pct) < 1) tx += ' ' + esc(t('Within ±1 % it is an ordinary kart — the measure is good to about a percent.')); }
+    else tx += ' ' + esc(t('The mark against the other karts appears once three or more other sessions on this layout in this kart class are loaded (now {n}).', { n: K.others.length }));
+    if (K.vs && D.O) { const v = K.vs, o = D.nameOf(D.O), mk = v.rating ? ` (${v.rating.mark}/10)` : ''; tx += ' <b>' + esc(Math.abs(v.rel) < 1 ? t('{o} drove a kart of the same strength{mk} — the gap is the driving.', { o, mk }) : (v.rel > 0 ? t('{o} drove a kart {p}% stronger than yours{mk}: about {s} s of the gap is the kart, not the driving.', { o, p: v.rel.toFixed(1), mk, s: Math.abs(v.sec).toFixed(2) }) : t('{o} drove a kart {p}% weaker than yours{mk}: about {s} s a lap in your favour comes from the kart.', { o, p: (-v.rel).toFixed(1), mk, s: Math.abs(v.sec).toFixed(2) }))) + '</b>'; }
+    P.push(tx + '</p>');
+  }
+  // pedals: throttle / brake / coasting metres of the reference lap, the fastest quarter of the loaded laps as the yardstick, the corners that coast most
+  if (LAB.G) {
+    const tr = LAB.G.track, PM = DATA.pedalModes(D.R, tr), pct = Math.round(100 * PM.coast / PM.L);
+    const all = allLaps().filter(x => x.L.clean).map(x => DATA.projectLap(x.L, tr, LAB.G.rev)).filter(Boolean).sort((a, b) => a.T - b.T), top = all.slice(0, Math.max(3, Math.round(all.length / 4)));
+    const med = (a) => { const q = a.slice().sort((p, r) => p - r); return q.length ? q[Math.floor(q.length / 2)] : NaN; }, base = top.length >= 3 ? med(top.map(P => DATA.pedalModes(P, tr).coast)) : NaN;
+    const byCorner = D.rows.map(r => ({ n: r.w.n, m: DATA.coastIn(PM, r.w, tr) })).filter(x => x.m >= 8).sort((a, b) => b.m - a.m).slice(0, 3);
+    let tx = `<p><span class="lbl">${esc(t('Pedals'))}</span><br>${esc(t('{ref}: on the throttle {a} m, braking {b} m, coasting {c} m — {p}% of the lap (neither braking nor accelerating: a lift, a roll through the apex, half throttle).', { ref: D.ref.avg ? t('The average lap') : t('The reference lap'), a: PM.throttle.toFixed(0), b: PM.brake.toFixed(0), c: PM.coast.toFixed(0), p: pct }))}`;
+    if (isFinite(base)) tx += ' ' + esc(PM.coast > base + 10 ? t('The fastest quarter of the {n} loaded laps coasts {d} m — {x} m less: that is where the time hides.', { n: all.length, d: base.toFixed(0), x: (PM.coast - base).toFixed(0) }) : t('The fastest quarter of the {n} loaded laps coasts {d} m — this lap coasts no more than they do.', { n: all.length, d: base.toFixed(0) }));
+    if (byCorner.length) tx += ' ' + t('Most coasting in {list}.', { list: byCorner.map(x => `${tref(x.n)} (${x.m.toFixed(0)} ${t('m')})`).join(', ') });
+    tx += ` <a class="tref pedals" href="#">${esc(LAB.opts.pedals ? t('Shown on the map') : t('Show on the map'))}</a>`;
+    P.push(tx + '</p>');
+  }
   // engine channels (a sport kart with an Alfano 6): the gearbox, where the shifts are, the revs, the water
   { const box = sess._box && sess._box.box; if (box) {
       const lg = L && L._gear, parts = [];
@@ -7167,6 +7404,7 @@ function renderDigest() {
     const rName = D.ref.avg ? `${t('Average lap')} · ${shortSess(sess)}` : (D.ref.mine ? t('Reference lap') : `${t('Reference lap')} · ${shortSess(sess)}`);
     const head = D.total < -0.02 ? t('{r} is faster than {o} by {t} s.', { r: rName, o: oName, t: (-D.total).toFixed(2) }) : (D.total > 0.02 ? t('{r} is slower than {o} by {t} s.', { r: rName, o: oName, t: D.total.toFixed(2) }) : t('{r} and {o} are equal on time.', { r: rName, o: oName }));
     let tx = `<p><span class="lbl">${esc(rName)} vs ${esc(oName)}</span><br>${esc(head)}`;
+    if (LAB.cmpAuto && LAB.cmp === LAB.cmpAuto.key) tx += ' ' + esc(LAB.cmpAuto.why === 'followed' ? t('{o} is the fastest lap on this layout among the drivers you follow — the comparison picked for you; any other lap, the session average or the ideal lap can be chosen above.', { o: oName }) : t('{o} is the fastest published lap on this layout in this kart class — the comparison picked for you; any other lap, the session average or the ideal lap can be chosen above.', { o: oName }));
     const linked = (r) => { const c = r.combo || r.comboPrev; if (!c) return ''; const on = c.n; return c.net <= -0.04 && r.cmp.dt >= 0.04 ? ' — ' + t('linked with {t}, net gain', { t: tref(on) }) : (c.net >= 0.04 && r.cmp.dt <= -0.04 ? ' — ' + t('linked with {t}, net loss', { t: tref(on) }) : ''); };
     if (gains.length) tx += ' ' + t('The gain comes in {list}.', { list: gains.slice(0, 4).map(r => `${tref(r.w.n)} (${(-r.cmp.dt).toFixed(2)} ${t('s')} — ${esc(reason(r))}${linked(r)})`).join(', ') });
     if (losses.length) tx += ' ' + t('It loses in {list}.', { list: losses.slice(0, 4).map(r => `${tref(r.w.n)} (${r.cmp.dt.toFixed(2)} ${t('s')} — ${esc(reason(r))}${linked(r)})`).join(', ') }); else tx += ' ' + t('It loses nowhere noticeably.');
@@ -7188,6 +7426,8 @@ function renderDigest() {
   $('digestSub').textContent = `${t('reference')}: ${D.ref.name}${D.O ? ' · ' + t('comparison') + ': ' + D.nameOf(D.O) : ''}`;
   $('glossList').innerHTML = [['brake', t('Brake — where the deceleration gets stronger than 2.5 m/s²; the number is metres from the start/finish line.')], ['lift', t('Lift — the throttle closes without braking; eased off — a partial lift.')], ['released', t('Released — the brake pedal is let go; earlier usually means the kart rolls and rotates on its own.')], ['apex', t('Apex — the slowest point of the corner; apex speed is the minimum speed.')], ['throttle', t('Throttle — where the full acceleration starts after the apex.')], ['exit', t('Exit — the speed 40 m after the apex: what the whole straight inherits.')], ['reserve', t('Reserve — how much faster the corner would be if driven like the best quarter of all passes in the loaded sessions.')], ['clean', t('Clean lap — no slower than the best by 1.5 %; the rest are counted as dirty and skipped in averages.')]].map(([k, v]) => `<li>${esc(v)}</li>`).join('');
 }
+// the grade chip: the letter, the weak part of the corner in the tooltip
+function gradeChip(gr) { const i = el('i', 'gr g' + gr.g, gr.g); i.title = t('{g} against the best passes — {why}', { g: gr.g, why: gr.why }); return i; }
 function renderCornersTable() {
   const D = LAB.dcmp, tb = $('cornersTable').querySelector('tbody'); tb.innerHTML = ''; $('cornersTable').classList.add('resp'); renderIdealBreak(); if (!D) return;
   const coachOf = (n) => LAB.coach ? LAB.coach.corners.find(c => c.n === n) : null;
@@ -7196,18 +7436,18 @@ function renderCornersTable() {
     const w = r.w, m = r.R, c = coachOf(w.n), tr = el('tr'); if (LAB.selN === w.n) tr.className = 'sel';
     const res = c ? Math.max(0, m.time - c.tTop) : 0, f = c && c.infl && c.infl[0];
     const main = r.cmp && Math.abs(r.cmp.dt) >= 0.04 && r.cmp.items[0] ? r.cmp.items[0].t : (f && Math.abs(f.corr) >= 0.35 ? t('what matters here is {f}', { f: f.name }) : '—');
-    const d3 = r.M3 ? m.time - r.M3.time : null;
-    const cells = [['T' + w.n, ''], [`${w.dir === 'L' ? t('left') : t('right')} · ${kindWord(m)}`, kindCls(m)], [short(m), 'txt'], [r.O ? (r.pick ? t('lap {n}', { n: r.pick.L.n }) + ' · ' : '') + short(r.O) : '—', 'txt'], [r.cmp ? sg(r.cmp.dt) + (d3 !== null ? `\n3: ${sg(d3)}` : '') : '—', (r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm') + ' num' + (d3 !== null ? ' two' : '')], [c ? (res > 0.03 ? res.toFixed(2) + ' ' + t('s') : t('ok')) : '—', (res > 0.1 ? 'loss' : 'm') + ' num'], [main, 'txt']];
-    for (const [tx, cl] of cells) { const td = el('td'); td.textContent = tx; if (cl) td.className = cl; tr.appendChild(td); }
+    const d3 = r.M3 ? m.time - r.M3.time : null, gr = c ? DATA.gradeCorner(m, c) : null;
+    const cells = [['T' + w.n, ''], [`${w.dir === 'L' ? t('left') : t('right')} · ${kindWord(m)}`, kindCls(m)], [short(m), 'txt'], [r.O ? (r.pick ? t('lap {n}', { n: r.pick.L.n }) + ' · ' : '') + short(r.O) : '—', 'txt'], [r.cmp ? sg(r.cmp.dt) + (d3 !== null ? `\n3: ${sg(d3)}` : '') : '—', (r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm') + ' num' + (d3 !== null ? ' two' : '')], [c ? (res > 0.03 ? res.toFixed(2) + ' ' + t('s') : t('ok')) : '—', (res > 0.1 ? 'loss' : 'm') + ' num', gr], [main, 'txt']];
+    for (const [tx, cl, g] of cells) { const td = el('td'); if (g) { td.appendChild(gradeChip(g)); td.appendChild(document.createTextNode(tx)); } else td.textContent = tx; if (cl) td.className = cl; tr.appendChild(td); }
     tr.onclick = () => selectCorner(w.n, true); const labels = ['#', t('Type'), $('youColHead').textContent, $('cmpColHead').textContent, 'Δt', t('Reserve'), t('Main difference')]; Array.from(tr.children).forEach((td, i) => { td.dataset.label = labels[i] || ''; });
     tr.addEventListener('mouseenter', () => { LAB.hoverIdx = w.apex; LAB.map.setHover(w.apex); renderInspector(); }); tr.addEventListener('mouseleave', () => { LAB.hoverIdx = -1; LAB.map.setHover(-1); renderInspector(); });
     tb.appendChild(tr);
   }
   // phone: one compact row per corner
   const mob = $('cornersMob'); mob.innerHTML = '';
-  for (const r of D.rows) { const w = r.w, m = r.R, c = coachOf(w.n), res = c ? Math.max(0, m.time - c.tTop) : 0; const b = el('button', 'crow' + (LAB.selN === w.n ? ' sel' : '')); b.type = 'button';
+  for (const r of D.rows) { const w = r.w, m = r.R, c = coachOf(w.n), res = c ? Math.max(0, m.time - c.tTop) : 0, gr = c ? DATA.gradeCorner(m, c) : null; const b = el('button', 'crow' + (LAB.selN === w.n ? ' sel' : '')); b.type = 'button';
     const main = r.cmp && Math.abs(r.cmp.dt) >= 0.04 && r.cmp.items[0] ? r.cmp.items[0].t : (c && c.infl && c.infl[0] && Math.abs(c.infl[0].corr) >= 0.35 ? t('what matters here is {f}', { f: c.infl[0].name }) : '');
-    b.innerHTML = `<b>T${w.n}</b><span class="ty ${kindCls(m)}">${esc((w.dir === 'L' ? t('left') : t('right')) + ' · ' + kindWord(m))}</span><span class="d ${r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm'}">${r.cmp ? sg(r.cmp.dt) + (r.M3 ? ` <small>3: ${sg(m.time - r.M3.time)}</small>` : '') : m.time.toFixed(2) + ' ' + t('s')}</span><span class="r ${res > 0.1 ? 'hot' : ''}">${c ? (res > 0.03 ? t('reserve') + ' ' + res.toFixed(2) : t('ok')) : ''}</span><span class="k">${esc(short(m))}${main ? ' — ' + esc(main) : ''}</span>`;
+    b.innerHTML = `<b>T${w.n}</b><span class="ty ${kindCls(m)}">${esc((w.dir === 'L' ? t('left') : t('right')) + ' · ' + kindWord(m))}</span><span class="d ${r.cmp ? (r.cmp.dt >= 0.04 ? 'loss' : (r.cmp.dt <= -0.04 ? 'gain' : 'm')) : 'm'}">${r.cmp ? sg(r.cmp.dt) + (r.M3 ? ` <small>3: ${sg(m.time - r.M3.time)}</small>` : '') : m.time.toFixed(2) + ' ' + t('s')}</span><span class="r ${res > 0.1 ? 'hot' : ''}">${gr ? gradeChip(gr).outerHTML : ''}${c ? (res > 0.03 ? t('reserve') + ' ' + res.toFixed(2) : t('ok')) : ''}</span><span class="k">${esc(short(m))}${main ? ' — ' + esc(main) : ''}</span>`;
     b.onclick = () => selectCorner(w.n, false); mob.appendChild(b); }
   if (isLand() && LAB.selN) { const s = mob.querySelector('.crow.sel'); if (s && s.scrollIntoView) s.scrollIntoView({ block: 'nearest' }); }
 }
@@ -7254,7 +7494,8 @@ function renderInspector() {
   }
   const O3 = D.P3 ? r.M3 : null, row = (lbl, a, b, c) => `<tr><td>${lbl}</td><td>${a}</td>${O ? `<td>${b}</td>` : ''}${O3 ? `<td class="third">${c === undefined ? '' : c}</td>` : ''}</tr>`;
   const sM = (x) => x >= 0 ? x.toFixed(0) + ' ' + t('m') : '—', K = t('km/h');
-  let html = `<div class="insp-head"><b>T${w.n}</b><span class="hint">${w.dir === 'L' ? t('left') : t('right')} · R ${w.Rmin.toFixed(0)} ${t('m')} · ${t('apex {s} m from S/F', { s: R.sApex.toFixed(0) })}</span>${pill}</div>`;
+  const gr = coach ? DATA.gradeCorner(R, coach) : null;
+  let html = `<div class="insp-head"><b>T${w.n}</b>${gr ? gradeChip(gr).outerHTML : ''}<span class="hint">${w.dir === 'L' ? t('left') : t('right')} · R ${w.Rmin.toFixed(0)} ${t('m')} · ${t('apex {s} m from S/F', { s: R.sApex.toFixed(0) })}</span>${pill}</div>`;
   html += `<div class="insp-wrap"><table class="insp-table${O3 ? ' three' : ''}"><tr><th></th><th class="you">1 · ${esc(youHead)}</th>${O ? `<th class="cmp">2 · ${esc(r.pick ? `${oName} · ${t('lap {n}', { n: r.pick.L.n })}` : oName)}</th>` : ''}${O3 ? `<th class="third">3 · ${esc(D.name3)}</th>` : ''}</tr>`;
   html += row(t('entry'), `${kmh(R.vEntry)} ${K}`, O ? `${kmh(O.vEntry)} ${K}` : '', O3 ? `${kmh(O3.vEntry)} ${K}` : '');
   html += row(t('pedal'), pedalText(R), O ? pedalText(O) : '', O3 ? pedalText(O3) : '');
@@ -7263,6 +7504,7 @@ function renderInspector() {
   html += row(t('throttle from'), sM(R.sThr), O ? sM(O.sThr) : '', O3 ? sM(O3.sThr) : '');
   html += row(t('exit'), `${kmh(R.vExit)} ${K}`, O ? `${kmh(O.vExit)} ${K}` : '', O3 ? `${kmh(O3.vExit)} ${K}` : '');
   html += row(t('lateral'), `${R.gmax.toFixed(2)} g`, O ? `${O.gmax.toFixed(2)} g` : '', O3 ? `${O3.gmax.toFixed(2)} g` : '');
+  { const tr0 = LAB.G.track, cm = (P) => `${DATA.coastIn(DATA.pedalModes(P, tr0), w, tr0).toFixed(0)} ${t('m')}`; html += row(t('coasting'), cm(D.R), O ? cm(D.O) : '', O3 ? cm(D.P3) : ''); }
   // engine rows (sport karts with revs): gears through the corner, the downshift and the upshift, the revs, water temperature
   { const E = engWin(D.R, w), EO = O ? engWin(D.O, w) : null, E3 = O3 ? engWin(D.P3, w) : null; const dash = '—';
     if (E || EO || E3) {
@@ -7274,9 +7516,16 @@ function renderInspector() {
       if (any(e => isFinite(e.t1))) { const tt = (e) => e && isFinite(e.t1) ? `${e.t1.toFixed(1)} °C` : dash; html += row(t('water'), tt(E), tt(EO), E3 ? tt(E3) : ''); }
     } }
   html += row(t('time'), `${R.time.toFixed(2)} ${t('s')}`, O ? `${O.time.toFixed(2)} ${t('s')}` : '', O3 ? `${O3.time.toFixed(2)} ${t('s')} <span class="hint">${sg(R.time - O3.time)}</span>` : '') + '</table></div>';
+  // the session's clean laps through this corner: how far the brake point and the apex speed wander (the dots on the map while the corner is chosen)
+  { const laps = D.sess.laps.filter(L => L.clean && L.px); if (laps.length >= 4) {
+      const tr0 = LAB.G.track, key = `${LAB.G.rev}|${w.n}|${w.a}`, ms = laps.map(L => { const P = DATA.projectLap(L, tr0, LAB.G.rev); if (!P) return null; if (!L._wm || L._wm.key !== key) L._wm = { key, m: DATA.windowMetrics(P, w, tr0) }; return L._wm.m; }).filter(Boolean);
+      const q = (arr, f) => { const s0 = arr.slice().sort((a, b) => a - b); return s0[Math.min(s0.length - 1, Math.max(0, Math.round((s0.length - 1) * f)))]; };
+      const bits = []; const pk = ms.filter(m => m.kind === 'brake').map(m => m.sBrake); if (pk.length >= 4) bits.push(t('brake point {lo}–{hi} m (wanders {d} m)', { lo: q(pk, 0.1).toFixed(0), hi: q(pk, 0.9).toFixed(0), d: (q(pk, 0.9) - q(pk, 0.1)).toFixed(0) })); else { const lk = ms.filter(m => m.kind === 'lift').map(m => m.sLift); if (lk.length >= 4) bits.push(t('lift point {lo}–{hi} m (wanders {d} m)', { lo: q(lk, 0.1).toFixed(0), hi: q(lk, 0.9).toFixed(0), d: (q(lk, 0.9) - q(lk, 0.1)).toFixed(0) })); }
+      const ap = ms.map(m => m.vApex), tt = ms.map(m => m.time); bits.push(t('apex {lo}–{hi} km/h', { lo: kmh(q(ap, 0.1)), hi: kmh(q(ap, 0.9)) })); bits.push(t('corner time {lo}–{hi} s', { lo: q(tt, 0.1).toFixed(2), hi: q(tt, 0.9).toFixed(2) }));
+      html += `<div class="insp-text spread"><div class="lbl">${esc(t('Across {n} clean laps', { n: ms.length }))}</div>${esc(bits.join(' · '))}. ${esc(t('The dots on the map are those laps\u2019 brake and apex points.'))}</div>`; } }
   if (r.pick) html += `<div class="insp-text ideal">${esc(r.pick.L === D.ref.L ? t('Your fastest pass through this corner is this very lap.') : t('Your fastest pass through this corner: lap {n}, {t} s ({d} s faster than the reference lap).', { n: r.pick.L.n, t: r.pick.time.toFixed(2), d: Math.max(0, R.time - r.pick.time).toFixed(2) }))} ${esc(t('Corners are judged one by one — check the next corner of that lap too.'))}</div>`;
   if (O) { const pl = plainCorner(r, oName, refLabel), pl3 = r.cmp3 && r.M3 ? plainCorner({ cmp: r.cmp3, R: r.R, O: r.M3, combo: null, comboPrev: null }, D.name3, refLabel) : null; html += `<div class="insp-text"><div class="lbl">${t('In plain words')}${pl3 ? ` · <span class="cmp">2 · ${esc(oName)}</span>` : ''}</div>${esc(pl.what)}${pl.advice ? `<br><b>${esc(pl.advice)}</b>` : ''}${pl3 && pl3.what ? `<div class="lbl" style="margin-top:8px"><span class="third">3 · ${esc(D.name3)}</span></div>${esc(pl3.what)}${pl3.advice ? `<br><b>${esc(pl3.advice)}</b>` : ''}` : ''}</div>`; }
-  if (coach) { const res = R.time - coach.tTop; html += `<div class="insp-text"><div class="lbl">${t('Coach · best passes through this corner')}</div>${esc(DATA.coachText(coach))}${res > 0.03 ? ` <b>${D.ref.mine ? t('Your reserve here ≈ {t} s.', { t: res.toFixed(2) }) : t('Reserve in this lap ≈ {t} s.', { t: res.toFixed(2) })}</b>` : ' ' + (D.ref.mine ? t('You are among the best here.') : t('This lap is among the best here.'))}</div>`; }
+  if (coach) { const res = R.time - coach.tTop; html += `<div class="insp-text"><div class="lbl">${t('Coach · best passes through this corner')}</div>${gr ? `<b>${esc(t('Grade {g}', { g: gr.g }))}${gr.weak ? ' — ' + esc(gr.why) : ''}.</b> ` : ''}${esc(DATA.coachText(coach))}${res > 0.03 ? ` <b>${D.ref.mine ? t('Your reserve here ≈ {t} s.', { t: res.toFixed(2) }) : t('Reserve in this lap ≈ {t} s.', { t: res.toFixed(2) })}</b>` : ' ' + (D.ref.mine ? t('You are among the best here.') : t('This lap is among the best here.'))}</div>`; }
   html += `<canvas class="chart" id="inspChart" height="130"></canvas>`;
   body.innerHTML = html;
   drawDataMini($('inspChart'), r, D);
