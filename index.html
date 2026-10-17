@@ -505,6 +505,8 @@ body.onboarding #toast{z-index:90}
 .cmp-row .who{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
 .cmp-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cmp-row .tm{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+.cmp-row .pills{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+@media (max-width:700px){.cmp-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:8px;row-gap:6px}.cmp-row .who{max-width:38%}.cmp-row .pills{grid-column:1/-1}}
 .cmp-row .pill{flex:none}
 .charts.under{border-top:1px solid var(--line);padding:4px 10px 8px;background:var(--surface)}
 .charts.under .chart{cursor:crosshair}
@@ -2617,6 +2619,8 @@ const ALFANO7 = (() => {
     const f = new Uint8Array(258); f.set(body); f[257] = x; return f;
   }
   // every 257th byte of a flash answer is the packet's XOR: dropped
+  // an answer of n packets, every one 256 bytes + their XOR: whole and every checksum right (a dropped byte anywhere shifts everything after it)
+  function packetsOk(raw, n) { if (raw.length !== n * 257) return false; for (let p = 0; p < n; p++) { let x = 0; const o = p * 257; for (let i = 0; i < 256; i++) x ^= raw[o + i]; if (x !== raw[o + 256]) return false; } return true; }
   function stripXor(raw) { const out = new Uint8Array(raw.length - Math.floor((raw.length + 0) / 257)); let k = 0; for (let i = 0; i < raw.length; i++) if (i % 257 !== 256) out[k++] = raw[i]; return out.subarray(0, k); }
   const concat = (parts) => { let n = 0; for (const p of parts) n += p.length; const out = new Uint8Array(n); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; } return out; };
 
@@ -2624,15 +2628,16 @@ const ALFANO7 = (() => {
   // length is in, or the timeout passes (then whatever came is returned, as the Alfano app does)
   function client(pipe, opts) {
     const o = Object.assign({ gapMs: 30, log: null }, opts || {});
-    let parts = [], got = 0, want = 0, wake = null;
-    pipe.onData((bytes) => { if (!bytes || !bytes.length) return; parts.push(bytes); got += bytes.length; if (wake && got >= want) wake(); });
+    let parts = [], got = 0, want = 0, wake = null, touch = null;
+    pipe.onData((bytes) => { if (!bytes || !bytes.length) return; parts.push(bytes); got += bytes.length; if (touch) touch(); if (wake && got >= want) wake(); });
     // the wait is event-driven (the data callback wakes it; one timer only for the deadline), so a tab in the background — where browsers
     // slow every timer to once a second — reads at the same pace as one in front
+    // the wait ends when the whole answer is in, at the deadline, or (idleMs) when an answer that has started stops coming — a torn
+    // answer then costs a second or two, not the deadline
     async function cmd(op, args, expect, timeoutMs, idleMs) {
       parts = []; got = 0; want = expect;
       await pipe.send(frame(op, args));
-      if (got < want && idleMs) { const t0 = Date.now(); while (got < want && Date.now() - t0 < timeoutMs) { const g = got; await sleep(idleMs); if (got === g && got > 0) break; } }   // a probe: an answer that has stopped coming is the answer
-      else if (got < want) await new Promise((res) => { const tm = setTimeout(() => { wake = null; res(); }, timeoutMs); wake = () => { clearTimeout(tm); wake = null; res(); }; });
+      if (got < want) await new Promise((res) => { let idle = null; const done = () => { clearTimeout(tm); clearTimeout(idle); wake = null; touch = null; res(); }; const tm = setTimeout(done, timeoutMs); wake = done; if (idleMs) touch = () => { clearTimeout(idle); idle = setTimeout(done, idleMs); }; if (idleMs && got > 0) touch(); });
       const out = concat(parts); if (o.log) o.log(op, args, out);
       if (o.gapMs && (typeof document === 'undefined' || document.visibilityState === 'visible')) await sleep(o.gapMs);
       return out;
@@ -2642,26 +2647,35 @@ const ALFANO7 = (() => {
       async password(timeoutMs) { const r = await cmd(OP.PASSWORD, PASSWORD, 1, timeoutMs || 3000); return r.length > 0 && r[0] === 0xff; },
       async status() { return cmd(OP.STATUS, STATUS_ARGS, 16, 3000); },
       async page(p) { const r = await cmd(OP.PAGE, [p & 0xff, (p >> 8) & 0xff, 0x00, 0x80], 129, 3000); return r.length >= 129 ? r.subarray(0, 129) : r; },
-      async fetch(addr, packets) { return cmd(OP.FETCH, [addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, packets, 0x00], packets * 257, 10000); },
-      // a stretch of flash, checksums dropped; stops early when the device sends nothing (stopOnEmpty) or on the caller's say-so.
-      // Up to 16 packets (4 KB) a command: the Alfano app asks for 2, but every command is a round trip, and the round trips are what make a
-      // read over BLE slow. The first big request is a probe — a device that answers fewer packets than asked (or none) sets the size for the
-      // rest of the session, and the link is left to go quiet before the next command so a late tail cannot land in the next answer
-      maxPackets: 16, probed: false,
+      async fetch(addr, packets) { let raw; for (let k = 0; k < 3; k++) { raw = await cmd(OP.FETCH, [addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, packets, 0x00], packets * 257, 10000, 1500); if (packetsOk(raw, packets)) return raw; await C.quiet(300); } return raw; },
+      // a stretch of flash, checksums checked and dropped; stops early when the device sends nothing (stopOnEmpty) or on the caller's say-so.
+      // Up to 4 packets (1 KB) a command — the Alfano app asks for 2, but every command is a round trip, and the round trips are what make
+      // a read over BLE slow. The first big request is a probe: a device that answers fewer packets than asked (or none) sets the size for
+      // the rest of the session. Every answer must be whole with every packet's XOR right; a bad one is asked for again, and a block size
+      // that keeps coming back bad is halved (a lap timer's serial module can drop bytes when an answer outruns the link)
+      maxPackets: 4, probed: false, bad: 0,
       async quiet(ms) { for (let i = 0; i < 40; i++) { const g = got; await sleep(ms); if (got === g) return; } },
       async bulk(addr, total, more) {
         const m = Object.assign({ stopOnEmpty: false, onChunk: null, stopWhen: null }, more || {});
-        const out = []; let a = addr, left = total, empties = 0;
+        const out = []; let a = addr, left = total, empties = 0, retry = 0;
         while (left > 0) {
           const packets = Math.max(1, Math.min(C.maxPackets, Math.ceil(left / 256))), chunk = packets * 256, probing = packets > 2 && !C.probed;
-          const raw = await cmd(OP.FETCH, [a & 0xff, (a >> 8) & 0xff, (a >> 16) & 0xff, packets, 0x00], packets * 257, probing ? 4000 : 10000, probing ? 700 : 0);
+          const raw = await cmd(OP.FETCH, [a & 0xff, (a >> 8) & 0xff, (a >> 16) & 0xff, packets, 0x00], packets * 257, probing ? 4000 : 10000, 1500);
           let shortByLimit = false;
           if (probing) {
             C.probed = true; const k = Math.floor(raw.length / 257);
             if (raw.length < packets * 257) { await C.quiet(400); C.maxPackets = Math.max(2, Math.min(k, packets - 1)); if (k === 0) continue; shortByLimit = true; }
           }
           if (!raw.length) { if (m.stopOnEmpty || ++empties >= 3) break; continue; }
-          const data = stripXor(raw), use = Math.min(data.length, left), piece = data.subarray(0, use);
+          const whole = Math.floor(raw.length / 257), useRaw = shortByLimit ? raw.subarray(0, whole * 257) : raw;
+          if (!packetsOk(useRaw, shortByLimit ? whole : packets)) {   // torn or wrong: again, smaller if it keeps happening
+            C.bad++; await C.quiet(400);
+            if (++retry >= 2 && C.maxPackets > 2) { C.maxPackets = Math.max(2, C.maxPackets >> 1); retry = 0; continue; }
+            if (retry >= 4) { const e = err('corrupt', `the device answer at ${a.toString(16)} failed its checksum ${retry} times`); e.diag = { addr: a, packets, rawLen: raw.length, maxPackets: C.maxPackets, bad: C.bad }; throw e; }
+            continue;
+          }
+          retry = 0;
+          const data = stripXor(useRaw), use = Math.min(data.length, left), piece = data.subarray(0, use);
           out.push(piece); a += use; left -= use; empties = 0;
           if (m.onChunk) m.onChunk(use);
           if (m.stopWhen && m.stopWhen(piece)) break;
@@ -2792,6 +2806,12 @@ const ALFANO7 = (() => {
     return { partiel, info, laps, pit };
   }
 
+  // how much of a read makes sense: the rows of every lap, those with impossible numbers (a dropped byte on the link shifts every field after it)
+  function sanity(raw) {
+    let rows = 0, garbage = 0, lapsBad = 0;
+    for (const lap of raw.laps) { const R = lapRows(lap); let g = 0; for (const r of R) if (pitGarbage(r.lat, r.lon, r.speed, r.orient) || r.lat > 0xffffff00 || r.rpm > 30000) g++; rows += R.length; garbage += g; if (R.length && g / R.length > 0.05) lapsBad++; }
+    return { rows, garbage, lapsBad, laps: raw.laps.length, frac: rows ? garbage / rows : 0 };
+  }
   // ---- the decoder: the lap files → rows → the CSVs, the G-forces computed the way the Alfano app computes them (integer maths and all)
   function lapRows(data) {
     const rows = []; let off = 0, partiel = 1, boundary = true;
@@ -2873,7 +2893,7 @@ const ALFANO7 = (() => {
     return concat([...locals, cd, eocd]);
   }
 
-  return { OP, frame, stripXor, client, open, list, download, describe, partielInfo, lapRows, gforce, decode, zip, decodeName, u16, u24, u32 };
+  return { OP, frame, stripXor, packetsOk, sanity, client, open, list, download, describe, partielInfo, lapRows, gforce, decode, zip, decodeName, u16, u24, u32 };
 })();
 if (typeof module !== "undefined" && module.exports) module.exports = ALFANO7;
 // ---------- loggers over Bluetooth: the Lab reads sessions straight out of the lap timer, no vendor app in between ----------
@@ -3173,7 +3193,12 @@ const LOGGERS = (() => {
       const me = {
         info: { serial: dev.serial, firmware: dev.firmware, driver: dev.driver }, kind: 'sessions',
         async list(onStep) { return ALFANO7.list(dev, onStep); },
-        async download(s, onProgress) { const raw = await ALFANO7.download(dev, s, onProgress); const dec = ALFANO7.decode(s, raw, dev.pages); const z = ALFANO7.zip(dec.files); return new File([z], dec.name + '.alf2', { type: 'application/zip', lastModified: Date.now() }); },
+        async download(s, onProgress) {
+          const raw = await ALFANO7.download(dev, s, onProgress);
+          // a read whose samples do not make sense is not handed on: the link dropped bytes somewhere the checksums did not catch
+          const sane = ALFANO7.sanity(raw); if (sane.frac > 0.02 || sane.lapsBad > Math.max(1, Math.floor(sane.laps * 0.1))) { const e = err('corrupt', `${Math.round(sane.frac * 100)}% of the samples are unreadable`); e.diag = { sanity: sane, client: { maxPackets: dev.C.maxPackets, bad: dev.C.bad, probed: dev.C.probed }, longWrites: !!H.longWrites, session: { page: s.page, laps: s.laps, sampling: s.sampling } }; throw e; }
+          const dec = ALFANO7.decode(s, raw, dev.pages); const z = ALFANO7.zip(dec.files); const f = new File([z], dec.name + '.alf2', { type: 'application/zip', lastModified: Date.now() }); f.sanity = sane; return f;
+        },
         async close() { await ble.disconnect(H); }
       };
       return me;
@@ -4228,6 +4253,7 @@ Object.assign(I18N.RU, { 'Straight from the lap timer (Bluetooth)': 'Прямо 
   'The other way, without Bluetooth: the app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.': 'Другой путь, без Bluetooth: то приложение, в котором ты смотришь круги. Каждая сессия — один файл: сохраняешь его на телефон и отдаёшь Hutka.' });
 Object.assign(I18N.RU, { 'Hutka may not use Bluetooth yet — allow it: iPhone — Settings → Hutka → Bluetooth; Android — Settings → Apps → Hutka → Permissions → Nearby devices.': 'Hutka пока нельзя пользоваться Bluetooth — разреши: iPhone — Настройки → Hutka → Bluetooth; Android — Настройки → Приложения → Hutka → Разрешения → Устройства поблизости.', 'Bluetooth is off — turn it on in the phone settings and try again.': 'Bluetooth выключен — включи его в настройках телефона и попробуй снова.' });
 Object.assign(I18N.RU, { '{p}% of the lap runs away from the “{layout}” line — a different configuration of the track? Pick the right layout under the session name, or ask an admin to add it; the corners along that part are not comparable here.': '{p}% круга проходит в стороне от линии конфигурации «{layout}» — другая конфигурация трассы? Выбери нужную под названием сессии или попроси админа добавить её; повороты на этом участке здесь не сравнить.' });
+Object.assign(I18N.RU, { 'The device answers came back damaged ({e}) — try again, closer to the lap timer.': 'Ответы прибора пришли повреждёнными ({e}) — попробуй ещё раз, ближе к прибору.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -5737,7 +5763,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.10.1';
+const APP_VERSION = 'v34.11';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6849,7 +6875,8 @@ function renderCmpPicker() {
       const tr = STORE.getTrack(m.track); const who = el('span', 'who', r.mine ? t('You') : ((names[m.owner] || {}).name || t('Driver')));
       const nm = el('span', 'nm', `${m.label || m.name} · ${fmtDate(m.date)}${!r.same ? ` · ${tr ? tr.name : (m.trackName || t('Custom'))}` : ''}`);
       const pill = el('span', 'pill ' + (r.same ? 'ok' : 'off'), r.same ? t('same layout') : t('other layout'));
-      b.append(who, nm, el('span', 'tm', fmtMs(m.bestMs)), pill); if (m.kart || kartClassOf(m) !== kartClassOf(sess)) b.appendChild(el('span', 'pill ' + (kartCompatible(m, sess) ? '' : 'off'), kartLabel(m)));
+      const pills = el('span', 'pills'); pills.appendChild(pill); if (m.kart || kartClassOf(m) !== kartClassOf(sess)) pills.appendChild(el('span', 'pill ' + (kartCompatible(m, sess) ? '' : 'off'), kartLabel(m)));
+      b.append(who, nm, el('span', 'tm', fmtMs(m.bestMs)), pills);   // on a phone the pills take a second line, so the name and the session read
       b.onclick = async () => { b.classList.add('busy'); try { const s = r.loaded ? m : await LAB.load(m); if (LAB.pickerFor === 'cmp2') { LAB.cmp2 = thirdDefault(s); LAB.pickerFor = ''; } else { LAB.cmp = sessAvg(s) ? 'avg:' + s.id : lapKey(s, bestLap(s)); LAB.chat = []; LAB.selN = 0; } LAB.pickerOpen = false; labRender(); } catch (e) { toast(t('Could not load that session: {e}', { e: e && e.message || e })); b.classList.remove('busy'); } };
       list.appendChild(b);
     }
@@ -7623,6 +7650,7 @@ const DEVICE = (() => {
       : c === 'btoff' ? t('Bluetooth is off — turn it on in the phone settings and try again.')
       : c === 'timeout' ? t('The device stopped answering — bring the phone closer and try again.')
       : c === 'locked' ? t('The device memory is locked — enter its security code.')
+      : c === 'corrupt' ? t('The device answers came back damaged ({e}) — try again, closer to the lap timer.', { e: m })
       : t('Could not read the device: {e}', { e: m }), 'warn');
   }
   // ---- step 1: which device. The app scans and lists what is in the air (the driver's own devices first); a browser opens its chooser
