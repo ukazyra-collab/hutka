@@ -5767,7 +5767,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.12';
+const APP_VERSION = 'v34.12.1';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -8017,7 +8017,9 @@ const LANDING = {
     const pr = $('ldProof'); if (C) { pr.innerHTML = ''; const rows = STORE.hasIdentity ? [[C.tracks, t('tracks')], [C.sessions, t('sessions')], [C.drivers, t('drivers')], [C.laps, t('laps analysed')]] : [[C.tracks, t('tracks')], [C.laps, t('laps analysed')], [C.published, t('sessions published')]]; for (const [v, k] of rows) if (v) { const sp = el('span'); sp.innerHTML = `<b>${esc(String(v))}</b> ${esc(k)}`; pr.appendChild(sp); } }
     // a signed-in driver: the second button leads to their own library, the copy stays
     { const d = $('ldDemo'), sp = d.querySelector('span'); if (STORE.hasIdentity) { d.href = '#lab'; if (sp) sp.textContent = t('My sessions'); } else if (sp) sp.textContent = t('Open a live example'); }
-    if (fresh) { LANDING.live = null; LANDING.fellBack = false; $('ldLive').classList.remove('on'); $('ldLive').innerHTML = ''; LANDING.idx = 0; const cv = $('ldCanvas'); cv.width = cv.width; $('ldMap').classList.toggle('ld-wait', !!ex); clearTimeout(LANDING.waitT); if (ex) LANDING.waitT = setTimeout(LANDING.fallback, 12000); clearTimeout(LANDING.promoT); LANDING.promoT = setTimeout(LANDING.loadPromo, 6000); }
+    // the drawn card goes up at once (the lap line with its points on the dark ground) and the live map on the imagery fades in over it when
+    // its tiles are in — not a bare blue box for the seconds the imagery takes
+    if (fresh) { LANDING.live = null; LANDING.fellBack = false; $('ldLive').classList.remove('on'); $('ldLive').innerHTML = ''; LANDING.idx = 0; const cv = $('ldCanvas'); cv.width = cv.width; if (ex && ex.card) LANDING.draw(cv, ex.card); $('ldMap').classList.toggle('ld-wait', !!ex); clearTimeout(LANDING.waitT); if (ex) LANDING.waitT = setTimeout(LANDING.fallback, 12000); clearTimeout(LANDING.promoT); LANDING.promoT = setTimeout(LANDING.loadPromo, 6000); }
     LANDING.setSlides(); LANDING.show(LANDING.idx);
     if (!ex) LANDING.loadPromo();
     LANDING.start();
