@@ -778,6 +778,7 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .card h2{font-size:16px}
   .ph h1{font-size:24px}
   .ph .row .btn{height:38px;font-size:13.5px;padding:0 12px}
+  .dev-pill{bottom:calc(82px + var(--sa-bottom))}
   .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px 4px calc(6px + var(--sa-bottom));justify-content:space-around;align-items:flex-end}
   .tabbar a,.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;border:0;background:none;color:var(--muted);text-decoration:none;font:500 10.5px/1 var(--body);cursor:pointer;min-width:0}
   .tabbar svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -1001,6 +1002,9 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .dev-item b{font-size:14px}
 .dev-item .hint{font-size:12px}
 .dev-item.dim{opacity:.55}
+.dev-pill{position:fixed;left:50%;bottom:calc(24px + var(--sa-bottom));transform:translateX(-50%);z-index:89;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:0;border-radius:999px;background:var(--accent);color:#fff;font:inherit;font-size:13px;font-weight:600;box-shadow:var(--shadow);cursor:pointer;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dev-pill::before{content:'';width:8px;height:8px;border-radius:50%;background:#fff;animation:scanpulse 1.2s ease-in-out infinite;flex:none}
+
 .hint.warn{color:var(--warn)}
 .btn.danger-text{color:var(--danger)}
 .dev-found{background:var(--surface);color:var(--fg);font:inherit;text-align:left;width:100%}
@@ -1641,6 +1645,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div id="devStage" hidden>
     <div class="status" id="devStatus"></div>
     <div class="progress dev-bar" id="devBar" hidden><div></div></div>
+    <div class="hint" id="devKeep" hidden data-t="Keep Hutka open while it reads — you can move around inside Hutka, but on a phone keep it on screen; in a browser, keep this tab open.">Keep Hutka open while it reads — you can move around inside Hutka, but on a phone keep it on screen; in a browser, keep this tab open.</div>
     <div class="row" id="devCodeRow" hidden><input type="text" id="devCode" inputmode="numeric" placeholder="123456" maxlength="10" style="width:140px"><button class="btn" id="devUnlock" type="button" data-t="Unlock">Unlock</button></div>
     <div class="dev-list" id="devList"></div>
     <div class="row" id="devActs" hidden style="justify-content:space-between;margin-top:10px"><button class="btn ghost danger-text" id="devErase" type="button" data-t="Erase the device memory">Erase the device memory</button><button class="btn primary" id="devImport" type="button" data-t="Open in the Lab">Open in the Lab</button></div>
@@ -1741,6 +1746,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div class="row"><button class="btn primary" id="bugSend" type="button" data-t="Send">Send</button><button class="btn ghost" id="bugCancel" type="button" data-t="Cancel">Cancel</button><span class="status" id="bugStatus"></span></div>
 </div></div>
 <div class="toast" id="toast" hidden></div>
+<button class="dev-pill" id="devPill" type="button" hidden></button>
 <script>
 // @@CORE-START
 const KLL = (() => {
@@ -2619,13 +2625,14 @@ const ALFANO7 = (() => {
     const o = Object.assign({ gapMs: 30, log: null }, opts || {});
     let parts = [], got = 0, want = 0, wake = null;
     pipe.onData((bytes) => { if (!bytes || !bytes.length) return; parts.push(bytes); got += bytes.length; if (wake && got >= want) wake(); });
+    // the wait is event-driven (the data callback wakes it; one timer only for the deadline), so a tab in the background — where browsers
+    // slow every timer to once a second — reads at the same pace as one in front
     async function cmd(op, args, expect, timeoutMs) {
       parts = []; got = 0; want = expect;
       await pipe.send(frame(op, args));
-      const t0 = Date.now();
-      while (got < want && Date.now() - t0 < timeoutMs) { await new Promise((res) => { wake = res; setTimeout(res, Math.min(100, Math.max(5, timeoutMs - (Date.now() - t0)))); }); wake = null; }
+      if (got < want) await new Promise((res) => { const tm = setTimeout(() => { wake = null; res(); }, timeoutMs); wake = () => { clearTimeout(tm); wake = null; res(); }; });
       const out = concat(parts); if (o.log) o.log(op, args, out);
-      await sleep(o.gapMs);
+      if (o.gapMs && (typeof document === 'undefined' || document.visibilityState === 'visible')) await sleep(o.gapMs);
       return out;
     }
     const C = {
@@ -2870,6 +2877,7 @@ const LOGGERS = (() => {
   const toU8 = (v) => v instanceof Uint8Array ? v : (v && v.buffer ? new Uint8Array(v.buffer, v.byteOffset || 0, v.byteLength) : (typeof v === 'string' ? unhex(v) : new Uint8Array(0)));
   const text = (u8) => { try { return new TextDecoder().decode(u8).replace(/\0+$/, '').trim(); } catch (e) { return ''; } };
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const yieldTurn = () => new Promise((r) => { if (typeof MessageChannel === 'undefined') { r(); return; } const ch = new MessageChannel(); ch.port1.onmessage = () => r(); ch.port2.postMessage(0); });   // a turn of the event loop that no background throttling touches
   const err = (code, msg) => { const e = new Error(msg || code); e.code = code; return e; };
 
   // ---- the transport: scan (the app) or the browser's chooser, connect, notify, write, read, services, disconnect — the same calls on both sides
@@ -3119,7 +3127,9 @@ const LOGGERS = (() => {
     const subs = []; let piece = 20;
     return {
       async start() { await ble.notify(H, svc, tx, (b) => { for (const cb of subs) cb(b); if (onBytes) onBytes('in', b); }); },
-      async send(bytes) { for (let i = 0; i < bytes.length; i += piece) { await ble.writeNoRsp(H, svc, rx, bytes.subarray(i, i + piece)); await sleep(6); } if (onBytes) onBytes('out', bytes); },
+      // a small pause between pieces while the page is in front (what the device liked in tests); in the background a browser stretches any
+      // timer to a second, so there the pieces follow each other as fast as the link takes them
+      async send(bytes) { const front = typeof document === 'undefined' || document.visibilityState === 'visible'; for (let i = 0; i < bytes.length; i += piece) { await ble.writeNoRsp(H, svc, rx, bytes.subarray(i, i + piece)); if (front) await sleep(6); else await yieldTurn(); } if (onBytes) onBytes('out', bytes); },
       onData(cb) { subs.push(cb); }
     };
   }
@@ -4139,6 +4149,7 @@ Object.assign(I18N.RU, { 'Bluetooth — the sessions in the device memory, strai
   'Session {k} of {n}: lap {lap} of {laps}… {pct}%': 'Сессия {k} из {n}: круг {lap} из {laps}… {pct}%' });
 Object.assign(I18N.RU, { 'Alfano 7 and RaceBox Mini S / Micro — the sessions go straight from the lap timer into the Lab, no vendor app.': 'Alfano 7 и RaceBox Mini S / Micro — сессии попадают в Лабораторию прямо с прибора, без фирменных программ.' });
 Object.assign(I18N.RU, { 'diagnostics sent to Hutka, thank you.': 'диагностика отправлена в Hutka, спасибо.' });
+Object.assign(I18N.RU, { 'Keep Hutka open while it reads — you can move around inside Hutka, but on a phone keep it on screen; in a browser, keep this tab open.': 'Пока идёт чтение, не закрывай Hutka: внутри Hutka ходить можно, но на телефоне держи её на экране, а в браузере — не закрывай вкладку.', 'Reading {name}: {pct}%': 'Читаю {name}: {pct}%' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -7491,7 +7502,12 @@ const DEVICE = (() => {
     stage('devKinds'); $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true; S('');
     $('devModal').hidden = false;
   }
-  function close() { $('devModal').hidden = true; if (scanning) stopScan(); }
+  function close() { $('devModal').hidden = true; if (scanning) stopScan(); pill(); }
+  // the read keeps going with the window closed or on another page of Hutka: a pill says so, a tap brings the window back; a tab close asks first
+  let pillText = '';
+  function pill(text) { if (text !== undefined) pillText = text; const p = $('devPill'); const on = busy && $('devModal').hidden && !!pillText; p.hidden = !on; if (on) p.textContent = pillText; }
+  $('devPill').onclick = () => { $('devModal').hidden = false; pill(); };
+  addEventListener('beforeunload', (e) => { if (busy) { e.preventDefault(); e.returnValue = ''; } });
   async function drop() { const d = dev, h = H, x = ex; dev = null; H = null; ex = null; items = []; if (x) { try { await x.close(); } catch (e) {} } else if (d) { try { await d.close(); } catch (e) {} } else if (h) { try { await LOGGERS.ble.disconnect(h); } catch (e) {} } }
   function bar(done, total) { const b = $('devBar'); b.hidden = false; b.firstElementChild.style.width = total ? Math.min(100, Math.round(done / total * 100)) + '%' : '0%'; }
   function fail(e) {
@@ -7576,20 +7592,20 @@ const DEVICE = (() => {
   async function importSessions() {
     const picked = [...$('devList').querySelectorAll('input:checked')].map(c => items[+c.dataset.i]).filter(o => o && o.ok);
     if (!picked.length) { S(t('Tick at least one session.'), 'warn'); return; }
-    busy = true; $('devActs').hidden = true; const files = [];
+    busy = true; $('devActs').hidden = true; $('devKeep').hidden = false; const files = [];
     try {
       for (let k = 0; k < picked.length; k++) {
         const o = picked[k]; bar(0, 1);
-        const f = await dev.download(o, (p) => { bar(p.done, p.total); S(t('Session {k} of {n}: lap {lap} of {laps}… {pct}%', { k: k + 1, n: picked.length, lap: Math.min(p.lap, p.laps), laps: p.laps, pct: Math.min(100, Math.round(p.done / p.total * 100)) })); });
+        const f = await dev.download(o, (p) => { bar(p.done, p.total); const tx = t('Session {k} of {n}: lap {lap} of {laps}… {pct}%', { k: k + 1, n: picked.length, lap: Math.min(p.lap, p.laps), laps: p.laps, pct: Math.min(100, Math.round(p.done / p.total * 100)) }); S(tx); pill(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct: Math.min(100, Math.round(p.done / p.total * 100)) })); });
         files.push(f);
       }
     } catch (e) {
-      busy = false; $('devActs').hidden = false; fail(e);
+      busy = false; $('devActs').hidden = false; $('devKeep').hidden = true; pill(''); fail(e);
       // what the parser saw goes to Hutka by itself, so the next version reads this device right
       if (e && e.diag && STORE.hasIdentity) { try { await STORE.deviceLog({ device: H ? H.name : drv.name, platform: LOGGERS.ble.kind(), kind: 'alfano-download', error: String(e.message || e), info: dev && dev.info, diag: e.diag, at: new Date().toISOString() }); S($('devStatus').textContent + ' — ' + t('diagnostics sent to Hutka, thank you.'), 'warn'); } catch (x) {} }
       return;
     }
-    busy = false; STORE.track('device_import', { app: drv.id, n: files.length });
+    busy = false; $('devKeep').hidden = true; pill(''); STORE.track('device_import', { app: drv.id, n: files.length });
     close(); await UPLOAD.withFiles(files);
   }
   async function readAll() {
@@ -7598,8 +7614,9 @@ const DEVICE = (() => {
     if (st && st.recording) S(t('{name} is still recording — stop it (REC) and try again.', { name: H.name }), 'warn');
     else S(st ? t('{name}: {n} records in memory ({p}% full) — reading…', { name: H.name, n: st.stored, p: st.level }) : t('Reading {name}…', { name: H.name }));
     bar(0, 1);
-    const outs = await dev.download((p) => { bar(p.done, p.total); S(t('Reading the memory… {done} / {total}', { done: p.done, total: p.total })); });
-    bar(1, 1); items = outs; busy = false; renderList();
+    $('devKeep').hidden = false;
+    const outs = await dev.download((p) => { bar(p.done, p.total); S(t('Reading the memory… {done} / {total}', { done: p.done, total: p.total })); pill(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct: p.total ? Math.min(100, Math.round(p.done / p.total * 100)) : 0 })); });
+    bar(1, 1); items = outs; busy = false; $('devKeep').hidden = true; pill(''); renderList();
   }
   async function unlock() { const code = $('devCode').value.trim(); if (!code || !dev || busy) return; busy = true; try { await dev.unlock(code); $('devCodeRow').hidden = true; await readAll(); } catch (e) { busy = false; fail(e); } }
   function renderList() {
