@@ -2627,33 +2627,44 @@ const ALFANO7 = (() => {
     pipe.onData((bytes) => { if (!bytes || !bytes.length) return; parts.push(bytes); got += bytes.length; if (wake && got >= want) wake(); });
     // the wait is event-driven (the data callback wakes it; one timer only for the deadline), so a tab in the background — where browsers
     // slow every timer to once a second — reads at the same pace as one in front
-    async function cmd(op, args, expect, timeoutMs) {
+    async function cmd(op, args, expect, timeoutMs, idleMs) {
       parts = []; got = 0; want = expect;
       await pipe.send(frame(op, args));
-      if (got < want) await new Promise((res) => { const tm = setTimeout(() => { wake = null; res(); }, timeoutMs); wake = () => { clearTimeout(tm); wake = null; res(); }; });
+      if (got < want && idleMs) { const t0 = Date.now(); while (got < want && Date.now() - t0 < timeoutMs) { const g = got; await sleep(idleMs); if (got === g && got > 0) break; } }   // a probe: an answer that has stopped coming is the answer
+      else if (got < want) await new Promise((res) => { const tm = setTimeout(() => { wake = null; res(); }, timeoutMs); wake = () => { clearTimeout(tm); wake = null; res(); }; });
       const out = concat(parts); if (o.log) o.log(op, args, out);
       if (o.gapMs && (typeof document === 'undefined' || document.visibilityState === 'visible')) await sleep(o.gapMs);
       return out;
     }
     const C = {
       cmd,
-      async password() { const r = await cmd(OP.PASSWORD, PASSWORD, 1, 3000); return r.length > 0 && r[0] === 0xff; },
+      async password(timeoutMs) { const r = await cmd(OP.PASSWORD, PASSWORD, 1, timeoutMs || 3000); return r.length > 0 && r[0] === 0xff; },
       async status() { return cmd(OP.STATUS, STATUS_ARGS, 16, 3000); },
       async page(p) { const r = await cmd(OP.PAGE, [p & 0xff, (p >> 8) & 0xff, 0x00, 0x80], 129, 3000); return r.length >= 129 ? r.subarray(0, 129) : r; },
       async fetch(addr, packets) { return cmd(OP.FETCH, [addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, packets, 0x00], packets * 257, 10000); },
-      // a stretch of flash, 512 bytes a command, checksums dropped; stops early when the device sends nothing (stopOnEmpty) or on the caller's say-so
+      // a stretch of flash, checksums dropped; stops early when the device sends nothing (stopOnEmpty) or on the caller's say-so.
+      // Up to 16 packets (4 KB) a command: the Alfano app asks for 2, but every command is a round trip, and the round trips are what make a
+      // read over BLE slow. The first big request is a probe — a device that answers fewer packets than asked (or none) sets the size for the
+      // rest of the session, and the link is left to go quiet before the next command so a late tail cannot land in the next answer
+      maxPackets: 16, probed: false,
+      async quiet(ms) { for (let i = 0; i < 40; i++) { const g = got; await sleep(ms); if (got === g) return; } },
       async bulk(addr, total, more) {
         const m = Object.assign({ stopOnEmpty: false, onChunk: null, stopWhen: null }, more || {});
         const out = []; let a = addr, left = total, empties = 0;
         while (left > 0) {
-          const chunk = Math.min(left, 512), packets = Math.ceil(chunk / 256);
-          const raw = await C.fetch(a, packets);
+          const packets = Math.max(1, Math.min(C.maxPackets, Math.ceil(left / 256))), chunk = packets * 256, probing = packets > 2 && !C.probed;
+          const raw = await cmd(OP.FETCH, [a & 0xff, (a >> 8) & 0xff, (a >> 16) & 0xff, packets, 0x00], packets * 257, probing ? 4000 : 10000, probing ? 700 : 0);
+          let shortByLimit = false;
+          if (probing) {
+            C.probed = true; const k = Math.floor(raw.length / 257);
+            if (raw.length < packets * 257) { await C.quiet(400); C.maxPackets = Math.max(2, Math.min(k, packets - 1)); if (k === 0) continue; shortByLimit = true; }
+          }
           if (!raw.length) { if (m.stopOnEmpty || ++empties >= 3) break; continue; }
           const data = stripXor(raw), use = Math.min(data.length, left), piece = data.subarray(0, use);
           out.push(piece); a += use; left -= use; empties = 0;
           if (m.onChunk) m.onChunk(use);
           if (m.stopWhen && m.stopWhen(piece)) break;
-          if (data.length < chunk) break;   // short answer: the end of what is there
+          if (data.length < chunk && !shortByLimit) break;   // short answer: the end of what is there
         }
         return concat(out);
       }
@@ -3131,12 +3142,13 @@ const LOGGERS = (() => {
   // in 20-byte pieces (what any Bluetooth link accepts without asking); the answers are collected by the protocol client (alfano7.js)
   const UART_SVC = '49535343-fe7d-4ae5-8fa9-9fafd205e455', UART_RX = '49535343-8841-43f4-a8d4-ecbe34729bb3', UART_TX = '49535343-1e4d-4bd9-ba61-23c647249616';
   function serialPipe(H, svc, rx, tx, onBytes) {
-    const subs = []; let piece = 20;
+    const subs = [];
     return {
+      piece: 20,   // bytes per write: 20 fits any link; the Alfano driver tries 180 first (one frame in two writes instead of thirteen — most of the time per command on an iPhone is the bridge, not the air)
       async start() { await ble.notify(H, svc, tx, (b) => { for (const cb of subs) cb(b); if (onBytes) onBytes('in', b); }); },
       // a small pause between pieces while the page is in front (what the device liked in tests); in the background a browser stretches any
       // timer to a second, so there the pieces follow each other as fast as the link takes them
-      async send(bytes) { const front = typeof document === 'undefined' || document.visibilityState === 'visible'; for (let i = 0; i < bytes.length; i += piece) { await ble.writeNoRsp(H, svc, rx, bytes.subarray(i, i + piece)); if (front) await sleep(6); else await yieldTurn(); } if (onBytes) onBytes('out', bytes); },
+      async send(bytes) { const front = typeof document === 'undefined' || document.visibilityState === 'visible', piece = this.piece; for (let i = 0; i < bytes.length; i += piece) { await ble.writeNoRsp(H, svc, rx, bytes.subarray(i, i + piece)); if (front) await sleep(piece > 20 ? 2 : 6); else await yieldTurn(); } if (onBytes) onBytes('out', bytes); },
       onData(cb) { subs.push(cb); }
     };
   }
@@ -3149,7 +3161,13 @@ const LOGGERS = (() => {
       const uart = svcs.find(s => s.uuid === UART_SVC);
       if (!uart || !uart.chrs.some(c => c.uuid === UART_RX) || !uart.chrs.some(c => c.uuid === UART_TX)) { const e = err('nouart', 'no serial service on this device'); e.services = svcs; throw e; }
       const pipe = serialPipe(H, UART_SVC, UART_RX, UART_TX, null); await pipe.start();
-      const C = ALFANO7.client(pipe, { gapMs: 30 });
+      const C = ALFANO7.client(pipe, { gapMs: 10 });
+      // long writes first (an iPhone and Android 14+ give the link a 185+ byte MTU): the password sent in two pieces; no answer — back to twenty-byte
+      // pieces after a pause long enough for the device to drop a half frame (a write the link could not take is either refused or cut short)
+      pipe.piece = 180; let long = false; await sleep(300);
+      try { long = await C.password(2500); } catch (e) { long = false; }
+      if (!long) { pipe.piece = 20; await sleep(1500); }
+      H.longWrites = long;
       const dev = await ALFANO7.open(C);
       const me = {
         info: { serial: dev.serial, firmware: dev.firmware, driver: dev.driver }, kind: 'sessions',
@@ -5682,7 +5700,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.8';
+const APP_VERSION = 'v34.9';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
