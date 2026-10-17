@@ -1633,6 +1633,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <div class="hint warn" id="devExNone" hidden data-t="The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.">The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.</div>
     <pre class="dev-log" id="devLog"></pre>
     <div class="hint" style="text-align:right"><span id="devLogN">0</span> <span data-t="lines">lines</span></div>
+    <div class="row" id="devPinRow" hidden style="gap:6px;flex-wrap:wrap;margin-top:8px"><input type="text" id="devPin" inputmode="numeric" maxlength="8" placeholder="PIN" style="width:110px;font-family:var(--mono)"><button class="btn xs primary" id="devPinTry" type="button" data-t="Try the PIN">Try the PIN</button><span class="hint" style="flex:1 1 200px" data-t="A code on the device's screen? Hutka sends it the common ways and listens for an answer.">A code on the device's screen? Hutka sends it the common ways and listens for an answer.</span></div>
     <div id="devConsole" hidden><div class="row" style="gap:6px;flex-wrap:wrap"><select id="devChr" style="flex:1 1 180px"></select><input type="text" id="devHex" placeholder="b5 62 ff 22 00 00   or   &quot;HELLO\r\n&quot;" style="flex:2 1 220px;font-family:var(--mono)"><button class="btn xs" id="devExSend" type="button" data-t="Send">Send</button><button class="btn xs ghost" id="devExSendNr" type="button" data-t="no response" title="write without response">no response</button></div><div class="hint" id="devExSent"></div></div>
     <div class="row" style="justify-content:space-between;margin-top:10px"><button class="btn ghost" id="devExDisc" type="button" data-t="Disconnect">Disconnect</button><button class="btn primary" id="devSendLog" type="button" data-t="Send the log to Hutka">Send the log to Hutka</button></div>
   </div>
@@ -2661,7 +2662,7 @@ const LOGGERS = (() => {
         await NATIVE.call('BluetoothLe', 'startNotifications', { deviceId: H.id, service: svc, characteristic: chr });
         return;
       }
-      const c = await this.chr(H, svc, chr); c.addEventListener('characteristicvaluechanged', (e) => cb(toU8(e.target.value))); await c.startNotifications();
+      const c = await this.chr(H, svc, chr), k = svc + '|' + chr; c.addEventListener('characteristicvaluechanged', (e) => { if (H.reading === k) return; cb(toU8(e.target.value)); }); await c.startNotifications();
     },
     async write(H, svc, chr, bytes) {
       if (H.kind === 'native') { await NATIVE.call('BluetoothLe', 'write', { deviceId: H.id, service: svc, characteristic: chr, value: hex(bytes) }); return; }
@@ -2673,7 +2674,7 @@ const LOGGERS = (() => {
     },
     async read(H, svc, chr) {
       if (H.kind === 'native') { const r = await NATIVE.call('BluetoothLe', 'read', { deviceId: H.id, service: svc, characteristic: chr }); return unhex(r && r.value); }
-      const c = await this.chr(H, svc, chr); return toU8(await c.readValue());
+      const c = await this.chr(H, svc, chr); H.reading = svc + '|' + chr; try { return toU8(await c.readValue()); } finally { H.reading = null; }
     },
     async disconnect(H) {
       if (!H) return; H.lost = null;
@@ -2858,6 +2859,15 @@ const LOGGERS = (() => {
       ex.readAll = async () => { for (const s of ex.services) for (const c of s.chrs) if (c.props.read) { try { line('read', s.uuid, c.uuid, await ble.read(H, s.uuid, c.uuid)); } catch (e) { line('info', s.uuid, c.uuid, null, 'read failed: ' + (e && e.message || e)); } } };
       ex.writable = () => { const out = []; for (const s of ex.services) for (const c of s.chrs) if (c.props.write || c.props.writeNoRsp) out.push({ svc: s.uuid, chr: c.uuid, label: short(s.uuid) + ' / ' + short(c.uuid) + (c.props.writeNoRsp && !c.props.write ? ' (no response)' : ''), noRsp: c.props.writeNoRsp && !c.props.write }); return out; };
       ex.send = async (svc, chr, bytes, noRsp) => { line('out', svc, chr, bytes); if (noRsp) await ble.writeNoRsp(H, svc, chr, bytes); else await ble.write(H, svc, chr, bytes); };
+      // the serial-in characteristic of the usual vendor UART services, else the first writable one
+      ex.dataIn = () => { const w = ex.writable(); const pref = ['49535343-8841-43f4-a8d4-ecbe34729bb3', '6e400002-b5a3-f393-e0a9-e50e24dcca9e', '0000ffe1-0000-1000-8000-00805f9b34fb', '0000fff2-0000-1000-8000-00805f9b34fb']; for (const u of pref) { const o = w.find(x => x.chr === u); if (o) return o; } return w[0] || null; };
+      // the code on the device's screen, tried the common ways (text with and without a line end, two bytes little- and big-endian, packed decimal), a pause to listen after each
+      ex.tryPin = async (pin, onStep) => {
+        const o = ex.dataIn(); if (!o) throw err('nowrite'); const p = String(pin || '').replace(/\D/g, ''); if (!p) return 0; const n = parseInt(p, 10) >>> 0;
+        const tries = [['text', new TextEncoder().encode(p)], ['text + CR LF', new TextEncoder().encode(p + '\r\n')], ['text + CR', new TextEncoder().encode(p + '\r')], ['u16 LE', Uint8Array.of(n & 0xff, (n >> 8) & 0xff)], ['u16 BE', Uint8Array.of((n >> 8) & 0xff, n & 0xff)], ['BCD', Uint8Array.from((p.length % 2 ? '0' + p : p).match(/../g).map(h => parseInt(h, 16)))]];
+        let k = 0; for (const [how, bytes] of tries) { line('info', o.svc, o.chr, null, 'PIN as ' + how); await ex.send(o.svc, o.chr, bytes, o.noRsp); k++; if (onStep) onStep(k, tries.length, how); await sleep(700); }
+        return k;
+      };
       ex.report = () => ({ device: H.name, id: H.id, platform: ble.kind(), at: new Date().toISOString(), services: ex.services, log: log.slice() });
       ex.close = async () => { await ble.disconnect(H); };
       return ex;
@@ -3814,6 +3824,7 @@ Object.assign(I18N.RU, { 'Bluetooth — the explorer: Hutka listens to the devic
   'Sign in to send the log.': 'Войди, чтобы отправить лог.', 'Log sent — thank you. {n} lines.': 'Лог отправлен — спасибо. Строк: {n}.', 'Could not send the log: {e}': 'Не удалось отправить лог: {e}' });
 Object.assign(I18N.RU, { 'Another device': 'Другой прибор' });
 Object.assign(I18N.RU, { "The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.": 'Браузер не смог открыть ни одного сервиса этого прибора — Chrome достаёт только до сервисов, которые знает заранее, а у этого прибора свои. Приложение Hutka на телефоне видит всё: для этого прибора используй его.' });
+Object.assign(I18N.RU, { 'Try the PIN': 'Попробовать PIN', "A code on the device's screen? Hutka sends it the common ways and listens for an answer.": 'На экране прибора код? Hutka отправит его всеми обычными способами и послушает ответ.', 'PIN {k}/{n}: {how}': 'PIN {k}/{n}: {how}', 'PIN tried {n} ways — see what came back above, then send the log.': 'PIN отправлен {n} способами — смотри ответы выше и отправь лог.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -7254,7 +7265,7 @@ const DEVICE = (() => {
   async function openExplorer() {
     stage('devExplore'); $('devLog').textContent = ''; $('devExSent').textContent = ''; $('devExNone').hidden = !(ex.services.length === 0 && LOGGERS.ble.kind() === 'web');
     ex.onLog = () => { if (!logT) logT = setTimeout(() => { logT = null; renderLog(); }, 120); };
-    const w = ex.writable(); fillSelect($('devChr'), w.map((o, i) => [String(i), o.label]), w.length ? '0' : ''); $('devConsole').hidden = !w.length;
+    const w = ex.writable(); fillSelect($('devChr'), w.map((o, i) => [String(i), o.label]), w.length ? '0' : ''); $('devConsole').hidden = !w.length; $('devPinRow').hidden = !w.length; $('devPin').value = '';
     renderExplore(); renderLog();
     await ex.listen(); await ex.readAll(); renderExplore(); renderLog();
   }
@@ -7286,6 +7297,7 @@ const DEVICE = (() => {
   $('devImport').onclick = importSel; $('devErase').onclick = erase; $('devUnlock').onclick = unlock; $('devCancel').onclick = close;
   $('devRescan').onclick = () => startScan(); $('devScanMore').onclick = () => { showAll = !showAll; renderScan(); }; $('devScanBack').onclick = async () => { await stopScan(); open(); };
   $('devExSend').onclick = () => sendCmd(false); $('devExSendNr').onclick = () => sendCmd(true); $('devHex').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendCmd(false); });
+  $('devPinTry').onclick = async () => { if (!ex || !ex.live) return; const pin = $('devPin').value.trim(); if (!pin) return; $('devPinTry').disabled = true; try { await ex.tryPin(pin, (k, n, how) => { $('devExSent').textContent = t('PIN {k}/{n}: {how}', { k, n, how }); renderLog(); }); $('devExSent').textContent = t('PIN tried {n} ways — see what came back above, then send the log.', { n: 6 }); } catch (e) { $('devExSent').textContent = t('write failed: {e}', { e: e && e.message || e }); } $('devPinTry').disabled = false; renderLog(); };
   $('devSendLog').onclick = sendLog; $('devExDisc').onclick = disconnect; $('devStageBack').onclick = async () => { if (busy && dev && dev.cancel) { try { await dev.cancel(); } catch (e) {} } busy = false; await drop(); open(); };
   $('devModal').addEventListener('click', (e) => { if (e.target === $('devModal')) close(); });
   $('uplFromDevice').onclick = () => { UPLOAD.close(); open(); };
