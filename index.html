@@ -2305,6 +2305,8 @@ const GEAR = (() => {
   return { channelsOf, gearsOfKart, analyse, lapShifts, tempStats, prepare, gearName, CH };
 })();
 if (typeof module !== 'undefined') module.exports = GEAR;
+// a clean lap: no slower than the session's best by 1.5 % (was 4 % — too loose, the averages and the ideal lap took in laps with mistakes)
+const CLEAN_TOL = 1.015;
 const ALF = (() => {
   async function inflate(comp) {
     const ds = new DecompressionStream('deflate-raw'), w = ds.writable.getWriter();
@@ -2371,7 +2373,7 @@ const ALF = (() => {
     const lat0 = laps[0].pts[0].lat, lon0 = laps[0].pts[0].lon, kx = 111320 * Math.cos(lat0 * Math.PI / 180), ky = 110574;
     for (const L of laps) { L.xy = L.pts.map(p => [(p.lon - lon0) * kx, (p.lat - lat0) * ky]); L.len = 0; for (let i = 1; i < L.xy.length; i++) L.len += Math.hypot(L.xy[i][0] - L.xy[i - 1][0], L.xy[i][1] - L.xy[i - 1][1]); }
     const bestT = Math.min(...laps.map(L => L.timeMs));
-    for (const L of laps) L.clean = L.timeMs <= bestT * 1.04 && L.len > 200;
+    for (const L of laps) L.clean = L.timeMs <= bestT * CLEAN_TOL && L.len > 200;
     const best = laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a);
     return { laps, best: best.n, name: name.replace(/\.[^.]+$/, '') };
   }
@@ -2585,7 +2587,7 @@ const IMPORT = (() => {
     const lat0 = laps[0].pts[0].lat, lon0 = laps[0].pts[0].lon, kx = 111320 * Math.cos(lat0 * Math.PI / 180), ky = 110574;
     for (const L of laps) { L.xy = L.pts.map(p => [(p.lon - lon0) * kx, (p.lat - lat0) * ky]); L.len = 0; for (let i = 1; i < L.xy.length; i++) L.len += Math.hypot(L.xy[i][0] - L.xy[i - 1][0], L.xy[i][1] - L.xy[i - 1][1]); }
     const bestT = Math.min(...laps.filter(L => L.len > 200).map(L => L.timeMs).concat([Infinity]));
-    for (const L of laps) L.clean = L.timeMs <= bestT * 1.04 && L.len > 200;
+    for (const L of laps) L.clean = L.timeMs <= bestT * CLEAN_TOL && L.len > 200;
     if (!laps.some(L => L.clean)) laps[0].clean = true;
     const q = grade(hz, src.app);
     return { laps, best: laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a).n, name: name.replace(/\.[^.]+$/, ''), source: q, lapsHow: how };
@@ -3740,7 +3742,7 @@ Object.assign(I18N.RU, {
   'same points, but a higher average speed through the section ({a} vs {b} km/h): smoother steering and throttle, less sliding': 'точки совпадают, но средняя скорость по участку выше ({a} против {b} км/ч): ровнее руль и газ, меньше скольжения',
   'Even ({t} s): no difference in points or speeds.': 'Одинаково ({t} с): по точкам и скоростям разницы нет.', 'no clear difference in points, it is in the smoothness.': 'явных отличий по точкам нет, разница в плавности.',
   'The reference pass is stronger here — this is what to copy.': 'Здесь опорный проезд сильнее — вот что стоит перенять.', 'You do this right here — remember what exactly.': 'Здесь ты делаешь правильно — запомни, что именно.',
-  '{n} laps, {c} of them clean (no slower than the best by 4 %)': '{n} кругов, из них {c} чистых (не медленнее лучшего на 4 %)', 'Best — lap {n}, {t}': 'Лучший — круг {n}, {t}', 'Average clean lap — {t}': 'Средний чистый круг — {t}', 'Five fastest: {list}': 'Пять быстрых: {list}',
+  '{n} laps, {c} of them clean (no slower than the best by 1.5 %)': '{n} кругов, из них {c} чистых (не медленнее лучшего на 1,5 %)', 'Best — lap {n}, {t}': 'Лучший — круг {n}, {t}', 'Average clean lap — {t}': 'Средний чистый круг — {t}', 'Five fastest: {list}': 'Пять быстрых: {list}',
   'The reference now is the average clean lap of this session, {t}: its points are a “typical” pass.': 'Опорный сейчас — средний чистый круг этой сессии, {t}: его точки — это «типичный» проезд.', 'The reference now is lap {n}, {t}.': 'Опорный сейчас — круг {n}, {t}.',
   'higher': 'выше', 'lower': 'ниже', 'same points, {hi} average speed through the section': 'точки те же, {hi} средняя скорость по участку', '{hi} apex speed': '{hi} скорость в апексе', '{dir} on the throttle': '{dir} газ', 'a pause before the throttle': 'пауза перед газом', 'brake released {dir}': '{dir} отпущен тормоз', '{hi} exit speed': '{hi} скорость на выходе', '{hi} entry speed': '{hi} скорость на входе',
   'a different braking point': 'другая точка торможения', 'different pedal work': 'другая работа педалями', 'a different lift point': 'другая точка сброса', 'a different line': 'другая траектория',
@@ -3755,7 +3757,7 @@ Object.assign(I18N.RU, {
   'Apex — the slowest point of the corner; apex speed is the minimum speed.': 'Апекс — самая медленная точка поворота; скорость в апексе — минимальная скорость.',
   'Throttle — where the full acceleration starts after the apex.': 'Газ — где после апекса начинается полный разгон.', 'Exit — the speed 40 m after the apex: what the whole straight inherits.': 'Выход — скорость через 40 м после апекса: её наследует вся прямая.',
   'Reserve — how much faster the corner would be if driven like the best quarter of all passes in the loaded sessions.': 'Резерв — насколько быстрее был бы поворот, если проехать его как лучшая четверть проездов в загруженных сессиях.',
-  'Clean lap — no slower than the best by 4 %; the rest are counted as dirty and skipped in averages.': 'Чистый круг — не медленнее лучшего на 4 %; остальные считаются грязными и не входят в средние.',
+  'Clean lap — no slower than the best by 1.5 %; the rest are counted as dirty and skipped in averages.': 'Чистый круг — не медленнее лучшего на 1,5 %; остальные считаются грязными и не входят в средние.',
   'ok': 'ок', 'Hover a corner on the map or click its number — the breakdown of that corner appears here.': 'Наведи курсор на поворот на карте или кликни по номеру — здесь будет разбор этого поворота.', 'Where to start': 'С чего начать',
   'reference slower': 'опорный медленнее', 'you are slower': 'ты медленнее', 'reference faster': 'опорный быстрее', 'you are faster': 'ты быстрее', 'even': 'одинаково',
   'pedal': 'педаль', 'released': 'отпустил', 'throttle from': 'газ с', 'lateral': 'боковое', 'time': 'время', 'In plain words': 'Простыми словами', 'Coach · best passes through this corner': 'Тренер · лучшие проезды этого поворота', 'Your reserve here ≈ {t} s.': 'Твой резерв здесь ≈ {t} с.', 'You are among the best here.': 'Ты здесь среди лучших.', 'Model': 'Модель',
@@ -4435,6 +4437,8 @@ const STORE = (() => {
       }
       laps.push({ n: h.n, timeMs: h.timeMs, clean: !!h.clean, pts });
     }
+    // sessions stored under the old 4 % rule: a lap flagged clean then is clean now only within today's tolerance of the best
+    { const best = Math.min(...laps.filter(L => L.clean).map(L => L.timeMs)); if (isFinite(best)) for (const L of laps) if (L.clean && L.timeMs > best * CLEAN_TOL) L.clean = false; }
     return laps;
   }
   async function packSession(sess) { const raw = packLaps(sess.laps), { enc, data } = await deflate(raw); const b64 = B64.enc(data), chunks = []; for (let i = 0; i < b64.length; i += 180000) chunks.push(b64.slice(i, i + 180000)); return { enc, chunks, bytes: data.length }; }
@@ -5763,7 +5767,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.11.1';
+const APP_VERSION = 'v34.12';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -7128,7 +7132,7 @@ function renderDigest() {
   const fastest = clean.slice().sort((a, b) => a.timeMs - b.timeMs).slice(0, 5);
   const P = [];
   if (sess.source && sess.source.app !== 'alfano') P.push(`<p class="hint"><span class="lbl">${t('Data source')}</span><br>${esc(t('{s}. Alfano at 10 Hz is the reference; at {hz} Hz braking, release and throttle points are accurate to about ±{m} m and apex speeds are smoothed. Treat small differences with care.', { s: sourceLabel(sess.source), hz: sess.source.hz, m: sess.source.hz >= 9 ? 2 : (sess.source.hz >= 4 ? 4 : 10) }))}</p>`);
-  P.push(`<p><span class="lbl">${t('Session')}</span><br>${esc(shortSess(sess))}: ${t('{n} laps, {c} of them clean (no slower than the best by 4 %)', { n: sess.laps.length, c: clean.length })}. ${t('Best — lap {n}, {t}', { n: bestLap(sess).n, t: fmtMs(bestLap(sess).timeMs) })}. ${t('Average clean lap — {t}', { t: fmtLap(avg) })}. ${t('Five fastest: {list}', { list: fastest.map(x => `${x.n} (${fmtMs(x.timeMs)})`).join(', ') })}.${D.ref.avg ? ' ' + t('The reference now is the average clean lap of this session, {t}: its points are a “typical” pass.', { t: fmtLap(D.R.T) }) : (L !== bestLap(sess) ? ' ' + t('The reference now is lap {n}, {t}.', { n: L.n, t: fmtLap(D.R.T) }) : '')}</p>`);
+  P.push(`<p><span class="lbl">${t('Session')}</span><br>${esc(shortSess(sess))}: ${t('{n} laps, {c} of them clean (no slower than the best by 1.5 %)', { n: sess.laps.length, c: clean.length })}. ${t('Best — lap {n}, {t}', { n: bestLap(sess).n, t: fmtMs(bestLap(sess).timeMs) })}. ${t('Average clean lap — {t}', { t: fmtLap(avg) })}. ${t('Five fastest: {list}', { list: fastest.map(x => `${x.n} (${fmtMs(x.timeMs)})`).join(', ') })}.${D.ref.avg ? ' ' + t('The reference now is the average clean lap of this session, {t}: its points are a “typical” pass.', { t: fmtLap(D.R.T) }) : (L !== bestLap(sess) ? ' ' + t('The reference now is lap {n}, {t}.', { n: L.n, t: fmtLap(D.R.T) }) : '')}</p>`);
   // engine channels (a sport kart with an Alfano 6): the gearbox, where the shifts are, the revs, the water
   { const box = sess._box && sess._box.box; if (box) {
       const lg = L && L._gear, parts = [];
@@ -7180,7 +7184,7 @@ function renderDigest() {
   }
   $('digest').innerHTML = P.join('');
   $('digestSub').textContent = `${t('reference')}: ${D.ref.name}${D.O ? ' · ' + t('comparison') + ': ' + D.nameOf(D.O) : ''}`;
-  $('glossList').innerHTML = [['brake', t('Brake — where the deceleration gets stronger than 2.5 m/s²; the number is metres from the start/finish line.')], ['lift', t('Lift — the throttle closes without braking; eased off — a partial lift.')], ['released', t('Released — the brake pedal is let go; earlier usually means the kart rolls and rotates on its own.')], ['apex', t('Apex — the slowest point of the corner; apex speed is the minimum speed.')], ['throttle', t('Throttle — where the full acceleration starts after the apex.')], ['exit', t('Exit — the speed 40 m after the apex: what the whole straight inherits.')], ['reserve', t('Reserve — how much faster the corner would be if driven like the best quarter of all passes in the loaded sessions.')], ['clean', t('Clean lap — no slower than the best by 4 %; the rest are counted as dirty and skipped in averages.')]].map(([k, v]) => `<li>${esc(v)}</li>`).join('');
+  $('glossList').innerHTML = [['brake', t('Brake — where the deceleration gets stronger than 2.5 m/s²; the number is metres from the start/finish line.')], ['lift', t('Lift — the throttle closes without braking; eased off — a partial lift.')], ['released', t('Released — the brake pedal is let go; earlier usually means the kart rolls and rotates on its own.')], ['apex', t('Apex — the slowest point of the corner; apex speed is the minimum speed.')], ['throttle', t('Throttle — where the full acceleration starts after the apex.')], ['exit', t('Exit — the speed 40 m after the apex: what the whole straight inherits.')], ['reserve', t('Reserve — how much faster the corner would be if driven like the best quarter of all passes in the loaded sessions.')], ['clean', t('Clean lap — no slower than the best by 1.5 %; the rest are counted as dirty and skipped in averages.')]].map(([k, v]) => `<li>${esc(v)}</li>`).join('');
 }
 function renderCornersTable() {
   const D = LAB.dcmp, tb = $('cornersTable').querySelector('tbody'); tb.innerHTML = ''; $('cornersTable').classList.add('resp'); renderIdealBreak(); if (!D) return;
