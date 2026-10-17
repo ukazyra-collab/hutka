@@ -230,6 +230,8 @@ td .gr,.crow .gr{margin-right:5px}.insp-head .gr{margin-left:6px;font-size:11px;
 .auth-email{display:flex;flex-direction:column;gap:10px;padding-top:12px;border-top:1px solid var(--line)}.auth-foot{justify-content:center}
 .modal.auth.gate{background:var(--bg);padding:0}.modal.auth.gate .box.auth-box{box-shadow:none;border:0;border-radius:0;width:100%;max-width:440px;min-height:100%;justify-content:center;padding:max(24px,var(--sa-top,0px)) 24px max(24px,var(--sa-bottom,0px))}.modal.auth.gate .auth-foot{display:none}
 html.native .modal.auth.gate .box.auth-box{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:0}
+/* the progress chart: best and average lap by session */
+.prog{margin:4px 0 14px}.prog-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px;font-size:13.5px}.prog-head b{font-weight:600}.prog-cv{display:block;width:100%;height:156px}
 .mark-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--fg);min-width:0}.mark-row .tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mark-row .tx b{font-weight:600}.mark-row .tm{font:600 12.5px var(--mono);color:var(--muted);white-space:nowrap}.mark-row .x{color:var(--muted);font-size:15px;line-height:1;padding:2px 6px;border-radius:6px}.mark-row .x:hover{background:var(--line);color:var(--fg)}#labMarks .list{display:grid;gap:6px}
 .pill.ok{background:var(--ok);border-color:var(--ok);color:#fff}
 .pill.off{background:var(--surface-3);border-color:var(--surface-3)}
@@ -1354,7 +1356,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       <div class="card book" id="tBook" hidden><div class="ico"><svg><use href="#i-ticket"/></svg></div><div class="t"><b data-t="Book a session">Book a session</b><span id="tBookSub"></span></div><a class="btn primary" id="tBookBtn" target="_blank" rel="noopener"><span data-t="Book now">Book now</span> ↗</a></div>
       <div class="card" id="tVideo" hidden><h2><svg><use href="#i-play"/></svg><span data-t="Take a virtual lap">Take a virtual lap</span><span class="sub" id="tVideoSub"></span></h2><a class="btn" id="tVideoBtn" target="_blank" rel="noopener"><svg><use href="#i-play"/></svg><span data-t="Watch the onboard">Watch the onboard</span> ↗</a></div>
       <div class="card" id="tDescCard" hidden><p id="tDesc" style="max-width:80ch;line-height:1.6"></p></div>
-      <div class="card" id="tMineCard" hidden><h2><svg><use href="#i-user"/></svg><span data-t="Your sessions on this track">Your sessions on this track</span><span class="sub" id="tMineSub"></span></h2><div id="tMine"></div></div>
+      <div class="card" id="tMineCard" hidden><h2><svg><use href="#i-user"/></svg><span data-t="Your sessions on this track">Your sessions on this track</span><span class="sub" id="tMineSub"></span></h2><div id="tProgress" hidden></div><div id="tMine"></div></div>
       <div class="card" id="tKartsCard" hidden><h2><svg><use href="#i-speed"/></svg><span data-t="Karts people drive here">Karts people drive here</span></h2><div class="karts" id="tKarts"></div></div>
       <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="Hot laps">Hot laps</span><span class="sub" id="tHotSub"></span></h2><div id="tHot"></div></div>
       <div class="card"><div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:center" id="tStatsWrap"><img class="thumb" id="tAerial" alt="" hidden style="width:240px;height:240px;object-fit:cover"><div class="tiles" id="tTiles"></div></div></div>
@@ -1492,7 +1494,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
         <div class="card" id="profSocialCard"><h2><svg><use href="#i-users"/></svg><span data-t="Community">Community</span></h2><div class="tiles" id="profSocial"></div><div class="hint" id="profSocialHint" style="margin-top:10px"></div></div>
       </div>
       <div class="card" id="profSwsCard" hidden><h2><svg><use href="#i-flag"/></svg><span data-t="SWS results">SWS results</span><span class="sub" id="profSwsSub"></span></h2><div id="profSwsBox"></div></div>
-      <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="profSessSub"></span></h2><div class="row" style="margin-bottom:12px"><button class="btn primary" id="profUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div><div id="profSessions"></div><div class="hint" id="profSessHint"></div></div>
+      <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="profSessSub"></span></h2><div class="row" style="margin-bottom:12px"><button class="btn primary" id="profUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div><div id="profProgress" hidden></div><div id="profSessions"></div><div class="hint" id="profSessHint"></div></div>
     </section>
 
     <!-- ========== DRIVER ========== -->
@@ -1511,6 +1513,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       <div class="card"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><img class="avatar" id="drvAvatar" alt="" style="width:72px;height:72px"><div style="min-width:0;flex:1"><div style="font-size:22px;font-weight:800" id="drvName">—</div><div class="hint" id="drvMeta"></div><div class="hint" id="drvFollowers"></div><div id="drvBio" style="margin-top:6px;font-size:14px"></div><div class="row" id="drvLinks" style="margin-top:8px"></div></div><div class="row" id="drvActs" style="gap:6px"><button class="btn primary" id="drvFollow" type="button" hidden></button><button class="btn" id="drvBlock" type="button" hidden data-t="Block">Block</button><button class="btn ghost" id="drvReport" type="button" hidden data-t="Report">Report</button></div></div><div class="hint blocked-note" id="drvBlockedNote" hidden></div></div>
       <div class="card" id="drvSwsCard" hidden><h2><svg><use href="#i-flag"/></svg><span data-t="SWS results">SWS results</span><span class="sub" id="drvSwsSub"></span></h2><div id="drvSwsBox"></div></div>
       <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="Personal bests">Personal bests</span></h2><div id="drvBest"></div></div>
+      <div class="card" id="drvDuelCard" hidden><h2><svg><use href="#i-users"/></svg><span id="drvDuelTitle"></span><span class="sub" id="drvDuelSub"></span></h2><div id="drvDuel"></div><div class="hint" data-t="Personal bests on the layouts you both drove, in the same kart class; the corners come from your best laps there. Compare opens the Lab with your latest session on that layout against theirs.">Personal bests on the layouts you both drove, in the same kart class; the corners come from your best laps there. Compare opens the Lab with your latest session on that layout against theirs.</div></div>
       <div class="card"><h2><svg><use href="#i-clip"/></svg><span data-t="Published sessions">Published sessions</span><span class="sub" id="drvSessSub"></span></h2><div id="drvSessions"></div></div>
     </section>
 
@@ -4441,6 +4444,11 @@ Object.assign(I18N.RU, { 'Bookmarks and favourites': 'Закладки и изб
 // v34.17 — the sign-in window
 Object.assign(I18N.RU, { 'Your sessions in one library on every device, comparisons with other drivers, a profile next to your laps.': 'Твои сессии в одной библиотеке на всех устройствах, сравнения с другими гонщиками, профиль рядом с твоими кругами.',
   'Continue with Apple': 'Продолжить с Apple', 'Continue with Google': 'Продолжить с Google', 'Continue with email': 'Продолжить по e-mail', 'No password needed: we e-mail you a link and a 6-digit code.': 'Пароль не нужен: пришлём на почту ссылку и 6-значный код.', 'Not now': 'Не сейчас' });
+// v34.18 — the progress chart
+Object.assign(I18N.RU, { 'personal best': 'личный рекорд', 'best lap': 'лучший круг', 'average clean lap': 'средний чистый круг', 'avg': 'ср.', 'Progress chart: best and average lap by session': 'График прогресса: лучший и средний круг по сессиям', 'custom layout': 'своя конфигурация' });
+// v34.18 — the duel
+Object.assign(I18N.RU, { 'You vs {name}': 'Ты против {name}', 'Personal bests on the layouts you both drove, in the same kart class; the corners come from your best laps there. Compare opens the Lab with your latest session on that layout against theirs.': 'Личные рекорды на конфигурациях, где ездили оба, в одной категории картов; повороты — по вашим лучшим кругам там. «Compare» открывает Lab: твоя последняя сессия на этой конфигурации против его.',
+  'Gap': 'Разрыв', 'Corners': 'Повороты', 'Compare': 'Сравнить', 'open Compare': 'открой Сравнить', '{name} faster in': '{name} быстрее в', 'you faster in': 'ты быстрее в', 'even in every corner': 'ровно во всех поворотах', 'even': 'ровно' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -5934,10 +5942,11 @@ const CAPTCHA = { id: null, loading: null,
   }
 };
 const AUTH = {
-  // Apple and Google show when their providers are on (config.js); inside the app the Google button needs Apple beside it (App Store rule 4.8).
-  // The Apple glyph comes from the system font on Apple devices only; elsewhere the button is text. With no provider buttons the e-mail
-  // fields open at once. `gate`: the app's start screen — no way past it without signing in (no Cancel, no backdrop click)
-  open(opts) { const cfg = window.HUTKA_CONFIG || {}, apple = !!cfg.appleAuth, google = !!cfg.googleAuth && (!NATIVE.on || apple), gate = !!(opts && opts.gate);
+  // Apple and Google show when their providers are on (config.js) — in the app too. Mind App Store rule 4.8: an iOS build submitted
+  // with Google needs Sign in with Apple beside it, so appleAuth must be on before the store build. The Apple glyph comes from the
+  // system font on Apple devices only; elsewhere the button is text. With no provider buttons the e-mail fields open at once.
+  // `gate`: the app's start screen — no way past it without signing in (no Cancel, no backdrop click)
+  open(opts) { const cfg = window.HUTKA_CONFIG || {}, apple = !!cfg.appleAuth, google = !!cfg.googleAuth, gate = !!(opts && opts.gate);
     $('authStatus').textContent = ''; $('authEmail').value = ''; $('authPass').value = ''; $('authCode').value = ''; $('authCodeField').hidden = true; $('authCodeBtn').hidden = true; $('authGoogleBtn').hidden = !google; $('authAppleBtn').hidden = !apple; $('authEmailBtn').disabled = false; AUTH.pass(false);
     $('authModal').querySelector('.apple-glyph').hidden = !(/Mac|iPhone|iPad|iPod/.test(navigator.platform || '') || NATIVE.platform === 'ios');
     const providers = apple || google; $('authEmailOpen').hidden = !providers; $('authEmailBox').hidden = providers; $('authCol').hidden = !providers;
@@ -5992,7 +6001,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.17';
+const APP_VERSION = 'v34.18';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6054,6 +6063,54 @@ async function renderSearch() {
   drop.hidden = false;
 }
 function logoInto(box, tr) { box.innerHTML = ''; if (tr.logo) { const im = new Image(); im.src = tr.logo; im.alt = ''; box.appendChild(im); } else box.textContent = GEO.initials(tr.name); }
+// ---------- progress: the best and the average lap of every session on one layout in one kart class, session by session ----------
+// Groups a list of session metas by track · layout · kart class (sessions of different karts are different sports); a group with two
+// or more sessions gets a small chart: filled dots and a line for the best lap, hollow dots and a dashed line for the average clean lap,
+// the personal best ringed in gold. Hover (or touch) names the session; a tap opens it in the Lab.
+function progressGroups(list) {
+  const g = new Map();
+  for (const m of list) { if (!(m.bestMs > 0) || !m.track) continue; const key = `${m.track}|${m.layout || 'custom'}|${kartKeyOf(m)}`; if (!g.has(key)) g.set(key, []); g.get(key).push(m); }
+  return [...g.entries()].map(([key, rows]) => ({ key, rows: rows.slice().sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.createdAt || 0) - (b.createdAt || 0)) })).filter(x => x.rows.length >= 2).sort((a, b) => b.rows.length - a.rows.length);
+}
+function renderProgress(box, list, opts) {
+  opts = opts || {}; box.innerHTML = ''; const groups = progressGroups(list).slice(0, opts.max || 3); if (!groups.length) { box.hidden = true; return 0; } box.hidden = false;
+  const cs = getComputedStyle(document.documentElement), tok = (n) => cs.getPropertyValue(n).trim(), mono = tok('--mono') || 'ui-monospace, monospace', body = tok('--body') || 'system-ui, sans-serif';
+  for (const grp of groups) {
+    const rows = grp.rows, m0 = rows[0], tr = STORE.getTrack(m0.track), lay = (STORE.getLayoutSync ? STORE.getLayoutSync(m0.track, m0.layout) : null) || STORE.getLayout(m0.track, m0.layout), pbRow = rows.reduce((a, b) => b.bestMs < a.bestMs ? b : a);
+    const head = el('div', 'prog-head'); head.innerHTML = `<b>${esc([opts.track === false ? '' : (tr ? tr.name : (m0.trackName || t('Custom'))), lay ? lay.name : (m0.layout && m0.layout !== 'custom' ? m0.layout : t('custom layout')), kartLabel(m0) || t('rental')].filter(Boolean).join(' · '))}</b><span class="hint">${esc(tn(rows.length, '{n} session', '{n} sessions').replace('{n}', rows.length))} · ${esc(t('personal best'))} ${esc(fmtMs(pbRow.bestMs))} (${esc(fmtDate(pbRow.date))})</span>`;
+    const cv = el('canvas', 'prog-cv'); const wrap = el('div', 'prog'); wrap.append(head, cv); box.appendChild(wrap);
+    const draw = (hi) => {
+      const { ctx, w, h } = setupCanvas(cv, 156), P = { l: 60, r: 16, t: 30, b: 24 }, n = rows.length;
+      ctx.clearRect(0, 0, w, h);
+      const bests = rows.map(r => r.bestMs / 1000), avgs = rows.map(r => r.avgMs > 0 ? r.avgMs / 1000 : NaN), all = bests.concat(avgs.filter(isFinite));
+      let lo = Math.min(...all), hi0 = Math.max(...all); const pad = Math.max(0.15, (hi0 - lo) * 0.12); lo -= pad; hi0 += pad;
+      const X = (i) => n === 1 ? (P.l + w - P.r) / 2 : P.l + (w - P.l - P.r) * i / (n - 1), Y = (v) => P.t + (h - P.t - P.b) * (v - lo) / (hi0 - lo);
+      // grid: three horizontal lines with times
+      ctx.font = `10.5px ${mono}`; ctx.fillStyle = tok('--muted'); ctx.strokeStyle = tok('--line'); ctx.lineWidth = 1; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      for (let k = 0; k <= 2; k++) { const v = lo + (hi0 - lo) * (k / 2), y = Y(v); ctx.beginPath(); ctx.moveTo(P.l, y); ctx.lineTo(w - P.r, y); ctx.stroke(); ctx.fillText(fmtLap(v), P.l - 6, y); }
+      // dates along the bottom: the first, the last and every k-th in between so they never overlap
+      ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; const step = Math.max(1, Math.ceil(n * 64 / Math.max(120, w - P.l - P.r)));
+      for (let i = 0; i < n; i++) if (i === 0 || i === n - 1 || i % step === 0) { if (i !== 0 && i !== n - 1 && (n - 1 - i) < step / 2) continue; ctx.textAlign = i === 0 ? 'left' : (i === n - 1 ? 'right' : 'center'); ctx.fillText(fmtDate(rows[i].date).replace(/\s\d{4}$/, ''), X(i), h - 7); }
+      // the average: dashed, hollow dots
+      ctx.setLineDash([4, 4]); ctx.strokeStyle = tok('--muted'); ctx.lineWidth = 1.4; ctx.beginPath(); let started = false; for (let i = 0; i < n; i++) { if (!isFinite(avgs[i])) continue; started ? ctx.lineTo(X(i), Y(avgs[i])) : ctx.moveTo(X(i), Y(avgs[i])); started = true; } ctx.stroke(); ctx.setLineDash([]);
+      for (let i = 0; i < n; i++) if (isFinite(avgs[i])) { ctx.beginPath(); ctx.arc(X(i), Y(avgs[i]), 3.2, 0, Math.PI * 2); ctx.fillStyle = tok('--surface'); ctx.fill(); ctx.strokeStyle = tok('--muted'); ctx.lineWidth = 1.4; ctx.stroke(); }
+      // the best: a line and filled dots, the personal best ringed
+      const col = tok('--actual') || '#2f6bf0'; ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); for (let i = 0; i < n; i++) i ? ctx.lineTo(X(i), Y(bests[i])) : ctx.moveTo(X(i), Y(bests[i])); ctx.stroke();
+      for (let i = 0; i < n; i++) { const pb = rows[i] === pbRow; ctx.beginPath(); ctx.arc(X(i), Y(bests[i]), pb ? 5 : 3.8, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill(); if (pb) { ctx.lineWidth = 2.5; ctx.strokeStyle = '#ffc233'; ctx.stroke(); } }
+      // the hovered session: a label with the name and both times
+      if (hi >= 0 && hi < n) { const r = rows[hi], x = X(hi), y = Y(bests[hi]), nm = (r.label || r.name || '').slice(0, 28), dd = fmtDate(r.date), text = `${nm.includes(dd) ? nm : nm + ' · ' + dd} · ${fmtMs(r.bestMs)}${isFinite(avgs[hi]) ? ' · ' + t('avg') + ' ' + fmtLap(avgs[hi]) : ''}`; ctx.font = `600 11px ${body}`; const tw = ctx.measureText(text).width + 14, bx = Math.max(P.l, Math.min(w - P.r - tw, x - tw / 2)), by = y - 30 < P.t ? y + 12 : y - 30; ctx.fillStyle = 'rgba(14,17,22,0.9)'; const rr = (x0, y0, w0, h0, r0) => { ctx.beginPath(); ctx.moveTo(x0 + r0, y0); ctx.arcTo(x0 + w0, y0, x0 + w0, y0 + h0, r0); ctx.arcTo(x0 + w0, y0 + h0, x0, y0 + h0, r0); ctx.arcTo(x0, y0 + h0, x0, y0, r0); ctx.arcTo(x0, y0, x0 + w0, y0, r0); ctx.closePath(); }; rr(bx, by, tw, 20, 5); ctx.fill(); ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(text, bx + 7, by + 10); }
+      // the legend
+      ctx.font = `10.5px ${body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; let lx = P.l + 2; const ly = 11; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(lx + 4, ly, 3.5, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = tok('--muted'); ctx.fillText(t('best lap'), lx + 12, ly); lx += 12 + ctx.measureText(t('best lap')).width + 14; ctx.beginPath(); ctx.arc(lx + 4, ly, 3.2, 0, Math.PI * 2); ctx.strokeStyle = tok('--muted'); ctx.lineWidth = 1.4; ctx.stroke(); ctx.fillText(t('average clean lap'), lx + 12, ly); lx += 12 + ctx.measureText(t('average clean lap')).width + 14; ctx.beginPath(); ctx.arc(lx + 4, ly, 3.8, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = '#ffc233'; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = tok('--muted'); ctx.fillText(t('personal best'), lx + 12, ly);
+      return { X, n, P, w };
+    };
+    let geo = draw(-1); const nearest = (e) => { const r = cv.getBoundingClientRect(), x = e.clientX - r.left; let bi = -1, bd = 1e9; for (let i = 0; i < geo.n; i++) { const d = Math.abs(geo.X(i) - x); if (d < bd) { bd = d; bi = i; } } return bd < 24 ? bi : -1; };
+    cv.addEventListener('pointermove', (e) => { geo = draw(nearest(e)); }); cv.addEventListener('pointerleave', () => { geo = draw(-1); });
+    cv.addEventListener('click', (e) => { const i = nearest(e); if (i >= 0) location.hash = '#lab~' + rows[i].id; });
+    cv.style.cursor = 'pointer'; cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', t('Progress chart: best and average lap by session'));
+    requestAnimationFrame(() => { geo = draw(-1); });
+  }
+  return groups.length;
+}
 // ---------- layout geometry: the track line for a layout, from its reference session (GPS), from an admin trace, or both ----------
 const GEOM = (() => {
   const cache = new Map();
@@ -6209,6 +6266,7 @@ async function renderTrackPage(tid, lid) {
   if (cur) renderLayoutBlock(tid, cur.id); else { $('lFirst').hidden = true; }
   // the viewer's own sessions on this track, with a publish switch
   const mineBox = $('tMine'); mineBox.innerHTML = ''; $('tMineCard').hidden = !mine.length; $('tMineSub').textContent = mine.length ? String(mine.length) : '';
+  try { renderProgress($('tProgress'), mine, { track: false, max: 3 }); } catch (e) { $('tProgress').hidden = true; }   // the progress chart: best and average lap by session, per layout and kart
   if (mine.length) {
     const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Session')}</th><th>${t('Layout')}</th><th>${t('Date')}</th><th>${t('Best')}</th><th>${t('Visibility')}</th><th></th></tr></thead>`; const body = el('tbody');
     for (const m of mine) { const r = el('tr'); const l = layouts.find(x => x.id === m.layout); r.innerHTML = `<td style="font-weight:600;white-space:normal">${esc(m.label || m.name)}</td><td>${esc(l ? l.name : t('Custom'))}</td><td>${esc(fmtDate(m.date))}</td><td class="num">${fmtMs(m.bestMs)}</td><td>${m.published ? `<span class="pill ok">${t('Published')}</span>` : `<span class="pill off">${t('Private')}</span>`}</td><td></td>`; const acts = el('div', 'row'); const open = el('a', 'btn xs', t('Open')); open.href = '#lab~' + m.id; acts.appendChild(open); if (STORE.canWrite() && m.owner !== 'local') { const pub = el('button', 'btn xs' + (m.published ? '' : ' primary'), m.published ? t('Unpublish') : t('Publish')); pub.type = 'button'; pub.onclick = async () => { try { await setPublished(m, !m.published); renderTrackPage(tid); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); } }; acts.appendChild(pub); } r.lastElementChild.appendChild(acts); body.appendChild(r); }
@@ -6377,6 +6435,45 @@ async function renderDriverPage(uid) {
   paintBlock();
   const pubs = await publishedBy(uid);
   renderBests($('drvBest'), pubs); renderSessionsTable($('drvSessions'), pubs, $('drvSessSub'));
+  renderDuel(uid, nm, pubs).catch(() => { $('drvDuelCard').hidden = true; });
+}
+// ---------- the duel: you against this driver on the layouts you both drove ----------
+// One row per track · layout · kart class with a personal best on both sides: the two bests, the gap, and — from the two best laps —
+// the corners where each of you is faster by 0.1 s or more (computed after the table shows, three layouts at most)
+async function renderDuel(uid, nm, pubs) {
+  const card = $('drvDuelCard'), box = $('drvDuel'); card.hidden = true; box.innerHTML = '';
+  if (!STORE.hasIdentity || nm.isMe || !pubs.length || STORE.isBlocked(uid)) return;
+  const mine = await STORE.mySessions(); if (!mine.length) return;
+  const key = (s) => `${s.track}|${s.layout || 'custom'}|${kartKeyOf(s)}`, bestOf = (list) => { const by = new Map(); for (const s of list) { if (!(s.bestMs > 0) || !s.track) continue; const cur = by.get(key(s)); if (!cur || s.bestMs < cur.bestMs) by.set(key(s), s); } return by; };
+  const my = bestOf(mine), theirs = bestOf(pubs), rows = [];
+  for (const [k, ts] of theirs) { const ms = my.get(k); if (ms) rows.push({ k, ms, ts, gap: (ms.bestMs - ts.bestMs) / 1000 }); }
+  if (!rows.length) return;
+  rows.sort((a, b) => (a.ts.track || '').localeCompare(b.ts.track || '') || a.ts.bestMs - b.ts.bestMs);
+  card.hidden = false; $('drvDuelTitle').textContent = t('You vs {name}', { name: nm.name || t('this driver') }); $('drvDuelSub').textContent = String(rows.length);
+  const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Layout')}</th><th>${t('You')}</th><th>${esc(nm.name || t('Driver'))}</th><th>${t('Gap')}</th><th>${t('Corners')}</th><th></th></tr></thead>`; const body = el('tbody');
+  const cells = [];
+  for (const r of rows) {
+    const tr = STORE.getTrack(r.ts.track), ls = r.ts.track ? await STORE.getLayouts(r.ts.track) : [], l = ls.find(x => x.id === r.ts.layout);
+    const latestMine = mine.filter(s => key(s) === r.k).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    const row = el('tr'); row.innerHTML = `<td style="white-space:normal;font-weight:600">${esc(tr ? tr.name : (r.ts.trackName || t('Custom')))} · ${esc(l ? l.name : (r.ts.layout && r.ts.layout !== 'custom' ? r.ts.layout : t('custom layout')))} <span class="hint">· ${esc(kartLabel(r.ts) || t('rental'))}</span></td><td class="num">${fmtMs(r.ms.bestMs)} <span class="hint">${esc(fmtDate(r.ms.date))}</span></td><td class="num">${fmtMs(r.ts.bestMs)} <span class="hint">${esc(fmtDate(r.ts.date))}</span></td><td class="num ${r.gap > 0.005 ? 'loss' : (r.gap < -0.005 ? 'gain' : 'm')}">${r.gap > 0.005 ? '+' + r.gap.toFixed(3) : (r.gap < -0.005 ? '−' + (-r.gap).toFixed(3) : t('even'))}</td><td class="txt duel-corners"><span class="hint">…</span></td><td><a class="btn xs primary" href="#lab~${esc(r.ts.id)}~cmp">${t('Compare')}</a></td>`;
+    body.appendChild(row); cells.push({ r, td: row.querySelector('.duel-corners'), latestMine });
+  }
+  tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
+  for (const c of cells.slice(0, 3)) { try { c.td.innerHTML = await duelCorners(c.r.ms, c.r.ts, nm.name || t('Driver')); } catch (e) { c.td.innerHTML = `<span class="hint">—</span>`; } }
+  for (const c of cells.slice(3)) c.td.innerHTML = `<span class="hint">${esc(t('open Compare'))}</span>`;
+}
+// the corners from the two best laps: where they are faster (≥ 0.1 s) and where you are
+async function duelCorners(myMeta, theirMeta, theirName) {
+  const [ms, ts] = await Promise.all([STORE.loadSession(myMeta), STORE.loadSession(theirMeta)]);
+  const tid = theirMeta.track, lid = theirMeta.layout || 'custom', G = await GEOM.build(tid, lid, ts, { noMedia: true }); if (!G) throw new Error('no geometry');
+  if (!GEOM.attach(ms, G).ok) throw new Error('no attach'); GEOM.attach(ts, G);
+  const best = (s) => s.laps.filter(L => L.px).reduce((a, b) => (!a || b.timeMs < a.timeMs) ? b : a, null), ml = best(ms), tl = best(ts); if (!ml || !tl) throw new Error('no laps');
+  const R = DATA.projectLap(ml, G.track, G.rev), O = DATA.projectLap(tl, G.track, G.rev); if (!R || !O) throw new Error('no projection');
+  const apexes = GEOM.apexes(G, tl.timeMs < ml.timeMs ? O : R), D = DATA.buildComparisonP(R, [O], 'lap', G.track, () => theirName, apexes, G.corners.R); if (!D) throw new Error('no comparison');
+  const them = D.rows.filter(r => r.cmp && r.cmp.dt >= 0.1).sort((a, b) => b.cmp.dt - a.cmp.dt).slice(0, 4), you = D.rows.filter(r => r.cmp && r.cmp.dt <= -0.1).sort((a, b) => a.cmp.dt - b.cmp.dt).slice(0, 4);
+  const list = (rs, sign) => rs.map(r => `<a href="#lab~${esc(theirMeta.id)}~t${r.w.n}" style="color:inherit">T${r.w.n}</a> (${sign}${Math.abs(r.cmp.dt).toFixed(2)})`).join(', ');
+  const parts = []; if (them.length) parts.push(`<span class="loss">${esc(t('{name} faster in', { name: theirName }))}</span> ${list(them, '+')}`); if (you.length) parts.push(`<span class="gain">${esc(t('you faster in'))}</span> ${list(you, '−')}`);
+  return parts.length ? parts.join('; ') : esc(t('even in every corner'));
 }
 async function publishedBy(uid) { return (await STORE.sessionsByOwner(uid)).sort((a, b) => (b.date || '').localeCompare(a.date || '')); }
 async function renderBests(box, pubs) {
@@ -8851,6 +8948,7 @@ async function renderProfile() {
   const sc = $('profSocialCard'); sc.hidden = !(STORE.hasIdentity && STORE.hasDb && await STORE.socialAvailable());
   if (!sc.hidden) { const box = $('profSocial'); box.innerHTML = ''; try { const f = await STORE.followInfo(me.id, true), pubs = await publishedBy(me.id); let likes = 0; try { const sc2 = await STORE.socialCounts(pubs.slice(0, 50).map(s => s.id)); for (const k in sc2) likes += sc2[k].likes || 0; } catch (e) {} for (const [k, v] of [[t('Followers'), f.followers], [t('Following'), f.following], [t('Published'), pubs.length], [t('Likes'), likes]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${v}</div>`; box.appendChild(d); } } catch (e) {} $('profSocialHint').textContent = t('Your public page: other drivers see your published sessions, follow you and discuss your laps.'); const a = el('a', 'btn sm', t('Open my public page')); a.href = '#driver~' + me.id; a.style.marginTop = '8px'; $('profSocialHint').appendChild(document.createElement('br')); $('profSocialHint').appendChild(a); }
   await renderMySessionsTable($('profSessions'), { hint: $('profSessHint'), sub: $('profSessSub') });
+  try { renderProgress($('profProgress'), await STORE.mySessions(), { max: 3 }); } catch (e) { $('profProgress').hidden = true; }   // the progress charts: the three layouts with the most sessions
 }
 // ---------- my sessions: one table for the profile and the Lab start screen ----------
 async function renderMySessionsTable(box, opts) {

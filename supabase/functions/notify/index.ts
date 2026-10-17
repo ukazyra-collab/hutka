@@ -4,10 +4,12 @@
 //      iOS goes straight to APNs (HTTP/2, a JWT signed with the .p8 key), Android through FCM HTTP v1 (a service account).
 //      Not configured → the lane is skipped, nothing breaks. A row delivered as a push is marked sent, so no e-mail follows it.
 //   2. e-mails through Resend for the rest: rows older than two minutes grouped per driver, one e-mail per hour per driver at most.
+//   3. the weekly digest (weekly.ts, weekly_digests): Monday–Tuesday, one push or e-mail per driver who drove last week.
 // Deploy as `notify` with "Verify JWT" OFF (the token is checked here; a NOTIFY_SECRET header works too, for a cron).
 // Secrets: RESEND_API_KEY (e-mails); APNS_KEY (the .p8 contents), APNS_KEY_ID, APNS_TEAM_ID, optional APNS_TOPIC (ai.hutka.app);
 // FCM_SERVICE_ACCOUNT (the Firebase service-account JSON); optional NOTIFY_FROM ("Hutka <no-reply@hutka.ai>"), SITE_URL, NOTIFY_SECRET.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { dueWeek, inWeek, buildDigest, type Sess } from "./weekly.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-notify-secret", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
@@ -78,12 +80,37 @@ async function describe(db: ReturnType<typeof createClient>, list: Row[]) {
   return { nameOf, sessOf, textOf };
 }
 
-// ---------- lane 1: pushes ----------
-async function runPushes(db: ReturnType<typeof createClient>) {
+// ---------- the push transport (the activity lane and the weekly digest) ----------
+type PushCfg = { apnsOn: boolean; fcmOn: boolean; apnsKey: string; apnsKid: string; apnsTid: string; topic: string; sa: { client_email: string; private_key: string; project_id: string } | null };
+function pushConfig(): PushCfg {
   const apnsKey = Deno.env.get("APNS_KEY") || "", apnsKid = Deno.env.get("APNS_KEY_ID") || "", apnsTid = Deno.env.get("APNS_TEAM_ID") || "", topic = Deno.env.get("APNS_TOPIC") || "ai.hutka.app";
-  let sa: { client_email: string; private_key: string; project_id: string } | null = null;
+  let sa: PushCfg["sa"] = null;
   try { const raw = Deno.env.get("FCM_SERVICE_ACCOUNT") || ""; if (raw) sa = JSON.parse(raw); } catch (e) { console.error("FCM_SERVICE_ACCOUNT is not JSON"); }
-  const apnsOn = !!(apnsKey && apnsKid && apnsTid), fcmOn = !!(sa && sa.client_email && sa.private_key && sa.project_id);
+  return { apnsOn: !!(apnsKey && apnsKid && apnsTid), fcmOn: !!(sa && sa.client_email && sa.private_key && sa.project_id), apnsKey, apnsKid, apnsTid, topic, sa };
+}
+// one message to every phone of a driver; dead tokens are dropped, failing ones counted
+async function pushTo(db: ReturnType<typeof createClient>, cfg: PushCfg, owner: string, title: string, body: string, url: string, badge: number) {
+  const out = { ok: false, sent: 0, dropped: 0, config: false, tokens: 0 };
+  const { data: tokens } = await db.from("push_tokens").select("token, platform, failed").eq("user_id", owner); if (!tokens || !tokens.length) return out;
+  out.tokens = tokens.length;
+  const aps = { aps: { alert: { title, body }, badge, sound: "default", "thread-id": "hutka" }, url };
+  for (const tk of tokens) {
+    let res: "ok" | "bad" | "fail" | "config" = "fail";
+    try {
+      if (tk.platform === "ios") { if (!cfg.apnsOn) continue; res = await apnsSend(tk.token, aps, await apnsAuth(cfg.apnsKey, cfg.apnsKid, cfg.apnsTid), cfg.topic); }
+      else { if (!cfg.fcmOn) continue; const auth = await fcmAuth(cfg.sa!); res = auth ? await fcmSend(tk.token, cfg.sa!.project_id, auth, title, body, url, badge) : "config"; }
+    } catch (e) { console.error("push", tk.platform, String(e && (e as Error).message || e)); res = "fail"; }
+    if (res === "ok") { out.ok = true; out.sent++; if (tk.failed) await db.from("push_tokens").update({ failed: 0, seen_at: new Date().toISOString() }).eq("token", tk.token); }
+    else if (res === "bad" || (res === "fail" && (tk.failed || 0) >= 9)) { out.dropped++; await db.from("push_tokens").delete().eq("token", tk.token); }
+    else if (res === "fail") await db.from("push_tokens").update({ failed: (tk.failed || 0) + 1 }).eq("token", tk.token);
+    else out.config = true;
+  }
+  return out;
+}
+
+// ---------- lane 1: pushes ----------
+async function runPushes(db: ReturnType<typeof createClient>, cfg: PushCfg) {
+  const { apnsOn, fcmOn } = cfg;
   if (!apnsOn && !fcmOn) return { configured: false, sent: 0 };
   // pending rows at least 10 s old (a burst of likes becomes one push); anything older than a day is too late for a push
   const { data: rows, error } = await db.from("notify_queue").select("id, owner, actor, kind, session_id, comment_id, created_at").is("pushed_at", null).lt("created_at", new Date(Date.now() - 10000).toISOString()).order("created_at", { ascending: true }).limit(500);
@@ -97,7 +124,6 @@ async function runPushes(db: ReturnType<typeof createClient>) {
     if (!claimed || !claimed.length) continue;
     const fresh = list.filter((r) => Date.now() - new Date(r.created_at).getTime() < 86400000); if (!fresh.length) continue;
     const { data: prof } = await db.from("profiles").select("push").eq("id", owner).maybeSingle(); if (prof && prof.push === false) continue;
-    const { data: tokens } = await db.from("push_tokens").select("token, platform, failed").eq("user_id", owner); if (!tokens || !tokens.length) continue;
     const { count: unread } = await db.from("notify_queue").select("id", { count: "exact", head: true }).eq("owner", owner).is("seen_at", null);
     const badge = Math.max(1, unread || 0);
     // the text: one person, one session → specific; otherwise a summary
@@ -109,20 +135,9 @@ async function runPushes(db: ReturnType<typeof createClient>) {
     else if (!comments.length && sids.length === 1) { const who = [...new Set(likes.map((r) => nameOf(r.actor)))]; title = who.length === 1 ? `${who[0]} liked your session` : who.length === 2 ? `${who[0]} and ${who[1]} liked your session` : `${who[0]} and ${who.length - 1} others liked your session`; body = `${sessTitle}${s0.track ? " — " + s0.track : ""}`; }
     else { title = "Activity on Hutka"; const bits = []; if (likes.length) bits.push(`${likes.length} ${likes.length === 1 ? "like" : "likes"}`); if (comments.length) bits.push(`${comments.length} ${comments.length === 1 ? "comment" : "comments"}`); body = `${bits.join(", ")} on ${sids.length === 1 ? sessTitle : "your sessions"}`; }
     const url = sids.length === 1 ? `#lab~${sids[0]}~discuss` : "#activity";
-    const aps = { aps: { alert: { title, body }, badge, sound: "default", "thread-id": "hutka" }, url };
-    let okAny = false;
-    for (const tk of tokens) {
-      let res: "ok" | "bad" | "fail" | "config" = "fail";
-      try {
-        if (tk.platform === "ios") { if (!apnsOn) continue; res = await apnsSend(tk.token, aps, await apnsAuth(apnsKey, apnsKid, apnsTid), topic); }
-        else { if (!fcmOn) continue; const auth = await fcmAuth(sa!); res = auth ? await fcmSend(tk.token, sa!.project_id, auth, title, body, url, badge) : "config"; }
-      } catch (e) { console.error("push", tk.platform, String(e && (e as Error).message || e)); res = "fail"; }
-      if (res === "ok") { okAny = true; sent++; if (tk.failed) await db.from("push_tokens").update({ failed: 0, seen_at: new Date().toISOString() }).eq("token", tk.token); }
-      else if (res === "bad" || (res === "fail" && (tk.failed || 0) >= 9)) { dropped++; await db.from("push_tokens").delete().eq("token", tk.token); }
-      else if (res === "fail") await db.from("push_tokens").update({ failed: (tk.failed || 0) + 1 }).eq("token", tk.token);
-      else config = true;
-    }
-    if (okAny) await db.from("notify_queue").update({ sent_at: new Date().toISOString() }).in("id", ids).is("sent_at", null);   // delivered to a phone: no e-mail for the same thing
+    const r = await pushTo(db, cfg, owner, title, body, url, badge); if (!r.tokens) continue;
+    sent += r.sent; dropped += r.dropped; if (r.config) config = true;
+    if (r.ok) await db.from("notify_queue").update({ sent_at: new Date().toISOString() }).in("id", ids).is("sent_at", null);   // delivered to a phone: no e-mail for the same thing
   }
   return { configured: true, sent, dropped, config };
 }
@@ -167,6 +182,53 @@ async function runEmails(db: ReturnType<typeof createClient>, site: string, from
   return { sent, skipped };
 }
 
+// ---------- lane 3: the weekly digest ----------
+// From Monday 03:00 UTC (07:00 in Dubai) through Tuesday, every driver who drove in the past Monday–Sunday gets one message about that
+// week — a push when a phone is registered, otherwise an e-mail: the sessions with their best laps, personal bests, the corners with
+// the most to gain (from the feed cards), what the drivers they follow published. weekly_digests remembers who got which week, so a
+// run never repeats; a driver without sessions that week gets nothing. The texts are built in weekly.ts.
+async function runWeekly(db: ReturnType<typeof createClient>, cfg: PushCfg, site: string, from: string, resend: string) {
+  const due = dueWeek(new Date()); if (!due) return { due: false };
+  const { data: recent, error } = await db.from("sessions").select("id, owner, track_id, layout_id, published, best_ms, meta, created_at").gte("created_at", new Date(due.end.getTime() - 35 * 86400000).toISOString()).limit(3000);
+  if (error) return { due: true, error: error.message };
+  const week = ((recent || []) as Sess[]).filter((s) => s.meta && inWeek(s.meta, due));
+  if (!week.length) return { due: true, week: due.key, drivers: 0 };
+  const owners = [...new Set(week.map((s) => s.owner))];
+  const { data: done } = await db.from("weekly_digests").select("user_id").eq("week", due.key).in("user_id", owners);
+  const doneSet = new Set((done || []).map((r: any) => r.user_id)), todo = owners.filter((o) => !doneSet.has(o));
+  if (!todo.length) return { due: true, week: due.key, drivers: owners.length, sent: 0 };
+  const tids = [...new Set(week.map((s) => s.track_id).filter(Boolean))] as string[];
+  const [{ data: tracks }, { data: layouts }] = await Promise.all([tids.length ? db.from("tracks").select("id, data").in("id", tids) : Promise.resolve({ data: [] as any[] }), tids.length ? db.from("layouts").select("track_id, id, data").in("track_id", tids) : Promise.resolve({ data: [] as any[] })]);
+  const trackName = (id: string | null) => { const t = (tracks || []).find((x: any) => x.id === id); return t && t.data && t.data.name || ""; };
+  const layoutName = (tid: string | null, lid: string | null) => { const l = (layouts || []).find((x: any) => x.track_id === tid && x.id === lid); return l && l.data && l.data.name || ""; };
+  let sent = 0, mailed = 0, pushed = 0;
+  for (const owner of todo.slice(0, 60)) {   // a big week is finished by the next run
+    try {
+      const mine = week.filter((s) => s.owner === owner);
+      const { data: earlierRows } = await db.from("sessions").select("id, owner, track_id, layout_id, published, best_ms, meta, created_at").eq("owner", owner).lt("created_at", due.start.toISOString()).limit(1000);
+      const earlier = ((earlierRows || []) as Sess[]).filter((s) => !inWeek(s.meta || {}, due) && String((s.meta || {}).date || "") < due.start.toISOString().slice(0, 10));
+      const { data: fol } = await db.from("follows").select("followee").eq("follower", owner).limit(500);
+      const ids = new Set((fol || []).map((f: any) => f.followee));
+      const theirs = week.filter((s) => s.published && ids.has(s.owner) && s.owner !== owner);
+      let followed: { s: Sess; who: string }[] = [];
+      if (theirs.length) { const { nameOf } = await describe(db, theirs.map((s) => ({ id: 0, owner, actor: s.owner, kind: "x", session_id: null, comment_id: null, created_at: "" }))); followed = theirs.map((s) => ({ s, who: nameOf(s.owner) })).sort((a, b) => (+(a.s.best_ms || 0)) - (+(b.s.best_ms || 0))); }
+      const d = buildDigest(owner, mine, earlier, followed, trackName, site, layoutName); if (!d) continue;
+      const { data: prof } = await db.from("profiles").select("push, notify").eq("id", owner).maybeSingle();
+      // claim the week first, so two runs at once cannot send twice
+      const { error: claimErr } = await db.from("weekly_digests").insert({ user_id: owner, week: due.key, channel: "" }); if (claimErr) continue;
+      let channel = "";
+      if ((cfg.apnsOn || cfg.fcmOn) && !(prof && prof.push === false)) { const r = await pushTo(db, cfg, owner, d.title, d.body, d.url, 1); if (r.ok) { channel = "push"; pushed++; } }
+      if (!channel && resend && !(prof && prof.notify === false)) {
+        const { data: u } = await db.auth.admin.getUserById(owner); const email = u && u.user ? u.user.email : "";
+        if (email) { const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${resend}`, "Content-Type": "application/json" }, body: JSON.stringify({ from, to: [email], subject: d.subject, html: d.html, text: d.text }) }); if (r.ok) { channel = "email"; mailed++; } else console.error("resend weekly", r.status, (await r.text().catch(() => "")).slice(0, 200)); }
+      }
+      await db.from("weekly_digests").update({ channel: channel || "none" }).eq("user_id", owner).eq("week", due.key);
+      if (channel) sent++;
+    } catch (e) { console.error("weekly", owner, String(e && (e as Error).message || e)); }
+  }
+  return { due: true, week: due.key, drivers: owners.length, sent, pushed, mailed };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "method" }, 405);
@@ -180,8 +242,11 @@ Deno.serve(async (req) => {
   if (!allowed) return json({ error: "sign_in" }, 401);
   const site = (Deno.env.get("SITE_URL") || "https://hutka.ai").replace(/\/$/, ""), from = Deno.env.get("NOTIFY_FROM") || "Hutka <no-reply@hutka.ai>";
   const db = createClient(url, serviceKey);
+  const cfg = pushConfig();
   let push: unknown = { configured: false, sent: 0 };
-  try { push = await runPushes(db); } catch (e) { console.error("push lane", String(e && (e as Error).message || e)); push = { error: String(e && (e as Error).message || e) }; }
+  try { push = await runPushes(db, cfg); } catch (e) { console.error("push lane", String(e && (e as Error).message || e)); push = { error: String(e && (e as Error).message || e) }; }
   const mail = resend ? await runEmails(db, site, from, resend) : { sent: 0, error: "RESEND_API_KEY" };
-  return json({ sent: mail.sent, skipped: (mail as any).skipped || 0, push });
+  let weekly: unknown = { due: false };
+  try { weekly = await runWeekly(db, cfg, site, from, resend); } catch (e) { console.error("weekly lane", String(e && (e as Error).message || e)); weekly = { error: String(e && (e as Error).message || e) }; }
+  return json({ sent: mail.sent, skipped: (mail as any).skipped || 0, push, weekly });
 });
