@@ -1633,7 +1633,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <div class="hint warn" id="devExNone" hidden data-t="The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.">The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.</div>
     <pre class="dev-log" id="devLog"></pre>
     <div class="hint" style="text-align:right"><span id="devLogN">0</span> <span data-t="lines">lines</span></div>
-    <div class="row" id="devPinRow" hidden style="gap:6px;flex-wrap:wrap;margin-top:8px"><input type="text" id="devPin" inputmode="numeric" maxlength="8" placeholder="PIN" style="width:110px;font-family:var(--mono)"><button class="btn xs primary" id="devPinTry" type="button" data-t="Try the PIN">Try the PIN</button><span class="hint" style="flex:1 1 200px" data-t="A code on the device's screen? Hutka sends it the common ways and listens for an answer.">A code on the device's screen? Hutka sends it the common ways and listens for an answer.</span></div>
+    <div class="row" id="devPinRow" hidden style="gap:6px;flex-wrap:wrap;margin-top:8px"><input type="text" id="devPin" inputmode="numeric" maxlength="8" placeholder="PIN" style="width:110px;font-family:var(--mono)"><button class="btn xs primary" id="devPinTry" type="button" data-t="Try the PIN">Try the PIN</button><button class="btn xs primary" id="devAlfHello" type="button" data-t="Alfano handshake">Alfano handshake</button><span class="hint" style="flex:1 1 200px" data-t="A code on the device's screen? Hutka sends it the common ways and listens for an answer.">A code on the device's screen? Hutka sends it the common ways and listens for an answer.</span></div>
     <div id="devConsole" hidden><div class="row" style="gap:6px;flex-wrap:wrap"><select id="devChr" style="flex:1 1 180px"></select><input type="text" id="devHex" placeholder="b5 62 ff 22 00 00   or   &quot;HELLO\r\n&quot;" style="flex:2 1 220px;font-family:var(--mono)"><button class="btn xs" id="devExSend" type="button" data-t="Send">Send</button><button class="btn xs ghost" id="devExSendNr" type="button" data-t="no response" title="write without response">no response</button></div><div class="hint" id="devExSent"></div></div>
     <div class="row" style="justify-content:space-between;margin-top:10px"><button class="btn ghost" id="devExDisc" type="button" data-t="Disconnect">Disconnect</button><button class="btn primary" id="devSendLog" type="button" data-t="Send the log to Hutka">Send the log to Hutka</button></div>
   </div>
@@ -2869,6 +2869,15 @@ const LOGGERS = (() => {
         let k = 0; for (const [how, bytes] of tries) { line('info', o.svc, o.chr, null, 'PIN as ' + how); await ex.send(o.svc, o.chr, bytes, o.noRsp); k++; if (onStep) onStep(k, tries.length, how); await sleep(700); }
         return k;
       };
+      // the Alfano 7 handshake over the serial pipe (PROTOCOL.md): a 258-byte frame — opcode, arguments, zero padding to byte 256, XOR checksum;
+      // PASSWORD 0x2D "000000" expects one byte 0xFF back, STATUS 0x36 expects 16 bytes. The frame goes out in 20-byte pieces (what any link takes)
+      ex.alfanoFrame = (op, args) => { const body = new Uint8Array(257); body[0] = op; body.set(args || [], 1); let x = 0; for (const b of body) x ^= b; const f = new Uint8Array(258); f.set(body); f[257] = x; return f; };
+      ex.alfanoHello = async (onStep) => {
+        const o = ex.dataIn(); if (!o) throw err('nowrite');
+        const steps = [['PASSWORD 0x2D "000000" → expect FF', ex.alfanoFrame(0x2d, [0x30, 0x30, 0x30, 0x30, 0x30, 0x30])], ['STATUS 0x36 → expect 16 bytes', ex.alfanoFrame(0x36, [0x07, 0x01, 0x00, 0x00, 0x00, 0x50, 0x09, 0x00])]];
+        let k = 0; for (const [how, frame] of steps) { line('info', o.svc, o.chr, null, how + ' (258 bytes in 20-byte pieces)'); const before = log.length; for (let i = 0; i < frame.length; i += 20) { const piece = frame.slice(i, i + 20); await ble.writeNoRsp(H, o.svc, o.chr, piece); await sleep(12); } line('out', o.svc, o.chr, frame, ''); k++; if (onStep) onStep(k, steps.length, how); await sleep(2500); const got = log.slice(before).filter(e => e.dir === 'in'); line('info', '', '', null, got.length ? `answer: ${got.map(e => e.hex).join(' | ')}` : 'no answer in 2.5 s'); }
+        return k;
+      };
       ex.report = () => ({ device: H.name, id: H.id, platform: ble.kind(), at: new Date().toISOString(), services: ex.services, log: log.slice() });
       ex.close = async () => { await ble.disconnect(H); };
       return ex;
@@ -3827,6 +3836,7 @@ Object.assign(I18N.RU, { 'Another device': 'Другой прибор' });
 Object.assign(I18N.RU, { "The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.": 'Браузер не смог открыть ни одного сервиса этого прибора — Chrome достаёт только до сервисов, которые знает заранее, а у этого прибора свои. Приложение Hutka на телефоне видит всё: для этого прибора используй его.' });
 Object.assign(I18N.RU, { 'Try the PIN': 'Попробовать PIN', "A code on the device's screen? Hutka sends it the common ways and listens for an answer.": 'На экране прибора код? Hutka отправит его всеми обычными способами и послушает ответ.', 'PIN {k}/{n}: {how}': 'PIN {k}/{n}: {how}', 'PIN tried {n} ways — see what came back above, then send the log.': 'PIN отправлен {n} способами — смотри ответы выше и отправь лог.' });
 Object.assign(I18N.RU, { 'This version of the app has no Bluetooth yet — update the Hutka app.': 'В этой версии приложения ещё нет Bluetooth — обнови приложение Hutka.' });
+Object.assign(I18N.RU, { 'Alfano handshake': 'Рукопожатие Alfano', 'Handshake sent — see the answers above, then send the log.': 'Рукопожатие отправлено — смотри ответы выше и отправь лог.' });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -7301,6 +7311,7 @@ const DEVICE = (() => {
   $('devRescan').onclick = () => startScan(); $('devScanMore').onclick = () => { showAll = !showAll; renderScan(); }; $('devScanBack').onclick = async () => { await stopScan(); open(); };
   $('devExSend').onclick = () => sendCmd(false); $('devExSendNr').onclick = () => sendCmd(true); $('devHex').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendCmd(false); });
   $('devPinTry').onclick = async () => { if (!ex || !ex.live) return; const pin = $('devPin').value.trim(); if (!pin) return; $('devPinTry').disabled = true; try { await ex.tryPin(pin, (k, n, how) => { $('devExSent').textContent = t('PIN {k}/{n}: {how}', { k, n, how }); renderLog(); }); $('devExSent').textContent = t('PIN tried {n} ways — see what came back above, then send the log.', { n: 6 }); } catch (e) { $('devExSent').textContent = t('write failed: {e}', { e: e && e.message || e }); } $('devPinTry').disabled = false; renderLog(); };
+  $('devAlfHello').onclick = async () => { if (!ex || !ex.live) return; $('devAlfHello').disabled = true; try { await ex.alfanoHello((k, n, how) => { $('devExSent').textContent = `${k}/${n}: ${how}`; renderLog(); }); $('devExSent').textContent = t('Handshake sent — see the answers above, then send the log.'); } catch (e) { $('devExSent').textContent = t('write failed: {e}', { e: e && e.message || e }); } $('devAlfHello').disabled = false; renderLog(); };
   $('devSendLog').onclick = sendLog; $('devExDisc').onclick = disconnect; $('devStageBack').onclick = async () => { if (busy && dev && dev.cancel) { try { await dev.cancel(); } catch (e) {} } busy = false; await drop(); open(); };
   $('devModal').addEventListener('click', (e) => { if (e.target === $('devModal')) close(); });
   $('uplFromDevice').onclick = () => { UPLOAD.close(); open(); };
