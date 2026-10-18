@@ -537,6 +537,47 @@ body.onboarding #toast{z-index:90}
 .big-btn.over,.upl-box.over #uplDrop{border-color:var(--accent);border-style:dashed;background:var(--accent-soft)}
 .btn.ghost.upl-help{align-self:center;height:44px;padding:0 14px;color:var(--muted);font-weight:600}
 .btn.ghost.upl-help:hover{color:var(--fg)}
+/* the upload at work: one line with a spinner (reading → the track → the layout → saving) */
+.upl-work{display:flex;align-items:center;gap:12px;padding:18px 4px;font-size:15px;font-weight:600}
+.spin{flex:none;width:22px;height:22px;border-radius:50%;border:2.5px solid var(--line-2);border-top-color:var(--accent);animation:spin .8s linear infinite}
+/* the finishing touches of a fresh upload (a private draft): compact — one row of tiles, one row of chips, the place inline, two buttons */
+.card.finish{border:1.5px solid color-mix(in srgb,var(--accent) 45%,var(--line));display:flex;flex-direction:column;gap:12px;padding-top:14px;padding-bottom:12px}
+.fin-head{display:flex;flex-direction:column;gap:2px}
+.fin-head b{font-size:17px;font-weight:700}
+.fin-head .hint{font-size:13px}
+.fin-sec{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fin-sec[hidden]{display:none}
+.fin-lbl{font-size:12.5px;font-weight:700;color:var(--fg);line-height:1.35}
+.fin-lbl .hint{font-weight:500;font-size:12px}
+.fin-lay-now{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;font-size:14.5px}
+.fin-lay-now[hidden]{display:none}
+.fin-lay-now b{font-weight:700}
+.fin-lay-now .ok{color:var(--ok);font-weight:600;font-size:12.5px}
+.fin-lay-now .btn{height:34px}
+.lay-pick{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.lay-pick[hidden]{display:none}
+.lay-tile{flex:none;scroll-snap-align:start;width:98px;display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:6px 6px 7px;border:1.5px solid var(--line-2);border-radius:13px;background:var(--surface);color:var(--fg);font:inherit;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
+.lay-tile:hover{border-color:var(--accent)}
+.lay-tile.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent) inset}
+.lay-tile svg{width:100%;height:58px;display:block}
+.lay-tile svg path{fill:none;stroke:var(--fg);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.lay-tile svg circle{fill:var(--accent)}
+.lay-tile .lt-none{height:58px;display:grid;place-items:center;color:var(--faint);font-size:11px;line-height:1.25;border-radius:8px;background:var(--surface-2);padding:0 4px}
+.lay-tile .lt-name{font-size:12px;font-weight:600;line-height:1.2;overflow-wrap:anywhere}
+.lay-tile .lt-tag{position:absolute;top:4px;right:4px;font-size:9.5px;font-weight:700;padding:2px 5px;border-radius:999px;background:var(--ok);color:#fff}
+.lay-tile .lt-tag.guess{background:var(--warn)}
+.fin-chips{display:flex;gap:6px;overflow-x:auto;padding:1px 1px 3px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.fin-chips::-webkit-scrollbar{display:none}
+.fin-chips .btn{flex:none;height:36px;border-radius:999px;padding:0 13px;font-size:13.5px;font-weight:600}
+.fin-chips .btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.fin-res{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:14.5px}
+.fin-res input{width:62px;height:40px;font-size:16px;text-align:center;padding:0 4px}
+.fin-acts{display:flex;gap:8px;align-items:center}
+.fin-acts .btn.cta{flex:1 1 auto;width:auto;height:50px}
+.fin-acts .btn.ghost{flex:none;height:50px;padding:0 12px;color:var(--muted);font-weight:600;white-space:normal;line-height:1.2;max-width:42%}
+.fin-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:8px}
+.fin-foot .hint{font-size:12.5px}
+.fin-foot .btn{height:34px;padding:0 8px}
 /* the one action of a sheet: full width, tall, in the accent colour */
 .btn.cta{width:100%;height:56px;border-radius:15px;font-size:16.5px;font-weight:700;background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px color-mix(in srgb,var(--accent) 80%,transparent)}
 .btn.cta:hover{background:var(--accent);filter:brightness(1.06)}
@@ -1463,6 +1504,26 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       </div>
       <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
       <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close">×</button></div>
+      <!-- a session just uploaded (a private draft): the layout when it was not recognised for sure, the session type and the result
+           (for the feed), publish or keep private — everything else is already filled in -->
+      <div class="card finish" id="finishCard" hidden>
+        <div class="fin-head"><b data-t="Finishing touches">Finishing touches</b><span class="hint" id="finSub"></span></div>
+        <div class="fin-sec" id="finLaySec">
+          <div class="fin-lbl" id="finLayLbl"></div>
+          <div class="fin-lay-now" id="finLayNow" hidden></div>
+          <div class="lay-pick" id="finLays"></div>
+        </div>
+        <div class="fin-sec">
+          <div class="fin-lbl"><span data-t="Session type">Session type</span> <span class="hint" data-t="(optional)">(optional)</span></div>
+          <div class="fin-chips" id="finFormat"></div>
+        </div>
+        <div class="fin-sec">
+          <div class="fin-lbl"><span data-t="Your place">Your place</span> <span class="hint" data-t="(optional)">(optional)</span></div>
+          <div class="fin-res"><b>P</b><input type="number" id="finPos" min="1" max="500" inputmode="numeric" aria-label="Place"><span data-t="of">of</span><input type="number" id="finDrivers" min="1" max="500" inputmode="numeric" aria-label="Drivers"><span data-t="drivers">drivers</span></div>
+        </div>
+        <div class="fin-acts"><button class="btn cta" id="finPublish" type="button"></button><button class="btn ghost" id="finPrivate" type="button" data-t="Keep it private">Keep it private</button></div>
+        <div class="fin-foot"><span class="hint" id="finKart"></span><button class="btn ghost sm" id="finMore" type="button" data-t="Change kart, name, notes">Change kart, name, notes</button></div>
+      </div>
       <div id="pickSentinel" style="height:1px;margin:-1px 0 0" hidden></div>
       <div class="card" id="pickbar" hidden>
         <button class="insp-close mobile-only" id="pickClose" type="button" aria-label="Close">×</button>
@@ -1715,24 +1776,9 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       <a class="btn ghost upl-help" href="#help" id="uplHelpLink"><svg><use href="#i-help"/></svg><span data-t="How to get the file out of an Alfano">How to get the file out of an Alfano</span></a>
     </div>
     <div class="status" id="uplStatus"></div>
-    <div id="uplForm" hidden>
-      <div class="form">
-        <div class="field wide"><label data-t="Session name">Session name</label><input type="text" id="uplName" placeholder="Pasha, Al Forsan, stint 1"></div>
-        <div class="field"><label data-t="Track">Track</label><select id="uplTrack"></select></div>
-        <div class="field"><label data-t="Layout — pick the one you drove">Layout — pick the one you drove</label><select id="uplLayout"></select></div>
-        <div class="field wide" id="uplNewTrack" hidden><div class="newtrack"><div class="hint" id="uplNewHint"></div><div class="form" style="margin-top:8px"><div class="field"><label data-t="Track name">Track name</label><input type="text" id="uplNewName" placeholder="Dubai Kartdrome"></div><div class="field"><label data-t="City">City</label><input type="text" id="uplNewCity"></div><div class="field"><label data-t="Country">Country</label><select id="uplNewCountry"></select></div></div></div></div>
-        <div class="field"><label data-t="Kart">Kart</label><select id="uplKart"></select></div>
-        <div class="field" id="uplKartOtherField" hidden><label data-t="Kart model">Kart model</label><input type="text" id="uplKartOther" maxlength="40" list="rentalModels" placeholder="Sodi RT8, Rotax Max, X30…"></div>
-        <div class="field"><label data-t="Session type (optional)">Session type (optional)</label><select id="uplFormat"></select></div>
-        <div class="field"><label data-t="Result (optional)">Result (optional)</label><div class="row" style="flex-wrap:nowrap;gap:8px;align-items:center"><input type="number" id="uplPos" min="1" max="500" placeholder="P" style="width:76px"><span class="hint" data-t="of">of</span><input type="number" id="uplDrivers" min="1" max="500" placeholder="drivers" style="width:96px"><span class="hint" data-t="drivers">drivers</span></div></div>
-        <div class="field wide" id="uplLayoutPhotoField" hidden><img id="uplLayoutPhoto" alt="" style="max-width:100%;max-height:220px;border-radius:10px;display:block"></div>
-        <div class="field"><label data-t="Notes">Notes</label><input type="text" id="uplNote" placeholder="#14, wet, new tyres"></div>
-        <div class="field" id="uplPubField"><label data-t="Visibility">Visibility</label><label class="row" style="min-height:40px;cursor:pointer;align-items:flex-start;flex-wrap:nowrap;gap:8px;line-height:1.35;padding-top:4px"><input type="checkbox" id="uplPublish" checked style="width:18px;height:18px;flex:none"><span data-t="Publish on the track page (others can compare with it)">Publish on the track page (others can compare with it)</span></label></div>
-      </div>
-      <div class="hint" id="uplDetect" style="margin-top:8px"></div>
+    <!-- the work in progress: reading, the track, the layout, saving — then the Lab opens with the session -->
+    <div class="upl-work" id="uplWork" hidden><span class="spin" aria-hidden="true"></span><span id="uplWorkTx"></span></div>
     </div>
-    </div>
-    <div class="sheet-foot" id="uplFoot" hidden><button class="btn cta" id="uplGo" type="button" data-t="Save and open in the Lab">Save and open in the Lab</button></div>
   </div>
 </div>
 <!-- the device window: a lap timer over Bluetooth -->
@@ -4657,6 +4703,42 @@ Object.assign(I18N.RU, {
   '{n} outing(s) on the device: {k} new, {m} already in Hutka.': 'Заездов на приборе: {n} — новых {k}, уже в Hutka {m}.',
   'Upload {n} new session|Upload {n} new sessions': 'Загрузить {n} новую сессию|Загрузить {n} новые сессии|Загрузить {n} новых сессий',
   'Everything is already in Hutka': 'Всё уже в Hutka' });
+
+// v34.25 — a fresh upload is a private draft at once; the finishing touches in the Lab; the layout recognised by the shape of the laps (Pasha's 7, 8, 11a)
+Object.assign(I18N.RU, {
+  'Finding the track…': 'Ищу трассу…',
+  'Recognising the layout…': 'Узнаю конфигурацию…',
+  'Saving {k} of {n}…': 'Сохраняю {k} из {n}…',
+  'These sessions are already in Hutka — the newest is open.': 'Эти сессии уже в Hutka — открыл самую новую.',
+  'This session is already in Hutka — it is open.': 'Эта сессия уже в Hutka — открыл её.',
+  '{n} session was already in Hutka — not uploaded again.|{n} sessions were already in Hutka — not uploaded again.': '{n} сессия уже была в Hutka — повторно не загружена.|{n} сессии уже были в Hutka — повторно не загружены.|{n} сессий уже были в Hutka — повторно не загружены.',
+  'Finishing touches': 'Последние штрихи',
+  'Session type': 'Тип заезда',
+  '(optional)': '(необязательно)',
+  'Your place': 'Твоё место',
+  'Keep it private': 'Оставить только для себя',
+  'Change kart, name, notes': 'Карт, название, заметки',
+  '{n} sessions from this upload are saved — private for now. A few taps and they are ready to share.': 'Сессий из этой загрузки: {n}. Сохранены — пока видишь только ты. Пара касаний — и можно делиться.',
+  'Saved — private for now. A few taps and it is ready to share.': 'Сохранено — пока видишь только ты. Пара касаний — и можно делиться.',
+  'Publish {n} sessions': 'Опубликовать все ({n})',
+  'Kart: {k}': 'Карт: {k}',
+  'rental, model unknown': 'прокатный, модель неизвестна',
+  'your pick': 'твой выбор',
+  'recognised by the shape of your laps': 'узнана по форме твоих кругов',
+  'Change': 'Изменить',
+  'Which layout? Hutka could not tell — pick it by its shape.': 'Какая конфигурация? Hutka не смогла понять — выбери по форме.',
+  'Which layout? The marked one looks most likely — tap the right one.': 'Какая конфигурация? Отмеченная — самая вероятная; нажми правильную.',
+  'likely': 'вероятно',
+  'this one': 'эта',
+  'no line yet': 'линии пока нет',
+  'Not in the list': 'Нет в списке',
+  'Published — {n} sessions are on the track page.': 'Опубликовано — сессии на странице трассы ({n}).',
+  'Kept private — only you see it. Publish it any time with the button at the top of the Lab.': 'Оставлено только для тебя. Опубликовать можно в любой момент кнопкой вверху Лаборатории.' });
+Object.assign(I18N.RU, {
+  'Every session in the lap timer’s memory: date, track, laps, best lap. The ones already in Hutka are grey; the new ones from the last day on the lap timer are ticked already. Tap the blue “Upload … sessions” at the bottom.': 'Все сессии из памяти прибора: дата, трасса, круги, лучший круг. Уже загруженные в Hutka — серые; новые с последнего дня на приборе уже отмечены. Нажми синюю «Загрузить … сессии» внизу.',
+  'A 45-lap session takes about five minutes over Bluetooth: a big bar shows the percent, the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. When it is done, the session opens in the Lab by itself — saved, private for now. The “Finishing touches” card on top asks the layout if Hutka is not sure, the session type and your place; Publish shares it on the track page.': 'Сессия на 45 кругов читается по Bluetooth минут пять: большая полоса показывает процент, какой круг читается и сколько осталось. На телефоне держи Hutka на экране (внутри Hutka ходить можно — плашка внизу показывает прогресс), в браузере не закрывай вкладку. Когда всё прочитано, сессия сама откроется в Лаборатории — сохранённая, пока только для тебя. Карточка «Последние штрихи» сверху спросит конфигурацию, если Hutka не уверена, тип заезда и твоё место; «Опубликовать» — и она на странице трассы.',
+  'Finishing touches, Publish': 'Последние штрихи, «Опубликовать»',
+  'The session opens in the Lab at once: the track found by GPS, the layout recognised by the shape of your laps, the kart most people drive there — private for now. The “Finishing touches” card asks the layout if Hutka is not sure, the session type and your place. Publish lets other drivers compare with you; “Keep it private” keeps it yours.': 'Сессия сразу откроется в Лаборатории: трасса найдена по GPS, конфигурация узнана по форме твоих кругов, карт — самый частый на этой трассе; пока она только для тебя. Карточка «Последние штрихи» спросит конфигурацию, если Hutka не уверена, тип заезда и твоё место. «Опубликовать» — другие смогут сравниваться с тобой; «Оставить только для себя» — сессия останется твоей.' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -5048,7 +5130,9 @@ const STORE = (() => {
   function sessionMeta(sess) {
     const clean = sess.laps.filter(L => L.clean), best = sess.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a), avg = clean.length ? clean.reduce((s, L) => s + L.timeMs, 0) / clean.length : best.timeMs;
     let la = 0, lo = 0, n = 0; for (const L of clean.length ? clean : sess.laps) for (let i = 0; i < L.pts.length; i += 5) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
-    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', kart: sess.kart || '', kartClass: sess.kartClass || (sess.kart ? 'rental' : ''), kartCat: sess.kartCat || '', format: sess.format || '', pos: +sess.pos || 0, drivers: +sess.drivers || 0, nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, ch: channelsMeta(sess), createdAt: sess.createdAt || Date.now(), updatedAt: Date.now() };
+    return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', kart: sess.kart || '', kartClass: sess.kartClass || (sess.kart ? 'rental' : ''), kartCat: sess.kartCat || '', format: sess.format || '', pos: +sess.pos || 0, drivers: +sess.drivers || 0, nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, ch: channelsMeta(sess), createdAt: sess.createdAt || Date.now(), updatedAt: Date.now(),
+      // a fresh upload waiting for its finishing touches: the batch it came in with, and how sure Hutka was of the layout
+      ...(sess.draft ? { draft: true, batch: sess.batch || '', detect: sess.detect || null } : {}) };
   }
   // what the logger recorded besides GPS (an Alfano 6 on a sport kart): which channels, the gearbox read out of them, rev and
   // temperature extremes — enough for the feed and the lists without loading the laps
@@ -6155,7 +6239,7 @@ async function renderShell() {
   $('navAdmin').hidden = !canAdm; $('adminSep').hidden = !canAdm; { const lbl = STORE.isAdmin() ? t('Admin Panel') : t('My tracks'); for (const id of ['navAdmin', 'profAdminLink']) { const sp = $(id).querySelector('span'); if (sp) sp.textContent = lbl; } $('pg-admin').querySelector('h1').textContent = lbl; } $('navAI').hidden = !STORE.hasAuth; $('tabAI').hidden = !STORE.hasAuth;
   $('modeNote').textContent = STORE.hasAuth ? (STORE.hasIdentity ? '' : t('Sign in to upload sessions and keep a library across devices. Browsing is open to everyone.')) : (STORE.hasDb ? (STORE.hasIdentity ? (STORE.canWrite() ? '' : t('Read-only access: ask the owner for Contributor access to publish sessions.')) : t('Sign in to claude.ai to publish sessions and keep a library across devices.')) : t('Offline mode: sessions stay in this browser. Open the shared Hutka link signed in to claude.ai to publish and compare with others.'));
   $('langEn').classList.toggle('active', I18N.lang === 'en'); $('langRu').classList.toggle('active', I18N.lang === 'ru'); $('langEnM').classList.toggle('active', I18N.lang === 'en'); $('langRuM').classList.toggle('active', I18N.lang === 'ru'); $('profAdminLink').hidden = !canAdm;
-  $('q').placeholder = t('Search tracks, drivers...'); $('uplName').placeholder = t('Pasha, Al Forsan, stint 1'); $('uplNote').placeholder = t('#14, wet, new tyres'); $('newLayoutName').placeholder = t('New layout name');
+  $('q').placeholder = t('Search tracks, drivers...'); $('newLayoutName').placeholder = t('New layout name');
 }
 $('langEn').onclick = $('langEnM').onclick = () => { I18N.setLang('en'); renderShell(); route(); };
 $('langRu').onclick = $('langRuM').onclick = () => { I18N.setLang('ru'); renderShell(); route(); };
@@ -6384,8 +6468,8 @@ function renderHelpPage() {
   b.appendChild(step(1, t('Put the lap timer in Bluetooth mode'), esc(t('Alfano 7: in its menu turn Bluetooth on (the connection / sharing mode). The screen shows a PIN and the green light comes on — the lap timer is ready to send. Hutka does not need the PIN. RaceBox: just turn it on.')), 'hutka-device-timer.jpg'));
   b.appendChild(step(2, t('Upload → From the lap timer'), esc(t('Open hutka.ai or the Hutka app, tap Upload (the round button in the middle of the bottom bar; on a computer — “Upload session” in the Lab), then the big blue “From the lap timer”. Sign in first if you have not.')), 'hutka-device.jpg'));
   b.appendChild(step(3, t('Pick the lap timer'), `${esc(t('The app lists the lap timers in the air at once — tap yours: ALFANO-… (marked Alfano) or RaceBox …. In Chrome the browser’s own list opens instead: pick the device there and press Pair. Hutka signs in to the lap timer and reads its session list.'))}<br><span class="hint">${esc(t('Not in the list? Check the lap timer is on and in Bluetooth mode and the phone’s Bluetooth is on. On Android the app asks for the nearby-devices permission the first time — allow it.'))}</span>`, 'hutka-device-scan.jpg'));
-  b.appendChild(step(4, t('Tick the sessions, tap Upload'), esc(t('Every session in the lap timer’s memory: date, track, laps, best lap — the newest is ticked already. Tick the ones you want (one at a time is quickest) and tap the blue “Upload 1 session” at the bottom.')), 'hutka-device-sessions.jpg'));
-  b.appendChild(step(5, t('Wait for the read — a few minutes'), esc(t('A 45-lap session takes about five minutes over Bluetooth: a big bar shows the percent, the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. When it is done, the next window opens by itself: check the track, tap “Save and open in the Lab” — the Lab opens with every corner.')), 'hutka-device-reading.jpg'));
+  b.appendChild(step(4, t('Tick the sessions, tap Upload'), esc(t('Every session in the lap timer’s memory: date, track, laps, best lap. The ones already in Hutka are grey; the new ones from the last day on the lap timer are ticked already. Tap the blue “Upload … sessions” at the bottom.')), 'hutka-device-sessions.jpg'));
+  b.appendChild(step(5, t('Wait for the read — a few minutes'), esc(t('A 45-lap session takes about five minutes over Bluetooth: a big bar shows the percent, the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. When it is done, the session opens in the Lab by itself — saved, private for now. The “Finishing touches” card on top asks the layout if Hutka is not sure, the session type and your place; Publish shares it on the track page.')), 'hutka-device-reading.jpg'));
   box.appendChild(b);
   // Alfano 7 — the ADA app on the phone
   const a = card(t('Alfano 7 — the ADA app on your phone'), t('The other way, without Bluetooth: the app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.'));
@@ -6394,7 +6478,7 @@ function renderHelpPage() {
   a.appendChild(step(3, t('Save the file on the phone'), `<b>${esc(t('With the Hutka app:'))}</b> ${esc(t('tap Hutka in the row of apps — the session opens in the upload window straight away, steps 4–5 are not needed.'))} <span class="hint">${esc(t('Hutka at the front of that row, once and for all: iPhone — scroll the app row to the end → More → Edit → “+” next to Hutka (Favourites), then drag it to the top; Android — hold Hutka in the share sheet → Pin.'))}</span><br><b>${esc(t('Without the app:'))}</b> <b>iPhone:</b> ${esc(t('tap “Save to Files”, choose a folder (Downloads is fine), tap Save.'))} <b>Android:</b> ${esc(t('choose “Save” / “Downloads”.'))}<br><span class="hint">${esc(t('The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.'))}</span>`));
   a.appendChild(step(4, t('Open hutka.ai and tap Upload'), esc(t('The round button in the middle of the bottom bar (on a computer — “Upload session” at the top right of the Lab). Sign in first if you have not — it takes one email.')), 'hutka-upload.jpg'));
   a.appendChild(step(5, t('Choose the file'), esc(t('Tap “Choose a file”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.')), 'hutka-choose.jpg'));
-  a.appendChild(step(6, t('Check the track, tap Save'), esc(t('Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap “Save and open in the Lab” — the Lab opens with every corner.')), 'hutka-form.jpg'));
+  a.appendChild(step(6, t('Finishing touches, Publish'), esc(t('The session opens in the Lab at once: the track found by GPS, the layout recognised by the shape of your laps, the kart most people drive there — private for now. The “Finishing touches” card asks the layout if Hutka is not sure, the session type and your place. Publish lets other drivers compare with you; “Keep it private” keeps it yours.')), 'hutka-form.jpg'));
   box.appendChild(a);
   // other loggers
   const o = card(t('Other loggers and apps'), t('Any of these files works the same way: save it on the phone or computer, then Upload → Choose a file.'));
@@ -6403,7 +6487,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.24';
+const APP_VERSION = 'v34.25';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -7146,7 +7230,7 @@ function cardFrom(D, G, coach) {
   return { v: CARD_V, w: Math.round((x1 - x0) / sc * 1000) / 1000, h: Math.round((y1 - y0) / sc * 1000) / 1000, pts, marks, corners, top, total, vmax: Math.round(Math.max(...R.v) * 3.6) };
 }
 // back to the start page: the session stays in memory, the Lab shows the library again
-LAB.close = function () { replayPlay(false); LAB.cmp2 = 'none'; LAB.scrubT = 0; if (fsOn()) { if (LAB.fsExit) LAB.fsExit(); else $('hero').classList.remove('fs-fallback'); } LAB.current = null; LAB.sessions = []; LAB.G = null; LAB.dcmp = null; LAB.coach = null; LAB.loaded = false; LAB.selN = 0; if (location.hash !== '#lab') history.replaceState(null, '', '#lab'); labRender(); renderLabStart(); window.scrollTo({ top: 0 }); };
+LAB.close = function () { if (typeof FINISH !== 'undefined') FINISH.hide(); replayPlay(false); LAB.cmp2 = 'none'; LAB.scrubT = 0; if (fsOn()) { if (LAB.fsExit) LAB.fsExit(); else $('hero').classList.remove('fs-fallback'); } LAB.current = null; LAB.sessions = []; LAB.G = null; LAB.dcmp = null; LAB.coach = null; LAB.loaded = false; LAB.selN = 0; if (location.hash !== '#lab') history.replaceState(null, '', '#lab'); labRender(); renderLabStart(); window.scrollTo({ top: 0 }); };
 // does a session belong on this layout? Its best clean lap has to follow the layout's line: a lap that leaves it for more than 12 % of
 // its samples was driven on another configuration of the track (a wrong layout picked at upload) and is never compared with laps of
 // this one — not in the default comparison, the coach, the kart mark, "since last time" or the picker. Cached per geometry.
@@ -7209,6 +7293,7 @@ LAB.open = async function (meta, asCmp) {
   else { LAB.ref = lapKey(sess, bestLap(sess)); LAB.cmp = LAB.cmpAuto ? LAB.cmpAuto.key : (sessAvg(sess) ? 'avg:' + sess.id : 'none'); }   // best lap against the fastest driver here, else the session average
   LAB.loaded = true; LAB.needFit = true; if (APP.route === 'lab') { LAB.map.fit(); LAB.needFit = false; } labRender();
   setStatus('labStatus', G.fitNote || '', 'ok');
+  FINISH.show(sess);   // a fresh upload: the finishing touches above the map
   // a session that leaves this layout's line for a good part of the lap was driven on another configuration of the track: say so — the
   // corners along that part cannot be compared with anyone here (the map still draws the lap as it was driven)
   { const bl = bestLap(sess), BP = bl && bl.px ? DATA.projectLap(bl, G.track, G.rev) : null; if (LAB.curOff) setStatus('labStatus', t('{p}% of the lap runs away from the “{layout}” line — it was driven on another configuration of the track, so it is not compared with the sessions of this one. Pick the right layout (Edit), or ask an admin to add it.', { p: Math.round(((sess._fit && sess._fit.lost) || (BP && BP.lost) || 0) * 100), layout: (STORE.getLayout(LAB.tid, LAB.lid) || {}).name || LAB.lid }), 'warn'); }
@@ -8443,8 +8528,100 @@ const VENUE = (() => {
   }
   return { lookup };
 })();
+// ---------- which layout a session was driven on (Pasha's point 11a): its best clean lap against every layout of the track that has a line
+// (its reference session, or the admin's trace with a GPS frame). For each: the share of samples off the line (> 20 m), the share of the
+// line the lap covers (20 m bins), the mean distance to the line and the length difference — one score, the lowest wins when the lap is on
+// that line (≤ 12 % off, ≥ 80 % covered). Two close scores (a chicane variant) → not sure: the finishing touches ask, the best guess marked.
+// No line anywhere: the only layout, or the first one (asked). Lines exist and none fits: another configuration — "custom", asked.
+async function detectLayout(tid, sess) {
+  const ls = (await STORE.getLayouts(tid)) || [], cands = [];
+  if (!ls.length) return { lid: 'custom', sure: false, how: 'none', cands };
+  const clean = sess.laps.filter(L => L.clean), pool = clean.length ? clean : sess.laps;
+  for (const l of ls) {
+    let G = null; try { G = await GEOM.build(tid, l.id, null, { noMedia: true }); } catch (e) { G = null; }
+    if (!G || !G.track || !G.frame) continue;
+    if (!GEOM.attach(sess, G).ok) continue;
+    const L = pool.filter(x => x.px).reduce((a, b) => (!a || b.timeMs < a.timeMs) ? b : a, null); if (!L) continue;
+    const P = DATA.projectLap(L, G.track, G.rev); if (!P) continue;
+    const tr = G.track, N = tr.N, ds = tr.ds, bins = Math.max(1, Math.round(N * ds / 20)), hit = new Set();
+    for (const i of P.pj) if (i >= 0) hit.add(Math.floor(i * ds / 20));
+    let off = 0; for (let i = 0; i < N; i++) off += Math.abs(P.o[i]);
+    let len = 0; for (let k = 1; k < L.px.length; k++) len += Math.hypot(L.px[k][0] - L.px[k - 1][0], L.px[k][1] - L.px[k - 1][1]); len *= tr.mpp;
+    const cov = Math.min(1, hit.size / bins), meanOff = off / N, dLen = Math.abs(len - N * ds);
+    cands.push({ lid: l.id, lost: P.lost, cov, meanOff, dLen, score: P.lost * 100 + meanOff + dLen / 10 + (1 - cov) * 60 });
+  }
+  for (const L of sess.laps) { delete L._proj; delete L.px; delete L.xy; } delete sess._attached; delete sess._fit;   // the Lab attaches it again
+  const ok = cands.filter(c => c.lost <= OFF_LAYOUT && c.cov >= 0.8).sort((a, b) => a.score - b.score);
+  if (ok.length) return { lid: ok[0].lid, sure: ok.length === 1 || ok[1].score - ok[0].score >= 2.5, how: 'fit', cands };
+  if (cands.length) return { lid: 'custom', sure: false, how: 'none', cands };
+  return { lid: ls[0].id, sure: ls.length === 1, how: ls.length === 1 ? 'only' : 'guess', cands };
+}
+// ---------- a fresh upload → private drafts (Pasha's point 7): no form. The track by GPS (a new community track named from the map when
+// there is none), the layout by the shape of the laps, the kart most people drive there (or the class the revs give away); sessions that
+// are already in the library (the start to the minute + the best lap to 1/100 s) are not saved twice. The finishing touches wait in the Lab.
+const DRAFTS = (() => {
+  const minute = (d) => String(d || '').replace('T', ' ').slice(0, 16);
+  const bestOfLaps = (laps) => laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a);
+  function kartFor(tr, p) {
+    const laps = p.data.laps, ch = typeof GEAR !== 'undefined' ? GEAR.channelsOf(laps) : null;
+    if (ch && ch.rpm) { const box = GEAR.analyse(laps, '', ''), n = box ? box.levels.length : 0; return kartFromValue('sport|' + (n === 2 ? 'rotax-dd2' : (n >= 3 ? 'kz2' : '')), ''); }
+    const fleet = rentalFleet(tr); return fleet.length ? { cls: 'rental', name: fleet[0].name, cat: '' } : { cls: 'rental', name: '', cat: '' };
+  }
+  async function trackFor(p) {
+    let la = 0, lo = 0, n = 0; for (const L of p.data.laps) for (let i = 0; i < L.pts.length; i += 10) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
+    const c = { lat: la / n, lon: lo / n };
+    const near = STORE.getTracks().filter(x => isFinite(x.lat) && isFinite(x.lon)).map(x => ({ x, d: GEO.distKm(c, x) })).sort((a, b) => a.d - b.d)[0];
+    if (near && near.d < 3) return { tid: near.x.id };
+    const canAdd = STORE.canWrite() && (STORE.isAdmin() || await STORE.communityAvailable()); if (!canAdd) return { tid: '' };
+    // a track Hutka does not know yet: its page and a first layout, named from the map (OSM) — the name can be changed on the track page
+    let v = {}; try { v = (await Promise.race([VENUE.lookup(c), new Promise(r => setTimeout(() => r(null), 8000))])) || {}; } catch (e) { v = {}; }
+    const city = GEO.nearestCity(c.lat, c.lon), cityName = v.city || (city && city.km < 60 ? city.name : ''), cc = v.cc || (city && city.km < 150 ? city.cc : '');
+    const fromFile = p.data.source && p.data.source.app !== 'alfano' ? '' : (p.meta.track || ''), guess = fromFile && !/alfano|lap|session|driver/i.test(fromFile) ? fromFile.replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase()) : '';
+    const name = v.venue || guess || (cityName ? t('{city} Karting', { city: cityName }) : t('Kart track'));
+    const best = bestOfLaps(p.data.laps), lengthM = best && best.len ? Math.round(best.len) : 0, kart = kartFor(null, p);
+    const tid = await STORE.saveTrack(Object.assign({ name, city: cityName, country: cc, lat: +c.lat.toFixed(5), lon: +c.lon.toFixed(5), address: v.address || '', website: v.website || '', phone: v.phone || '', indoor: !!v.indoor, lengthM, karts: kart.name && kart.cls !== 'sport' ? [{ name: kart.name, cls: kart.cls }] : [], community: true, osm: v.osm || '' }, parseHours(v.hours || '')));
+    const lid = await STORE.saveLayout(tid, { name: t('Main'), order: 0, cornerR: 110, widthM: 8, lengthM });
+    return { tid, lid, newTrack: true };
+  }
+  // the first session on a brand-new layout of a community track defines its line for everyone who comes after; the page gets the length and the corner count
+  async function defineLine(tid, lid, sess, newTrack) {
+    const tr = STORE.getTrack(tid), l = STORE.getLayout(tid, lid); if (!tr || !tr.community || !l || l.refSession || !STORE.canEditTrack(tr)) return;
+    try {
+      await STORE.saveLayout(tid, Object.assign({}, l, { refSession: sess.id })); GEOM.invalidate();
+      const G = await GEOM.build(tid, lid, sess, { noMedia: true }); if (!G || !G.track) return;
+      const corners = GEOM.apexes(G, null).length, lengthM = Math.round(G.lengthM || G.track.lengthM || l.lengthM || 0), l2 = STORE.getLayout(tid, lid) || l;
+      await STORE.saveLayout(tid, Object.assign({}, l2, { refSession: sess.id, lengthM, corners }));
+      if (newTrack) { const tr2 = STORE.getTrack(tid) || tr; const desc = t('{length} m, {corners} corners — mapped from a driver’s session on {date}. Know this track? Add the website, hours and a photo on the track page.', { length: lengthM, corners, date: fmtDate(sess.date) }); await STORE.saveTrack(Object.assign({}, tr2, { lengthM, corners, description: tr2.description || desc })); }
+    } catch (e) {}
+  }
+  async function save(parsed, say) {
+    const mine = await STORE.mySessions().catch(() => []), known = [], fresh = [];
+    for (const p of parsed) {
+      const date = p.meta.date || fileDate(p.file), best = bestOfLaps(p.data.laps).timeMs;
+      const hit = mine.find(m => minute(m.date) === minute(date) && Math.abs((+m.bestMs || 0) - best) <= 15);
+      if (hit) known.push(hit.id); else fresh.push(Object.assign(p, { date }));
+    }
+    if (!fresh.length) return { first: null, known, saved: [] };
+    say(t('Finding the track…'));
+    const T = await trackFor(fresh[0]), tid = T.tid, tr = tid ? STORE.getTrack(tid) : null, kart = kartFor(tr, fresh[0]), batch = 'b' + STORE.uid(), saved = [];
+    for (let k = 0; k < fresh.length; k++) {
+      const p = fresh[k], label = p.meta.driver ? `${p.meta.driver}${p.date ? ', ' + fmtDate(p.date) : ''}` : (p.data.name || '');
+      const sess = { id: 's' + STORE.uid(), name: p.data.name, label, driver: p.meta.driver, date: p.date, trackName: tr ? tr.name : p.meta.track, track: tid, layout: 'custom', note: '', kart: kart.name, kartClass: kart.cls, kartCat: kart.cat || '', format: '', pos: 0, drivers: 0, published: false, draft: true, batch, detect: null, source: p.data.source || null, createdAt: Date.now() + k, laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
+      for (const L of sess.laps) L._sess = sess;
+      if (tid) { say(t('Recognising the layout…')); const D = T.newTrack ? { lid: T.lid, sure: true, how: 'new' } : await detectLayout(tid, sess); sess.layout = D.lid || 'custom'; sess.detect = { sure: !!D.sure, how: D.how }; }
+      // loggers without a start/finish beacon: every lap starts at the layout's S/F, so corners line up with everyone else's
+      if (sess.source && sess.source.app !== 'alfano' && tid && sess.layout !== 'custom') { try { const G = await GEOM.build(tid, sess.layout, null, { noMedia: true }); IMPORT.alignToStart(sess, G); } catch (e) {} for (const L of sess.laps) { delete L.px; delete L.xy; delete L._proj; } delete sess._attached; }
+      say(fresh.length > 1 ? t('Saving {k} of {n}…', { k: k + 1, n: fresh.length }) : t('Saving…'));
+      await STORE.saveSession(sess); saved.push(sess);
+      if (k === 0 && tid && sess.layout !== 'custom') await defineLine(tid, sess.layout, sess, !!T.newTrack);
+    }
+    STORE.track('upload', { n: fresh.length, kart: kart.cls, app: fresh[0].data.source ? fresh[0].data.source.app : 'alfano', layout: saved[0].detect ? saved[0].detect.how : '', sure: !!(saved[0].detect && saved[0].detect.sure), known: known.length });
+    return { first: saved[0], known, saved };
+  }
+  return { save, detectLayout };
+})();
 const UPLOAD = (() => {
-  let parsed = [], ctx = {}, venueP = null, venue = null;
+  let ctx = {}, working = false;
   const finePointer = !!(window.matchMedia && window.matchMedia('(pointer: fine)').matches);
   // where the session comes from: the lap timer first, in the accent colour, where this phone or browser has Bluetooth; the file first where it has not
   function syncSources() {
@@ -8454,66 +8631,26 @@ const UPLOAD = (() => {
     $('uplBtSub').textContent = bt ? t('Bluetooth · Alfano 7, RaceBox') : t('Bluetooth works in the Hutka app, or in Chrome on a computer or Android');
     $('uplFileSub').textContent = t('Alfano .alf2 / .zip · AiM · RaceChrono · VBOX · GPX') + (finePointer ? ' — ' + t('or drop the files here') : '');
   }
+  const work = (tx) => { $('uplWork').hidden = !tx; if (tx) $('uplWorkTx').textContent = tx; };
   function open(o) {
-    ctx = o || {}; parsed = []; $('uplForm').hidden = true; $('uplFoot').hidden = true; $('uplGo').disabled = false; $('uplGo').classList.remove('busy'); setStatus('uplStatus', ''); $('uplName').value = ''; $('uplNote').value = ''; $('uplFile').value = '';
-    $('uplDetect').textContent = ''; syncSources(); $('uplSrc').hidden = !!ctx.files; $('uplBox').classList.remove('over');
+    ctx = o || {}; if (working) { $('uplModal').hidden = false; return; }
+    setStatus('uplStatus', ''); $('uplFile').value = ''; work(''); syncSources(); $('uplSrc').hidden = !!ctx.files; $('uplBox').classList.remove('over');
     $('uplModal').hidden = false; $('uplBox').querySelector('.sheet-body').scrollTop = 0;
   }
   function close() { $('uplModal').hidden = true; }
   async function onFiles(files) {
-    if (!files.length) return; $('uplSrc').hidden = true; setStatus('uplStatus', t('Reading {n} file(s)…', { n: files.length }));
-    parsed = [];
-    for (const f of files) { try { const data = await readAnyLogger(f); const meta = DATA.parseAlfName(f.name || ''); parsed.push({ file: f, data, meta }); } catch (e) { setStatus('uplStatus', t('Could not read {f}: {e}', { f: f.name, e: e.message || e }), 'warn'); } }
-    if (!parsed.length) { $('uplSrc').hidden = false; $('uplFile').value = ''; return; }   // nothing readable: the choice comes back, the reason stays above it
-    const p0 = parsed[0], laps = p0.data.laps, best = laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a);
-    let la = 0, lo = 0, n = 0; for (const L of laps) for (let i = 0; i < L.pts.length; i += 10) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
-    const c = { lat: la / n, lon: lo / n };
-    const trs = STORE.getTracks().filter(x => isFinite(x.lat) && isFinite(x.lon)).map(x => ({ x, d: GEO.distKm(c, x) })).sort((a, b) => a.d - b.d);
-    const near = trs.length && trs[0].d < 3 ? trs[0] : null; center = c;
-    const canAdd = STORE.canWrite() && (STORE.isAdmin() || await STORE.communityAvailable());
-    fillSelect($('uplTrack'), (canAdd ? [['__new__', '+ ' + t('Add a new track…')]] : []).concat([['', t('— no track (private, custom) —')]], STORE.getTracks().map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), ctx.track || (near ? near.x.id : (canAdd ? '__new__' : '')));
-    // a new track: name from the file where the logger wrote one, city and country from the nearest known city
-    { const city = GEO.nearestCity(c.lat, c.lon), fileName = p0.data.source && p0.data.source.app !== 'alfano' ? '' : (p0.meta.track || ''), guess = fileName && !/alfano|lap|session|driver/i.test(fileName) ? fileName.replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase()) : '';
-      $('uplNewName').value = guess; $('uplNewCity').value = city && city.km < 60 ? city.name : ''; fillCountries($('uplNewCountry'), true); $('uplNewCountry').value = city && city.km < 150 ? city.cc : ''; venue = null; venueP = null;
-      if (!near && canAdd) { $('uplNewHint').textContent = t('Not in Hutka yet — looking the place up on the map…'); const typed = { name: $('uplNewName').value, city: $('uplNewCity').value };
-        venueP = VENUE.lookup(c).then((v) => { venue = v; if (parsed[0] !== p0) return v;
-          if (v.venue && (!$('uplNewName').value || $('uplNewName').value === typed.name)) $('uplNewName').value = v.venue;
-          if (v.city && (!$('uplNewCity').value || $('uplNewCity').value === typed.city)) $('uplNewCity').value = v.city;
-          if (v.cc && [...$('uplNewCountry').options].some(o => o.value === v.cc)) $('uplNewCountry').value = v.cc;
-          if (!$('uplNewName').value) $('uplNewName').value = $('uplNewCity').value ? t('{city} Karting', { city: $('uplNewCity').value }) : t('Kart track');
-          $('uplNewHint').textContent = v.venue ? t('Found on the map: {name} — check the name, it becomes the track page; other drivers will find it by GPS from now on.', { name: v.venue }) : t('Not on the map yet — name the track (the page is created with this session, you can edit it later; other drivers find it by GPS from then on).');
-          return v; }).catch(() => null);
-      } else $('uplNewHint').textContent = t('Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.'); }
-    await fillLayouts(); syncPub(); syncNew();
-    if (ctx.layout) { $('uplLayout').value = ctx.layout; showLayoutPhoto(); }
-    fillKarts(); fillFormats($('uplFormat'), ''); $('uplPos').value = ''; $('uplDrivers').value = '';
-    // engine channels in the file (an Alfano 6 on a sport kart): not a rental — the class is preselected from the gear ratios the revs show
-    let engTx = '';
-    { const ch = typeof GEAR !== 'undefined' ? GEAR.channelsOf(laps) : null;
-      if (ch && ch.rpm) { const box = GEAR.analyse(laps, '', ''), n = box ? box.levels.length : 0, rmax = box ? box.rpmMax : 0;
-        const guess = n === 2 ? 'rotax-dd2' : (n >= 3 ? 'kz2' : ''), v = 'sport|' + guess;
-        if ([...$('uplKart').options].some(o => o.value === v)) { $('uplKart').value = v; syncKart(); }
-        engTx = ' · ' + (n === 2 ? t('Revs and two gear ratios in the file — looks like a Rotax DD2 (change the kart if not)') : (n >= 3 ? t('Revs and {n} gear ratios in the file — a shifter kart; KZ2 is preselected, change it if not', { n }) : t('Revs in the file (up to {r} rpm) — a sport kart; pick its class below', { r: fmtRpm(rmax) }))); } }
-    $('uplName').value = p0.meta.driver ? `${p0.meta.driver}${p0.meta.date ? ', ' + fmtDate(p0.meta.date) : ''}` : (p0.data.name || '');
-    const src = p0.data.source; const srcTx = src && src.app !== 'alfano' ? ' · ' + t('Source: {s}', { s: sourceLabel(src) }) + (src.grade !== 'high' ? ' — ' + t('braking and throttle points will be approximate; Alfano at 10 Hz is the reference') : '') + (p0.data.lapsHow === 'loop' ? ' · ' + t('laps were cut where the loop closes (no start/finish beacon in the file)') : '') : '';
-    $('uplDetect').textContent = `${t('{n} laps, best {b}', { n: laps.length, b: fmtMs(best.timeMs) })} · ${near ? t('GPS puts this session at {name} ({d} km)', { name: near.x.name, d: near.d.toFixed(1) }) : (canAdd ? t('GPS does not match any track in Hutka yet — it is added below with its own page, or keep the session private without a track.') : (STORE.hasAuth && !STORE.hasIdentity ? t('GPS does not match any track in Hutka yet — sign in and upload again: the track page is created automatically.') : t('GPS does not match any track in the catalogue — it will be saved as a custom track.')))}${parsed.length > 1 ? ' · ' + t('{n} files: one session each, the same track and layout', { n: parsed.length }) : ''}${srcTx}${engTx}`;
-    setStatus('uplStatus', '', ''); $('uplForm').hidden = false; $('uplFoot').hidden = false; $('uplGo').disabled = false;
+    if (!files.length || working) return; working = true; $('uplSrc').hidden = true; setStatus('uplStatus', ''); work(t('Reading {n} file(s)…', { n: files.length }));
+    const parsed = [];
+    for (const f of files) { try { const data = await readAnyLogger(f); parsed.push({ file: f, data, meta: DATA.parseAlfName(f.name || '') }); } catch (e) { setStatus('uplStatus', t('Could not read {f}: {e}', { f: f.name, e: e.message || e }), 'warn'); } }
+    if (!parsed.length) { working = false; work(''); $('uplSrc').hidden = false; $('uplFile').value = ''; return; }   // nothing readable: the choice comes back, the reason stays above it
+    let res = null;
+    try { res = await DRAFTS.save(parsed, work); }
+    catch (e) { working = false; work(''); $('uplSrc').hidden = false; $('uplFile').value = ''; setStatus('uplStatus', STORE.isQuota(e) ? t('Daily upload limit reached — the rest tomorrow.') : t('Could not save the session: {e}', { e: e && e.message || e }), 'warn'); return; }
+    working = false; work(''); close();
+    if (!res.first) { if (res.known.length) { toast(res.known.length > 1 ? t('These sessions are already in Hutka — the newest is open.') : t('This session is already in Hutka — it is open.'), 4000); location.hash = '#lab~' + res.known[0]; } return; }
+    NATIVE.haptic('success'); await LAB.open(res.first, false); go('lab');
+    if (res.known.length) toast(tn(res.known.length, '{n} session was already in Hutka — not uploaded again.', '{n} sessions were already in Hutka — not uploaded again.').replace('{n}', res.known.length), 4500);
   }
-  let center = null;
-  function syncNew() { const nw = $('uplTrack').value === '__new__'; $('uplNewTrack').hidden = !nw; $('uplLayout').parentElement.hidden = nw; if (nw) $('uplPublish').checked = true; }
-  // the kart: the track's own list first, then any other rental kart or a sport kart (named by hand)
-  function fillKarts() {
-    const tid = $('uplTrack').value, tr = tid && tid !== '__new__' ? STORE.getTrack(tid) : null, opts = kartOptions(tr);
-    const cur = $('uplKart').value, keep = opts.some(o => o[0] === cur) && !(/^rental\|\??$/.test(cur) && rentalFleet(tr).length); fillSelect($('uplKart'), opts, keep ? cur : (opts[0][0])); syncKart();
-  }
-  function syncKart() { const v = $('uplKart').value || 'rental|'; const custom = /\|$/.test(v); $('uplKartOtherField').hidden = !custom; $('uplKartOther').placeholder = v.startsWith('sport') ? 'Rotax Max, X30, KZ2…' : 'Sodi RT8, Birel N35…'; }
-  const kartPick = () => kartFromValue($('uplKart').value, $('uplKartOther').value);
-  $('uplKart').addEventListener('change', syncKart);
-  async function fillLayouts() { const tid = $('uplTrack').value; const ls = tid && tid !== '__new__' ? await STORE.getLayouts(tid) : []; fillSelect($('uplLayout'), ls.map(l => [l.id, l.name + (l.lengthM ? ` · ${l.lengthM} ${t('m')}` : '')]).concat([['custom', t('Custom / not listed')]]), ls.length ? ls[0].id : 'custom'); showLayoutPhoto(); }
-  async function showLayoutPhoto() { const tid = $('uplTrack').value, lid = $('uplLayout').value, l = tid && tid !== '__new__' ? STORE.getLayout(tid, lid) : null; let src = null; if (l && l.photo) src = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/photo`); if ($('uplLayout').value !== lid) return; $('uplLayoutPhotoField').hidden = !src; if (src) $('uplLayoutPhoto').src = src; }
-  function syncPub() { const can = STORE.canWrite() && !!$('uplTrack').value; $('uplPubField').hidden = !can; }
-  $('uplTrack').addEventListener('change', () => { fillLayouts(); syncPub(); syncNew(); fillKarts(); });
-  $('uplLayout').addEventListener('change', showLayoutPhoto);
   $('uplFile').addEventListener('change', (e) => onFiles(Array.from(e.target.files || [])));
   if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) $('uplFile').removeAttribute('accept');
   $('uplDrop').addEventListener('click', () => $('uplFile').click());
@@ -8525,46 +8662,97 @@ const UPLOAD = (() => {
   $('uplModal').addEventListener('drop', (e) => { e.preventDefault(); dragOn(false); if ($('uplSrc').hidden) return; onFiles(Array.from(e.dataTransfer.files || [])); });
   $('uplCancel').onclick = close; $('uplModal').addEventListener('click', (e) => { if (e.target === $('uplModal')) close(); });
   $('uplModal')._back = close;   // the phone's back button
-  // the Save button shows its spinner while the session goes up; a failure gives it back with the reason above
-  const goFail = (msg) => { setStatus('uplStatus', msg, 'warn'); $('uplGo').disabled = false; $('uplGo').classList.remove('busy'); };
-  $('uplGo').onclick = async () => {
-    if (!parsed.length) return; $('uplGo').disabled = true; $('uplGo').classList.add('busy'); setStatus('uplStatus', t('Saving…'));
-    let tid = $('uplTrack').value, lid = $('uplLayout').value || 'custom'; const label = $('uplName').value.trim(), note = $('uplNote').value.trim(), kart = kartPick();
-    // a track that is not in Hutka yet: its page and a first layout are created together with the session
-    let newTrack = false;
-    if (tid === '__new__') {
-      if (venueP) { setStatus('uplStatus', t('Checking the map…')); try { await Promise.race([venueP, new Promise(r => setTimeout(r, 8000))]); } catch (e) {} }
-      const v = venue || {}, city = $('uplNewCity').value.trim() || v.city || '', cc = $('uplNewCountry').value || v.cc || '';
-      const name = $('uplNewName').value.trim() || v.venue || (city ? t('{city} Karting', { city }) : t('Kart track'));
-      const bestLap = parsed[0].data.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a), lengthM = bestLap && bestLap.len ? Math.round(bestLap.len) : 0;
-      const hrs = parseHours(v.hours || '');
-      try {
-        tid = await STORE.saveTrack(Object.assign({ name, city, country: cc, lat: center ? +center.lat.toFixed(5) : null, lon: center ? +center.lon.toFixed(5) : null, address: v.address || '', website: v.website || '', phone: v.phone || '', indoor: !!v.indoor, lengthM, karts: kart.name ? [{ name: kart.name, cls: kart.cls }] : [], community: true, osm: v.osm || '' }, hrs));
-        lid = await STORE.saveLayout(tid, { name: t('Main'), order: 0, cornerR: 110, widthM: 8, lengthM });
-        newTrack = true;
-      } catch (e) { goFail(t('Could not create the track: {e}', { e: e && e.message || e })); return; }
-    }
-    const tr = tid ? STORE.getTrack(tid) : null;
-    // a kart this track did not list yet is remembered on the track page (for the next driver's picker)
-    if (tr && kart.name && kart.cls !== 'sport' && STORE.canEditTrack(tr) && !(tr.karts || []).some(k => k.name.toLowerCase() === kart.name.toLowerCase())) { try { await STORE.saveTrack(Object.assign({}, tr, { karts: (tr.karts || []).concat([{ name: kart.name, cls: kart.cls }]) })); } catch (e) {} }
-    let first = null;
-    for (let k = 0; k < parsed.length; k++) {
-      const pub = STORE.canWrite() && !!tid && $('uplPublish').checked;
-      const p = parsed[k], sess = { id: 's' + STORE.uid(), name: p.data.name, label: parsed.length > 1 ? (label ? `${label} · ${k + 1}` : '') : label, driver: p.meta.driver, date: p.meta.date || fileDate(p.file), trackName: tr ? tr.name : p.meta.track, track: tid, layout: tid ? lid : 'custom', note, kart: kart.name, kartClass: kart.cls, kartCat: kart.cat || '', format: $('uplFormat').value || '', pos: +$('uplPos').value || 0, drivers: +$('uplDrivers').value || 0, published: pub, source: p.data.source || null, createdAt: Date.now(), laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
-      for (const L of sess.laps) L._sess = sess;
-      // loggers without a start/finish beacon: start every lap at the layout's S/F so corners line up with everyone else's
-      if (sess.source && sess.source.app !== 'alfano' && tid && lid !== 'custom') { try { const G = await GEOM.build(tid, lid); IMPORT.alignToStart(sess, G); } catch (e) {} }
-      try { await STORE.saveSession(sess); if (!first) first = sess; } catch (e) { goFail(STORE.isQuota(e) ? t('Daily upload limit reached — the rest tomorrow.') : t('Could not save the session: {e}', { e: e && e.message || e })); return; }
-      // the first session on a brand-new layout defines its track line for everyone who comes after; the page gets the length and the corner count
-      if (k === 0 && tr && tr.community && lid !== 'custom') { const l = STORE.getLayout(tid, lid); if (l && !l.refSession && STORE.canEditTrack(tr)) { try { await STORE.saveLayout(tid, Object.assign({}, l, { refSession: sess.id })); GEOM.invalidate();
-            const G = await GEOM.build(tid, lid, sess, { noMedia: true }); if (G && G.track) { const corners = GEOM.apexes(G, null).length, lengthM = Math.round(G.lengthM || G.track.lengthM || l.lengthM || 0); const l2 = STORE.getLayout(tid, lid) || l; await STORE.saveLayout(tid, Object.assign({}, l2, { refSession: sess.id, lengthM, corners }));
-              if (newTrack) { const tr2 = STORE.getTrack(tid) || tr; const desc = t('{length} m, {corners} corners — mapped from a driver\u2019s session on {date}. Know this track? Add the website, hours and a photo on the track page.', { length: lengthM, corners, date: fmtDate(sess.date) }); await STORE.saveTrack(Object.assign({}, tr2, { lengthM, corners, description: tr2.description || desc })); } } } catch (e) {} } }
-    }
-    STORE.track('upload', { n: parsed.length, kart: kart.cls, app: parsed[0] && parsed[0].data.source ? parsed[0].data.source.app : 'alfano' });
-    close(); $('uplGo').classList.remove('busy'); if (first) { NATIVE.haptic('success'); await LAB.open(first, false); go('lab'); }
-  };
   async function withFiles(files) { open({ files: true }); await onFiles(files); }
-  return { open, close, withFiles };
+  return { open, close, withFiles, get working() { return working; } };
+})();
+// ---------- the finishing touches of a fresh upload (a private draft — Pasha's points 7 and 8): the layout when Hutka was not sure of it,
+// picked by the shape of each layout's line (the likely one marked); the session type and the place, for the feed; publish or keep it
+// private. The layout and the publishing go for the whole batch (one read of the lap timer = one evening on one configuration); the type
+// and the place for this session. Everything saves as it is tapped — there is no Save button.
+const FINISH = (() => {
+  let sess = null, batch = [];
+  const shapes = new Map();
+  const card = () => $('finishCard');
+  function hide() { card().hidden = true; sess = null; batch = []; }
+  const layoutName = (s) => (s.layout && s.layout !== 'custom' ? (STORE.getLayout(s.track, s.layout) || {}).name : '') || t('Not in the list');
+  async function show(s) {
+    if (!s || !s.draft || !mySession(s) || s.owner === 'local' || !STORE.canWrite()) { hide(); return; }
+    sess = s; batch = [s];
+    if (s.batch) { try { const mates = (await STORE.mySessions()).filter(m => m.draft && m.batch === s.batch && m.id !== s.id); batch = [s].concat(mates); } catch (e) {} }
+    if (sess !== s) return;
+    const n = batch.length;
+    $('finSub').textContent = n > 1 ? t('{n} sessions from this upload are saved — private for now. A few taps and they are ready to share.', { n }) : t('Saved — private for now. A few taps and it is ready to share.');
+    renderFormat(); $('finPos').value = s.pos || ''; $('finDrivers').value = s.drivers || '';
+    $('finPublish').textContent = n > 1 ? t('Publish {n} sessions', { n }) : t('Publish'); $('finPublish').disabled = !s.track;
+    $('finKart').textContent = t('Kart: {k}', { k: s.kart || t('rental, model unknown') });
+    card().hidden = false;
+    await renderLayouts(s);
+  }
+  // the layout: sure → one line with a Change button; not sure → every layout as a tile with its shape, the likely one marked
+  async function renderLayouts(s) {
+    const box = $('finLays'), now = $('finLayNow'), lbl = $('finLayLbl'); box.innerHTML = ''; now.innerHTML = '';
+    if (!s.track) { $('finLaySec').hidden = true; return; }
+    const ls = (await STORE.getLayouts(s.track)) || [], d = s.detect || {}, sure = !!d.sure && s.layout !== 'custom';
+    if (sess !== s) return;
+    $('finLaySec').hidden = sure && ls.length <= 1; if ($('finLaySec').hidden) return;
+    if (sure) {
+      lbl.textContent = t('Layout'); now.hidden = false; box.hidden = true;
+      now.innerHTML = `<b>${esc(layoutName(s))}</b><span class="ok">✓ ${esc(d.how === 'picked' ? t('your pick') : t('recognised by the shape of your laps'))}</span>`;
+      const ch = el('button', 'btn ghost sm', t('Change')); ch.type = 'button'; ch.onclick = () => { now.hidden = true; box.hidden = false; tiles(s, ls); }; now.appendChild(ch); return;
+    }
+    lbl.textContent = s.layout === 'custom' ? t('Which layout? Hutka could not tell — pick it by its shape.') : t('Which layout? The marked one looks most likely — tap the right one.');
+    now.hidden = true; box.hidden = false; tiles(s, ls);
+  }
+  function tiles(s, ls) {
+    const box = $('finLays'); box.innerHTML = '';
+    for (const l of ls) {
+      const on = s.layout === l.id, b = el('button', 'lay-tile' + (on ? ' on' : '')); b.type = 'button'; b.dataset.lid = l.id;
+      const tag = on ? ((s.detect || {}).sure ? 'ok' : 'guess') : '';
+      b.innerHTML = `${tag ? `<span class="lt-tag${tag === 'guess' ? ' guess' : ''}">${esc(tag === 'guess' ? t('likely') : t('this one'))}</span>` : ''}<div class="lt-shape"><div class="lt-none">${esc(t('no line yet'))}</div></div><div class="lt-name">${esc(l.name)}</div>`;
+      b.onclick = () => pick(l.id); box.appendChild(b); shapeInto(b.querySelector('.lt-shape'), s.track, l.id);
+    }
+    const o = el('button', 'lay-tile' + (s.layout === 'custom' ? ' on' : '')); o.type = 'button'; o.dataset.lid = 'custom';
+    o.innerHTML = `<div class="lt-shape"><div class="lt-none">?</div></div><div class="lt-name">${esc(t('Not in the list'))}</div>`; o.onclick = () => pick('custom'); box.appendChild(o);
+    const cur = box.querySelector('.lay-tile.on'); if (cur && cur.offsetLeft + cur.offsetWidth > box.clientWidth) box.scrollLeft = cur.offsetLeft + cur.offsetWidth - box.clientWidth + 4;   // the marked tile in view, whole
+  }
+  // a layout's line as a small picture: the reference session's line (or the admin's trace), the start/finish as a dot
+  async function shapeInto(host, tid, lid) {
+    const key = tid + '|' + lid; let pts = shapes.get(key);
+    if (!pts) { pts = null; try { const G = await GEOM.build(tid, lid, null, { noMedia: true }); if (G && G.track) { const tr = G.track, step = Math.max(1, Math.round(tr.N / 160)); pts = []; for (let i = 0; i < tr.N; i += step) pts.push([tr.cx[i] / tr.mpp, tr.cy[i] / tr.mpp]); } } catch (e) { pts = null; } if (pts) shapes.set(key, pts); }   // a layout without a line yet is asked again next time (a session may have given it one since)
+    if (!pts || !pts.length) return;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (const [x, y] of pts) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+    const pad = Math.max(x1 - x0, y1 - y0) * 0.08, d = 'M' + pts.map(([x, y]) => `${(x - x0 + pad).toFixed(1)} ${(y - y0 + pad).toFixed(1)}`).join('L') + 'Z';
+    host.innerHTML = `<svg viewBox="0 0 ${(x1 - x0 + 2 * pad).toFixed(1)} ${(y1 - y0 + 2 * pad).toFixed(1)}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="${d}"/><circle cx="${(pts[0][0] - x0 + pad).toFixed(1)}" cy="${(pts[0][1] - y0 + pad).toFixed(1)}" r="${((Math.max(x1 - x0, y1 - y0) + 2 * pad) * 0.035).toFixed(1)}"/></svg>`;
+  }
+  async function pick(lid) {
+    if (!sess) return; const s = sess, patch = { layout: lid, detect: { sure: lid !== 'custom', how: 'picked' } };
+    for (const m of batch) if (m.track === s.track) { try { await STORE.updateSession(m.id, patch); } catch (e) {} }
+    Object.assign(s, patch); STORE.track('layout_pick', { sid: s.id, lid, n: batch.length });
+    await LAB.open(s);   // the Lab again, on that layout's line
+  }
+  function renderFormat() {
+    const box = $('finFormat'); box.innerHTML = '';
+    for (const [k, n] of FORMATS) { if (!k) continue; const b = el('button', 'btn' + (sess.format === k ? ' on' : ''), t(n)); b.type = 'button'; b.onclick = async () => { await patchThis({ format: sess.format === k ? '' : k }); renderFormat(); }; box.appendChild(b); }
+  }
+  async function patchThis(p) { if (!sess) return; const s = sess; try { await STORE.updateSession(s.id, p); Object.assign(s, p); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); } }
+  $('finPos').addEventListener('change', () => patchThis({ pos: Math.max(0, Math.min(500, +$('finPos').value || 0)) }));
+  $('finDrivers').addEventListener('change', () => patchThis({ drivers: Math.max(0, Math.min(500, +$('finDrivers').value || 0)) }));
+  $('finPublish').onclick = async () => {
+    if (!sess) return; const s = sess, b = $('finPublish'); b.classList.add('busy');
+    try {
+      for (const m of batch) { if (!m.track) continue; await STORE.updateSession(m.id, { published: true, draft: false }); Object.assign(m, { published: true, draft: false }); }
+      Object.assign(s, { published: true, draft: false }); STORE.track('publish', { sid: s.id, n: batch.length, from: 'finish' }); NATIVE.haptic('success');
+      toast(batch.length > 1 ? t('Published — {n} sessions are on the track page.', { n: batch.length }) : t('Published — it is now on the track page.'));
+      hide(); labRender(); SHARE.sync(s);
+    } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); }
+    b.classList.remove('busy');
+  };
+  $('finPrivate').onclick = async () => {
+    if (!sess) return; const s = sess; for (const m of batch) { try { await STORE.updateSession(m.id, { draft: false }); Object.assign(m, { draft: false }); } catch (e) {} }
+    Object.assign(s, { draft: false }); hide(); toast(t('Kept private — only you see it. Publish it any time with the button at the top of the Lab.'), 4000);
+  };
+  $('finMore').onclick = () => { if (sess) { const s = sess; SESSEDIT.open(s, () => LAB.open(s)); } };
+  return { show, hide, get session() { return sess; } };
 })();
 // ---------- straight from the lap timer: the device window — pick the logger, find it nearby (the app scans; a browser has its chooser),
 // connect, read its memory, tick the outings; for Alfano the explorer: everything the device exposes and says, logged and sent to Hutka ----------
@@ -9915,7 +10103,7 @@ const ADMIN = (() => {
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
   try { AUTH.gate(); } catch (e) {}   // the app: sign in first
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { if (typeof INTRO !== 'undefined') INTRO.ready(); } catch (e) {}   // the opening may finish: the app is up
