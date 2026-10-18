@@ -1105,6 +1105,11 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .dev-item.known b{color:var(--muted)}
 .dev-item .dev-in{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--ok);color:#fff;font-size:12px;font-weight:800;line-height:1}
 .dev-item .dev-in-tx{font-size:12.5px;font-weight:600;color:var(--ok)}
+.dev-item .dev-in.wait{background:var(--warn);font-size:11px}
+.dev-item .dev-in-tx.wait{color:var(--warn)}
+.banner.outbox{align-items:center;gap:10px}
+.banner.outbox #obText{flex:1;min-width:0}
+.banner.outbox .btn{flex:none}
 .dev-item .dev-go{margin-left:auto;flex:none;width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.45}
 #devPick{display:flex;flex-direction:column;gap:12px}
 .btn.cta.dev-retry{margin-top:14px}
@@ -1497,6 +1502,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn fav" id="btnFav" type="button" hidden title="Favourite">☆</button><button class="btn" id="btnShare" type="button" hidden><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="btnModerate" type="button" hidden></button><button class="btn" id="btnTransfer" type="button" hidden data-t="Transfer to…">Transfer to…</button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
       <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div><button class="btn primary sm" id="labSignIn" style="margin-left:auto;flex:none" hidden data-t="Sign in">Sign in</button></div>
       <div id="labStart" hidden>
+        <div class="banner info outbox" id="labOutbox" hidden><span class="spin" id="obSpin" hidden></span><svg id="obIcon"><use href="#i-clock"/></svg><div id="obText"></div><button class="btn sm" id="obGo" type="button" data-t="Upload now">Upload now</button></div>
         <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="labMineSub"></span></h2><div id="labMine"></div><div class="hint" id="labMineHint"></div></div>
         <div class="card" id="labMarksCard" hidden><h2><span class="star">★</span><span data-t="Bookmarks and favourites">Bookmarks and favourites</span><span class="sub" id="labMarksSub"></span></h2><div id="labMarks"></div><div class="hint" data-t="A star on a session keeps it here; a bookmark on a corner (in the corner inspector) keeps that corner with your note.">A star on a session keeps it here; a bookmark on a corner (in the corner inspector) keeps that corner with your note.</div></div>
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
@@ -4739,6 +4745,19 @@ Object.assign(I18N.RU, {
   'A 45-lap session takes about five minutes over Bluetooth: a big bar shows the percent, the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. When it is done, the session opens in the Lab by itself — saved, private for now. The “Finishing touches” card on top asks the layout if Hutka is not sure, the session type and your place; Publish shares it on the track page.': 'Сессия на 45 кругов читается по Bluetooth минут пять: большая полоса показывает процент, какой круг читается и сколько осталось. На телефоне держи Hutka на экране (внутри Hutka ходить можно — плашка внизу показывает прогресс), в браузере не закрывай вкладку. Когда всё прочитано, сессия сама откроется в Лаборатории — сохранённая, пока только для тебя. Карточка «Последние штрихи» сверху спросит конфигурацию, если Hutka не уверена, тип заезда и твоё место; «Опубликовать» — и она на странице трассы.',
   'Finishing touches, Publish': 'Последние штрихи, «Опубликовать»',
   'The session opens in the Lab at once: the track found by GPS, the layout recognised by the shape of your laps, the kart most people drive there — private for now. The “Finishing touches” card asks the layout if Hutka is not sure, the session type and your place. Publish lets other drivers compare with you; “Keep it private” keeps it yours.': 'Сессия сразу откроется в Лаборатории: трасса найдена по GPS, конфигурация узнана по форме твоих кругов, карт — самый частый на этой трассе; пока она только для тебя. Карточка «Последние штрихи» спросит конфигурацию, если Hutka не уверена, тип заезда и твоё место. «Опубликовать» — другие смогут сравниваться с тобой; «Оставить только для себя» — сессия останется твоей.' });
+
+// v34.26 — no connection after a read: kept on the phone, uploaded by itself (Pasha's point 9)
+Object.assign(I18N.RU, {
+  'Uploading the sessions kept on this phone…': 'Загружаю сессии, сохранённые на телефоне…',
+  '{n} session from the lap timer waits on this phone for the internet — it uploads by itself.|{n} sessions from the lap timer wait on this phone for the internet — they upload by themselves.': '{n} сессия с прибора ждёт интернета на телефоне — загрузится сама.|{n} сессии с прибора ждут интернета на телефоне — загрузятся сами.|{n} сессий с прибора ждут интернета на телефоне — загрузятся сами.',
+  '{n} session from the lap timer is uploaded — it is in your Lab.|{n} sessions from the lap timer are uploaded — they are in your Lab.': '{n} сессия с прибора загружена — она в Лаборатории.|{n} сессии с прибора загружены — они в Лаборатории.|{n} сессий с прибора загружены — они в Лаборатории.',
+  'Still no connection — the sessions stay on this phone and upload by themselves later.': 'Интернета всё ещё нет — сессии остаются на телефоне и загрузятся сами позже.',
+  'No internet right now — the session is kept on this phone and uploads by itself as soon as the connection is back.|No internet right now — the {n} sessions are kept on this phone and upload by themselves as soon as the connection is back.': 'Сейчас нет интернета — сессия сохранена на телефоне и загрузится сама, как только появится связь.|Сейчас нет интернета — {n} сессии сохранены на телефоне и загрузятся сами, как только появится связь.|Сейчас нет интернета — {n} сессий сохранены на телефоне и загрузятся сами, как только появится связь.',
+  'On this phone — uploads by itself when the internet is back': 'На телефоне — загрузится сама, когда появится интернет',
+  'Upload now': 'Загрузить сейчас',
+  '{n} session from the lap timer waits on this phone.|{n} sessions from the lap timer wait on this phone.': '{n} сессия с прибора ждёт на телефоне.|{n} сессии с прибора ждут на телефоне.|{n} сессий с прибора ждут на телефоне.',
+  'The upload did not go through — Hutka tries again by itself.': 'Загрузка не прошла — Hutka попробует ещё раз сама.',
+  'Daily limit reached — Hutka uploads by itself tomorrow.': 'Дневной лимит исчерпан — Hutka загрузит сама завтра.' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -5426,6 +5445,13 @@ const STORE = (() => {
   }
   // drop loaded session data that nothing on the page holds (after background work): the next open fetches it again
   function trimSessions(keep) { const k = new Set(keep || []); for (const id of [...sessCache.keys()]) if (!k.has(id)) sessCache.delete(id); }
+  // ----- the outbox (Pasha's point 9): files read off the lap timer with no connection wait here, on this device, until they can be uploaded.
+  // IndexedDB keeps the File itself; one record per file, grouped by the read they came from
+  const OUT = 'outbox:';
+  async function outboxAdd(item) { const id = OUT + uid(); await LDB.put('kv', Object.assign({ id, at: Date.now(), owner: me.id || '' }, item)); return id; }
+  async function outboxAll() { try { return (await LDB.all('kv')).filter(r => String(r.id).startsWith(OUT) && (!r.owner || !me.id || r.owner === me.id)).sort((a, b) => a.at - b.at); } catch (e) { return []; } }
+  async function outboxDel(id) { try { await LDB.del('kv', id); } catch (e) {} notify('outbox'); }
+  async function outboxPut(rec) { try { await LDB.put('kv', rec); } catch (e) {} notify('outbox'); }   // a record kept back (one this version cannot read stays for the next)
   async function deleteSession(meta) { if (adapter && meta.owner !== 'local') await adapter.deleteSession(meta.id, meta.chunks); else await LDB.del('sessions', meta.id); sessCache.delete(meta.id); notify('sessions'); }
 
   // ----- people -----
@@ -5599,7 +5625,7 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, marks, markOf, setMark, removeMark, get marksOn() { return marksOk !== false && !!(adapter && adapter.marksOf && me.id); }, visit, adminVisits, track, adminAnalytics,
+    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, outboxAdd, outboxAll, outboxDel, outboxPut, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, marks, markOf, setMark, removeMark, get marksOn() { return marksOk !== false && !!(adapter && adapter.marksOf && me.id); }, visit, adminVisits, track, adminAnalytics,
     profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); }, deviceLog: async (o) => { if (!adapter || !adapter.deviceLog) throw new Error('not configured'); if (!me.id) throw new Error('sign in'); return adapter.deviceLog(o); } };
@@ -6487,7 +6513,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.25';
+const APP_VERSION = 'v34.26';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -7671,6 +7697,7 @@ function selectCorner(n, scroll) { NATIVE.haptic('light'); LAB.selN = (LAB.selN 
 
 // ----- the start screen: my sessions and what the drivers I follow have published -----
 async function renderLabStart() {
+  try { OUTBOX.refresh(); } catch (e) {}   // what waits on this phone for the internet
   const box = $('labMine');
   await renderMySessionsTable(box, { hint: $('labMineHint'), sub: $('labMineSub'), compact: true });
   await renderMarksCard();
@@ -8645,7 +8672,11 @@ const UPLOAD = (() => {
     if (!parsed.length) { working = false; work(''); $('uplSrc').hidden = false; $('uplFile').value = ''; return; }   // nothing readable: the choice comes back, the reason stays above it
     let res = null;
     try { res = await DRAFTS.save(parsed, work); }
-    catch (e) { working = false; work(''); $('uplSrc').hidden = false; $('uplFile').value = ''; setStatus('uplStatus', STORE.isQuota(e) ? t('Daily upload limit reached — the rest tomorrow.') : t('Could not save the session: {e}', { e: e && e.message || e }), 'warn'); return; }
+    catch (e) {
+      working = false; work(''); $('uplFile').value = '';
+      if (STORE.hasIdentity && OUTBOX.offline(e)) { try { await OUTBOX.keep(parsed); $('uplSrc').hidden = true; setStatus('uplStatus', tn(parsed.length, 'No internet right now — the session is kept on this phone and uploads by itself as soon as the connection is back.', 'No internet right now — the {n} sessions are kept on this phone and upload by themselves as soon as the connection is back.').replace('{n}', parsed.length), 'ok'); NATIVE.haptic('success'); STORE.track('outbox_keep', { n: parsed.length }); return; } catch (x) {} }
+      $('uplSrc').hidden = false; setStatus('uplStatus', STORE.isQuota(e) ? t('Daily upload limit reached — the rest tomorrow.') : t('Could not save the session: {e}', { e: e && e.message || e }), 'warn'); return;
+    }
     working = false; work(''); close();
     if (!res.first) { if (res.known.length) { toast(res.known.length > 1 ? t('These sessions are already in Hutka — the newest is open.') : t('This session is already in Hutka — it is open.'), 4000); location.hash = '#lab~' + res.known[0]; } return; }
     NATIVE.haptic('success'); await LAB.open(res.first, false); go('lab');
@@ -8664,6 +8695,59 @@ const UPLOAD = (() => {
   $('uplModal')._back = close;   // the phone's back button
   async function withFiles(files) { open({ files: true }); await onFiles(files); }
   return { open, close, withFiles, get working() { return working; } };
+})();
+// ---------- no connection after the read (Pasha's point 9): what the lap timer gave is kept on this phone and uploaded by itself when the
+// connection is back — on the browser's "online", when Hutka comes back on screen, at start and once a minute while something waits. Files
+// of one read go up together (one batch, one track and layout check); one that cannot be read any more is dropped; the library's
+// fingerprints keep a half-done batch from being saved twice.
+const OUTBOX = (() => {
+  let busy = false, timer = null, count = 0, fails = 0, lastErr = null;
+  const offline =(e) => (navigator.onLine === false) || /failed to fetch|networkerror|network request failed|load failed|internet connection|err_internet|err_network|timed? ?out|offline/i.test(String((e && (e.message || e)) || ''));
+  async function keep(parsed) {
+    const batch = 'o' + STORE.uid();
+    for (const p of parsed) await STORE.outboxAdd({ batch, name: p.file.name || 'session', type: p.file.type || '', lastModified: p.file.lastModified || Date.now(), blob: p.file, date: p.meta.date || fileDate(p.file), best: p.data.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a).timeMs, app: (p.data.source && p.data.source.app) || 'alfano' });
+    await refresh();
+  }
+  // what waits: a record this version of Hutka could not read again is kept on the phone (never dropped — it may be the only copy once the
+  // lap timer's memory is erased) but set aside until a newer version tries it
+  const items = async () => (await STORE.outboxAll()).filter(r => r.bad !== APP_VERSION);
+  // the next try: a minute after a try with no connection; after a refusal that is not the connection (the daily quota, a server error)
+  // 2, 4, 8 … up to 30 minutes, so a session the server keeps refusing is not sent again and again over mobile data
+  function arm() { if (!count) { clearTimeout(timer); timer = null; return; } if (!timer) timer = setTimeout(() => { timer = null; flush(); }, Math.min(60000 * Math.pow(2, fails), 1800000)); }
+  async function refresh() { const list = await items(); count = list.length; banner(list); arm(); return list; }
+  // the banner on the Lab's start page: how many wait, and a button to try now
+  const refused = (e) => STORE.isQuota(e) ? t('Daily limit reached — Hutka uploads by itself tomorrow.') : t('The upload did not go through — Hutka tries again by itself.');
+  function banner(list, working) {
+    const b = $('labOutbox'); if (!b) return; b.hidden = !list.length; if (!list.length) return;
+    $('obSpin').hidden = !working; $('obIcon').toggleAttribute('hidden', !!working);   /* an <svg> has no .hidden property */ $('obGo').disabled = !!working;
+    $('obText').textContent = working ? t('Uploading the sessions kept on this phone…')
+      : lastErr ? tn(list.length, '{n} session from the lap timer waits on this phone.', '{n} sessions from the lap timer wait on this phone.').replace('{n}', list.length) + ' ' + refused(lastErr)
+      : tn(list.length, '{n} session from the lap timer waits on this phone for the internet — it uploads by itself.', '{n} sessions from the lap timer wait on this phone for the internet — they upload by themselves.').replace('{n}', list.length);
+  }
+  async function flush(manual) {
+    if (busy || !STORE.hasIdentity || !STORE.canWrite()) return;
+    const list = await items(); count = list.length; if (!count) { banner(list); return; }
+    if (navigator.onLine === false && !manual) { arm(); return; }
+    busy = true; banner(list, true);
+    const groups = new Map(); for (const r of list) { if (!groups.has(r.batch)) groups.set(r.batch, []); groups.get(r.batch).push(r); }
+    let up = 0, offl = false, err = null;
+    for (const recs of groups.values()) {
+      const parsed = [], read = [];
+      for (const r of recs) { try { const f = new File([r.blob], r.name, { type: r.type, lastModified: r.lastModified }); parsed.push({ file: f, data: await readAnyLogger(f), meta: DATA.parseAlfName(f.name || '') }); read.push(r); } catch (e) { await STORE.outboxPut(Object.assign({}, r, { bad: APP_VERSION })); } }
+      if (!parsed.length) continue;
+      try { const res = await DRAFTS.save(parsed, () => {}); for (const r of read) await STORE.outboxDel(r.id); up += res.saved.length; }
+      catch (e) { if (offline(e)) { offl = true; break; } err = e; }   // still no connection: the rest waits too; another error: this read waits for the next try
+    }
+    if (err) { fails++; lastErr = err; } else if (!offl) { fails = 0; lastErr = null; }
+    busy = false; clearTimeout(timer); timer = null; await refresh();
+    if (up) { toast(tn(up, '{n} session from the lap timer is uploaded — it is in your Lab.', '{n} sessions from the lap timer are uploaded — they are in your Lab.').replace('{n}', up), 5000); STORE.track('outbox', { n: up }); if (APP.route === 'lab' && !LAB.current) renderLabStart(); }
+    else if (manual && err) toast(refused(err), 4000);
+    else if (manual && offl) toast(t('Still no connection — the sessions stay on this phone and upload by themselves later.'), 4000);
+  }
+  addEventListener('online', () => flush());
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') flush(); });
+  if ($('obGo')) $('obGo').onclick = () => flush(true);
+  return { keep, flush, refresh, offline, items, get count() { return count; } };
 })();
 // ---------- the finishing touches of a fresh upload (a private draft — Pasha's points 7 and 8): the layout when Hutka was not sure of it,
 // picked by the shape of each layout's line (the likely one marked); the session type and the place, for the feed; publish or keep it
@@ -8881,14 +8965,14 @@ const DEVICE = (() => {
   // Alfano's own) — the same in a Bluetooth read and in an ADA export; a RaceBox outing by its start. Known ones are greyed and open the
   // Lab; new ones from the newest day on the device are ticked (the day just driven), older new ones wait for a tick
   let mine = [];
-  async function loadMine() { try { mine = (await STORE.mySessions()).map(m => ({ id: m.id, at: String(m.date || '').replace('T', ' ').slice(0, 16), best: +m.bestMs || 0, app: (m.source && m.source.app) || 'alfano' })); } catch (e) { mine = []; } }
+  async function loadMine() { try { mine = (await STORE.mySessions()).map(m => ({ id: m.id, at: String(m.date || '').replace('T', ' ').slice(0, 16), best: +m.bestMs || 0, app: (m.source && m.source.app) || 'alfano' })); } catch (e) { mine = []; } try { mine = mine.concat((await OUTBOX.items()).map(r => ({ id: r.id, at: String(r.date || '').replace('T', ' ').slice(0, 16), best: +r.best || 0, app: r.app || 'alfano', pending: true }))); } catch (e) {} }
   const bestOf = (o) => ((o.bestMin * 60 + o.bestSec) * 1000 + o.bestCs * 10);
   const knownSession = (o) => (o.ok ? mine.find(m => m.at === String(o.date || '').slice(0, 16) && (!m.best || Math.abs(m.best - bestOf(o)) <= 15)) : null) || null;
   const knownOuting = (o) => (isFinite(o.startMs) ? mine.find(m => m.app === 'racebox' && m.at === fileDate({ lastModified: o.startMs })) : null) || null;
   function knownRow(m, title, sub) {
     const b = el('button', 'dev-item known'); b.type = 'button';
-    b.innerHTML = `<span class="dev-in" aria-hidden="true">✓</span><div><b>${esc(title)}</b><span class="hint">${esc(sub)}</span><span class="dev-in-tx">${esc(t('Already in Hutka — tap to open'))}</span></div><svg class="dev-go" aria-hidden="true"><use href="#i-chev"/></svg>`;
-    b.onclick = () => { close(); location.hash = '#lab~' + m.id; }; return b;
+    b.innerHTML = `<span class="dev-in${m.pending ? ' wait' : ''}" aria-hidden="true">${m.pending ? '⏳' : '✓'}</span><div><b>${esc(title)}</b><span class="hint">${esc(sub)}</span><span class="dev-in-tx${m.pending ? ' wait' : ''}">${esc(m.pending ? t('On this phone — uploads by itself when the internet is back') : t('Already in Hutka — tap to open'))}</span></div><svg class="dev-go" aria-hidden="true"><use href="#i-chev"/></svg>`;
+    b.onclick = () => { if (m.pending) { OUTBOX.flush(true); return; } close(); location.hash = '#lab~' + m.id; }; return b;
   }
   function sayKnown(nAll, nKnown, name) {
     if (nKnown && nKnown === nAll) S(t('Everything on {name} is already in Hutka — tap a session to open it.', { name }), 'ok');
@@ -10103,11 +10187,12 @@ const ADMIN = (() => {
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
   try { AUTH.gate(); } catch (e) {}   // the app: sign in first
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { if (typeof INTRO !== 'undefined') INTRO.ready(); } catch (e) {}   // the opening may finish: the app is up
   try { await NATIVE.init(); } catch (e) {}
+  setTimeout(() => { try { OUTBOX.refresh().then(() => OUTBOX.flush()); } catch (e) {} }, 2500);   // sessions read with no connection: up they go
 })();
 })();
 </script>
