@@ -503,9 +503,44 @@ body.onboarding #toast{z-index:90}
 .lib h4{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-weight:600}
 .progress{height:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:3px;overflow:hidden}
 .progress > div{height:100%;width:0;background:var(--accent);transition:width .15s}
-.upl-drop{border:1.5px dashed var(--line-2);border-radius:14px;padding:26px 16px;text-align:center;color:var(--muted);cursor:pointer}
-.upl-drop.over{border-color:var(--accent);background:var(--accent-soft)}
-.upl-drop b{color:var(--fg)}
+/* ---------- sheets (upload, the lap timer): the title with a round ✕ (and ‹ back) on top, the body scrolls, one big coloured action at the bottom ---------- */
+.modal .box.sheet{padding:0;gap:0;overflow:hidden}
+.box.sheet > .sheet-head{flex:none;display:flex;align-items:center;gap:10px;padding:16px 16px 10px 22px}
+.box.sheet > .sheet-head h3{flex:1;min-width:0;margin:0}
+.box.sheet > .sheet-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:14px;padding:4px 22px 20px}
+.box.sheet > .sheet-body > .status:empty{display:none}
+.box.sheet > .sheet-foot{flex:none;display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:12px 22px 18px;border-top:1px solid var(--line)}
+.sheet-x,.sheet-back{flex:none;position:relative;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:var(--surface-2);color:var(--fg);display:grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sheet-x::after,.sheet-back::after{content:'';position:absolute;inset:-6px}
+.sheet-x:hover,.sheet-back:hover{background:var(--surface-3)}
+.sheet-x:active,.sheet-back:active{transform:scale(.94)}
+.sheet-x:focus-visible,.sheet-back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sheet-x svg,.sheet-back svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.sheet-head .sheet-back{margin-left:-8px}
+/* the big buttons: a whole row to hit with a shaking hand after a session */
+.upl-src{display:flex;flex-direction:column;gap:10px}
+.big-btn{display:flex;align-items:center;gap:14px;width:100%;min-height:74px;padding:12px 16px 12px 13px;border:1.5px solid var(--line-2);border-radius:17px;background:var(--surface);color:var(--fg);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .08s,background .15s,border-color .15s}
+.big-btn:hover{border-color:var(--accent)}
+.big-btn:active{transform:scale(.985)}
+.big-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.big-btn .bb-ic{flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.big-btn .bb-ic svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.big-btn .bb-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.big-btn .bb-tx b{font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+.big-btn .bb-tx span{font-size:13px;line-height:1.35;color:var(--muted)}
+.big-btn .bb-chev{flex:none;width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.45}
+.big-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px color-mix(in srgb,var(--accent) 80%,transparent)}
+.big-btn.primary:hover{filter:brightness(1.06)}
+.big-btn.primary .bb-ic{background:color-mix(in srgb,var(--accent-ink) 18%,transparent);color:inherit}
+.big-btn.primary .bb-tx span{color:color-mix(in srgb,var(--accent-ink) 84%,transparent)}
+.big-btn.primary .bb-chev{opacity:.85}
+.big-btn.over,.upl-box.over #uplDrop{border-color:var(--accent);border-style:dashed;background:var(--accent-soft)}
+.btn.ghost.upl-help{align-self:center;height:44px;padding:0 14px;color:var(--muted);font-weight:600}
+.btn.ghost.upl-help:hover{color:var(--fg)}
+/* the one action of a sheet: full width, tall, in the accent colour */
+.btn.cta{width:100%;height:56px;border-radius:15px;font-size:16.5px;font-weight:700;background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px color-mix(in srgb,var(--accent) 80%,transparent)}
+.btn.cta:hover{background:var(--accent);filter:brightness(1.06)}
+.btn.cta:disabled{opacity:1;background:var(--surface-3);border-color:var(--surface-3);color:var(--muted);box-shadow:none;filter:none}
 .vgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
 .vbox{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface-2)}
 .vbox .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
@@ -882,6 +917,9 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .admin-grid{grid-template-columns:1fr}
   .modal{padding:0;align-items:end}
   .modal .box{border-radius:18px 18px 0 0;max-height:94vh;padding:16px;width:100%}
+  .box.sheet > .sheet-head{padding:12px 12px 8px 16px}
+  .box.sheet > .sheet-body{padding:2px 16px 16px}
+  .box.sheet > .sheet-foot{padding:10px 16px 14px}
   .toast{bottom:calc(72px + var(--sa-bottom))}
   /* data tables become stacked cards */
   .tbl.resp{display:block}
@@ -1011,23 +1049,28 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .captcha{min-height:0;display:flex;justify-content:center}
 .captcha:empty{display:none}
 /* ---------- a lap timer over Bluetooth: the device window ---------- */
-.dev-row{align-items:center;gap:10px;margin-top:-2px}
-.dev-row .btn{display:inline-flex;align-items:center;gap:7px;flex:none}
-.dev-row .hint{font-size:12.5px;flex:1 1 200px}
-.dev-kinds{display:grid;gap:8px}
-.dev-kind{display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font:inherit;cursor:pointer}
+.modal .box.dev-box{width:min(560px,100%)}
+.dev-kinds{display:grid;gap:10px}
+.dev-kind{position:relative;display:flex;flex-direction:column;gap:3px;align-items:flex-start;min-height:70px;justify-content:center;text-align:left;padding:13px 46px 13px 16px;border:1.5px solid var(--line-2);border-radius:16px;background:var(--surface);color:var(--fg);font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dev-kind::after{content:'';position:absolute;right:20px;top:50%;width:9px;height:9px;border-right:2.2px solid currentColor;border-top:2.2px solid currentColor;transform:translateY(-50%) rotate(45deg);opacity:.4}
 .dev-kind:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
-.dev-kind b{font-size:15px}
-.dev-kind span{font-size:12.5px;color:var(--muted);line-height:1.4}
+.dev-kind:active:not(:disabled){transform:scale(.985)}
+.dev-kind b{font-size:16.5px}
+.dev-kind span{font-size:13px;color:var(--muted);line-height:1.4}
 .dev-kind:disabled{cursor:default;opacity:.6}
 .dev-bar{margin:8px 0 4px}
-.dev-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;max-height:40vh;overflow:auto}
-.dev-item{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
-.dev-item input{width:18px;height:18px;flex:none}
+.dev-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.dev-item{display:flex;gap:12px;align-items:center;min-height:62px;padding:11px 14px;border:1.5px solid var(--line);border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s}
+.dev-item.on{border-color:var(--accent);background:var(--accent-soft)}
+.dev-item input{width:22px;height:22px;flex:none;accent-color:var(--accent)}
 .dev-item div{display:flex;flex-direction:column;gap:2px;min-width:0}
-.dev-item b{font-size:14px}
-.dev-item .hint{font-size:12px}
+.dev-item b{font-size:15px}
+.dev-item .hint{font-size:12.5px}
 .dev-item.dim{opacity:.55}
+.dev-scan-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dev-scan-acts .btn{height:46px;flex:1 1 auto}
+.dev-scan-acts .btn[hidden]{display:none}
+.sheet-foot.dev-acts .btn.ghost.danger-text{align-self:center;height:44px}
 .dev-pill{position:fixed;left:50%;bottom:calc(24px + var(--sa-bottom));transform:translateX(-50%);z-index:89;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:0;border-radius:999px;background:var(--accent);color:#fff;font:inherit;font-size:13px;font-weight:600;box-shadow:var(--shadow);cursor:pointer;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dev-pill::before{content:'';width:8px;height:8px;border-radius:50%;background:#fff;animation:scanpulse 1.2s ease-in-out infinite;flex:none}
 
@@ -1121,6 +1164,8 @@ html.native .side{background:var(--glass);-webkit-backdrop-filter:blur(26px) sat
   html.native .modal{background:rgba(10,14,24,.38);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
   html.native .modal .box{background:var(--glass-strong);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border-radius:24px 24px 0 0;border:1px solid var(--glass-edge);border-bottom:0;padding-bottom:calc(16px + var(--sa-bottom));box-shadow:0 -10px 40px -10px rgba(20,30,60,.35)}
   html.native .search-drop{background:var(--glass-strong);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%)}
+  html.native .modal .box.sheet{padding:0 0 var(--sa-bottom)}
+  html.native .box.sheet > .sheet-foot{border-top-color:var(--glass-edge)}
 }
 html.native body.cockpit .ck-panel,html.native body.cockpit .ck-scrub{background:rgba(14,18,30,.55);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border-color:rgba(255,255,255,.16)}
 html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border-color:rgba(255,255,255,.16)}
@@ -1224,6 +1269,10 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></symbol>
     <symbol id="i-rotate" viewBox="0 0 24 24"><rect x="3" y="7" width="14" height="10" rx="2"/><path d="M20 10v4M17 20l-2-2 2-2M15 18h3a2 2 0 002-2"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-bt" viewBox="0 0 24 24"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
   </defs>
 </svg>
 
@@ -1624,11 +1673,16 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 </nav>
 <!-- upload modal -->
 <div class="modal" id="uplModal" hidden>
-  <div class="box">
-    <h3 data-t="Upload session">Upload session</h3>
-    <div class="upl-drop" id="uplDrop"><div><b data-t="Choose session files">Choose session files</b></div><div class="hint" data-t="Alfano .alf2 (the reference) or an Alfano 6 export (.zip, with revs and temperatures on sport karts), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.">Alfano .alf2 (the reference) or an Alfano 6 export (.zip, with revs and temperatures on sport karts), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.</div><input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden></div>
-    <div class="row dev-row"><button class="btn" id="uplFromDevice" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg><span data-t="From a device (Bluetooth)">From a device (Bluetooth)</span></button><span class="hint" data-t="Alfano 7 and RaceBox Mini S / Micro — the sessions go straight from the lap timer into the Lab, no vendor app.">Alfano 7 and RaceBox Mini S / Micro — the sessions go straight from the lap timer into the Lab, no vendor app.</span></div>
-    <div class="hint" style="margin-top:-4px"><a href="#help" id="uplHelpLink" data-t="How do I get the file from my Alfano? — step by step">How do I get the file from my Alfano? — step by step</a></div>
+  <div class="box sheet upl-box" id="uplBox">
+    <div class="sheet-head"><h3 data-t="Upload session">Upload session</h3><button class="sheet-x" id="uplCancel" type="button" data-tt="Close" title="Close" aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+    <div class="sheet-body">
+    <!-- where the session comes from: the lap timer over Bluetooth first (one big coloured button), a file second -->
+    <div class="upl-src" id="uplSrc">
+      <button class="big-btn primary" id="uplFromDevice" type="button"><span class="bb-ic"><svg><use href="#i-bt"/></svg></span><span class="bb-tx"><b data-t="From the lap timer">From the lap timer</b><span id="uplBtSub" data-t="Bluetooth · Alfano 7, RaceBox">Bluetooth · Alfano 7, RaceBox</span></span><svg class="bb-chev"><use href="#i-chev"/></svg></button>
+      <button class="big-btn" id="uplDrop" type="button"><span class="bb-ic"><svg><use href="#i-file"/></svg></span><span class="bb-tx"><b data-t="Choose a file">Choose a file</b><span id="uplFileSub" data-t="Alfano .alf2 / .zip · AiM · RaceChrono · VBOX · GPX">Alfano .alf2 / .zip · AiM · RaceChrono · VBOX · GPX</span></span><svg class="bb-chev"><use href="#i-chev"/></svg></button>
+      <input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden>
+      <a class="btn ghost upl-help" href="#help" id="uplHelpLink"><svg><use href="#i-help"/></svg><span data-t="How to get the file out of an Alfano">How to get the file out of an Alfano</span></a>
+    </div>
     <div class="status" id="uplStatus"></div>
     <div id="uplForm" hidden>
       <div class="form">
@@ -1646,12 +1700,15 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       </div>
       <div class="hint" id="uplDetect" style="margin-top:8px"></div>
     </div>
-    <div class="row" style="justify-content:flex-end"><button class="btn" id="uplCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="uplGo" type="button" disabled data-t="Analyse">Analyse</button></div>
+    </div>
+    <div class="sheet-foot" id="uplFoot" hidden><button class="btn cta" id="uplGo" type="button" data-t="Save and open in the Lab">Save and open in the Lab</button></div>
   </div>
 </div>
 <!-- the device window: a lap timer over Bluetooth -->
-<div class="modal" id="devModal" hidden><div class="box" style="width:min(560px,100%)"><h3 data-t="From a device">From a device</h3>
-  <p class="hint" data-t="Connect the lap timer over Bluetooth: Hutka reads the recorded outings out of its memory and opens them in the Lab — no vendor app, no files.">Connect the lap timer over Bluetooth: Hutka reads the recorded outings out of its memory and opens them in the Lab — no vendor app, no files.</p>
+<div class="modal" id="devModal" hidden><div class="box sheet dev-box">
+  <div class="sheet-head"><button class="sheet-back" id="devBack" type="button" hidden data-tt="Back" title="Back" aria-label="Back"><svg><use href="#i-back"/></svg></button><h3 data-t="From the lap timer">From the lap timer</h3><button class="sheet-x" id="devCancel" type="button" data-tt="Close" title="Close" aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="sheet-body">
+  <p class="hint" id="devIntro" data-t="Turn the lap timer on and put it in Bluetooth mode — Hutka reads the sessions straight out of its memory: no vendor app, no files.">Turn the lap timer on and put it in Bluetooth mode — Hutka reads the sessions straight out of its memory: no vendor app, no files.</p>
   <div class="dev-kinds" id="devKinds"></div>
   <div class="hint warn" id="devNoBt" hidden data-t="This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.">This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.</div>
   <div id="devScan" hidden>
@@ -1659,7 +1716,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <div class="hint" id="devScanHint"></div>
     <div class="dev-list" id="devScanList"></div>
     <div class="hint" id="devScanEmpty" hidden data-t="Nothing yet…">Nothing yet…</div>
-    <div class="row" style="margin-top:8px;gap:8px;flex-wrap:wrap"><button class="btn xs ghost" id="devScanMore" type="button" hidden></button><button class="btn xs" id="devRescan" type="button" hidden data-t="Scan again">Scan again</button><button class="btn xs ghost" id="devScanBack" type="button" data-t="Back">Back</button></div>
+    <div class="dev-scan-acts"><button class="btn" id="devRescan" type="button" hidden data-t="Scan again">Scan again</button><button class="btn ghost" id="devScanMore" type="button" hidden></button></div>
   </div>
   <div id="devExplore" hidden>
     <div class="dev-ex-head"><b id="devExTitle"></b><span class="hint" id="devExSub"></span></div>
@@ -1677,10 +1734,9 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <div class="hint" id="devKeep" hidden data-t="Keep Hutka open while it reads — you can move around inside Hutka, but on a phone keep it on screen; in a browser, keep this tab open.">Keep Hutka open while it reads — you can move around inside Hutka, but on a phone keep it on screen; in a browser, keep this tab open.</div>
     <div class="row" id="devCodeRow" hidden><input type="text" id="devCode" inputmode="numeric" placeholder="123456" maxlength="10" style="width:140px"><button class="btn" id="devUnlock" type="button" data-t="Unlock">Unlock</button></div>
     <div class="dev-list" id="devList"></div>
-    <div class="row" id="devActs" hidden style="justify-content:space-between;margin-top:10px"><button class="btn ghost danger-text" id="devErase" type="button" data-t="Erase the device memory">Erase the device memory</button><button class="btn primary" id="devImport" type="button" data-t="Open in the Lab">Open in the Lab</button></div>
-    <div class="row" style="margin-top:8px"><button class="btn xs ghost" id="devStageBack" type="button" data-t="Another device">Another device</button></div>
   </div>
-  <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="devCancel" type="button" data-t="Close">Close</button></div>
+  </div>
+  <div class="sheet-foot dev-acts" id="devActs" hidden><button class="btn cta" id="devImport" type="button"></button><button class="btn ghost danger-text" id="devErase" type="button" data-t="Erase the device memory">Erase the device memory</button></div>
 </div></div>
 <!-- SWS import modal -->
 <div class="modal" id="swsModal" hidden><div class="box" style="width:min(680px,100%)"><h3 data-t="Import your SWS results">Import your SWS results</h3>
@@ -4471,6 +4527,34 @@ Object.assign(I18N.RU, { 'Email me a code': 'Прислать код на поч
   'We sent a 6-digit code to {email}. Type it here — no need to open anything in the e-mail.': 'Отправили 6-значный код на {email}. Введи его здесь — в письме ничего открывать не нужно.',
   'We sent a 6-digit code to {email}. Type it here (on this device the button in the e-mail works too).': 'Отправили 6-значный код на {email}. Введи его здесь (на этом устройстве сработает и кнопка в письме).',
   'Could not send the code: {e}': 'Не получилось отправить код: {e}' });
+
+// v34.22 — the upload window and the lap-timer window: one big coloured button, ✕ and ‹ in the header, "Upload N sessions" (Pasha's points 2, 3, 5); the guide names the new buttons
+Object.assign(I18N.RU, {
+  'From the lap timer': 'С прибора',
+  'Bluetooth · Alfano 7, RaceBox': 'Bluetooth · Alfano 7, RaceBox',
+  'Bluetooth works in the Hutka app, or in Chrome on a computer or Android': 'Bluetooth работает в приложении Hutka или в Chrome на компьютере и Android',
+  'Choose a file': 'Выбрать файл',
+  'Alfano .alf2 / .zip · AiM · RaceChrono · VBOX · GPX': 'Alfano .alf2 / .zip · AiM · RaceChrono · VBOX · GPX',
+  'or drop the files here': 'или перетащи файлы сюда',
+  'How to get the file out of an Alfano': 'Как достать файл из Alfano',
+  'Save and open in the Lab': 'Сохранить и открыть в Лаборатории',
+  'Turn the lap timer on and put it in Bluetooth mode — Hutka reads the sessions straight out of its memory: no vendor app, no files.': 'Включи прибор и переведи его в режим Bluetooth — Hutka сама вычитает сессии из его памяти: без фирменных программ и файлов.',
+  'Upload {n} session|Upload {n} sessions': 'Загрузить {n} сессию|Загрузить {n} сессии|Загрузить {n} сессий',
+  'Tick a session to upload': 'Отметь сессию для загрузки',
+  '{n} session(s) on {name} — tick the ones to upload (the newest first).': 'Сессий на {name}: {n} — отметь, какие загрузить (новые сверху).',
+  '{n} outing(s) on the device — tick the ones to upload.': 'На приборе заездов: {n} — отметь, какие загрузить.',
+  'Stop reading the lap timer?': 'Остановить чтение прибора?',
+  'What has been read so far is not kept — the sessions stay on the lap timer.': 'Уже прочитанное не сохранится — сессии останутся на приборе.',
+  'Stop reading': 'Остановить',
+  'Upload → From the lap timer': 'Загрузить → С прибора',
+  'Open hutka.ai or the Hutka app, tap Upload (the round button in the middle of the bottom bar; on a computer — “Upload session” in the Lab), then the big blue “From the lap timer”. Sign in first if you have not.': 'Открой hutka.ai или приложение Hutka, нажми «Загрузить» (круглая кнопка в середине нижней панели; на компьютере — «Загрузить сессию» в Лаборатории), потом большую синюю «С прибора». Если ещё не вошёл — сначала войди.',
+  'Tick the sessions, tap Upload': 'Отметь сессии, нажми «Загрузить»',
+  'Every session in the lap timer’s memory: date, track, laps, best lap — the newest is ticked already. Tick the ones you want (one at a time is quickest) and tap the blue “Upload 1 session” at the bottom.': 'Все сессии из памяти прибора: дата, трасса, круги, лучший круг — самая новая уже отмечена. Отметь нужные (быстрее всего по одной) и нажми синюю «Загрузить 1 сессию» внизу.',
+  'A 45-lap session takes about five minutes over Bluetooth: the screen shows the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. Then the usual window opens: check the track, tap “Save and open in the Lab” — the Lab opens with every corner.': 'Сессия на 45 кругов читается по Bluetooth минут пять: на экране видно, какой круг читается и сколько осталось. На телефоне держи Hutka на экране (внутри Hutka ходить можно — плашка внизу показывает прогресс), в браузере не закрывай вкладку. Потом откроется обычное окно: проверь трассу, нажми «Сохранить и открыть в Лаборатории» — Лаборатория откроется со всеми поворотами.',
+  'Tap “Choose a file”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.': 'Нажми «Выбрать файл» и найди свой .alf2: iPhone — Обзор → Downloads (или папка Telegram / WhatsApp); Android — Загрузки.',
+  'Check the track, tap Save': 'Проверь трассу, нажми «Сохранить»',
+  'Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap “Save and open in the Lab” — the Lab opens with every corner.': 'Hutka узнаёт трассу по GPS и подставляет лейаут и самый частый карт — проверь, поменяй, если надо. «Опубликовать» — другие смогут сравниваться с тобой; сними галочку, чтобы сессия осталась приватной. Нажми «Сохранить и открыть в Лаборатории» — откроется Лаборатория с разбором по поворотам.',
+  'Any of these files works the same way: save it on the phone or computer, then Upload → Choose a file.': 'Любой из этих файлов грузится так же: сохрани на телефон или компьютер, потом «Загрузить» → «Выбрать файл».' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -5744,7 +5828,7 @@ const svgUse = (id, cls) => { const s = document.createElementNS('http://www.w3.
 let toastT = null;
 function toast(msg, ms) { const e = $('toast'); e.textContent = msg; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { e.hidden = true; }, ms || 2600); }
 function setStatus(id, text, cls) { const e = $(id); if (!e) return; e.textContent = text || ''; e.className = 'status' + (cls ? ' ' + cls : ''); }
-function confirmDlg(title, text, yes) { return new Promise((res) => { $('cfTitle').textContent = title; $('cfText').textContent = text || ''; $('cfYes').textContent = yes || t('Confirm'); $('cfModal').hidden = false; const done = (v) => { $('cfModal').hidden = true; $('cfYes').onclick = null; $('cfNo').onclick = null; res(v); }; $('cfYes').onclick = () => done(true); $('cfNo').onclick = () => done(false); }); }
+function confirmDlg(title, text, yes) { return new Promise((res) => { $('cfTitle').textContent = title; $('cfText').textContent = text || ''; $('cfYes').textContent = yes || t('Confirm'); $('cfModal').hidden = false; const done = (v) => { $('cfModal').hidden = true; $('cfYes').onclick = null; $('cfNo').onclick = null; $('cfModal')._back = null; res(v); }; $('cfYes').onclick = () => done(true); $('cfNo').onclick = () => done(false); $('cfModal')._back = () => done(false); }); }
 // files handed over by the service worker after "Share → Hutka" from another app
 async function takeSharedFiles() { const out = []; try { if (!('caches' in window)) return out; const c = await caches.open('hutka-share'); for (const k of await c.keys()) { const r = await c.match(k); if (!r) continue; const b = await r.blob(); const name = decodeURIComponent(k.url.split('/').pop() || 'session.alf2'); out.push(new File([b], name, { type: b.type })); await c.delete(k); } } catch (e) {} return out; }
 // on phones data tables stack into cards: every cell gets its column name as a label
@@ -6011,7 +6095,7 @@ const NATIVE = window.NATIVE = {
     // the app's sign-in gate is not a window to close: back folds the e-mail fields when the provider buttons are there, otherwise leaves the app
     const g = $('authModal'); if (g && !g.hidden && g.classList.contains('gate')) { if (!$('authEmailBox').hidden && !$('authCol').hidden) { $('authEmailBox').hidden = true; $('authEmailOpen').hidden = false; return true; } return 'gate'; }
     const z = document.querySelector('.zoom:not([hidden])'); if (z) { z.hidden = true; return true; }
-    const m = [...document.querySelectorAll('.modal:not([hidden])')].pop(); if (m) { m.hidden = true; return true; }
+    const m = [...document.querySelectorAll('.modal:not([hidden])')].pop(); if (m) { if (typeof m._back === 'function') m._back(); else m.hidden = true; return true; }   // a window with steps goes one step back
     const pb = $('pickbar'); if (pb && pb.classList.contains('open')) { pb.classList.remove('open', 'peek'); return true; }
     if (APP.route === 'lab' && typeof LAB !== 'undefined') {
       if (LAB.selN) { LAB.selN = 0; if (typeof afterSelect === 'function') afterSelect(true); return true; }
@@ -6196,10 +6280,10 @@ function renderHelpPage() {
   // straight from the lap timer over Bluetooth — the quickest way
   const b = card(t('Straight from the lap timer (Bluetooth)'), t('Alfano 7 and RaceBox: no vendor app, no files — the sessions come out of the device memory straight into the Lab. In the Hutka app (iPhone, Android), or in Chrome on a Mac, Windows or Android.'));
   b.appendChild(step(1, t('Put the lap timer in Bluetooth mode'), esc(t('Alfano 7: in its menu turn Bluetooth on (the connection / sharing mode). The screen shows a PIN and the green light comes on — the lap timer is ready to send. Hutka does not need the PIN. RaceBox: just turn it on.')), 'hutka-device-timer.jpg'));
-  b.appendChild(step(2, t('Upload → From a device'), esc(t('Open hutka.ai or the Hutka app, tap Upload (the round button in the middle of the bottom bar; on a computer — “Upload session” in the Lab), then “From a device (Bluetooth)”. Sign in first if you have not.')), 'hutka-device.jpg'));
+  b.appendChild(step(2, t('Upload → From the lap timer'), esc(t('Open hutka.ai or the Hutka app, tap Upload (the round button in the middle of the bottom bar; on a computer — “Upload session” in the Lab), then the big blue “From the lap timer”. Sign in first if you have not.')), 'hutka-device.jpg'));
   b.appendChild(step(3, t('Pick the lap timer'), `${esc(t('Tap Alfano 6 / 7 (or RaceBox). The app lists what is in the air — tap yours: ALFANO-… with “looks like an Alfano”. In Chrome the browser’s own list opens instead: pick the device there and press Pair. Hutka signs in to the lap timer and reads its session list.'))}<br><span class="hint">${esc(t('Not in the list? Check the lap timer is on and in Bluetooth mode and the phone’s Bluetooth is on. On Android the app asks for the nearby-devices permission the first time — allow it.'))}</span>`, 'hutka-device-scan.jpg'));
-  b.appendChild(step(4, t('Tick the sessions, tap Open in the Lab'), esc(t('Every session in the lap timer’s memory: date, track, laps, best lap — the newest is ticked already. Tick the ones you want (one at a time is quickest) and tap Open in the Lab.')), 'hutka-device-sessions.jpg'));
-  b.appendChild(step(5, t('Wait for the read — a few minutes'), esc(t('A 45-lap session takes about five minutes over Bluetooth: the screen shows the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. Then the usual window opens: check the track, tap Analyse — the Lab opens with every corner.')), 'hutka-device-reading.jpg'));
+  b.appendChild(step(4, t('Tick the sessions, tap Upload'), esc(t('Every session in the lap timer’s memory: date, track, laps, best lap — the newest is ticked already. Tick the ones you want (one at a time is quickest) and tap the blue “Upload 1 session” at the bottom.')), 'hutka-device-sessions.jpg'));
+  b.appendChild(step(5, t('Wait for the read — a few minutes'), esc(t('A 45-lap session takes about five minutes over Bluetooth: the screen shows the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. Then the usual window opens: check the track, tap “Save and open in the Lab” — the Lab opens with every corner.')), 'hutka-device-reading.jpg'));
   box.appendChild(b);
   // Alfano 7 — the ADA app on the phone
   const a = card(t('Alfano 7 — the ADA app on your phone'), t('The other way, without Bluetooth: the app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.'));
@@ -6207,17 +6291,17 @@ function renderHelpPage() {
   a.appendChild(step(2, t('Tap the paper plane'), esc(t('The paper-plane icon in the bottom row (2 on the picture) — that is “send the session out of the app”. The phone’s share sheet opens. (The box-with-arrow icon on the far right is import — not that one.)'))));
   a.appendChild(step(3, t('Save the file on the phone'), `<b>${esc(t('With the Hutka app:'))}</b> ${esc(t('tap Hutka in the row of apps — the session opens in the upload window straight away, steps 4–5 are not needed.'))} <span class="hint">${esc(t('Hutka at the front of that row, once and for all: iPhone — scroll the app row to the end → More → Edit → “+” next to Hutka (Favourites), then drag it to the top; Android — hold Hutka in the share sheet → Pin.'))}</span><br><b>${esc(t('Without the app:'))}</b> <b>iPhone:</b> ${esc(t('tap “Save to Files”, choose a folder (Downloads is fine), tap Save.'))} <b>Android:</b> ${esc(t('choose “Save” / “Downloads”.'))}<br><span class="hint">${esc(t('The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.'))}</span>`));
   a.appendChild(step(4, t('Open hutka.ai and tap Upload'), esc(t('The round button in the middle of the bottom bar (on a computer — “Upload session” at the top right of the Lab). Sign in first if you have not — it takes one email.')), 'hutka-upload.jpg'));
-  a.appendChild(step(5, t('Choose the file'), esc(t('Tap “Choose session files”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.')), 'hutka-choose.jpg'));
-  a.appendChild(step(6, t('Check the track, tap Analyse'), esc(t('Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap Analyse — the Lab opens with every corner.')), 'hutka-form.jpg'));
+  a.appendChild(step(5, t('Choose the file'), esc(t('Tap “Choose a file”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.')), 'hutka-choose.jpg'));
+  a.appendChild(step(6, t('Check the track, tap Save'), esc(t('Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap “Save and open in the Lab” — the Lab opens with every corner.')), 'hutka-form.jpg'));
   box.appendChild(a);
   // other loggers
-  const o = card(t('Other loggers and apps'), t('Any of these files works the same way: save it on the phone or computer, then Upload → Choose session files.'));
+  const o = card(t('Other loggers and apps'), t('Any of these files works the same way: save it on the phone or computer, then Upload → Choose a file.'));
   const ul = el('ul', 'hlist'); for (const [k, v] of [['RaceChrono', t('open the session → ⋮ → Export → RaceChrono CSV (v3) → share / save the file.')], ['AiM (MyChron)', t('Race Studio 3 on a computer → the session → Export → CSV.')], ['VBOX', t('the .vbo file from the logger or VBOX Test Suite.')], ['TrackAddict / Harry’s LapTimer', t('Export → CSV / GPX → save.')], [t('Any phone GPS app'), t('export the session as GPX (RaceChrono free and most “GPS logger” apps do). GPS at 1 Hz is enough to see corners; 10 Hz is better.')]]) { const li = el('li'); li.innerHTML = `<b>${esc(k)}</b> — ${esc(v)}`; ul.appendChild(li); }
   o.appendChild(ul); box.appendChild(o);
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.21';
+const APP_VERSION = 'v34.22';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -8259,16 +8343,26 @@ const VENUE = (() => {
 })();
 const UPLOAD = (() => {
   let parsed = [], ctx = {}, venueP = null, venue = null;
+  const finePointer = !!(window.matchMedia && window.matchMedia('(pointer: fine)').matches);
+  // where the session comes from: the lap timer first, in the accent colour, where this phone or browser has Bluetooth; the file first where it has not
+  function syncSources() {
+    const bt = !!LOGGERS.ble.kind(), src = $('uplSrc');
+    $('uplFromDevice').classList.toggle('primary', bt); $('uplDrop').classList.toggle('primary', !bt);
+    if (bt) src.insertBefore($('uplFromDevice'), $('uplDrop')); else src.insertBefore($('uplDrop'), $('uplFromDevice'));
+    $('uplBtSub').textContent = bt ? t('Bluetooth · Alfano 7, RaceBox') : t('Bluetooth works in the Hutka app, or in Chrome on a computer or Android');
+    $('uplFileSub').textContent = t('Alfano .alf2 / .zip · AiM · RaceChrono · VBOX · GPX') + (finePointer ? ' — ' + t('or drop the files here') : '');
+  }
   function open(o) {
-    ctx = o || {}; parsed = []; $('uplForm').hidden = true; $('uplGo').disabled = true; setStatus('uplStatus', ''); $('uplName').value = ''; $('uplNote').value = ''; $('uplModal').hidden = false; $('uplFile').value = '';
-    $('uplDetect').textContent = '';
+    ctx = o || {}; parsed = []; $('uplForm').hidden = true; $('uplFoot').hidden = true; $('uplGo').disabled = false; $('uplGo').classList.remove('busy'); setStatus('uplStatus', ''); $('uplName').value = ''; $('uplNote').value = ''; $('uplFile').value = '';
+    $('uplDetect').textContent = ''; syncSources(); $('uplSrc').hidden = !!ctx.files; $('uplBox').classList.remove('over');
+    $('uplModal').hidden = false; $('uplBox').querySelector('.sheet-body').scrollTop = 0;
   }
   function close() { $('uplModal').hidden = true; }
   async function onFiles(files) {
-    if (!files.length) return; setStatus('uplStatus', t('Reading {n} file(s)…', { n: files.length }));
+    if (!files.length) return; $('uplSrc').hidden = true; setStatus('uplStatus', t('Reading {n} file(s)…', { n: files.length }));
     parsed = [];
     for (const f of files) { try { const data = await readAnyLogger(f); const meta = DATA.parseAlfName(f.name || ''); parsed.push({ file: f, data, meta }); } catch (e) { setStatus('uplStatus', t('Could not read {f}: {e}', { f: f.name, e: e.message || e }), 'warn'); } }
-    if (!parsed.length) return;
+    if (!parsed.length) { $('uplSrc').hidden = false; $('uplFile').value = ''; return; }   // nothing readable: the choice comes back, the reason stays above it
     const p0 = parsed[0], laps = p0.data.laps, best = laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a);
     let la = 0, lo = 0, n = 0; for (const L of laps) for (let i = 0; i < L.pts.length; i += 10) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
     const c = { lat: la / n, lon: lo / n };
@@ -8301,7 +8395,7 @@ const UPLOAD = (() => {
     $('uplName').value = p0.meta.driver ? `${p0.meta.driver}${p0.meta.date ? ', ' + fmtDate(p0.meta.date) : ''}` : (p0.data.name || '');
     const src = p0.data.source; const srcTx = src && src.app !== 'alfano' ? ' · ' + t('Source: {s}', { s: sourceLabel(src) }) + (src.grade !== 'high' ? ' — ' + t('braking and throttle points will be approximate; Alfano at 10 Hz is the reference') : '') + (p0.data.lapsHow === 'loop' ? ' · ' + t('laps were cut where the loop closes (no start/finish beacon in the file)') : '') : '';
     $('uplDetect').textContent = `${t('{n} laps, best {b}', { n: laps.length, b: fmtMs(best.timeMs) })} · ${near ? t('GPS puts this session at {name} ({d} km)', { name: near.x.name, d: near.d.toFixed(1) }) : (canAdd ? t('GPS does not match any track in Hutka yet — it is added below with its own page, or keep the session private without a track.') : (STORE.hasAuth && !STORE.hasIdentity ? t('GPS does not match any track in Hutka yet — sign in and upload again: the track page is created automatically.') : t('GPS does not match any track in the catalogue — it will be saved as a custom track.')))}${parsed.length > 1 ? ' · ' + t('{n} files: one session each, the same track and layout', { n: parsed.length }) : ''}${srcTx}${engTx}`;
-    setStatus('uplStatus', '', ''); $('uplForm').hidden = false; $('uplGo').disabled = false;
+    setStatus('uplStatus', '', ''); $('uplForm').hidden = false; $('uplFoot').hidden = false; $('uplGo').disabled = false;
   }
   let center = null;
   function syncNew() { const nw = $('uplTrack').value === '__new__'; $('uplNewTrack').hidden = !nw; $('uplLayout').parentElement.hidden = nw; if (nw) $('uplPublish').checked = true; }
@@ -8321,12 +8415,18 @@ const UPLOAD = (() => {
   $('uplFile').addEventListener('change', (e) => onFiles(Array.from(e.target.files || [])));
   if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) $('uplFile').removeAttribute('accept');
   $('uplDrop').addEventListener('click', () => $('uplFile').click());
-  $('uplHelpLink').onclick = () => { $('uplModal').hidden = true; };   // the guide opens as a page; the window closes
-  $('uplDrop').addEventListener('dragover', (e) => { e.preventDefault(); $('uplDrop').classList.add('over'); }); $('uplDrop').addEventListener('dragleave', () => $('uplDrop').classList.remove('over'));
-  $('uplDrop').addEventListener('drop', (e) => { e.preventDefault(); $('uplDrop').classList.remove('over'); onFiles(Array.from(e.dataTransfer.files || [])); });
+  $('uplHelpLink').onclick = close;   // the guide opens as a page; the window closes
+  // files dropped anywhere on the window (a computer): the window lights up, the drop reads them — never a browser tab opening the file
+  const dragOn = (on) => $('uplBox').classList.toggle('over', on && !$('uplSrc').hidden);
+  $('uplModal').addEventListener('dragover', (e) => { e.preventDefault(); dragOn(true); });
+  $('uplModal').addEventListener('dragleave', (e) => { if (!e.relatedTarget || !$('uplModal').contains(e.relatedTarget)) dragOn(false); });
+  $('uplModal').addEventListener('drop', (e) => { e.preventDefault(); dragOn(false); if ($('uplSrc').hidden) return; onFiles(Array.from(e.dataTransfer.files || [])); });
   $('uplCancel').onclick = close; $('uplModal').addEventListener('click', (e) => { if (e.target === $('uplModal')) close(); });
+  $('uplModal')._back = close;   // the phone's back button
+  // the Save button shows its spinner while the session goes up; a failure gives it back with the reason above
+  const goFail = (msg) => { setStatus('uplStatus', msg, 'warn'); $('uplGo').disabled = false; $('uplGo').classList.remove('busy'); };
   $('uplGo').onclick = async () => {
-    if (!parsed.length) return; $('uplGo').disabled = true; setStatus('uplStatus', t('Saving…'));
+    if (!parsed.length) return; $('uplGo').disabled = true; $('uplGo').classList.add('busy'); setStatus('uplStatus', t('Saving…'));
     let tid = $('uplTrack').value, lid = $('uplLayout').value || 'custom'; const label = $('uplName').value.trim(), note = $('uplNote').value.trim(), kart = kartPick();
     // a track that is not in Hutka yet: its page and a first layout are created together with the session
     let newTrack = false;
@@ -8340,7 +8440,7 @@ const UPLOAD = (() => {
         tid = await STORE.saveTrack(Object.assign({ name, city, country: cc, lat: center ? +center.lat.toFixed(5) : null, lon: center ? +center.lon.toFixed(5) : null, address: v.address || '', website: v.website || '', phone: v.phone || '', indoor: !!v.indoor, lengthM, karts: kart.name ? [{ name: kart.name, cls: kart.cls }] : [], community: true, osm: v.osm || '' }, hrs));
         lid = await STORE.saveLayout(tid, { name: t('Main'), order: 0, cornerR: 110, widthM: 8, lengthM });
         newTrack = true;
-      } catch (e) { setStatus('uplStatus', t('Could not create the track: {e}', { e: e && e.message || e }), 'warn'); $('uplGo').disabled = false; return; }
+      } catch (e) { goFail(t('Could not create the track: {e}', { e: e && e.message || e })); return; }
     }
     const tr = tid ? STORE.getTrack(tid) : null;
     // a kart this track did not list yet is remembered on the track page (for the next driver's picker)
@@ -8352,16 +8452,16 @@ const UPLOAD = (() => {
       for (const L of sess.laps) L._sess = sess;
       // loggers without a start/finish beacon: start every lap at the layout's S/F so corners line up with everyone else's
       if (sess.source && sess.source.app !== 'alfano' && tid && lid !== 'custom') { try { const G = await GEOM.build(tid, lid); IMPORT.alignToStart(sess, G); } catch (e) {} }
-      try { await STORE.saveSession(sess); if (!first) first = sess; } catch (e) { setStatus('uplStatus', STORE.isQuota(e) ? t('Daily upload limit reached — the rest tomorrow.') : t('Could not save the session: {e}', { e: e && e.message || e }), 'warn'); $('uplGo').disabled = false; return; }
+      try { await STORE.saveSession(sess); if (!first) first = sess; } catch (e) { goFail(STORE.isQuota(e) ? t('Daily upload limit reached — the rest tomorrow.') : t('Could not save the session: {e}', { e: e && e.message || e })); return; }
       // the first session on a brand-new layout defines its track line for everyone who comes after; the page gets the length and the corner count
       if (k === 0 && tr && tr.community && lid !== 'custom') { const l = STORE.getLayout(tid, lid); if (l && !l.refSession && STORE.canEditTrack(tr)) { try { await STORE.saveLayout(tid, Object.assign({}, l, { refSession: sess.id })); GEOM.invalidate();
             const G = await GEOM.build(tid, lid, sess, { noMedia: true }); if (G && G.track) { const corners = GEOM.apexes(G, null).length, lengthM = Math.round(G.lengthM || G.track.lengthM || l.lengthM || 0); const l2 = STORE.getLayout(tid, lid) || l; await STORE.saveLayout(tid, Object.assign({}, l2, { refSession: sess.id, lengthM, corners }));
               if (newTrack) { const tr2 = STORE.getTrack(tid) || tr; const desc = t('{length} m, {corners} corners — mapped from a driver\u2019s session on {date}. Know this track? Add the website, hours and a photo on the track page.', { length: lengthM, corners, date: fmtDate(sess.date) }); await STORE.saveTrack(Object.assign({}, tr2, { lengthM, corners, description: tr2.description || desc })); } } } catch (e) {} } }
     }
     STORE.track('upload', { n: parsed.length, kart: kart.cls, app: parsed[0] && parsed[0].data.source ? parsed[0].data.source.app : 'alfano' });
-    close(); if (first) { NATIVE.haptic('success'); await LAB.open(first, false); go('lab'); }
+    close(); $('uplGo').classList.remove('busy'); if (first) { NATIVE.haptic('success'); await LAB.open(first, false); go('lab'); }
   };
-  async function withFiles(files) { open({}); await onFiles(files); }
+  async function withFiles(files) { open({ files: true }); await onFiles(files); }
   return { open, close, withFiles };
 })();
 // ---------- straight from the lap timer: the device window — pick the logger, find it nearby (the app scans; a browser has its chooser),
@@ -8371,12 +8471,15 @@ const DEVICE = (() => {
   let H = null, dev = null, drv = null, items = [], busy = false, seen = new Map(), scanT = null, scanning = false, showAll = false, ex = null, logT = null;
   const S = (tx, cls) => setStatus('devStatus', tx, cls);
   const when = (ms) => { if (!isFinite(ms)) return ''; return new Date(ms).toLocaleString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
-  const stage = (name) => { for (const id of ['devKinds', 'devScan', 'devStage', 'devExplore']) $(id).hidden = true; if (name) $(name).hidden = false; $('devNoBt').hidden = name !== 'devKinds' || !!LOGGERS.ble.kind(); };
+  // one step of the window at a time; the header's ‹ goes one step back (it is not there on the first step), ✕ closes
+  let cur = 'devKinds';
+  const stage = (name) => { for (const id of ['devKinds', 'devScan', 'devStage', 'devExplore']) $(id).hidden = true; if (name) $(name).hidden = false; cur = name || 'devKinds';
+    $('devNoBt').hidden = name !== 'devKinds' || !!LOGGERS.ble.kind(); $('devIntro').hidden = name !== 'devKinds'; $('devBack').hidden = name === 'devKinds'; if (name !== 'devStage') $('devActs').hidden = true; $('devModal').querySelector('.sheet-body').scrollTop = 0; };
   function open() {
     if (busy || (dev && items.length) || ex) { $('devModal').hidden = false; return; }   // a read in progress, a device still connected with its outings listed, or the explorer open
     items = []; dev = null; H = null; drv = null;
     const kinds = $('devKinds'); kinds.innerHTML = '';
-    for (const d of LOGGERS.list) {
+    for (const d of LOGGERS.list.slice().sort((a, b) => (a.id === 'alfano' ? 0 : 1) - (b.id === 'alfano' ? 0 : 1))) {   // the Alfano first: most drivers have one
       const b = el('button', 'dev-kind'); b.type = 'button'; b.dataset.id = d.id;
       b.innerHTML = `<b>${esc(d.name)}</b><span>${esc(d.sessions ? t('Bluetooth — the sessions in the device memory, straight into the Lab') : t('Bluetooth — the recorded outings go straight into the Lab'))}</span>`;
       b.onclick = () => choose(d); kinds.appendChild(b);
@@ -8470,21 +8573,28 @@ const DEVICE = (() => {
     S(t('Signed in — reading the session list…'));
     bar(0, 1);
     const outs = await dev.list((what, k, n) => { if (what === 'scan') { bar(k, 70); S(t('Looking through the memory… {k}', { k: k + 1 })); } else if (what === 'session') { bar(k, n); S(t('Session headers… {k} / {n}', { k, n })); } });
-    bar(1, 1); items = outs; busy = false; renderSessions();
+    items = outs; busy = false; $('devBar').hidden = true; renderSessions();
   }
   const whenStr = (iso) => { const ms = Date.parse(String(iso || '').replace(' ', 'T')); return isFinite(ms) ? new Date(ms).toLocaleString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : String(iso || ''); };
   function renderSessions() {
     const box = $('devList'); box.innerHTML = '';
-    if (!items.length) { S(t('No sessions in the device memory.'), 'warn'); $('devActs').hidden = false; $('devImport').hidden = true; $('devErase').hidden = true; return; }
-    S(t('{n} session(s) on {name} — tick the ones to bring into the Lab (the newest first).', { n: items.length, name: H ? H.name : drv.name }), 'ok');
+    if (!items.length) { S(t('No sessions in the device memory.'), 'warn'); $('devActs').hidden = true; return; }
+    S(t('{n} session(s) on {name} — tick the ones to upload (the newest first).', { n: items.length, name: H ? H.name : drv.name }), 'ok');
     items.forEach((o, i) => {
       const lab = el('label', 'dev-item' + (o.ok ? '' : ' dim')); const cb = el('input'); cb.type = 'checkbox'; cb.checked = i === 0 && o.ok; cb.disabled = !o.ok; cb.dataset.i = i;
       const best = `${o.bestMin}:${String(o.bestSec).padStart(2, '0')}.${String(o.bestCs).padStart(2, '0')}`;
       const tx = el('div'); tx.innerHTML = `<b>${esc(o.ok ? whenStr(o.date) : t('Session {n}', { n: i + 1 }))}</b><span class="hint">${esc(o.ok ? `${o.track}${o.driver ? ' · ' + o.driver : ''} · ${t('{n} laps', { n: o.laps })} · ${t('best')} ${best}` : t('{n} laps · header unreadable', { n: o.laps }))}</span>`;
       lab.appendChild(cb); lab.appendChild(tx); box.appendChild(lab);
     });
-    $('devActs').hidden = false; $('devImport').hidden = false; $('devErase').hidden = true;
+    $('devActs').hidden = false; $('devImport').hidden = false; $('devErase').hidden = true; syncPick();
   }
+  // the one button says what it will do and how much: "Upload 2 sessions" (a read over Bluetooth takes minutes — never "Open")
+  function syncPick() {
+    const cbs = [...$('devList').querySelectorAll('input[type=checkbox]')]; for (const c of cbs) c.closest('.dev-item').classList.toggle('on', c.checked);
+    const n = cbs.filter(c => c.checked && !c.disabled).length, b = $('devImport');
+    b.disabled = !n; b.textContent = n ? tn(n, 'Upload {n} session', 'Upload {n} sessions').replace('{n}', n) : t('Tick a session to upload');
+  }
+  $('devList').addEventListener('change', syncPick);
   async function importSessions() {
     const picked = [...$('devList').querySelectorAll('input:checked')].map(c => items[+c.dataset.i]).filter(o => o && o.ok);
     if (!picked.length) { S(t('Tick at least one session.'), 'warn'); return; }
@@ -8512,19 +8622,19 @@ const DEVICE = (() => {
     bar(0, 1); etaStart();
     $('devKeep').hidden = false;
     const outs = await dev.download((p) => { bar(p.done, p.total); const left = etaText(p.done, p.total); S(withEta(t('Reading the memory… {done} / {total}', { done: p.done, total: p.total }), left)); pill(withEta(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct: p.total ? Math.min(100, Math.round(p.done / p.total * 100)) : 0 }), left)); });
-    bar(1, 1); items = outs; busy = false; $('devKeep').hidden = true; pill(''); renderList();
+    items = outs; busy = false; $('devBar').hidden = true; $('devKeep').hidden = true; pill(''); renderList();
   }
   async function unlock() { const code = $('devCode').value.trim(); if (!code || !dev || busy) return; busy = true; try { await dev.unlock(code); $('devCodeRow').hidden = true; await readAll(); } catch (e) { busy = false; fail(e); } }
   function renderList() {
     const box = $('devList'); box.innerHTML = '';
-    if (!items.length) { S(t('Nothing recorded on the device yet — press its REC button before the next outing.'), 'warn'); $('devActs').hidden = false; $('devImport').hidden = true; $('devErase').hidden = true; return; }
-    S(t('{n} outing(s) on the device — tick the ones to bring into the Lab.', { n: items.length }), 'ok');
+    if (!items.length) { S(t('Nothing recorded on the device yet — press its REC button before the next outing.'), 'warn'); $('devActs').hidden = true; return; }
+    S(t('{n} outing(s) on the device — tick the ones to upload.', { n: items.length }), 'ok');
     items.forEach((o, i) => {
       const lab = el('label', 'dev-item'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = true; cb.dataset.i = i;
       const tx = el('div'); tx.innerHTML = `<b>${esc(when(o.startMs) || t('Outing {n}', { n: i + 1 }))}</b><span class="hint">${esc(t('{min} min · {hz} Hz · up to {v} km/h', { min: Math.max(1, Math.round(o.span / 60)), hz: o.hz, v: Math.round(o.vmax * 3.6) }))}</span>`;
       lab.appendChild(cb); lab.appendChild(tx); box.appendChild(lab);
     });
-    $('devActs').hidden = false; $('devImport').hidden = false; $('devErase').hidden = !(dev && dev.erase);
+    $('devActs').hidden = false; $('devImport').hidden = false; $('devErase').hidden = !(dev && dev.erase); syncPick();
   }
   async function importSel() {
     if (dev && dev.kind === 'sessions') return importSessions();
@@ -8573,11 +8683,21 @@ const DEVICE = (() => {
   }
   async function disconnect() { await drop(); open(); }
   $('devImport').onclick = importSel; $('devErase').onclick = erase; $('devUnlock').onclick = unlock; $('devCancel').onclick = close;
-  $('devRescan').onclick = () => startScan(); $('devScanMore').onclick = () => { showAll = !showAll; renderScan(); }; $('devScanBack').onclick = async () => { await stopScan(); open(); };
+  $('devRescan').onclick = () => startScan(); $('devScanMore').onclick = () => { showAll = !showAll; renderScan(); };
   $('devExSend').onclick = () => sendCmd(false); $('devExSendNr').onclick = () => sendCmd(true); $('devHex').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendCmd(false); });
   $('devPinTry').onclick = async () => { if (!ex || !ex.live) return; const pin = $('devPin').value.trim(); if (!pin) return; $('devPinTry').disabled = true; try { await ex.tryPin(pin, (k, n, how) => { $('devExSent').textContent = t('PIN {k}/{n}: {how}', { k, n, how }); renderLog(); }); $('devExSent').textContent = t('PIN tried {n} ways — see what came back above, then send the log.', { n: 6 }); } catch (e) { $('devExSent').textContent = t('write failed: {e}', { e: e && e.message || e }); } $('devPinTry').disabled = false; renderLog(); };
   $('devAlfHello').onclick = async () => { if (!ex || !ex.live) return; $('devAlfHello').disabled = true; try { await ex.alfanoHello((k, n, how) => { $('devExSent').textContent = `${k}/${n}: ${how}`; renderLog(); }); $('devExSent').textContent = t('Handshake sent — see the answers above, then send the log.'); } catch (e) { $('devExSent').textContent = t('write failed: {e}', { e: e && e.message || e }); } $('devAlfHello').disabled = false; renderLog(); };
-  $('devSendLog').onclick = sendLog; $('devExDisc').onclick = disconnect; $('devStageBack').onclick = async () => { if (busy && dev && dev.cancel) { try { await dev.cancel(); } catch (e) {} } busy = false; await drop(); open(); };
+  $('devSendLog').onclick = sendLog; $('devExDisc').onclick = disconnect;
+  // ‹ — one step back: the scan → the kinds; the explorer → disconnected; the device → another device (a read in progress is stopped only after a yes)
+  async function back() {
+    if (cur === 'devKinds') { close(); return; }
+    if (cur === 'devScan') { await stopScan(); open(); return; }
+    if (cur === 'devExplore') { await disconnect(); return; }
+    if (busy && !(await confirmDlg(t('Stop reading the lap timer?'), t('What has been read so far is not kept — the sessions stay on the lap timer.'), t('Stop reading')))) return;
+    if (busy && dev && dev.cancel) { try { await dev.cancel(); } catch (e) {} }
+    busy = false; pill(''); $('devKeep').hidden = true; await drop(); open();
+  }
+  $('devBack').onclick = back; $('devModal')._back = back;   // the header's ‹ and the phone's back button
   $('devModal').addEventListener('click', (e) => { if (e.target === $('devModal')) close(); });
   $('uplFromDevice').onclick = () => { UPLOAD.close(); open(); };
   addEventListener('pagehide', () => { drop(); });
