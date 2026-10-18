@@ -4769,6 +4769,13 @@ Object.assign(I18N.RU, {
   'No connection — your sessions show when it is back.': 'Нет связи — твои сессии появятся, когда она вернётся.',
   'No connection': 'Нет связи',
   'The latest sessions show when the connection is back.': 'Свежие сессии появятся, когда вернётся связь.' });
+
+// v34.28 — the line decides, not the label (the user's report: Al Forsan and "custom" sessions not comparable)
+Object.assign(I18N.RU, {
+  'checking…': 'проверяю…',
+  'same line': 'та же линия',
+  'other track': 'другая трасса',
+  'Filed under another layout or track page, but its laps follow this layout — compared all the same.': 'Записана под другой конфигурацией или трассой, но круги идут по этой линии — сравнивается.' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -6552,7 +6559,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.27';
+const APP_VERSION = 'v34.28';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -7904,34 +7911,69 @@ function markCombos(D) {
   for (const c of cand) { if (c.a.combo || c.a.comboPrev || c.b.combo || c.b.comboPrev) continue; c.a.combo = { n: c.b.w.n, net: c.da + c.db, dta: c.da, dtb: c.db }; c.b.comboPrev = { n: c.a.w.n, net: c.da + c.db, dta: c.da, dtb: c.db }; }
 }
 const comboText = (r) => { const c = r.combo || r.comboPrev; if (!c) return ''; const first = !!r.combo, me = first ? c.dta : c.dtb, other = first ? c.dtb : c.dta, on = first ? c.n : c.n; const netYou = c.net <= -0.04, netLoss = c.net >= 0.04; if (me >= 0.04 && other <= -0.04) return netYou ? t('Linked with T{n}: the {a} s lost here buys {b} s there — together you are {net} s faster. The earlier brake sets up the next corner; keep it.', { n: on, a: me.toFixed(2), b: (-other).toFixed(2), net: (-c.net).toFixed(2) }) : t('Linked with T{n}: {a} s lost here against {b} s gained there — net {net} s. Judge the pair together, not this corner alone.', { n: on, a: me.toFixed(2), b: (-other).toFixed(2), net: sg(c.net) }); if (me <= -0.04 && other >= 0.04) return netLoss ? t('Linked with T{n}: the {a} s gained here costs {b} s there — together you are {net} s slower. The entry here is compromising the next corner.', { n: on, a: (-me).toFixed(2), b: other.toFixed(2), net: c.net.toFixed(2) }) : t('Linked with T{n}: {a} s gained here, {b} s lost there — net {net} s. Judge the pair together.', { n: on, a: (-me).toFixed(2), b: other.toFixed(2), net: sg(c.net) }); return ''; };
+// the line decides, not the label: a session filed under another layout or another page of the same track (a "custom" upload, a wrong
+// pick, a duplicate track page made by a pin kilometres off) is compared all the same when its laps follow this layout — tested the way
+// an upload's layout is recognised (detectLayout: the best clean lap against every layout's line of this track)
+const centreOf = (m) => { const la = +((m && m.lat) || 0), lo = +((m && m.lon) || 0); if (la && lo && isFinite(la) && isFinite(lo)) return { lat: la, lon: lo }; const laps = m && m.laps; if (!laps || !laps.length) return null; let a = 0, b = 0, n = 0; for (const L of laps) for (let i = 0; i < L.pts.length; i += 10) { a += L.pts[i].lat; b += L.pts[i].lon; n++; } return n ? { lat: a / n, lon: b / n } : null; };
+const LINE_OF = new Map();   // session id + track → the layout its laps follow there ('' none)
+async function lineOf(tid, s) {
+  const key = s.id + '|' + tid; if (LINE_OF.has(key)) return LINE_OF.get(key);
+  const probe = { laps: s.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) }; for (const L of probe.laps) L._sess = probe;
+  let lid = ''; try { const D = await detectLayout(tid, probe); lid = D.how === 'fit' ? D.lid : ''; } catch (e) { lid = ''; }
+  LINE_OF.set(key, lid); return lid;
+}
 function renderCmpPicker() {
   const box = $('cmpPicker'), list = $('cmpList'); box.hidden = !LAB.pickerOpen; if (!LAB.pickerOpen) return;
   list.innerHTML = ''; $('cmpPickerHint').textContent = (LAB.pickerFor === 'cmp2' ? t('Pick the session of the third lap.') + ' ' : '') + t('Sessions on the same layout can be compared corner by corner; sessions on another layout cannot.');
-  const sess = LAB.current; const rows = [];
-  const push = (meta, loaded, same, mine) => rows.push({ meta, loaded, same, mine });
+  const sess = LAB.current, G0 = LAB.G, run = LAB.pickerRun = (LAB.pickerRun || 0) + 1; const rows = [];
+  const alive = () => LAB.pickerRun === run && LAB.current === sess && LAB.G === G0 && LAB.pickerOpen;
+  const push = (meta, loaded, same, mine) => { const r = { meta, loaded, same, mine }; rows.push(r); return r; };
   for (const sx of LAB.sessions) if (sx !== sess) push(sx, true, true, mySession(sx));
   (async () => {
     const sameKart = (m) => LAB.allKarts || kartCompatible(m, sess); let hidden = 0;
     const mine = await STORE.mySessions(); for (const m of mine) if (m.id !== sess.id && !sessOf(m.id)) { if (sameKart(m)) push(m, false, m.track === LAB.tid && m.layout === LAB.lid, true); else hidden++; }
     if (LAB.tid) { const pubs = await STORE.sessionsFor(LAB.tid, LAB.lid); for (const m of pubs) if (m.id !== sess.id && !sessOf(m.id) && !rows.some(r => r.meta.id === m.id)) { if (sameKart(m)) push(m, false, true, false); else hidden++; } }
+    if (!alive()) return;
     if (hidden || LAB.allKarts) { const h = $('cmpPickerHint'); h.textContent = (LAB.allKarts ? t('Showing every kart — different karts are not comparable corner by corner.') : t('{n} session(s) on another kart are hidden (different karts are not comparable corner by corner).', { n: hidden })) + ' '; const a = el('a', 'tref', LAB.allKarts ? t('Hide them') : t('Show anyway')); a.href = '#'; a.onclick = async (e) => { e.preventDefault(); LAB.allKarts = !LAB.allKarts; LAB.pickerOpen = true; await LAB.open(LAB.current, false); }; h.appendChild(a); }
-    const names = await STORE.names(rows.map(r => r.meta.owner));
+    // the place: my sessions filed under another layout or track page but driven here are checked by their line
+    const c0 = centreOf(sess), here = (m) => { const a = centreOf(m); return a && c0 ? GEO.distKm(a, c0) < 2 : m.track === LAB.tid; };
+    for (const r of rows) if (!r.same) { r.here = here(r.meta); r.check = r.here && !LAB.curOff; }
+    // and the published ones of others: on this track with no layout ("custom"), and on other track pages within a few km — shown only
+    // when their line is this one
+    // a "custom" session (no layout): the layout its laps follow, if any — the sessions published on that layout are its peers too
+    const curLine = LAB.curOff ? '' : (LAB.lid && LAB.lid !== 'custom' ? LAB.lid : await lineOf(LAB.tid, sess));
+    const extra = [];
+    if (!LAB.curOff && c0) {
+      const tids = [LAB.tid].concat(STORE.getTracks().filter(x => x.id !== LAB.tid && isFinite(x.lat) && isFinite(x.lon) && GEO.distKm(c0, x) < 15).map(x => x.id)).filter(Boolean);
+      for (const tid of tids) { let list = []; try { list = await STORE.sessionsFor(tid); } catch (e) {} for (const m of list) { if (m.id === sess.id || rows.some(r => r.meta.id === m.id) || extra.some(x => x.id === m.id)) continue; if (tid === LAB.tid && m.layout && m.layout !== 'custom' && m.layout !== curLine) continue; if (!here(m) || !sameKart(m)) continue; extra.push(m); } }
+    }
+    const names = await STORE.names(rows.map(r => r.meta.owner).concat(extra.map(m => m.owner)));
+    if (!alive()) return;
     const fav = (r) => STORE.markOf(r.meta.id, 0) ? 1 : 0;
-    rows.sort((a, b) => (b.same - a.same) || (fav(b) - fav(a)) || (b.mine - a.mine) || (b.meta.date || '').localeCompare(a.meta.date || ''));
+    rows.sort((a, b) => (b.same - a.same) || ((b.check ? 1 : 0) - (a.check ? 1 : 0)) || (fav(b) - fav(a)) || (b.mine - a.mine) || (b.meta.date || '').localeCompare(a.meta.date || ''));
     list.innerHTML = '';
     if (LAB.curOff) { list.appendChild(el('div', 'hint', t('This session was driven on another configuration of the track — comparisons are off until its layout is right (Edit).'))); return; }
-    if (!rows.length) { list.appendChild(el('div', 'hint', t('No other sessions yet. Upload another stint or wait for other drivers to publish on this layout.'))); return; }
-    for (const r of rows) {
-      const m = r.meta, b = el('button', 'cmp-row'); b.type = 'button'; if (!r.same) b.disabled = true;
+    if (!rows.length && !extra.length) { list.appendChild(el('div', 'hint', t('No other sessions yet. Upload another stint or wait for other drivers to publish on this layout.'))); return; }
+    const rowEl = (r) => {
+      const m = r.meta, b = el('button', 'cmp-row'); b.type = 'button';
+      const ok = r.same || r.line, off = r.same && LAB.offIds && LAB.offIds.has(m.id); if (!ok || off || r.check) b.disabled = true;
       const tr = STORE.getTrack(m.track); const who = el('span', 'who', r.mine ? t('You') : ((names[m.owner] || {}).name || t('Driver')));
-      const nm = el('span', 'nm', `${m.label || m.name} · ${fmtDate(m.date)}${!r.same ? ` · ${tr ? tr.name : (m.trackName || t('Custom'))}` : ''}`); if (fav(r)) nm.prepend(el('span', 'star', '★'));
-      const off = r.same && LAB.offIds && LAB.offIds.has(m.id); if (off) b.disabled = true;
-      const pill = el('span', 'pill ' + (r.same && !off ? 'ok' : 'off'), off ? t('another configuration?') : (r.same ? t('same layout') : t('other layout'))); if (off) pill.title = t('Uploaded under this layout, but the lap follows another configuration of the track — not comparable.');
+      const nm = el('span', 'nm', `${m.label || m.name} · ${fmtDate(m.date)}${!r.same && !r.line ? ` · ${tr ? tr.name : (m.trackName || t('Custom'))}` : ''}`); if (fav(r)) nm.prepend(el('span', 'star', '★'));
+      const pill = el('span', 'pill ' + (r.check ? '' : (ok && !off ? 'ok' : 'off')), off ? t('another configuration?') : r.check ? t('checking…') : r.same ? t('same layout') : r.line ? t('same line') : r.here ? t('other layout') : t('other track'));
+      if (off) pill.title = t('Uploaded under this layout, but the lap follows another configuration of the track — not comparable.');
+      if (r.line) pill.title = t('Filed under another layout or track page, but its laps follow this layout — compared all the same.');
       const pills = el('span', 'pills'); pills.appendChild(pill); if (m.kart || kartClassOf(m) !== kartClassOf(sess)) pills.appendChild(el('span', 'pill ' + (kartCompatible(m, sess) ? '' : 'off'), kartLabel(m)));
       b.append(who, nm, el('span', 'tm', fmtMs(m.bestMs)), pills);   // on a phone the pills take a second line, so the name and the session read
       b.onclick = async () => { b.classList.add('busy'); try { const s = r.loaded ? m : await LAB.load(m); if (LAB.pickerFor === 'cmp2') { LAB.cmp2 = thirdDefault(s); LAB.pickerFor = ''; } else { LAB.cmp = sessAvg(s) ? 'avg:' + s.id : lapKey(s, bestLap(s)); LAB.chat = []; LAB.selN = 0; } LAB.pickerOpen = false; labRender(); } catch (e) { toast(t('Could not load that session: {e}', { e: e && e.message || e })); b.classList.remove('busy'); } };
-      list.appendChild(b);
-    }
+      return b;
+    };
+    for (const r of rows) { r.node = rowEl(r); list.appendChild(r.node); }
+    // the checks, one by one (mine first, then the others' — at most 12 loads): a row turns "same line" and opens, or settles as it is
+    const fits = async (m) => { try { const s = sessOf(m.id) || await STORE.loadSession(m); if (!alive()) return false; if (curLine) return (await lineOf(LAB.tid, s)) === curLine; const r = GEOM.attach(s, LAB.G); return !!(r && r.ok) && fitsLayout(s, LAB.G); } catch (e) { return false; } };
+    let budget = 12;
+    const lift = (r) => { const first = rows.find(x => x !== r && !x.same && !x.line && x.node); if (first && first.node !== r.node) list.insertBefore(r.node, first.node); };   // a row that turned comparable goes up, under the comparable ones
+    for (const r of rows.filter(x => x.check)) { if (!alive()) return; const yes = budget-- > 0 && await fits(r.meta); if (!alive()) return; r.check = false; r.line = yes; const n = rowEl(r); r.node.replaceWith(n); r.node = n; if (yes) lift(r); }
+    for (const m of extra) { if (!alive() || budget-- <= 0) return; if (!(await fits(m))) continue; if (!alive()) return; const r = { meta: m, loaded: false, same: false, line: true, mine: false, here: true }; rows.push(r); r.node = rowEl(r); list.appendChild(r.node); lift(r); }
   })();
 }
 async function renderSocialBits() {
@@ -8634,6 +8676,16 @@ async function detectLayout(tid, sess) {
 // ---------- a fresh upload → private drafts (Pasha's point 7): no form. The track by GPS (a new community track named from the map when
 // there is none), the layout by the shape of the laps, the kart most people drive there (or the class the revs give away); sessions that
 // are already in the library (the start to the minute + the best lap to 1/100 s) are not saved twice. The finishing touches wait in the Lab.
+// two names of one track: "AL FORSAN INTERNATIONAL" (the lap timer) and "Al Forsan International Sports Resort" (the page) — the words
+// left after the generic ones (karting, circuit, international, the city's article…) are the same, one set inside the other
+const sameTrackName = (() => {
+  const GENERIC = new Set(['al', 'el', 'the', 'de', 'la', 'le', 'du', 'des', 'di', 'da', 'and', 'kart', 'karts', 'karting', 'kartdrome', 'kartodrom', 'go', 'gokart', 'gokarts', 'circuit', 'track', 'raceway', 'speedway', 'motorsport', 'motorsports', 'international', 'intl', 'sports', 'sport', 'resort', 'park', 'club', 'arena', 'outdoor', 'indoor', 'centre', 'center', 'racing', 'race', 'gp', 'layout', 'main']);
+  // minus: words that say nothing here (the city the laps are in — "DUBAI" names no track in Dubai)
+  const words = (name) => String(name || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').split(/[^a-z0-9а-яё]+/).filter(w => w && !GENERIC.has(w) && !/^\d+$/.test(w));
+  const key = (name, minus) => { const no = new Set(words(minus)); return words(name).filter(w => !no.has(w)).join(' '); };
+  const same = (a, b) => { const A = String(a || '').split(' ').filter(Boolean), B = key(b).split(' ').filter(Boolean); if (!A.length || !B.length) return false; const [s1, s2] = A.length <= B.length ? [A, new Set(B)] : [B, new Set(A)]; return s1.every(w => s2.has(w)); };
+  same.key = key; return same;
+})();
 const DRAFTS = (() => {
   const minute = (d) => String(d || '').replace('T', ' ').slice(0, 16);
   const bestOfLaps = (laps) => laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a);
@@ -8645,7 +8697,17 @@ const DRAFTS = (() => {
   async function trackFor(p) {
     let la = 0, lo = 0, n = 0; for (const L of p.data.laps) for (let i = 0; i < L.pts.length; i += 10) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
     const c = { lat: la / n, lon: lo / n };
-    const near = STORE.getTracks().filter(x => isFinite(x.lat) && isFinite(x.lon)).map(x => ({ x, d: GEO.distKm(c, x) })).sort((a, b) => a.d - b.d)[0];
+    const all = STORE.getTracks().filter(x => isFinite(x.lat) && isFinite(x.lon)).map(x => ({ x, d: GEO.distKm(c, x) })).sort((a, b) => a.d - b.d);
+    // 1. the line decides, not the pin: a track nearby whose layout these laps follow. A track's coordinates can be kilometres off (Al
+    //    Forsan's pin was the resort's address, 6.5 km from the circuit, and the first upload there opened a second page for the same
+    //    track), and two tracks can sit side by side (Dubai's indoor and outdoor circuits)
+    const probe = { laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) }; for (const L of probe.laps) L._sess = probe;
+    for (const o of all.filter(o => o.d < 15).slice(0, 4)) { try { const D = await detectLayout(o.x.id, probe); if (D.how === 'fit') return { tid: o.x.id }; } catch (e) {} }
+    // 2. the name the lap timer gives the track, against the tracks around (a page with no laps on it yet has no line to match)
+    const town = GEO.nearestCity(c.lat, c.lon), named = sameTrackName.key(p.data.source && p.data.source.app !== 'alfano' ? '' : (p.meta.track || ''), town && town.km < 60 ? town.name : '');
+    if (named) { const hits = all.filter(o => o.d < 30 && sameTrackName(named, o.x.name)); if (hits.length === 1 || (hits.length > 1 && hits[0].d < 3)) return { tid: hits[0].x.id }; }
+    // 3. the nearest within 3 km
+    const near = all[0];
     if (near && near.d < 3) return { tid: near.x.id };
     const canAdd = STORE.canWrite() && (STORE.isAdmin() || await STORE.communityAvailable()); if (!canAdd) return { tid: '' };
     // a track Hutka does not know yet: its page and a first layout, named from the map (OSM) — the name can be changed on the track page
@@ -10246,7 +10308,7 @@ const ADMIN = (() => {
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
   try { AUTH.gate(); } catch (e) {}   // the app: sign in first
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, sameTrackName, lineOf, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { if (typeof INTRO !== 'undefined') INTRO.ready(); } catch (e) {}   // the opening may finish: the app is up
