@@ -1059,6 +1059,12 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .dev-item b{font-size:15px}
 .dev-item .hint{font-size:12.5px}
 .dev-item.dim{opacity:.55}
+/* a session already in Hutka: greyed, dashed, a green tick; the whole row opens it in the Lab */
+.dev-item.known{width:100%;background:var(--surface-2);border-style:dashed;color:var(--fg);font:inherit;text-align:left}
+.dev-item.known b{color:var(--muted)}
+.dev-item .dev-in{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--ok);color:#fff;font-size:12px;font-weight:800;line-height:1}
+.dev-item .dev-in-tx{font-size:12.5px;font-weight:600;color:var(--ok)}
+.dev-item .dev-go{margin-left:auto;flex:none;width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.45}
 #devPick{display:flex;flex-direction:column;gap:12px}
 .btn.cta.dev-retry{margin-top:14px}
 #devPick[hidden]{display:none}
@@ -4642,6 +4648,15 @@ Object.assign(I18N.RU, {
 Object.assign(I18N.RU, {
   'The app lists the lap timers in the air at once — tap yours: ALFANO-… (marked Alfano) or RaceBox …. In Chrome the browser’s own list opens instead: pick the device there and press Pair. Hutka signs in to the lap timer and reads its session list.': 'Приложение сразу покажет приборы в эфире — нажми на свой: ALFANO-… (с пометкой Alfano) или RaceBox …. В Chrome вместо этого откроется список самого браузера: выбери прибор там и нажми «Подключить». Hutka войдёт в прибор и прочитает список сессий.',
   'A 45-lap session takes about five minutes over Bluetooth: a big bar shows the percent, the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. When it is done, the next window opens by itself: check the track, tap “Save and open in the Lab” — the Lab opens with every corner.': 'Сессия на 45 кругов читается по Bluetooth минут пять: большая полоса показывает процент, какой круг читается и сколько осталось. На телефоне держи Hutka на экране (внутри Hutka ходить можно — плашка внизу показывает прогресс), в браузере не закрывай вкладку. Когда всё прочитано, следующее окно откроется само: проверь трассу, нажми «Сохранить и открыть в Лаборатории» — Лаборатория откроется со всеми поворотами.' });
+
+// v34.24 — sessions already in Hutka recognised on the lap timer (Pasha's point 4)
+Object.assign(I18N.RU, {
+  'Already in Hutka — tap to open': 'Уже в Hutka — нажми, чтобы открыть',
+  'Everything on {name} is already in Hutka — tap a session to open it.': 'Всё с {name} уже в Hutka — нажми на сессию, чтобы открыть.',
+  '{n} session(s) on {name}: {k} new, {m} already in Hutka.': 'Сессий на {name}: {n} — новых {k}, уже в Hutka {m}.',
+  '{n} outing(s) on the device: {k} new, {m} already in Hutka.': 'Заездов на приборе: {n} — новых {k}, уже в Hutka {m}.',
+  'Upload {n} new session|Upload {n} new sessions': 'Загрузить {n} новую сессию|Загрузить {n} новые сессии|Загрузить {n} новых сессий',
+  'Everything is already in Hutka': 'Всё уже в Hutka' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -6388,7 +6403,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.23';
+const APP_VERSION = 'v34.24';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -8570,7 +8585,7 @@ const DEVICE = (() => {
   // the browser's chooser for any lap timer: every device in the air, the services of both kinds allowed
   const anyTimer = () => ({ id: 'any', name: 'lap timer', namePrefixes: [], services: [...new Set(LOGGERS.list.reduce((a, d) => a.concat(d.services || []), []))] });
   function open(o) {
-    if (busy || (dev && items.length) || ex) { $('devModal').hidden = false; return; }   // a read in progress, a device still connected with its sessions listed, or the explorer open
+    if (busy || (dev && items.length) || ex) { $('devModal').hidden = false; if (!busy && !ex && cur === 'devStage') loadMine().then(() => { if (!busy && items.length && cur === 'devStage') (drv && drv.sessions ? renderSessions : renderList)(); }); return; }   // a read in progress, a device still connected with its sessions listed (refreshed: what was just uploaded is in Hutka now), or the explorer open
     items = []; dev = null; H = null; drv = null;
     $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true; S(''); setStatus('devPickNote', '');
     $('devModal').hidden = false; start(!!(o && o.auto));
@@ -8671,27 +8686,49 @@ const DEVICE = (() => {
     S(t('Signed in — reading the session list…'));
     bar(0, 1);
     const outs = await dev.list((what, k, n) => { if (what === 'scan') { bar(k, 70); S(t('Looking through the memory… {k}', { k: k + 1 })); } else if (what === 'session') { bar(k, n); S(t('Session headers… {k} / {n}', { k, n })); } });
-    items = outs; busy = false; $('devBar').hidden = true; renderSessions();
+    await loadMine(); items = outs; busy = false; $('devBar').hidden = true; renderSessions();
   }
   const whenStr = (iso) => { const ms = Date.parse(String(iso || '').replace(' ', 'T')); return isFinite(ms) ? new Date(ms).toLocaleString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : String(iso || ''); };
+  // ---- what is already in Hutka. A session off the lap timer is known by its start (to the minute) and its best lap (to 1/100 s, the
+  // Alfano's own) — the same in a Bluetooth read and in an ADA export; a RaceBox outing by its start. Known ones are greyed and open the
+  // Lab; new ones from the newest day on the device are ticked (the day just driven), older new ones wait for a tick
+  let mine = [];
+  async function loadMine() { try { mine = (await STORE.mySessions()).map(m => ({ id: m.id, at: String(m.date || '').replace('T', ' ').slice(0, 16), best: +m.bestMs || 0, app: (m.source && m.source.app) || 'alfano' })); } catch (e) { mine = []; } }
+  const bestOf = (o) => ((o.bestMin * 60 + o.bestSec) * 1000 + o.bestCs * 10);
+  const knownSession = (o) => (o.ok ? mine.find(m => m.at === String(o.date || '').slice(0, 16) && (!m.best || Math.abs(m.best - bestOf(o)) <= 15)) : null) || null;
+  const knownOuting = (o) => (isFinite(o.startMs) ? mine.find(m => m.app === 'racebox' && m.at === fileDate({ lastModified: o.startMs })) : null) || null;
+  function knownRow(m, title, sub) {
+    const b = el('button', 'dev-item known'); b.type = 'button';
+    b.innerHTML = `<span class="dev-in" aria-hidden="true">✓</span><div><b>${esc(title)}</b><span class="hint">${esc(sub)}</span><span class="dev-in-tx">${esc(t('Already in Hutka — tap to open'))}</span></div><svg class="dev-go" aria-hidden="true"><use href="#i-chev"/></svg>`;
+    b.onclick = () => { close(); location.hash = '#lab~' + m.id; }; return b;
+  }
+  function sayKnown(nAll, nKnown, name) {
+    if (nKnown && nKnown === nAll) S(t('Everything on {name} is already in Hutka — tap a session to open it.', { name }), 'ok');
+    else if (nKnown) S(t('{n} session(s) on {name}: {k} new, {m} already in Hutka.', { n: nAll, name, k: nAll - nKnown, m: nKnown }), 'ok');
+    else S(t('{n} session(s) on {name} — tick the ones to upload (the newest first).', { n: nAll, name }), 'ok');
+  }
   function renderSessions() {
     const box = $('devList'); box.innerHTML = '';
     if (!items.length) { S(t('No sessions in the device memory.'), 'warn'); $('devActs').hidden = true; return; }
-    S(t('{n} session(s) on {name} — tick the ones to upload (the newest first).', { n: items.length, name: H ? H.name : drv.name }), 'ok');
+    const known = items.map(knownSession), day = (items.find((o, i) => o.ok && !known[i]) || {}).date || '';
+    sayKnown(items.length, known.filter(Boolean).length, H ? H.name : drv.name);
     items.forEach((o, i) => {
-      const lab = el('label', 'dev-item' + (o.ok ? '' : ' dim')); const cb = el('input'); cb.type = 'checkbox'; cb.checked = i === 0 && o.ok; cb.disabled = !o.ok; cb.dataset.i = i;
-      const best = `${o.bestMin}:${String(o.bestSec).padStart(2, '0')}.${String(o.bestCs).padStart(2, '0')}`;
-      const tx = el('div'); tx.innerHTML = `<b>${esc(o.ok ? whenStr(o.date) : t('Session {n}', { n: i + 1 }))}</b><span class="hint">${esc(o.ok ? `${o.track}${o.driver ? ' · ' + o.driver : ''} · ${t('{n} laps', { n: o.laps })} · ${t('best')} ${best}` : t('{n} laps · header unreadable', { n: o.laps }))}</span>`;
+      const best = `${o.bestMin}:${String(o.bestSec).padStart(2, '0')}.${String(o.bestCs).padStart(2, '0')}`, sub = o.ok ? `${o.track}${o.driver ? ' · ' + o.driver : ''} · ${t('{n} laps', { n: o.laps })} · ${t('best')} ${best}` : t('{n} laps · header unreadable', { n: o.laps });
+      if (known[i]) { box.appendChild(knownRow(known[i], whenStr(o.date), sub)); return; }
+      const lab = el('label', 'dev-item' + (o.ok ? '' : ' dim')); const cb = el('input'); cb.type = 'checkbox'; cb.checked = o.ok && !!day && String(o.date).slice(0, 10) === day.slice(0, 10); cb.disabled = !o.ok; cb.dataset.i = i;
+      const tx = el('div'); tx.innerHTML = `<b>${esc(o.ok ? whenStr(o.date) : t('Session {n}', { n: i + 1 }))}</b><span class="hint">${esc(sub)}</span>`;
       lab.appendChild(cb); lab.appendChild(tx); box.appendChild(lab);
     });
     $('devActs').hidden = false; $('devImport').hidden = false; $('devErase').hidden = true; syncPick();
+    STORE.track('device_list', { app: 'alfano', n: items.length, known: known.filter(Boolean).length });
   }
   // the one button says what it will do and how much: "Upload 2 sessions" (a read over Bluetooth takes minutes — never "Open")
   function syncPick() {
     const cbs = [...$('devList').querySelectorAll('input[type=checkbox]')]; for (const c of cbs) c.closest('.dev-item').classList.toggle('on', c.checked);
     const n = cbs.filter(c => c.checked && !c.disabled).length, b = $('devImport');
     if (drv && drv.sessions && !dev) { b.disabled = false; b.textContent = t('Connect again'); return; }
-    b.disabled = !n; b.textContent = n ? tn(n, 'Upload {n} session', 'Upload {n} sessions').replace('{n}', n) : t('Tick a session to upload');
+    const someKnown = !!$('devList').querySelector('.dev-item.known'), allKnown = someKnown && !cbs.some(c => !c.disabled);
+    b.disabled = !n; b.textContent = n ? (someKnown ? tn(n, 'Upload {n} new session', 'Upload {n} new sessions') : tn(n, 'Upload {n} session', 'Upload {n} sessions')).replace('{n}', n) : (allKnown ? t('Everything is already in Hutka') : t('Tick a session to upload'));
   }
   $('devList').addEventListener('change', syncPick);
   // ---- the read: its own step of the window — one big bar over everything chosen (weighted by laps), the percent and the time left,
@@ -8764,17 +8801,22 @@ const DEVICE = (() => {
     let outs;
     try { outs = await dev.download((p) => { readTick(p.total ? p.done / p.total : 0, sub); }); }
     catch (e) { readFail(e); return; }
-    items = outs; await readDone(tn(outs.length, '{n} outing found', '{n} outings found').replace('{n}', outs.length), '');
+    items = outs; await loadMine(); await readDone(tn(outs.length, '{n} outing found', '{n} outings found').replace('{n}', outs.length), '');
     busy = false; stage('devStage'); $('devBar').hidden = true; renderList();
   }
   async function unlock() { const code = $('devCode').value.trim(); if (!code || !dev || busy) return; busy = true; try { await dev.unlock(code); $('devCodeRow').hidden = true; await readAll(); } catch (e) { busy = false; fail(e); } }
   function renderList() {
     const box = $('devList'); box.innerHTML = '';
     if (!items.length) { S(t('Nothing recorded on the device yet — press its REC button before the next outing.'), 'warn'); $('devActs').hidden = true; return; }
-    S(t('{n} outing(s) on the device — tick the ones to upload.', { n: items.length }), 'ok');
+    const known = items.map(knownOuting), nKnown = known.filter(Boolean).length;
+    if (nKnown === items.length) S(t('Everything on {name} is already in Hutka — tap a session to open it.', { name: H ? H.name : drv.name }), 'ok');
+    else if (nKnown) S(t('{n} outing(s) on the device: {k} new, {m} already in Hutka.', { n: items.length, k: items.length - nKnown, m: nKnown }), 'ok');
+    else S(t('{n} outing(s) on the device — tick the ones to upload.', { n: items.length }), 'ok');
     items.forEach((o, i) => {
+      const sub = t('{min} min · {hz} Hz · up to {v} km/h', { min: Math.max(1, Math.round(o.span / 60)), hz: o.hz, v: Math.round(o.vmax * 3.6) });
+      if (known[i]) { box.appendChild(knownRow(known[i], when(o.startMs) || t('Outing {n}', { n: i + 1 }), sub)); return; }
       const lab = el('label', 'dev-item'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = true; cb.dataset.i = i;
-      const tx = el('div'); tx.innerHTML = `<b>${esc(when(o.startMs) || t('Outing {n}', { n: i + 1 }))}</b><span class="hint">${esc(t('{min} min · {hz} Hz · up to {v} km/h', { min: Math.max(1, Math.round(o.span / 60)), hz: o.hz, v: Math.round(o.vmax * 3.6) }))}</span>`;
+      const tx = el('div'); tx.innerHTML = `<b>${esc(when(o.startMs) || t('Outing {n}', { n: i + 1 }))}</b><span class="hint">${esc(sub)}</span>`;
       lab.appendChild(cb); lab.appendChild(tx); box.appendChild(lab);
     });
     $('devActs').hidden = false; $('devImport').hidden = false; $('devErase').hidden = !(dev && dev.erase); syncPick();
