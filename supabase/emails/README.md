@@ -2,12 +2,12 @@
 
 Свой отправитель: Project Settings → Authentication → SMTP Settings → Enable Custom SMTP (Resend: host `smtp.resend.com`, port `465`, user `resend`, password = API key, sender `no-reply@hutka.ai`, name `Hutka`). Домен `hutka.ai` сначала подтверждается в Resend (3 DNS-записи в GoDaddy).
 
-Шаблоны — вставить целиком в поле Body, тему — в Subject:
+Шаблоны — вставить целиком в поле Body, тему — в Subject. Тексты писем и темы только на английском, без русского блока:
 
 | Шаблон в Supabase | Файл | Subject |
 |---|---|---|
-| Magic Link | `magic-link.html` | `Your Hutka code · Код для входа в Hutka` |
-| Confirm signup | `confirm-signup.html` | `Confirm your email for Hutka · Подтверди почту` |
+| Magic Link | `magic-link.html` | `Your Hutka code` |
+| Confirm signup | `confirm-signup.html` | `Confirm your email for Hutka` |
 | Change Email Address | `email-change.html` | `Confirm your new email for Hutka` |
 | Reset Password | `recovery.html` | `Reset your Hutka password` |
 
