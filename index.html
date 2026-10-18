@@ -6504,7 +6504,7 @@ function renderHelpPage() {
   a.appendChild(step(3, t('Save the file on the phone'), `<b>${esc(t('With the Hutka app:'))}</b> ${esc(t('tap Hutka in the row of apps — the session opens in the upload window straight away, steps 4–5 are not needed.'))} <span class="hint">${esc(t('Hutka at the front of that row, once and for all: iPhone — scroll the app row to the end → More → Edit → “+” next to Hutka (Favourites), then drag it to the top; Android — hold Hutka in the share sheet → Pin.'))}</span><br><b>${esc(t('Without the app:'))}</b> <b>iPhone:</b> ${esc(t('tap “Save to Files”, choose a folder (Downloads is fine), tap Save.'))} <b>Android:</b> ${esc(t('choose “Save” / “Downloads”.'))}<br><span class="hint">${esc(t('The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.'))}</span>`));
   a.appendChild(step(4, t('Open hutka.ai and tap Upload'), esc(t('The round button in the middle of the bottom bar (on a computer — “Upload session” at the top right of the Lab). Sign in first if you have not — it takes one email.')), 'hutka-upload.jpg'));
   a.appendChild(step(5, t('Choose the file'), esc(t('Tap “Choose a file”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.')), 'hutka-choose.jpg'));
-  a.appendChild(step(6, t('Finishing touches, Publish'), esc(t('The session opens in the Lab at once: the track found by GPS, the layout recognised by the shape of your laps, the kart most people drive there — private for now. The “Finishing touches” card asks the layout if Hutka is not sure, the session type and your place. Publish lets other drivers compare with you; “Keep it private” keeps it yours.')), 'hutka-form.jpg'));
+  a.appendChild(step(6, t('Finishing touches, Publish'), esc(t('The session opens in the Lab at once: the track found by GPS, the layout recognised by the shape of your laps, the kart most people drive there — private for now. The “Finishing touches” card asks the layout if Hutka is not sure, the session type and your place. Publish lets other drivers compare with you; “Keep it private” keeps it yours.')), 'hutka-finish.jpg'));
   box.appendChild(a);
   // other loggers
   const o = card(t('Other loggers and apps'), t('Any of these files works the same way: save it on the phone or computer, then Upload → Choose a file.'));
@@ -6513,7 +6513,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.26';
+const APP_VERSION = 'v34.26.1';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
