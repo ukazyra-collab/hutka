@@ -46,7 +46,7 @@
   --bg:#f5f6f8; --surface:#ffffff; --surface-2:#f3f4f7; --surface-3:#e9ebf0; --line:#e3e6ec; --line-2:#cdd3dd;
   --fg:#1a2237; --muted:#5f6b84; --faint:#98a1b3;
   --btn:#1f2b48; --btn-ink:#ffffff; --accent:#2f6bf0; --accent-ink:#ffffff; --accent-soft:#e9f0ff;
-  --ok:#2fb563; --ok-soft:#e4f6ea; --warn:#d99400; --warn-soft:#fff5d6; --danger:#e5484d; --danger-soft:#fde8e9;
+  --ok:#2fb563; --ok-soft:#e4f6ea; --warn:#d99400; --warn-soft:#fff5d6; --ok-ink:#1b7a43; --warn-ink:#8a5a00; --danger:#e5484d; --danger-soft:#fde8e9;
   --brake:#e5484d; --limit:#ff8c2e; --lift:#d9a300; --throttle:#2fb563; --turnin:#2f6bf0; --apex:#1a2237; --actual:#1f6fe0; --cmp:#d63f9a; --cmp2:#0f9d9d; --shift-up:#f2c94c; --shift-down:#8b5cf6;
   --map-water:#d8e7f5; --map-land:#f2f1ec; --map-coast:#b7c5d6; --map-border:#d8a0ad; --map-label:#5f6b84;
   --shadow:0 1px 2px rgba(20,30,60,.06),0 8px 24px -12px rgba(20,30,60,.18);
@@ -60,7 +60,7 @@
     --bg:#0f1420; --surface:#161c2a; --surface-2:#1c2333; --surface-3:#232b3d; --line:#273043; --line-2:#3a4560;
     --fg:#e8ebf3; --muted:#9aa4ba; --faint:#6b7590;
     --btn:#e8ebf3; --btn-ink:#0f1420; --accent:#6c9cff; --accent-ink:#0f1420; --accent-soft:#1d2a47;
-    --ok:#3fcb74; --ok-soft:#153324; --warn:#f0b429; --warn-soft:#3a2f10; --danger:#ff6b70; --danger-soft:#3d1f22;
+    --ok:#3fcb74; --ok-soft:#153324; --warn:#f0b429; --warn-soft:#3a2f10; --ok-ink:#5fd68c; --warn-ink:#f5c451; --danger:#ff6b70; --danger-soft:#3d1f22;
     --brake:#ff6b70; --limit:#ff9f47; --lift:#f2c53d; --throttle:#3fcb74; --turnin:#6c9cff; --apex:#ffffff; --actual:#5ea2ff; --cmp:#ff7ad9; --cmp2:#3fd2e8; --shift-up:#ffd866; --shift-down:#a78bfa;
     --map-water:#0e1a2c; --map-land:#1c2436; --map-coast:#34435c; --map-border:#6b3f4d; --map-label:#9aa4ba;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
@@ -72,7 +72,7 @@
   --bg:#0f1420; --surface:#161c2a; --surface-2:#1c2333; --surface-3:#232b3d; --line:#273043; --line-2:#3a4560;
   --fg:#e8ebf3; --muted:#9aa4ba; --faint:#6b7590;
   --btn:#e8ebf3; --btn-ink:#0f1420; --accent:#6c9cff; --accent-ink:#0f1420; --accent-soft:#1d2a47;
-  --ok:#3fcb74; --ok-soft:#153324; --warn:#f0b429; --warn-soft:#3a2f10; --danger:#ff6b70; --danger-soft:#3d1f22;
+  --ok:#3fcb74; --ok-soft:#153324; --warn:#f0b429; --warn-soft:#3a2f10; --ok-ink:#5fd68c; --warn-ink:#f5c451; --danger:#ff6b70; --danger-soft:#3d1f22;
   --brake:#ff6b70; --limit:#ff9f47; --lift:#f2c53d; --throttle:#3fcb74; --turnin:#6c9cff; --apex:#ffffff; --actual:#5ea2ff; --cmp:#ff7ad9; --cmp2:#3fd2e8; --shift-up:#ffd866; --shift-down:#a78bfa;
   --map-water:#0e1a2c; --map-land:#1c2436; --map-coast:#34435c; --map-border:#6b3f4d; --map-label:#9aa4ba;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
@@ -214,7 +214,7 @@ textarea{min-height:90px;resize:vertical}
 .hint{color:var(--muted);font-size:13px;line-height:1.5}
 .hint b{color:var(--fg);font-weight:600}
 .status{font-size:12.5px;color:var(--muted);min-height:1.2em}
-.status.ok{color:var(--ok)}.status.warn{color:var(--warn)}.status.err{color:var(--danger)}
+.status.ok{color:var(--ok-ink)}.status.warn{color:var(--warn-ink)}.status.err{color:var(--danger)}
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--muted);white-space:nowrap}
 /* the corner grade against the best passes: a letter chip, the same colours as the numbers on the map */
 .gr{display:inline-block;min-width:17px;padding:0 4px;border-radius:5px;font:700 10.5px/17px var(--mono);color:#fff;text-align:center;vertical-align:1px}.gr.gA{background:#1f8f4f}.gr.gB{background:#5a9e2f}.gr.gC{background:#c48a00}.gr.gD{background:#e0661c}.gr.gE{background:#d12f3a}
@@ -552,8 +552,8 @@ body.onboarding #toast{z-index:90}
 .fin-lay-now{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;font-size:14.5px}
 .fin-lay-now[hidden]{display:none}
 .fin-lay-now b{font-weight:700}
-.fin-lay-now .ok{color:var(--ok);font-weight:600;font-size:12.5px}
-.fin-lay-now .btn{height:34px}
+.fin-lay-now .ok{color:var(--ok-ink);font-weight:600;font-size:12.5px}
+.fin-lay-now .btn{height:40px}
 .lay-pick{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .lay-pick[hidden]{display:none}
 .lay-tile{flex:none;scroll-snap-align:start;width:98px;display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:6px 6px 7px;border:1.5px solid var(--line-2);border-radius:13px;background:var(--surface);color:var(--fg);font:inherit;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
@@ -562,13 +562,13 @@ body.onboarding #toast{z-index:90}
 .lay-tile svg{width:100%;height:58px;display:block}
 .lay-tile svg path{fill:none;stroke:var(--fg);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
 .lay-tile svg circle{fill:var(--accent)}
-.lay-tile .lt-none{height:58px;display:grid;place-items:center;color:var(--faint);font-size:11px;line-height:1.25;border-radius:8px;background:var(--surface-2);padding:0 4px}
+.lay-tile .lt-none{height:58px;display:grid;place-items:center;color:var(--muted);font-size:11px;line-height:1.25;border-radius:8px;background:var(--surface-2);padding:0 4px}
 .lay-tile .lt-name{font-size:12px;font-weight:600;line-height:1.2;overflow-wrap:anywhere}
-.lay-tile .lt-tag{position:absolute;top:4px;right:4px;font-size:9.5px;font-weight:700;padding:2px 5px;border-radius:999px;background:var(--ok);color:#fff}
-.lay-tile .lt-tag.guess{background:var(--warn)}
+.lay-tile .lt-tag{position:absolute;top:4px;right:4px;font-size:9.5px;font-weight:700;padding:2px 5px;border-radius:999px;background:#1b7a43;color:#fff}
+.lay-tile .lt-tag.guess{background:#f0b429;color:#2b1d00}
 .fin-chips{display:flex;gap:6px;overflow-x:auto;padding:1px 1px 3px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .fin-chips::-webkit-scrollbar{display:none}
-.fin-chips .btn{flex:none;height:36px;border-radius:999px;padding:0 13px;font-size:13.5px;font-weight:600}
+.fin-chips .btn{flex:none;height:40px;border-radius:999px;padding:0 13px;font-size:13.5px;font-weight:600}
 .fin-chips .btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .fin-res{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:14.5px}
 .fin-res input{width:62px;height:40px;font-size:16px;text-align:center;padding:0 4px}
@@ -577,7 +577,7 @@ body.onboarding #toast{z-index:90}
 .fin-acts .btn.ghost{flex:none;height:50px;padding:0 12px;color:var(--muted);font-weight:600;white-space:normal;line-height:1.2;max-width:42%}
 .fin-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:8px}
 .fin-foot .hint{font-size:12.5px}
-.fin-foot .btn{height:34px;padding:0 8px}
+.fin-foot .btn{height:40px;padding:0 8px}
 /* the one action of a sheet: full width, tall, in the accent colour */
 .btn.cta{width:100%;height:56px;border-radius:15px;font-size:16.5px;font-weight:700;background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px color-mix(in srgb,var(--accent) 80%,transparent)}
 .btn.cta:hover{background:var(--accent);filter:brightness(1.06)}
@@ -879,7 +879,6 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .card h2{font-size:16px}
   .ph h1{font-size:24px}
   .ph .row .btn{height:38px;font-size:13.5px;padding:0 12px}
-  .dev-pill{bottom:calc(82px + var(--sa-bottom))}
   .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px 4px calc(6px + var(--sa-bottom));justify-content:space-around;align-items:flex-end}
   .tabbar a,.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;border:0;background:none;color:var(--muted);text-decoration:none;font:500 10.5px/1 var(--body);cursor:pointer;min-width:0}
   .tabbar svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -1104,14 +1103,14 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .dev-item.known{width:100%;background:var(--surface-2);border-style:dashed;color:var(--fg);font:inherit;text-align:left}
 .dev-item.known b{color:var(--muted)}
 .dev-item .dev-in{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--ok);color:#fff;font-size:12px;font-weight:800;line-height:1}
-.dev-item .dev-in-tx{font-size:12.5px;font-weight:600;color:var(--ok)}
+.dev-item .dev-in-tx{font-size:12.5px;font-weight:600;color:var(--ok-ink)}
 .dev-item .dev-in.wait{background:var(--warn);font-size:11px}
-.dev-item .dev-in-tx.wait{color:var(--warn)}
-.banner.outbox{align-items:center;gap:10px}
+.dev-item .dev-in-tx.wait{color:var(--warn-ink)}
+.banner.outbox{align-items:center;gap:10px;flex-wrap:wrap}
 .offbar{margin:0 28px 8px;align-items:center}
 @media (max-width:860px){.offbar{margin:0 16px 8px}}
-.banner.outbox #obText{flex:1;min-width:0}
-.banner.outbox .btn{flex:none}
+.banner.outbox #obText{flex:1 1 180px;min-width:0}
+.banner.outbox .btn{flex:none;min-height:40px;margin-left:auto}
 .dev-item .dev-go{margin-left:auto;flex:none;width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.45}
 #devPick{display:flex;flex-direction:column;gap:12px}
 .btn.cta.dev-retry{margin-top:14px}
@@ -1151,6 +1150,11 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 @media (prefers-reduced-motion:reduce){.dr-bar > div::after{animation:none;display:none}.dr-tip{transition:none}}
 .dev-pill{position:fixed;left:50%;bottom:calc(24px + var(--sa-bottom));transform:translateX(-50%);z-index:89;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:0;border-radius:999px;background:var(--accent);color:#fff;font:inherit;font-size:13px;font-weight:600;box-shadow:var(--shadow);cursor:pointer;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dev-pill::before{content:'';width:8px;height:8px;border-radius:50%;background:#fff;animation:scanpulse 1.2s ease-in-out infinite;flex:none}
+/* on a phone the pill sits above the tab bar and its raised Upload button (the rule comes after the base one, so it wins) */
+@media (max-width:700px), (max-height:520px) and (orientation:landscape) and (pointer:coarse){.dev-pill{bottom:calc(100px + var(--sa-bottom))}}
+/* the narrowest phones: the Lab's bar keeps the lap time — Compare and Map lose their words; the tab labels shrink to fit Russian */
+@media (max-width:360px){.lab-mob #lmCompare span,.lab-mob #lmMap span{display:none}.lab-mob #lmCompare,.lab-mob #lmMap{padding:0 10px}.tabbar a>span,.tabbar button>span:not(.circ){font-size:9.5px;letter-spacing:-.2px}}
+.dev-read.done .dr-eyebrow{visibility:hidden}
 
 .hint.warn{color:var(--warn)}
 .btn.danger-text{color:var(--danger)}
@@ -1512,7 +1516,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
         <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><div class="row" style="margin-top:10px"><button class="btn primary" id="labUpload2" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#help"><span data-t="How to get the file — step by step">How to get the file — step by step</span></a></div></div>
       </div>
-      <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
+      <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button" aria-label="Compare"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button" aria-label="Map"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
       <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close">×</button></div>
       <!-- a session just uploaded (a private draft): the layout when it was not recognised for sure, the session type and the result
            (for the feed), publish or keep private — everything else is already filled in -->
@@ -2559,15 +2563,15 @@ const ALF = (() => {
   }
   async function importFile(file) {
     const name = file.name || 'alfano', buf = await file.arrayBuffer();
-    let laps = [];
+    let laps = [], inner = '';   // inner: the session file's own name inside the zip (SN…_ddmmyy_HHhMM…) — the date when the .alf2 was renamed
     if (/\.csv$/i.test(name)) { const pts = parseLap(new TextDecoder('latin1').decode(buf)); if (pts) laps.push({ n: 1, timeMs: Math.round(pts.length * 100), pts, name }); }
     else {
       const files = await readZip(buf); let times = {};
-      for (const f of files) if (!/^LAP_/i.test(f.name) && /SN\d+/.test(f.name)) { times = Object.assign(times, parseSession(f.text)); }
+      for (const f of files) if (!/^LAP_/i.test(f.name) && /SN\d+/.test(f.name)) { times = Object.assign(times, parseSession(f.text)); inner = inner || f.name; }
       for (const f of files) { const m = /^LAP_(\d+)_/i.exec(f.name); if (!m) continue; const pts = parseLap(f.text); if (!pts) continue; const n = +m[1]; laps.push({ n, timeMs: times[n] || Math.round(pts.length * 100), pts, name: f.name }); }
     }
     laps.sort((a, b) => a.n - b.n);
-    if (!laps.length) throw new Error('В файле нет кругов с GPS.');
+    if (!laps.length) throw new Error(typeof t === 'function' ? t('The file has no laps with GPS.') : 'The file has no laps with GPS.');
     // channels the logger did not really have (a rental Alfano 7 writes RPM 0) are dropped, so a rental session stays as it was
     if (typeof GEAR !== 'undefined') { const ch = GEAR.channelsOf(laps); for (const c of GEAR.CH) if (!ch[c]) for (const L of laps) for (const p of L.pts) delete p[c]; }
     const lat0 = laps[0].pts[0].lat, lon0 = laps[0].pts[0].lon, kx = 111320 * Math.cos(lat0 * Math.PI / 180), ky = 110574;
@@ -2575,7 +2579,7 @@ const ALF = (() => {
     const bestT = Math.min(...laps.map(L => L.timeMs));
     for (const L of laps) L.clean = L.timeMs <= bestT * CLEAN_TOL && L.len > 200;
     const best = laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a);
-    return { laps, best: best.n, name: name.replace(/\.[^.]+$/, '') };
+    return { laps, best: best.n, name: name.replace(/\.[^.]+$/, ''), inner };
   }
   // mean driven line across clean laps, resampled by normalised distance (all laps start at the S/F beam)
   function meanLine(laps, M) {
@@ -2697,14 +2701,16 @@ const IMPORT = (() => {
     for (const r of rows) r.v = isFinite(r.v) ? r.v * vMul : NaN;
     // time: from the column, else from "Sample Rate"/"Frequency" meta, else 10 Hz
     if (!rows.every(r => isFinite(r.t))) { let hz = 10; for (const k in meta) if (/sample rate|frequency|hz/.test(k)) { const m = /([\d.]+)/.exec(meta[k]); if (m) hz = +m[1]; } rows.forEach((r, i) => r.t = i / hz); }
-    const t0 = rows[0].t; for (const r of rows) r.t -= t0;
+    const t0 = rows[0].t; let startMs = t0 > 1e9 ? t0 * 1000 : NaN; for (const r of rows) r.t -= t0;   // a clock column in epoch seconds (RaceChrono, RaceBox) dates the recording
+    // a RaceBox outing read by Hutka over Bluetooth says when it started (UTC) in its first line
+    if (!isFinite(startMs)) { const m = /read by hutka over bluetooth[^\n]*?start (\d{4}-\d{2}-\d{2}T[\d:.]+Z)/i.exec(text.slice(0, 600)); if (m) { const ms = Date.parse(m[1]); if (isFinite(ms)) startMs = ms; } }
     // speed from position when the file has none
     if (!rows.some(r => isFinite(r.v))) fillSpeed(rows);
     const low = text.slice(0, 1500).toLowerCase(), fn = (fileName || '').toLowerCase();
     let app = 'csv'; if (/racebox/.test(low) || /racebox/.test(fn)) app = 'racebox'; else if (/racechrono/.test(low) || /racechrono/.test(fn)) app = 'racechrono'; else if (/trackaddict|racerender/.test(low) || /trackaddict/.test(fn)) app = 'trackaddict'; else if (/aim|race ?studio|beacon markers/.test(low)) app = 'aim'; else if (/laptimer|harry/.test(low) || /laptimer/.test(fn)) app = 'harrys'; else if (/garmin|catalyst/.test(low)) app = 'garmin'; else if (/apex pro|apexpro/.test(low)) app = 'apexpro';
     // AiM: lap boundaries from the beacon markers (seconds from the start)
     let beacons = null; for (const k in meta) if (/beacon/.test(k)) { const nums = meta[k].split(/[\s,;]+/).map(Number).filter(isFinite); if (nums.length) beacons = nums; }
-    return { rows, app, beacons };
+    return { rows, app, beacons, startMs };
   }
   // speed from positions: central difference over ~0.4 s, then a short moving average (phone GPS is jittery)
   function fillSpeed(rows) {
@@ -2733,7 +2739,7 @@ const IMPORT = (() => {
     const rows = []; let t0 = null;
     for (const p of pts) { const lat = num(p.getAttribute('lat')), lon = num(p.getAttribute('lon')); const te = p.getElementsByTagName('time')[0]; const tt = te ? Date.parse(te.textContent) / 1000 : NaN; if (t0 === null && isFinite(tt)) t0 = tt; const sp = p.getElementsByTagNameNS('*', 'speed')[0]; rows.push({ t: isFinite(tt) ? tt - (t0 || 0) : NaN, lat, lon, v: sp ? num(sp.textContent) : NaN, lap: NaN, hdg: NaN }); }
     if (!rows.every(r => isFinite(r.t))) rows.forEach((r, i) => r.t = i); if (!rows.some(r => isFinite(r.v))) fillSpeed(rows);
-    return { rows, app: 'gpx', beacons: null };
+    return { rows, app: 'gpx', beacons: null, startMs: t0 !== null && isFinite(t0) ? t0 * 1000 : NaN };   // when it was driven: the first point's clock
   }
   // ---- laps: from a lap column, from beacon times, or from the loop closing on itself
   function splitLaps(src) {
@@ -2790,7 +2796,7 @@ const IMPORT = (() => {
     for (const L of laps) L.clean = L.timeMs <= bestT * CLEAN_TOL && L.len > 200;
     if (!laps.some(L => L.clean)) laps[0].clean = true;
     const q = grade(hz, src.app);
-    return { laps, best: laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a).n, name: name.replace(/\.[^.]+$/, ''), source: q, lapsHow: how };
+    return { laps, best: laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a).n, name: name.replace(/\.[^.]+$/, ''), source: q, lapsHow: how, startMs: src.startMs };
   }
   // laps from a logger without a start/finish beacon: start every lap at the layout's S/F when the layout has a GPS line
   function alignToStart(sess, G) {
@@ -2830,22 +2836,28 @@ const ALFANO7 = (() => {
   // length is in, or the timeout passes (then whatever came is returned, as the Alfano app does)
   function client(pipe, opts) {
     const o = Object.assign({ gapMs: 30, log: null }, opts || {});
-    let parts = [], got = 0, want = 0, wake = null, touch = null;
-    pipe.onData((bytes) => { if (!bytes || !bytes.length) return; parts.push(bytes); got += bytes.length; if (touch) touch(); if (wake && got >= want) wake(); });
+    let parts = [], got = 0, want = 0, wake = null, touch = null, stopped = null;
+    pipe.onData((bytes) => { if (stopped || !bytes || !bytes.length) return; parts.push(bytes); got += bytes.length; if (touch) touch(); if (wake && got >= want) wake(); });
+    // stopped (the driver went back, closed the window, the link dropped): the command waiting ends at once and no other goes out — a read
+    // that was stopped never sends another command down a link that may already belong to the next read
+    const check = () => { if (stopped) throw err(stopped, stopped === 'lost' ? 'the connection dropped' : 'the read was stopped'); };
     // the wait is event-driven (the data callback wakes it; one timer only for the deadline), so a tab in the background — where browsers
     // slow every timer to once a second — reads at the same pace as one in front
     // the wait ends when the whole answer is in, at the deadline, or (idleMs) when an answer that has started stops coming — a torn
     // answer then costs a second or two, not the deadline
     async function cmd(op, args, expect, timeoutMs, idleMs) {
-      parts = []; got = 0; want = expect;
-      await pipe.send(frame(op, args));
+      check(); parts = []; got = 0; want = expect;
+      await pipe.send(frame(op, args)); check();
       if (got < want) await new Promise((res) => { let idle = null; const done = () => { clearTimeout(tm); clearTimeout(idle); wake = null; touch = null; res(); }; const tm = setTimeout(done, timeoutMs); wake = done; if (idleMs) touch = () => { clearTimeout(idle); idle = setTimeout(done, idleMs); }; if (idleMs && got > 0) touch(); });
+      check();
       const out = concat(parts); if (o.log) o.log(op, args, out);
       if (o.gapMs && (typeof document === 'undefined' || document.visibilityState === 'visible')) await sleep(o.gapMs);
       return out;
     }
     const C = {
       cmd,
+      stop(code) { if (!stopped) stopped = code || 'stopped'; if (wake) wake(); },
+      get stopped() { return stopped; },
       async password(timeoutMs) { const r = await cmd(OP.PASSWORD, PASSWORD, 1, timeoutMs || 3000); return r.length > 0 && r[0] === 0xff; },
       async status() { return cmd(OP.STATUS, STATUS_ARGS, 16, 3000); },
       async page(p) { const r = await cmd(OP.PAGE, [p & 0xff, (p >> 8) & 0xff, 0x00, 0x80], 129, 3000); return r.length >= 129 ? r.subarray(0, 129) : r; },
@@ -2868,7 +2880,7 @@ const ALFANO7 = (() => {
             C.probed = true; const k = Math.floor(raw.length / 257);
             if (raw.length < packets * 257) { await C.quiet(400); C.maxPackets = Math.max(2, Math.min(k, packets - 1)); if (k === 0) continue; shortByLimit = true; }
           }
-          if (!raw.length) { if (m.stopOnEmpty || ++empties >= 3) break; continue; }
+          if (!raw.length) { if (m.stopOnEmpty) break; if (++empties >= 3) { const e = err('timeout', `the device stopped sending at ${a.toString(16)} with ${left} bytes still to read`); e.diag = { addr: a, left, total }; throw e; } await C.quiet(400); continue; }
           const whole = Math.floor(raw.length / 257), useRaw = shortByLimit ? raw.subarray(0, whole * 257) : raw;
           if (!packetsOk(useRaw, shortByLimit ? whole : packets)) {   // torn or wrong: again, smaller if it keeps happening
             C.bad++; await C.quiet(400);
@@ -3095,7 +3107,11 @@ const ALFANO7 = (() => {
     return concat([...locals, cd, eocd]);
   }
 
-  return { OP, frame, stripXor, packetsOk, sanity, client, open, list, download, describe, partielInfo, lapRows, gforce, decode, zip, decodeName, u16, u24, u32 };
+  // the name of the file a read becomes — the Alfano app's own pattern (…_SN_ddmmyy_HHhMM_Driver_P_Track_dd_mm_yy_laps_best), so the
+  // driver and the track come back apart when the file is read (and when it waits in the outbox)
+  const part = (x) => String(x || '').trim().replace(/[\s\-*/\\:._]+/g, '_').replace(/^_+|_+$/g, '');
+  const fileName = (s) => `ALFANO7_LAP_SN${s.serial}_${pad2(s.day)}${pad2(s.month)}${pad2(s.year)}_${pad2(s.hour)}H${pad2(s.minute)}_${part(s.driver)}_P_${part(s.track)}_${pad2(s.day)}_${pad2(s.month)}_${pad2(s.year)}_${s.laps}_${s.bestRaw}`;
+  return { OP, frame, stripXor, packetsOk, sanity, client, open, list, download, describe, partielInfo, lapRows, gforce, decode, zip, decodeName, fileName, u16, u24, u32 };
 })();
 if (typeof module !== "undefined" && module.exports) module.exports = ALFANO7;
 // ---------- loggers over Bluetooth: the Lab reads sessions straight out of the lap timer, no vendor app in between ----------
@@ -3267,7 +3283,7 @@ const LOGGERS = (() => {
   const stamp = (ms) => { if (!isFinite(ms)) return ''; const d = new Date(ms); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}.${pad2(d.getMinutes())}`; };
   // an outing as the CSV the universal importer reads (RaceBox columns, 25 Hz): the file is what gets stored, so a session can be re-read later like any other upload
   function csvFile(o, info) {
-    const head = `# RaceBox ${info.model || 'Mini S'} ${info.serial || ''} — ${o.hz} Hz — read by Hutka over Bluetooth\n` + 'timestamp (s),latitude,longitude,speed (m/s),bearing,gforce_x,gforce_y,gforce_z,altitude (m),sats,hacc (m)\n';
+    const head = `# RaceBox ${info.model || 'Mini S'} ${info.serial || ''} — ${o.hz} Hz — read by Hutka over Bluetooth${isFinite(o.startMs) ? ' — start ' + new Date(o.startMs).toISOString() : ''}\n` + 'timestamp (s),latitude,longitude,speed (m/s),bearing,gforce_x,gforce_y,gforce_z,altitude (m),sats,hacc (m)\n';
     const rows = new Array(o.recs.length);
     for (let i = 0; i < o.recs.length; i++) { const r = o.recs[i]; rows[i] = `${(r.t - o.t0).toFixed(3)},${r.lat.toFixed(7)},${r.lon.toFixed(7)},${r.v.toFixed(3)},${r.hdg.toFixed(2)},${r.gx.toFixed(3)},${r.gy.toFixed(3)},${r.gz.toFixed(3)},${r.alt.toFixed(1)},${r.sats},${r.hacc.toFixed(2)}`; }
     const name = `RaceBox ${stamp(o.startMs) || 'session'}${info.serial ? ' ' + info.serial.slice(-4) : ''}.csv`;
@@ -3280,7 +3296,7 @@ const LOGGERS = (() => {
     get services() { return [this.UART, this.DIS]; },
     // a connected device: status, unlock, download (→ outings with their CSV files), erase
     async open(H) {
-      const RB = this; let sink = null;
+      const RB = this; let sink = null, halt = null;
       await ble.notify(H, RB.UART, RB.TX, framer((f) => { if (sink) sink(f); }));
       const info = {}; for (const [k, c] of [['model', RB.MODEL], ['serial', RB.SERIAL], ['fw', RB.FW]]) { try { info[k] = text(await ble.read(H, RB.DIS, c)); } catch (e) {} }
       if (!info.serial) { const m = /(\d{6,})\s*$/.exec(H.name || ''); if (m) info.serial = m[1]; }
@@ -3288,9 +3304,10 @@ const LOGGERS = (() => {
       const send = (cls, id, payload) => ble.write(H, RB.UART, RB.RX, frame(cls, id, payload));
       // one command, one answer: the frame the predicate accepts, or a timeout; live records keep flowing past
       const ask = (cls, id, payload, pred, ms) => new Promise((res, rej) => {
-        const tm = setTimeout(() => { sink = null; rej(err('timeout')); }, ms || 6000);
-        sink = (f) => { if (pred(f)) { clearTimeout(tm); sink = null; res(f); } };
-        send(cls, id, payload).catch((e) => { clearTimeout(tm); sink = null; rej(e); });
+        const tm = setTimeout(() => { sink = null; halt = null; rej(err('timeout')); }, ms || 6000);
+        halt = (e) => { clearTimeout(tm); sink = null; halt = null; rej(e); };
+        sink = (f) => { if (pred(f)) { clearTimeout(tm); sink = null; halt = null; res(f); } };
+        send(cls, id, payload).catch((e) => { clearTimeout(tm); sink = null; halt = null; rej(e); });
       });
       const isAck = (f, c, i) => f.cls === 0xff && f.id === 0x02 && f.payload[0] === c && f.payload[1] === i;
       const isNack = (f, c, i) => f.cls === 0xff && f.id === 0x03 && f.payload[0] === c && f.payload[1] === i;
@@ -3312,36 +3329,39 @@ const LOGGERS = (() => {
           if (isNack(f0, 0xff, 0x23)) throw err('locked');
           total = u32(f0.payload, 0);
           if (onProgress) onProgress({ done: 0, total });
-          if (total === 0) { await new Promise((res) => { const tm = setTimeout(() => { sink = null; res(); }, 2500); sink = (f) => { if (isAck(f, 0xff, 0x23)) { clearTimeout(tm); sink = null; res(); } }; }); return []; }
+          if (total === 0) { await new Promise((res, rej) => { const tm = setTimeout(() => { sink = null; halt = null; res(); }, 2500); halt = (e) => { clearTimeout(tm); sink = null; halt = null; rej(e); }; sink = (f) => { if (isAck(f, 0xff, 0x23)) { clearTimeout(tm); sink = null; halt = null; res(); } }; }); return []; }
           await new Promise((res, rej) => {
-            let tm = setTimeout(() => { sink = null; rej(err('timeout')); }, 20000);
-            const bump = () => { clearTimeout(tm); tm = setTimeout(() => { sink = null; rej(err('timeout')); }, 20000); };
+            let tm = setTimeout(() => { sink = null; halt = null; rej(err('timeout')); }, 20000);
+            halt = (e) => { clearTimeout(tm); sink = null; halt = null; rej(e); };
+            const bump = () => { clearTimeout(tm); tm = setTimeout(() => { sink = null; halt = null; rej(err('timeout')); }, 20000); };
             sink = (f) => {
               if (f.cls !== 0xff) return;
               if (f.id === 0x21) { const r = record(f.payload); if (r) events.push({ kind: 'rec', rec: r }); done++; bump(); const now = Date.now(); if (onProgress && now - lastTick > 150) { lastTick = now; onProgress({ done, total }); } }
               else if (f.id === 0x26) { events.push({ kind: 'state', state: f.payload[0] }); bump(); }
-              else if (isAck(f, 0xff, 0x23)) { clearTimeout(tm); sink = null; res(); }
-              else if (isNack(f, 0xff, 0x23)) { clearTimeout(tm); sink = null; rej(err('locked')); }
+              else if (isAck(f, 0xff, 0x23)) { clearTimeout(tm); sink = null; halt = null; res(); }
+              else if (isNack(f, 0xff, 0x23)) { clearTimeout(tm); sink = null; halt = null; rej(err('locked')); }
             };
           });
           if (onProgress) onProgress({ done, total: Math.max(total, done) });
           return outings(events).map((o) => Object.assign(o, { file: csvFile(o, info) }));
         },
-        async cancel() { try { await send(0xff, 0x23, Uint8Array.of(1)); } catch (e) {} sink = null; },
+        async cancel() { if (halt) halt(err('stopped', 'the read was stopped')); sink = null; try { await send(0xff, 0x23, Uint8Array.of(1)); } catch (e) {} },
+        abort(code) { if (halt) halt(err(code || 'lost', code === 'lost' || !code ? 'the connection dropped' : code)); sink = null; },
         async erase(onProgress) {
           await new Promise((res, rej) => {
-            let tm = setTimeout(() => { sink = null; rej(err('timeout')); }, 30000);
+            let tm = setTimeout(() => { sink = null; halt = null; rej(err('timeout')); }, 30000);
+            halt = (e) => { clearTimeout(tm); sink = null; halt = null; rej(e); };
             sink = (f) => {
               if (f.cls !== 0xff) return;
-              if (f.id === 0x24 && f.payload.length >= 1) { clearTimeout(tm); tm = setTimeout(() => { sink = null; rej(err('timeout')); }, 30000); if (onProgress) onProgress(f.payload[0]); }
-              else if (isAck(f, 0xff, 0x24)) { clearTimeout(tm); sink = null; res(); }
-              else if (isNack(f, 0xff, 0x24)) { clearTimeout(tm); sink = null; rej(err('locked')); }
+              if (f.id === 0x24 && f.payload.length >= 1) { clearTimeout(tm); tm = setTimeout(() => { sink = null; halt = null; rej(err('timeout')); }, 30000); if (onProgress) onProgress(f.payload[0]); }
+              else if (isAck(f, 0xff, 0x24)) { clearTimeout(tm); sink = null; halt = null; res(); }
+              else if (isNack(f, 0xff, 0x24)) { clearTimeout(tm); sink = null; halt = null; rej(err('locked')); }
             };
-            send(0xff, 0x24, null).catch((e) => { clearTimeout(tm); sink = null; rej(e); });
+            send(0xff, 0x24, null).catch((e) => { clearTimeout(tm); sink = null; halt = null; rej(e); });
           });
           return true;
         },
-        async close() { sink = null; await ble.disconnect(H); }
+        async close() { if (halt) halt(err('stopped', 'the read was stopped')); sink = null; await ble.disconnect(H); }
       };
       return dev;
     }
@@ -3371,13 +3391,14 @@ const LOGGERS = (() => {
       async start() { await ble.notify(H, svc, tx, (b) => { for (const cb of subs) cb(b); if (onBytes) onBytes('in', b); }); },
       // a small pause between pieces while the page is in front (what the device liked in tests); in the background a browser stretches any
       // timer to a second, so there the pieces follow each other as fast as the link takes them
-      async send(bytes) { const front = typeof document === 'undefined' || document.visibilityState === 'visible', piece = this.piece; for (let i = 0; i < bytes.length; i += piece) { await ble.writeNoRsp(H, svc, rx, bytes.subarray(i, i + piece)); if (front) await sleep(piece > 20 ? 2 : 6); else await yieldTurn(); } if (onBytes) onBytes('out', bytes); },
+      dead: false,
+      async send(bytes) { const front = typeof document === 'undefined' || document.visibilityState === 'visible', piece = this.piece; for (let i = 0; i < bytes.length; i += piece) { if (this.dead) throw err('stopped', 'the read was stopped'); await ble.writeNoRsp(H, svc, rx, bytes.subarray(i, i + piece)); if (front) await sleep(piece > 20 ? 2 : 6); else await yieldTurn(); } if (onBytes) onBytes('out', bytes); },
       onData(cb) { subs.push(cb); }
     };
   }
   const alfano = {
     id: 'alfano', name: 'Alfano 6 / 7', ready: true, sessions: true, namePrefixes: [], services: CANDIDATES,
-    looks(name) { return /alfano|alf\b|alf[0-9]/i.test(name || ''); },
+    looks(name) { return /^alfano|\balfano\b|^alf[\s_-]?\d/i.test(name || ''); },   // ALFANO-2659, ALFANO7 4695, ALF7 …, never a speaker called Half Moon
     // the session reader: sign in with the device's password, list what it holds, read a session and turn it into the Alfano app's own ZIP
     async open(H) {
       const svcs = await ble.services(H);
@@ -3399,9 +3420,12 @@ const LOGGERS = (() => {
           const raw = await ALFANO7.download(dev, s, onProgress);
           // a read whose samples do not make sense is not handed on: the link dropped bytes somewhere the checksums did not catch
           const sane = ALFANO7.sanity(raw); if (sane.frac > 0.02 || sane.lapsBad > Math.max(1, Math.floor(sane.laps * 0.1))) { const e = err('corrupt', `${Math.round(sane.frac * 100)}% of the samples are unreadable`); e.diag = { sanity: sane, client: { maxPackets: dev.C.maxPackets, bad: dev.C.bad, probed: dev.C.probed }, longWrites: !!H.longWrites, session: { page: s.page, laps: s.laps, sampling: s.sampling } }; throw e; }
-          const dec = ALFANO7.decode(s, raw, dev.pages); const z = ALFANO7.zip(dec.files); const f = new File([z], dec.name + '.alf2', { type: 'application/zip', lastModified: Date.now() }); f.sanity = sane; return f;
+          const dec = ALFANO7.decode(s, raw, dev.pages); const z = ALFANO7.zip(dec.files); const f = new File([z], ALFANO7.fileName(s) + '.alf2', { type: 'application/zip', lastModified: Date.now() }); f.sanity = sane; return f;
         },
-        async close() { await ble.disconnect(H); }
+        // a stop (the driver went back), a drop or the close: the command waiting ends now and nothing more is sent on this link
+        async cancel() { pipe.dead = true; C.stop('stopped'); },
+        abort(code) { pipe.dead = true; C.stop(code || 'lost'); },
+        async close() { pipe.dead = true; C.stop('stopped'); await ble.disconnect(H); }
       };
       return me;
     },
@@ -3993,11 +4017,11 @@ Object.assign(I18N.RU, {
   'Tracks near {name}': 'Трассы рядом с {name}', 'Tracks near you': 'Трассы рядом', 'Set your home track in the profile to see distances.': 'Укажи домашнюю трассу в профиле, чтобы видеть расстояния.', 'Tracks appear here once you are signed in.': 'Трассы появятся здесь после входа.',
   'Add track': 'Добавить трассу', 'Click a pin to open the track': 'Нажми на точку, чтобы открыть трассу', 'All tracks': 'Все трассы',
   // track page
-  'Track not found': 'Трасса не найдена', 'Open': 'Открыто', 'Closed': 'Закрыто', 'Website': 'Сайт', 'Closes at {t}': 'Закрывается в {t}', 'Opens at {t}': 'Открывается в {t}',
+  'Track not found': 'Трасса не найдена', 'Open': 'Открыть', 'Open now': 'Открыто', 'Closed': 'Закрыто', 'Website': 'Сайт', 'Closes at {t}': 'Закрывается в {t}', 'Opens at {t}': 'Открывается в {t}',
   'Reserve your spot at {name} through their official booking site.': 'Забронируй заезд на {name} через официальный сайт.', "Experience {name} from a driver's perspective": '{name} глазами гонщика',
   '{n} corners': '{n} поворотов', 'be the first': 'будь первым', 'No layouts yet — add them in the admin panel.': 'Лейаутов пока нет — добавь их в админке.', 'No layouts listed yet.': 'Лейауты пока не указаны.',
   '{n} published sessions': 'опубликовано сессий: {n}', 'No hot laps posted yet — open a layout to add yours.': 'Лучших кругов пока нет — открой лейаут и добавь свой.',
-  'Lap': 'Круг', 'Layout': 'Лейаут', 'Session': 'Сессия', 'Date': 'Дата', 'Custom': 'Свой', 'Track length': 'Длина трассы', 'Corners': 'Поворотов', 'Max speed': 'Макс. скорость', 'Avg session': 'Средний заезд', 'FIA accredited': 'Аккредитация FIA', 'Yes': 'Да', 'No': 'Нет', 'No track facts yet.': 'Данных о трассе пока нет.',
+  'Lap': 'Круг', 'Layout': 'Конфигурация', 'Session': 'Сессия', 'Date': 'Дата', 'Custom': 'Свой', 'Track length': 'Длина трассы', 'Corners': 'Поворотов', 'Max speed': 'Макс. скорость', 'Avg session': 'Средний заезд', 'FIA accredited': 'Аккредитация FIA', 'Yes': 'Да', 'No': 'Нет', 'No track facts yet.': 'Данных о трассе пока нет.',
   'Follow {name}': 'Следи за {name}', '{name} is listed from public information. Claim it to keep the details, photos and events accurate.': '{name} добавлена по открытым данным. Заяви права, чтобы самому вести описание, фото и события.',
   'Claim this track': 'Это моя трасса', 'Send a request to the Hutka admins to manage this track page?': 'Отправить админам Hutka запрос на управление этой страницей?', 'Send request': 'Отправить', 'Request sent — the admins will get in touch.': 'Запрос отправлен — админы свяжутся с тобой.', 'Could not send the request. Sign in to claude.ai and try again.': 'Не удалось отправить запрос. Войди в claude.ai и попробуй снова.',
   'Subscribe': 'Подписаться', 'Edit track': 'Редактировать', 'Book a session': 'Забронировать заезд', 'Book now': 'Забронировать', 'Take a virtual lap': 'Виртуальный круг', 'Watch the onboard': 'Смотреть онборд', 'Layouts': 'Лейауты', 'Hot laps': 'Лучшие круги', 'Is this your track?': 'Это ваша трасса?',
@@ -4119,7 +4143,7 @@ Object.assign(I18N.RU, {
   'Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.': 'Загрузи сессию (Alfano .alf2 — эталон; AiM, RaceChrono, TrackAddict, VBOX и GPX тоже работают), выбери трассу и лейаут — и Лаборатория покажет, где время: точки тормоза, апекса и газа в каждом повороте, выжимку простым языком и, когда нужно, сравнение с любым другим кругом, средним по сессии или другим гонщиком на той же конфигурации.',
   'Published on this layout': 'Опубликованные на этой конфигурации',
   'Compare with — this session': 'Сравнить с — эта сессия',
-  'Assign a track first (Edit).': 'Сначала укажи трек (Edit).',
+  'Assign a track first (Edit).': 'Сначала укажи трассу («Изменить»).',
   'Linked with T{n}: the {a} s lost here buys {b} s there — together you are {net} s faster. The earlier brake sets up the next corner; keep it.': 'Связка с T{n}: {a} с, потерянные здесь, окупаются {b} с там — вместе ты быстрее на {net} с. Раннее торможение готовит следующий поворот; оставь как есть.',
   'Linked with T{n}: {a} s lost here against {b} s gained there — net {net} s. Judge the pair together, not this corner alone.': 'Связка с T{n}: {a} с потеряно здесь против {b} с выигранных там — итог {net} с. Оценивай пару целиком, а не этот поворот отдельно.',
   'Linked with T{n}: the {a} s gained here costs {b} s there — together you are {net} s slower. The entry here is compromising the next corner.': 'Связка с T{n}: {a} с, выигранные здесь, стоят {b} с там — вместе ты медленнее на {net} с. Вход сюда портит следующий поворот.',
@@ -4170,7 +4194,7 @@ Object.assign(I18N.RU, {
   'Likes': 'Лайки',
   'Your public page: other drivers see your published sessions, follow you and discuss your laps.': 'Твоя публичная страница: другие гонщики видят твои опубликованные сессии, подписываются и обсуждают твои круги.',
   'Open my public page': 'Открыть мою публичную страницу',
-  'Open a session to analyse it; Edit changes its name, track and layout.': 'Открой сессию для разбора; Edit меняет название, трек и конфигурацию.',
+  'Open a session to analyse it; Edit changes its name, track and layout.': 'Открой сессию для разбора; «Изменить» меняет название, трассу и конфигурацию.',
   'This browser': 'Этот браузер',
   'Edit': 'Изменить',
   'Session updated.': 'Сессия обновлена.',
@@ -4278,7 +4302,7 @@ Object.assign(I18N.RU, {
   'Chat title': 'Название чата',
   'Delete this chat?': 'Удалить этот чат?',
   'The messages are removed; credits are not returned.': 'Сообщения удалятся; кредиты не возвращаются.',
-  'AI coach': 'AI-тренер',
+  'AI coach': 'ИИ-тренер',
   'Credits': 'Кредиты',
   'Manage plan': 'Управлять планом',
   'Chats': 'Чаты',
@@ -4338,7 +4362,7 @@ Object.assign(I18N.RU, {
   'SWS race this session belongs to (optional)': 'Гонка SWS, к которой относится сессия (необязательно)',
   'No SWS results imported yet. ': 'Результаты SWS ещё не импортированы. ',
   'Import results from your SWS page': 'Импортировать результаты со своей страницы SWS',
-  'SWS results saved — pick the race in the session editor (Edit).': 'Результаты SWS сохранены — выбери гонку в редакторе сессии (Edit).',
+  'SWS results saved — pick the race in the session editor (Edit).': 'Результаты SWS сохранены — выбери гонку в редакторе сессии («Изменить»).',
   'Map': 'Карта',
   'Corners': 'Повороты',
   'Digest': 'Разбор',
@@ -4420,7 +4444,7 @@ Object.assign(I18N.RU, {
   'Tap the export button — bottom right': 'Нажми кнопку экспорта — справа внизу', 'The icon with the arrow out of a box (2 on the picture). The phone’s share sheet opens.': 'Иконка со стрелкой из коробки (2 на картинке). Откроется меню «Поделиться».',
   'Save the file on the phone': 'Сохрани файл на телефон', 'tap “Save to Files”, choose a folder (Downloads is fine), tap Save.': 'нажми «Сохранить в Файлы», выбери папку (Downloads подойдёт), Сохранить.', 'choose “Save” / “Downloads”.': 'выбери «Сохранить» / «Загрузки».',
   'The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.': 'Файл начинается с ALFANO7 и заканчивается на .alf2. Короткий путь, который тоже работает: отправь его себе в Telegram или WhatsApp — на следующем шаге его можно взять оттуда.',
-  'Open hutka.ai and tap Upload': 'Открой hutka.ai и нажми Upload', 'The round button in the middle of the bottom bar (on a computer — “Upload session” at the top right of the Lab). Sign in first if you have not — it takes one email.': 'Круглая кнопка посередине нижней панели (на компьютере — «Upload session» справа вверху в Lab). Если ещё не вошёл — войди, нужна только почта.',
+  'Open hutka.ai and tap Upload': 'Открой hutka.ai и нажми «Загрузить»', 'The round button in the middle of the bottom bar (on a computer — “Upload session” at the top right of the Lab). Sign in first if you have not — it takes one email.': 'Круглая кнопка посередине нижней панели (на компьютере — «Загрузить сессию» справа вверху в Лаборатории). Если ещё не вошёл — войди, нужна только почта.',
   'Choose the file': 'Выбери файл', 'Tap “Choose session files”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.': 'Нажми «Choose session files» и найди свой .alf2: iPhone — Обзор → Downloads (или папка Telegram / WhatsApp); Android — Загрузки.',
   'Check the track, tap Analyse': 'Проверь трассу, нажми Analyse', 'Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap Analyse — the Lab opens with every corner.': 'Hutka узнаёт трассу по GPS и подставляет лейаут и самый частый карт — проверь, поменяй, если надо. «Publish» — другие смогут сравниваться с тобой; сними галочку, чтобы сессия осталась приватной. Нажми Analyse — откроется Lab с разбором по поворотам.',
   'Other loggers and apps': 'Другие логгеры и приложения', 'Any of these files works the same way: save it on the phone or computer, then Upload → Choose session files.': 'Любой из этих файлов грузится так же: сохрани на телефон или компьютер, потом Upload → Choose session files.',
@@ -4447,7 +4471,7 @@ Object.assign(I18N.RU, { 'Ideal lap breakdown': 'Из чего состоит и
 Object.assign(I18N.RU, { 'Third lap (optional)': 'Третий круг (необязательно)', '— no third lap —': '— без третьего круга —', 'Third lap': 'Третий круг', 'third lap': 'третий круг', 'Play the lap': 'Проиграть круг', 'Pause': 'Пауза', "Show this lap's points on the map": 'Показать точки этого круга на карте' });
 Object.assign(I18N.RU, { '(dashed)': '(пунктир)' });
 Object.assign(I18N.RU, { 'E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)': 'Писать мне на почту, когда мои сессии лайкают или комментируют (не чаще раза в час)' });
-Object.assign(I18N.RU, { 'Also uploaded — the fastest is above': 'Ещё загрузил — быстрейшая выше', 'Show all {n}': 'Показать все {n}', 'Hide': 'Скрыть', "Hide from the public (admins): the session stays in its owner's library, unpublished.": 'Скрыть от всех (админы): сессия остаётся у владельца, снятая с публикации.', 'Hide this session from the public?': 'Скрыть эту сессию от всех?', 'It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again from the Lab.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется снятой с публикации, опубликовать заново он не сможет; вернуть её можно из Lab.', 'It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again here.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется снятой с публикации, опубликовать заново он не сможет; вернуть её можно здесь.', 'Hidden from the public.': 'Скрыто от всех.', 'Shown again.': 'Снова видна.', 'Run supabase/moderate.sql in the SQL editor once — then admins can hide sessions.': 'Выполни supabase/moderate.sql в SQL Editor один раз — тогда админы смогут скрывать сессии.', 'Could not hide: {e}': 'Не удалось скрыть: {e}', 'Hide from public': 'Скрыть от всех', 'Show again': 'Показать снова', 'Unpublished by owner': 'Снята владельцем', 'Hidden by admins': 'Скрыта админами', 'The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine, or ask them.': 'Админы сайта скрыли эту сессию от всех (битая запись или не тот лейаут). Если с данными всё в порядке — загрузи заново или напиши им.', 'The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.': 'Админы сайта скрыли эту сессию от всех (битая запись или не тот лейаут) — опубликовать её заново нельзя. Если с данными всё в порядке — загрузи заново.', 'Admins: hide a broken or wrongly placed session from the feed and the track page — its owner keeps it.': 'Админам: скрыть битую или не туда положенную сессию из ленты и со страницы трассы — у владельца она остаётся.' });
+Object.assign(I18N.RU, { 'Also uploaded — the fastest is above': 'Ещё загрузил — быстрейшая выше', 'Show all {n}': 'Показать все {n}', 'Hide': 'Скрыть', "Hide from the public (admins): the session stays in its owner's library, unpublished.": 'Скрыть от всех (админы): сессия остаётся у владельца, снятая с публикации.', 'Hide this session from the public?': 'Скрыть эту сессию от всех?', 'It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again from the Lab.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется снятой с публикации, опубликовать заново он не сможет; вернуть её можно из Lab.', 'It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again here.': 'Она пропадёт из ленты и со страницы трассы. У владельца останется снятой с публикации, опубликовать заново он не сможет; вернуть её можно здесь.', 'Hidden from the public.': 'Скрыто от всех.', 'Shown again.': 'Снова видна.', 'Run supabase/moderate.sql in the SQL editor once — then admins can hide sessions.': 'Выполни supabase/moderate.sql в SQL Editor один раз — тогда админы смогут скрывать сессии.', 'Could not hide: {e}': 'Не удалось скрыть: {e}', 'Hide from public': 'Скрыть от всех', 'Show again': 'Показать снова', 'Unpublished by owner': 'Снята владельцем', 'Hidden by admins': 'Скрыта админами', 'The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine, or ask them.': 'Админы сайта скрыли эту сессию от всех (битая запись или не та конфигурация). Если с данными всё в порядке — загрузи заново или напиши им.', 'The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.': 'Админы сайта скрыли эту сессию от всех (битая запись или не та конфигурация) — опубликовать её заново нельзя. Если с данными всё в порядке — загрузи заново.', 'Admins: hide a broken or wrongly placed session from the feed and the track page — its owner keeps it.': 'Админам: скрыть битую или не туда положенную сессию из ленты и со страницы трассы — у владельца она остаётся.' });
 Object.assign(I18N.RU, { 'Hidden sessions': 'Скрытые сессии', 'hidden by admins — the owners keep them': 'скрыты админами — у владельцев остаются', 'Run supabase/moderate.sql in the SQL editor once — then admins can hide broken sessions from the feed (the Hide button on a post or in the Lab).': 'Выполни supabase/moderate.sql в SQL Editor один раз — тогда админы смогут скрывать битые сессии из ленты (кнопка «Скрыть» на посте или в Lab).', 'Nothing hidden. A broken or wrongly placed session can be hidden from the feed with the Hide button on its post (or in the Lab).': 'Скрытых нет. Битую или не туда положенную сессию можно убрать из ленты кнопкой «Скрыть» на её посте (или в Lab).' });
 // v32 — sport karts with an Alfano 6: revs, gears, shifts, water temperature
 Object.assign(I18N.RU, {
@@ -4477,7 +4501,7 @@ Object.assign(I18N.RU, { 'Code from the e-mail': 'Код из письма', 'Co
   'Check your inbox: open the link in the email, or type the 6-digit code from it here.': 'Проверь почту: открой ссылку из письма или введи сюда шестизначный код из него.', 'Enter the 6-digit code from the e-mail.': 'Введи шестизначный код из письма.',
   'That code did not work — check the digits, or ask for a new e-mail.': 'Код не подошёл — проверь цифры или запроси новое письмо.' });
 // v33.4 — the help page: the app in the share sheet
-Object.assign(I18N.RU, { 'With the Hutka app:': 'С приложением Hutka:', 'tap Hutka in the row of apps — the session opens in the upload window straight away, steps 4–5 are not needed.': 'нажми Hutka в ряду приложений — сессия сразу откроется в окне загрузки, шаги 4–5 не нужны.',
+Object.assign(I18N.RU, { 'With the Hutka app:': 'С приложением Hutka:', 'tap Hutka in the row of apps — the session opens in the upload window straight away, steps 4–5 are not needed.': 'нажми Hutka в ряду приложений — сессия сразу откроется в окне загрузки, шаги 4–5 не нужны.', 'tap Hutka in the row of apps — the session opens in the Lab straight away, steps 4–5 are not needed.': 'нажми Hutka в ряду приложений — сессия сразу откроется в Лаборатории, шаги 4–5 не нужны.',
   'Hutka at the front of that row, once and for all: iPhone — scroll the app row to the end → More → Edit → “+” next to Hutka (Favourites), then drag it to the top; Android — hold Hutka in the share sheet → Pin.': 'Чтобы Hutka всегда была первой в этом ряду: iPhone — пролистай ряд приложений до конца → «Ещё» → «Править» → «+» у Hutka (Избранное), потом перетащи её наверх; Android — удержи Hutka в меню «Поделиться» → «Закрепить».',
   'Without the app:': 'Без приложения:' });
 // v33.7 — a track that is not in Hutka: looked up on the map, its page made from the session
@@ -4616,12 +4640,12 @@ Object.assign(I18N.RU, { 'Your sign-in has expired — sign in again to ask the 
 Object.assign(I18N.RU, { 'See where the time is': 'Увидь, где время' });
 Object.assign(I18N.RU, { 'Loading': 'Загрузка' });
 // v34.20 — sessions on another configuration are not compared
-Object.assign(I18N.RU, { '{p}% of the lap runs away from the “{layout}” line — it was driven on another configuration of the track, so it is not compared with the sessions of this one. Pick the right layout (Edit), or ask an admin to add it.': '{p}% круга уходит с линии конфигурации «{layout}» — круг проехан по другой конфигурации трассы, поэтому с сессиями этой он не сравнивается. Выбери правильную конфигурацию (Edit) или попроси админа её добавить.',
-  'this session was driven on another configuration — pick its layout first (Edit)': 'эта сессия проехана по другой конфигурации — сначала выбери её конфигурацию (Edit)',
+Object.assign(I18N.RU, { '{p}% of the lap runs away from the “{layout}” line — it was driven on another configuration of the track, so it is not compared with the sessions of this one. Pick the right layout (Edit), or ask an admin to add it.': '{p}% круга уходит с линии конфигурации «{layout}» — круг проехан по другой конфигурации трассы, поэтому с сессиями этой он не сравнивается. Выбери правильную конфигурацию («Изменить») или попроси админа её добавить.',
+  'this session was driven on another configuration — pick its layout first (Edit)': 'эта сессия проехана по другой конфигурации — сначала выбери её конфигурацию («Изменить»)',
   'its lap does not follow this layout — it was driven on another configuration': 'её круг не ложится на эту конфигурацию — она проехана по другой',
   'another configuration?': 'другая конфигурация?', 'Uploaded under this layout, but the lap follows another configuration of the track — not comparable.': 'Загружена под этой конфигурацией, но круг идёт по другой — сравнивать нельзя.',
-  'This session was driven on another configuration of the track — comparisons are off until its layout is right (Edit).': 'Эта сессия проехана по другой конфигурации трассы — сравнения выключены, пока конфигурация не исправлена (Edit).',
-  'another configuration — not comparable': 'другая конфигурация — не сравнить' });
+  'This session was driven on another configuration of the track — comparisons are off until its layout is right (Edit).': 'Эта сессия проехана по другой конфигурации трассы — сравнения выключены, пока конфигурация не исправлена («Изменить»).',
+  'another configuration — not comparable': 'другая конфигурация — не сравнивается' });
 Object.assign(I18N.RU, { 'Colour the lap by what the kart is doing: accelerating, decelerating, coasting': 'Раскрасить круг по тому, что делает карт: разгон, замедление, накат' });
 // v34.21 — the sign-in code
 Object.assign(I18N.RU, { 'Email me a code': 'Прислать код на почту', 'Email me a code instead': 'Лучше код на почту', 'No password needed: we e-mail you a 6-digit code.': 'Пароль не нужен: пришлём на почту 6-значный код.',
@@ -4666,9 +4690,9 @@ Object.assign(I18N.RU, {
   'lap {lap} of {laps}': 'круг {lap} из {laps}',
   '{n} session read|{n} sessions read': '{n} сессия прочитана|{n} сессии прочитаны|{n} сессий прочитано',
   'Opening…': 'Открываю…',
-  '{n} records in memory ({p}% full)': 'в памяти {n} записей (заполнено на {p}%)',
+  '{n} records in memory ({p}% full)': 'записей в памяти: {n} (заполнено на {p}%)',
   '{n} outing found|{n} outings found': 'найден {n} заезд|найдено {n} заезда|найдено {n} заездов',
-  'The gap, corner by corner': 'Отрыв по поворотам',
+  'The gap, corner by corner': 'Разница по поворотам',
   'The Lab puts you next to the fastest driver on this layout in your kart class and shows where the time goes in every corner.': 'Лаборатория ставит тебя рядом с самым быстрым на этой конфигурации в твоём классе картов и показывает, где уходит время в каждом повороте.',
   'Grades A–E': 'Оценки A–E',
   'Every corner gets a grade for the entry, the apex and the exit — start with the lowest one.': 'Каждый поворот получает оценку за вход, апекс и выход — начни с самой низкой.',
@@ -4719,15 +4743,15 @@ Object.assign(I18N.RU, {
   'Finding the track…': 'Ищу трассу…',
   'Recognising the layout…': 'Узнаю конфигурацию…',
   'Saving {k} of {n}…': 'Сохраняю {k} из {n}…',
-  'These sessions are already in Hutka — the newest is open.': 'Эти сессии уже в Hutka — открыл самую новую.',
-  'This session is already in Hutka — it is open.': 'Эта сессия уже в Hutka — открыл её.',
+  'These sessions are already in Hutka — the newest is open.': 'Эти сессии уже в Hutka — открыта самая новая.',
+  'This session is already in Hutka — it is open.': 'Эта сессия уже в Hutka — она открыта.',
   '{n} session was already in Hutka — not uploaded again.|{n} sessions were already in Hutka — not uploaded again.': '{n} сессия уже была в Hutka — повторно не загружена.|{n} сессии уже были в Hutka — повторно не загружены.|{n} сессий уже были в Hutka — повторно не загружены.',
   'Finishing touches': 'Последние штрихи',
   'Session type': 'Тип заезда',
   '(optional)': '(необязательно)',
   'Your place': 'Твоё место',
   'Keep it private': 'Оставить только для себя',
-  'Change kart, name, notes': 'Карт, название, заметки',
+  'Change kart, name, notes': 'Изменить карт, название, заметки',
   '{n} sessions from this upload are saved — private for now. A few taps and they are ready to share.': 'Сессий из этой загрузки: {n}. Сохранены — пока видишь только ты. Пара касаний — и можно делиться.',
   'Saved — private for now. A few taps and it is ready to share.': 'Сохранено — пока видишь только ты. Пара касаний — и можно делиться.',
   'Publish {n} sessions': 'Опубликовать все ({n})',
@@ -4738,7 +4762,7 @@ Object.assign(I18N.RU, {
   'Change': 'Изменить',
   'Which layout? Hutka could not tell — pick it by its shape.': 'Какая конфигурация? Hutka не смогла понять — выбери по форме.',
   'Which layout? The marked one looks most likely — tap the right one.': 'Какая конфигурация? Отмеченная — самая вероятная; нажми правильную.',
-  'likely': 'вероятно',
+  'likely': 'скорее всего',
   'this one': 'эта',
   'no line yet': 'линии пока нет',
   'Not in the list': 'Нет в списке',
@@ -4752,16 +4776,9 @@ Object.assign(I18N.RU, {
 
 // v34.26 — no connection after a read: kept on the phone, uploaded by itself (Pasha's point 9)
 Object.assign(I18N.RU, {
-  'Uploading the sessions kept on this phone…': 'Загружаю сессии, сохранённые на телефоне…',
-  '{n} session from the lap timer waits on this phone for the internet — it uploads by itself.|{n} sessions from the lap timer wait on this phone for the internet — they upload by themselves.': '{n} сессия с прибора ждёт интернета на телефоне — загрузится сама.|{n} сессии с прибора ждут интернета на телефоне — загрузятся сами.|{n} сессий с прибора ждут интернета на телефоне — загрузятся сами.',
-  '{n} session from the lap timer is uploaded — it is in your Lab.|{n} sessions from the lap timer are uploaded — they are in your Lab.': '{n} сессия с прибора загружена — она в Лаборатории.|{n} сессии с прибора загружены — они в Лаборатории.|{n} сессий с прибора загружены — они в Лаборатории.',
-  'Still no connection — the sessions stay on this phone and upload by themselves later.': 'Интернета всё ещё нет — сессии остаются на телефоне и загрузятся сами позже.',
-  'No internet right now — the session is kept on this phone and uploads by itself as soon as the connection is back.|No internet right now — the {n} sessions are kept on this phone and upload by themselves as soon as the connection is back.': 'Сейчас нет интернета — сессия сохранена на телефоне и загрузится сама, как только появится связь.|Сейчас нет интернета — {n} сессии сохранены на телефоне и загрузятся сами, как только появится связь.|Сейчас нет интернета — {n} сессий сохранены на телефоне и загрузятся сами, как только появится связь.',
-  'On this phone — uploads by itself when the internet is back': 'На телефоне — загрузится сама, когда появится интернет',
   'Upload now': 'Загрузить сейчас',
-  '{n} session from the lap timer waits on this phone.|{n} sessions from the lap timer wait on this phone.': '{n} сессия с прибора ждёт на телефоне.|{n} сессии с прибора ждут на телефоне.|{n} сессий с прибора ждут на телефоне.',
   'The upload did not go through — Hutka tries again by itself.': 'Загрузка не прошла — Hutka попробует ещё раз сама.',
-  'Daily limit reached — Hutka uploads by itself tomorrow.': 'Дневной лимит исчерпан — Hutka загрузит сама завтра.' });
+  'Daily limit reached — Hutka uploads by itself tomorrow.': 'Дневной лимит исчерпан — Hutka загрузит их сама завтра.' });
 
 // v34.27 — the app opened with no internet
 Object.assign(I18N.RU, {
@@ -4776,6 +4793,41 @@ Object.assign(I18N.RU, {
   'same line': 'та же линия',
   'other track': 'другая трасса',
   'Filed under another layout or track page, but its laps follow this layout — compared all the same.': 'Записана под другой конфигурацией или трассой, но круги идут по этой линии — сравнивается.' });
+
+// v34.29 — the review of 18 Oct: "this device" (a computer too, a file too), the lap timer's list counts what waits on the device apart,
+// plurals without "(s)", the copy that still described the old form
+Object.assign(I18N.RU, {
+  'Uploading the sessions kept on this device…': 'Загружаю сессии, сохранённые на этом устройстве…',
+  '{n} session waits on this device — it uploads by itself.|{n} sessions wait on this device — they upload by themselves.': '{n} сессия ждёт на этом устройстве — загрузится сама.|{n} сессии ждут на этом устройстве — загрузятся сами.|{n} сессий ждут на этом устройстве — загрузятся сами.',
+  '{n} session waits on this device.|{n} sessions wait on this device.': '{n} сессия ждёт на этом устройстве.|{n} сессии ждут на этом устройстве.|{n} сессий ждут на этом устройстве.',
+  '{n} session kept on this device is uploaded — it is in your Lab.|{n} sessions kept on this device are uploaded — they are in your Lab.': '{n} сессия с этого устройства загружена — она в Лаборатории.|{n} сессии с этого устройства загружены — они в Лаборатории.|{n} сессий с этого устройства загружены — они в Лаборатории.',
+  'Still no connection — the sessions stay on this device and upload by themselves later.': 'Интернета всё ещё нет — сессии остаются на этом устройстве и загрузятся сами позже.',
+  'No internet right now — the session is kept on this device and uploads by itself as soon as the connection is back.|No internet right now — the {n} sessions are kept on this device and upload by themselves as soon as the connection is back.': 'Сейчас нет интернета — {n} сессия сохранена на этом устройстве и загрузится сама, как только появится связь.|Сейчас нет интернета — {n} сессии сохранены на этом устройстве и загрузятся сами, как только появится связь.|Сейчас нет интернета — {n} сессий сохранены на этом устройстве и загрузятся сами, как только появится связь.',
+  'On this device — uploads by itself when the internet is back': 'На этом устройстве — загрузится сама, когда появится интернет',
+  '{n} session on {name}: {k} new, {m} already in Hutka, {w} waiting on this device.|{n} sessions on {name}: {k} new, {m} already in Hutka, {w} waiting on this device.': 'Сессий на {name}: {n} — новых {k}, уже в Hutka {m}, ждут на этом устройстве {w}.',
+  '{n} session on {name}: {k} new, {m} already in Hutka.|{n} sessions on {name}: {k} new, {m} already in Hutka.': 'Сессий на {name}: {n} — новых {k}, уже в Hutka {m}.',
+  '{n} session on {name} — tick it to upload.|{n} sessions on {name} — tick the ones to upload (the newest first).': 'Сессий на {name}: {n} — отметь, какие загрузить (новые сверху).',
+  '{n} outing on the device: {k} new, {m} already in Hutka, {w} waiting on this device.|{n} outings on the device: {k} new, {m} already in Hutka, {w} waiting on this device.': 'Заездов на приборе: {n} — новых {k}, уже в Hutka {m}, ждут на этом устройстве {w}.',
+  '{n} outing on the device: {k} new, {m} already in Hutka.|{n} outings on the device: {k} new, {m} already in Hutka.': 'Заездов на приборе: {n} — новых {k}, уже в Hutka {m}.',
+  '{n} outing on the device — tick it to upload.|{n} outings on the device — tick the ones to upload.': 'Заездов на приборе: {n} — отметь, какие загрузить.',
+  'Show 1 other device|Show {n} other devices': 'Показать другие устройства: {n}',
+  'Kept private — only you see it. Publish it any time from My sessions.': 'Оставлено только для тебя. Опубликовать можно в любой момент в «Моих сессиях».',
+  'No connection — this fills in when it is back.': 'Нет связи — заполнится, когда она вернётся.',
+  'A few minutes the first time; after that, a couple of taps.': 'В первый раз — несколько минут, дальше — пара касаний.',
+  '{n} session on {name}: {k} new, {w} waiting on this device.|{n} sessions on {name}: {k} new, {w} waiting on this device.': 'Сессий на {name}: {n} — новых {k}, ждут на этом устройстве {w}.',
+  '{n} outing on the device: {k} new, {w} waiting on this device.|{n} outings on the device: {k} new, {w} waiting on this device.': 'Заездов на приборе: {n} — новых {k}, ждут на этом устройстве {w}.',
+  'Comment': 'Комментарий', 'lap': 'круг',
+  // the lap timer, the outbox and the finishing touches after the review
+  'Bluetooth is off — turn it on and try again.': 'Bluetooth выключен — включи его и попробуй снова.',
+  'No connection — sessions already in Hutka are recognised from what this device saw last time.': 'Нет связи — сессии, которые уже есть в Hutka, узнаю по тому, что это устройство видело в прошлый раз.',
+  'Daily upload limit reached — the session is kept on this device and goes up by itself tomorrow.|Daily upload limit reached — the {n} sessions are kept on this device and go up by themselves tomorrow.': 'Дневной лимит загрузок исчерпан — {n} сессия ждёт на этом устройстве и загрузится сама завтра.|Дневной лимит загрузок исчерпан — {n} сессии ждут на этом устройстве и загрузятся сами завтра.|Дневной лимит загрузок исчерпан — {n} сессий ждут на этом устройстве и загрузятся сами завтра.',
+  'The upload did not go through ({e}) — the session is kept on this device and Hutka tries again by itself.|The upload did not go through ({e}) — the {n} sessions are kept on this device and Hutka tries again by itself.': 'Загрузка не прошла ({e}) — {n} сессия ждёт на этом устройстве, Hutka попробует ещё раз сама.|Загрузка не прошла ({e}) — {n} сессии ждут на этом устройстве, Hutka попробует ещё раз сама.|Загрузка не прошла ({e}) — {n} сессий ждут на этом устройстве, Hutka попробует ещё раз сама.',
+  'One more session from this upload stays private — open it from My sessions to check its layout.|{n} more sessions from this upload stay private — open them from My sessions to check their layout.': 'Ещё {n} сессия из этой загрузки осталась только для тебя — открой её в «Моих сессиях» и проверь конфигурацию.|Ещё {n} сессии из этой загрузки остались только для тебя — открой их в «Моих сессиях» и проверь конфигурацию.|Ещё {n} сессий из этой загрузки остались только для тебя — открой их в «Моих сессиях» и проверь конфигурацию.',
+  'The session read before it is saved.|The {n} sessions read before it are saved.': '{n} сессия, прочитанная до этого, сохранена.|{n} сессии, прочитанные до этого, сохранены.|{n} сессий, прочитанных до этого, сохранены.',
+  'One outing on it is not in Hutka yet — it would be lost.|{n} outings on it are not in Hutka yet — they would be lost.': 'На нём {n} заезд, которого ещё нет в Hutka, — он пропадёт.|На нём {n} заезда, которых ещё нет в Hutka, — они пропадут.|На нём {n} заездов, которых ещё нет в Hutka, — они пропадут.',
+  'One outing is only on this phone so far, waiting for the internet.|{n} outings are only on this phone so far, waiting for the internet.': '{n} заезд пока только на этом телефоне — ждёт интернета.|{n} заезда пока только на этом телефоне — ждут интернета.|{n} заездов пока только на этом телефоне — ждут интернета.',
+  'The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine.': 'Админы сайта скрыли эту сессию от всех (битая запись или не та конфигурация). Если с данными всё в порядке — загрузи заново.',
+  'The file has no laps with GPS.': 'В файле нет кругов с GPS.' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -4872,7 +4924,7 @@ Object.assign(I18N.EN, {
 "{who} earlier ({a} m vs {b}) and still faster: a late brake spoils the apex here": "{who} earlier ({a} m vs {b}) and still faster: a late deceleration spoils the apex here",
 "{who} flat out, {other} lifts at {b} m": "{who} without slowing, {other} slows gently at {b} m",
 "{who} without braking ({how}), {other} brakes at {b} m": "{who} without hard slowing ({how}), {other} decelerates at {b} m",
-"Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.": "Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: deceleration, apex and acceleration points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout."
+"Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.": "Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too) — the track and the layout are found by themselves — and the Lab shows where the time is: deceleration, apex and acceleration points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout."
 });
 Object.assign(I18N.RU, {
 "Brake — where the deceleration gets stronger than 2.5 m/s²; the number is metres from the start/finish line.": "Замедление — где карт начинает замедляться сильнее 2,5 м/с²; число — метры от линии старт/финиш. Все точки считаются по GPS-скорости, а не по педалям: одна и та же педаль на разных картах тормозит по-разному.",
@@ -4966,7 +5018,7 @@ Object.assign(I18N.RU, {
 "{who} earlier ({a} m vs {b}) and still faster: a late brake spoils the apex here": "{who} раньше ({a} м против {b}) и всё равно быстрее: позднее замедление здесь портит апекс",
 "{who} flat out, {other} lifts at {b} m": "{who} без замедления, {other} мягко замедляется у {b} м",
 "{who} without braking ({how}), {other} brakes at {b} m": "{who} без сильного замедления ({how}), {other} замедляется у {b} м",
-"Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.": "Загрузи сессию (Alfano .alf2 — эталон; AiM, RaceChrono, TrackAddict, VBOX и GPX тоже работают), выбери трассу и лейаут — и Лаборатория покажет, где время: точки замедления, апекса и разгона в каждом повороте, выжимку простым языком и, когда нужно, сравнение с любым другим кругом, средним по сессии или другим гонщиком на той же конфигурации."
+"Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.": "Загрузи сессию (Alfano .alf2 — эталон; AiM, RaceChrono, TrackAddict, VBOX и GPX тоже работают) — трасса и конфигурация найдутся сами — и Лаборатория покажет, где время: точки замедления, апекса и разгона в каждом повороте, выжимку простым языком и, когда нужно, сравнение с любым другим кругом, средним по сессии или другим гонщиком на той же конфигурации."
 });
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
@@ -5169,7 +5221,9 @@ const STORE = (() => {
     let la = 0, lo = 0, n = 0; for (const L of clean.length ? clean : sess.laps) for (let i = 0; i < L.pts.length; i += 5) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; }
     return { id: sess.id, owner: sess.owner || me.id || 'local', name: sess.name || '', label: sess.label || '', driver: sess.driver || '', date: sess.date || '', trackName: sess.trackName || '', track: sess.track || '', layout: sess.layout || 'custom', note: sess.note || '', kart: sess.kart || '', kartClass: sess.kartClass || (sess.kart ? 'rental' : ''), kartCat: sess.kartCat || '', format: sess.format || '', pos: +sess.pos || 0, drivers: +sess.drivers || 0, nLaps: sess.laps.length, cleanLaps: clean.length, bestMs: best.timeMs, bestLapN: best.n, avgMs: Math.round(avg), lat: n ? la / n : null, lon: n ? lo / n : null, published: !!sess.published, preview: previewOf(sess), source: sess.source || null, ch: channelsMeta(sess), createdAt: sess.createdAt || Date.now(), updatedAt: Date.now(),
       // a fresh upload waiting for its finishing touches: the batch it came in with, and how sure Hutka was of the layout
-      ...(sess.draft ? { draft: true, batch: sess.batch || '', detect: sess.detect || null } : {}) };
+      ...(sess.draft ? { draft: true, batch: sess.batch || '', detect: sess.detect || null } : {}),
+      // when a recording with a real clock started (UTC ms): the same outing read again in another time zone is still recognised
+      ...(+sess.startMs > 0 ? { startMs: Math.round(+sess.startMs) } : {}) };
   }
   // what the logger recorded besides GPS (an Alfano 6 on a sport kart): which channels, the gearbox read out of them, rev and
   // temperature extremes — enough for the feed and the lists without loading the laps
@@ -5230,7 +5284,22 @@ const STORE = (() => {
 
   // ===== backend: Supabase (standalone hosting) =====
   function supabaseAdapter(cfg) {
-    const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+    // the client: no blind retries of failed reads (supabase-js would wait 1 + 2 + 4 s on each — the app keeps and retries what failed
+    // itself), a time limit on every request (a hung connection is a failed one), and with no connection at all no request leaves: the
+    // database calls answer "Failed to fetch" at once, so an app opened at the track with no signal starts in a moment, not a minute
+    const offline = () => navigator.onLine === false;
+    const timedFetch = (url, opts) => {
+      if (offline()) return Promise.reject(new TypeError('Failed to fetch (offline)'));
+      const o = Object.assign({}, opts || {}), ctl = new AbortController(), ms = !o.method || o.method === 'GET' || o.method === 'HEAD' ? 20000 : 90000;
+      if (o.signal) { if (o.signal.aborted) ctl.abort(); else o.signal.addEventListener('abort', () => ctl.abort(), { once: true }); }
+      const timer = setTimeout(() => ctl.abort(), ms); o.signal = ctl.signal;
+      return fetch(url, o).catch((e) => { throw ctl.signal.aborted && !(opts && opts.signal && opts.signal.aborted) ? new TypeError('Failed to fetch (timed out)') : e; }).finally(() => clearTimeout(timer));
+    };
+    const sb0 = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, { db: { retry: false }, global: { fetch: timedFetch } });
+    // database calls with no connection: an answer at once ("Failed to fetch"), without waiting for the sign-in to refresh a token it cannot
+    const OFF = { data: null, error: { message: 'TypeError: Failed to fetch (offline)', code: '' } };
+    const dead = () => { const p = new Proxy(function () {}, { get(_, k) { if (k === 'then') return (res, rej) => Promise.resolve(OFF).then(res, rej); return () => p; }, apply() { return p; } }); return p; };
+    const sb = new Proxy(sb0, { get(target, k) { if ((k === 'from' || k === 'rpc') && offline()) return () => dead(); const v = target[k]; return typeof v === 'function' ? v.bind(target) : v; } });
     const must = (r) => { if (r.error) { const e = new Error(r.error.message || 'db error'); e.code = r.error.code; throw e; } return r.data; };
     const row2doc = (r) => Object.assign({ id: r.id }, r.data || {});
     const noCol = (err) => /column|schema cache|PGRST204|42703/i.test((err.message || '') + ' ' + (err.code || ''));   // a column the SQL update has not added yet
@@ -5239,9 +5308,13 @@ const STORE = (() => {
     const A = {
       kind: 'supabase', sb,
       // the token is live (a request carries the driver, not the anonymous key): false while a session kept with no connection waits to refresh
-      async live() { try { const r = await sb.auth.getSession(); return !!(r.data && r.data.session); } catch (e) { return false; } },
+      async live() { if (offline()) return false; try { const r = await sb.auth.getSession(); return !!(r.data && r.data.session); } catch (e) { return false; } },
+      // is the telemetry of this session in the database? (a save cut off between the row and its data leaves a row without it)
+      async hasData(sid) { return must(await sb.from('session_data').select('id').eq('id', sid).limit(1)).length > 0; },
       async init() {
-        let s = { data: null, error: null }; try { s = await sb.auth.getSession(); } catch (e) { s = { data: null, error: e }; }
+        let s = { data: null, error: null };
+        if (offline()) s = { data: null, error: { name: 'AuthRetryableFetchError', message: 'offline' } };   // no connection: not even a try — the session kept on this device below
+        else { try { s = await sb.auth.getSession(); } catch (e) { s = { data: null, error: e }; } }
         session = s.data ? s.data.session : null;
         // no connection and the access token has run out: supabase-js cannot refresh it, so getSession() gives nothing — yet the session is
         // still on this device and refreshes by itself once the connection is back. Meanwhile the driver stays signed in: the app opened at
@@ -5359,7 +5432,7 @@ const STORE = (() => {
       signInPassword: async (email, password, captchaToken) => must(await sb.auth.signInWithPassword(Object.assign({ email, password }, captchaToken ? { options: { captchaToken } } : {}))),
       verifyEmailCode: async (email, code) => must(await sb.auth.verifyOtp({ email, token: code, type: 'email' })),   // the 6-digit code from the magic-link e-mail ({{ .Token }} in the template)
       finishSignIn: async (url) => { const u = new URL(String(url).replace(/^hutka:\/\//i, 'https://hutka.app/')); const code = u.searchParams.get('code'); if (code) { must(await sb.auth.exchangeCodeForSession(code)); return true; } const h = new URLSearchParams((u.hash || '').replace(/^#/, '')); const at = h.get('access_token'), rt = h.get('refresh_token'); if (at && rt) { must(await sb.auth.setSession({ access_token: at, refresh_token: rt })); return true; } const err = h.get('error_description') || u.searchParams.get('error_description'); if (err) throw new Error(err); return false; },
-      signOut: async () => { await sb.auth.signOut(); },
+      signOut: async () => { let r = null; try { r = await sb.auth.signOut(); } catch (e) { r = { error: e }; } if (r && r.error) { try { localStorage.removeItem(sb0.auth.storageKey || authKey); } catch (e) {} } kept = false; },
       token: () => session && session.access_token || ''
     };
     return A;
@@ -5424,7 +5497,10 @@ const STORE = (() => {
     if (adapter && me.id) { try { return (await adapter.mySessions(me.id)).sort(byDate); } catch (e) { return []; } }
     const all = await LDB.all('sessions').catch(() => []); return all.map(r => r.meta).sort(byDate);
   }
-  async function mySessionsStrict() { if (adapter && me.id) return (await adapter.mySessions(me.id)).sort(byDate); return mySessions(); }
+  async function mySessionsStrict() { if (adapter && me.id) { const list = (await adapter.mySessions(me.id)).sort(byDate); LDB.put('kv', { id: 'cache:mine:' + me.id, at: Date.now(), list: list.map(m => ({ id: m.id, date: m.date, bestMs: m.bestMs, nLaps: m.nLaps, source: m.source || null, track: m.track, layout: m.layout, startMs: m.startMs || 0 })) }).catch(() => {}); return list; } return mySessions(); }
+  // the library as it was the last time it loaded, when it cannot load now (the lap timer's list with no connection: what is already in Hutka)
+  async function mySessionsKnown() { try { return await mySessionsStrict(); } catch (e) { try { const c = await LDB.get('kv', 'cache:mine:' + me.id); return c && Array.isArray(c.list) ? c.list : []; } catch (x) { return []; } } }
+  async function hasData(sid) { return !adapter || !adapter.hasData ? true : adapter.hasData(sid); }
   async function myOnTrack(tid) { if (adapter && me.id) { try { return (await adapter.myOnTrack(me.id, tid)).sort(byDate); } catch (e) { return []; } } return (await mySessions()).filter(m => m.track === tid); }
   // published sessions of a track (or a layout): the track page, the Lab and the feed ask for the same list many times in a row —
   // one network round trip per 20 s per key, dropped as soon as any session changes
@@ -5454,7 +5530,14 @@ const STORE = (() => {
     else { meta.owner = 'local'; meta.published = false; await LDB.put('sessions', { id: sess.id, meta, chunks: packed.chunks }); }
     Object.assign(sess, meta); sessCache.set(sess.id, sess); notify('sessions'); return meta;
   }
-  async function updateSession(sid, patch) {
+  // one write per session at a time: a write reads the stored meta and puts it back with the change, so two at once (a tap on a chip
+  // and then on Publish) would undo each other — each one waits for the one before it
+  const writing = new Map();
+  function updateSession(sid, patch) {
+    const prev = writing.get(sid) || Promise.resolve(), p = prev.then(() => updateSession1(sid, patch)), tail = p.catch(() => {});
+    writing.set(sid, tail); tail.then(() => { if (writing.get(sid) === tail) writing.delete(sid); }); return p;
+  }
+  async function updateSession1(sid, patch) {
     const cached = sessCache.get(sid);
     if (adapter && !(cached && cached.owner === 'local')) await adapter.updateSession(sid, Object.assign({ updatedAt: Date.now() }, patch));
     else { const rec = await LDB.get('sessions', sid); if (rec) { Object.assign(rec.meta, patch, { updatedAt: Date.now() }); await LDB.put('sessions', rec); } }
@@ -5494,7 +5577,7 @@ const STORE = (() => {
   // IndexedDB keeps the File itself; one record per file, grouped by the read they came from
   const OUT = 'outbox:';
   async function outboxAdd(item) { const id = OUT + uid(); await LDB.put('kv', Object.assign({ id, at: Date.now(), owner: me.id || '' }, item)); return id; }
-  async function outboxAll() { try { return (await LDB.range('kv', OUT, OUT + '\uffff')).filter(r => (!r.owner || !me.id || r.owner === me.id)).sort((a, b) => a.at - b.at); } catch (e) { return []; } }
+  async function outboxAll() { if (!me.id) return []; try { return (await LDB.range('kv', OUT, OUT + '\uffff')).filter(r => !r.owner || r.owner === me.id).sort((a, b) => a.at - b.at); } catch (e) { return []; } }
   async function outboxDel(id) { try { await LDB.del('kv', id); } catch (e) {} notify('outbox'); }
   async function outboxPut(rec) { try { await LDB.put('kv', rec); } catch (e) {} notify('outbox'); }   // a record kept back (one this version cannot read stays for the next)
   async function deleteSession(meta) { if (adapter && meta.owner !== 'local') await adapter.deleteSession(meta.id, meta.chunks); else await LDB.del('sessions', meta.id); sessCache.delete(meta.id); notify('sessions'); }
@@ -5671,7 +5754,7 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, mySessionsStrict, ensureTracks, live, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, outboxAdd, outboxAll, outboxDel, outboxPut, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, marks, markOf, setMark, removeMark, get marksOn() { return marksOk !== false && !!(adapter && adapter.marksOf && me.id); }, visit, adminVisits, track, adminAnalytics,
+    mySessions, mySessionsStrict, mySessionsKnown, hasData, ensureTracks, live, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, outboxAdd, outboxAll, outboxDel, outboxPut, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, marks, markOf, setMark, removeMark, get marksOn() { return marksOk !== false && !!(adapter && adapter.marksOf && me.id); }, visit, adminVisits, track, adminAnalytics,
     profile, profileStrict, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); }, deviceLog: async (o) => { if (!adapter || !adapter.deviceLog) throw new Error('not configured'); if (!me.id) throw new Error('sign in'); return adapter.deviceLog(o); } };
@@ -6164,7 +6247,7 @@ async function sharePageSync(meta, img) {
   return share;
 }
 // publish / unpublish from a list (profile, track page): the flag, then the share page in the background
-async function setPublished(meta, on) { if (on && meta.moderated && !STORE.isAdmin()) { toast(t('The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.')); return; } await STORE.updateSession(meta.id, { published: on }); meta.published = on; sharePageSync(meta).catch(() => {}); }
+async function setPublished(meta, on) { if (on && meta.moderated && !STORE.isAdmin()) { toast(t('The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.')); return; } const patch = on ? { published: true, draft: false } : { published: false }; await STORE.updateSession(meta.id, patch); Object.assign(meta, patch); sharePageSync(meta).catch(() => {}); }
 // ---------- kart categories ----------
 // Every session is driven in one category: a rental kart model of the track (Sodi RT8, Birel N35…) or a sport class (Rotax Senior, X30,
 // KZ2…). Rankings, hot laps, personal bests and the Lab's comparisons never mix categories — a 270 cc rental and a KZ2 are different sports.
@@ -6415,7 +6498,11 @@ const NATIVE = window.NATIVE = {
   freshAt: 0,
   async freshness() {
     if (!this.on || Date.now() - this.freshAt < 60000) return; this.freshAt = Date.now();
-    try { const r = await fetch('version.txt?_=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return; const v = (await r.text()).trim(); if (v && /^v\d/.test(v) && v !== APP_VERSION && (sessionStorage.getItem('hutka.reloadedFor') || '') !== v) { sessionStorage.setItem('hutka.reloadedFor', v); location.reload(); } } catch (e) {}
+    try { const r = await fetch('version.txt?_=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return; const v = (await r.text()).trim(); if (v && /^v\d/.test(v) && v !== APP_VERSION && (sessionStorage.getItem('hutka.reloadedFor') || '') !== v) {
+      // never in the middle of a read of the lap timer or an upload: the next time the app comes to the front
+      let busy = false; try { busy = !!(DEVICE.busy || UPLOAD.working); } catch (e) {}
+      if (busy) { this.freshAt = 0; return; }
+      sessionStorage.setItem('hutka.reloadedFor', v); location.reload(); } } catch (e) {}
   },
   async onUrl(url) {
     if (!url) return; url = String(url);
@@ -6529,7 +6616,7 @@ $('authEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('au
 
 // ---------- the guide: how to get a session file out of the logger and into Hutka (plain steps with pictures) ----------
 function renderHelpPage() {
-  $('helpSub').textContent = t('Three minutes the first time, thirty seconds after that.');
+  $('helpSub').textContent = t('A few minutes the first time; after that, a couple of taps.');
   const box = $('helpBody'); box.innerHTML = '';
   // a picture arrives whole or not at all: fetched as a blob with retries (a baseline JPEG cut by a dropped mobile connection stays half-grey otherwise); the box keeps the picture's shape meanwhile
   const SIZES = { 'ada-sessions.jpg': [1400, 645], 'hutka-device-timer.jpg': [800, 928] }, loadPic = async (im, url) => { for (let i = 0; i < 3; i++) { try { const r = await fetch(url); if (!r.ok) throw new Error(r.status); const b = await r.blob(); if (b.size < 1000) throw new Error('short'); im.src = URL.createObjectURL(b); return; } catch (e) { await new Promise(res => setTimeout(res, 700 * (i + 1))); } } im.src = url; };
@@ -6547,7 +6634,7 @@ function renderHelpPage() {
   const a = card(t('Alfano 7 — the ADA app on your phone'), t('The other way, without Bluetooth: the app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.'));
   a.appendChild(step(1, t('Open the ADA app and go to Sessions'), esc(t('In the list “Select your sessions”, tap the session you want — the row lights up. One session = one file.')), 'ada-sessions.jpg'));
   a.appendChild(step(2, t('Tap the paper plane'), esc(t('The paper-plane icon in the bottom row (2 on the picture) — that is “send the session out of the app”. The phone’s share sheet opens. (The box-with-arrow icon on the far right is import — not that one.)'))));
-  a.appendChild(step(3, t('Save the file on the phone'), `<b>${esc(t('With the Hutka app:'))}</b> ${esc(t('tap Hutka in the row of apps — the session opens in the upload window straight away, steps 4–5 are not needed.'))} <span class="hint">${esc(t('Hutka at the front of that row, once and for all: iPhone — scroll the app row to the end → More → Edit → “+” next to Hutka (Favourites), then drag it to the top; Android — hold Hutka in the share sheet → Pin.'))}</span><br><b>${esc(t('Without the app:'))}</b> <b>iPhone:</b> ${esc(t('tap “Save to Files”, choose a folder (Downloads is fine), tap Save.'))} <b>Android:</b> ${esc(t('choose “Save” / “Downloads”.'))}<br><span class="hint">${esc(t('The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.'))}</span>`));
+  a.appendChild(step(3, t('Save the file on the phone'), `<b>${esc(t('With the Hutka app:'))}</b> ${esc(t('tap Hutka in the row of apps — the session opens in the Lab straight away, steps 4–5 are not needed.'))} <span class="hint">${esc(t('Hutka at the front of that row, once and for all: iPhone — scroll the app row to the end → More → Edit → “+” next to Hutka (Favourites), then drag it to the top; Android — hold Hutka in the share sheet → Pin.'))}</span><br><b>${esc(t('Without the app:'))}</b> <b>iPhone:</b> ${esc(t('tap “Save to Files”, choose a folder (Downloads is fine), tap Save.'))} <b>Android:</b> ${esc(t('choose “Save” / “Downloads”.'))}<br><span class="hint">${esc(t('The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.'))}</span>`));
   a.appendChild(step(4, t('Open hutka.ai and tap Upload'), esc(t('The round button in the middle of the bottom bar (on a computer — “Upload session” at the top right of the Lab). Sign in first if you have not — it takes one email.')), 'hutka-upload.jpg'));
   a.appendChild(step(5, t('Choose the file'), esc(t('Tap “Choose a file”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.')), 'hutka-choose.jpg'));
   a.appendChild(step(6, t('Finishing touches, Publish'), esc(t('The session opens in the Lab at once: the track found by GPS, the layout recognised by the shape of your laps, the kart most people drive there — private for now. The “Finishing touches” card asks the layout if Hutka is not sure, the session type and your place. Publish lets other drivers compare with you; “Keep it private” keeps it yours.')), 'hutka-finish.jpg'));
@@ -6559,13 +6646,13 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.28';
+const APP_VERSION = 'v34.29';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
   const off = navigator.onLine === false, b = $('offBar'); if (b) b.hidden = !off;
   // back online: once the driver's token is live again (a session kept with no connection refreshes by itself), the lists of the page in view load
-  if (wasOffline && !off) (async () => { for (let i = 0; i < 35 && !(await STORE.live()); i++) await new Promise(r => setTimeout(r, 2000)); if (navigator.onLine === false) return; try { await STORE.ensureTracks(); } catch (e) {} try { if (APP.route === 'home') await renderHomePage(); else if (APP.route === 'lab' && !LAB.current) await renderLabStart(); } catch (e) {} })();
+  if (wasOffline && !off) (async () => { if (STORE.hasIdentity) for (let i = 0; i < 35 && !(await STORE.live()); i++) await new Promise(r => setTimeout(r, 2000));   /* a guest has no token to wait for */ if (navigator.onLine === false) return; try { await STORE.ensureTracks(); } catch (e) {} try { if (APP.route === 'home') await renderHomePage(); else if (APP.route === 'lab' && !LAB.current) await renderLabStart(); } catch (e) {} })();
   wasOffline = off;
 }
 addEventListener('online', () => syncOffline()); addEventListener('offline', () => syncOffline()); syncOffline();
@@ -6876,7 +6963,7 @@ async function renderTrackPage(tid, lid) {
   if (!tr) { $('tName').textContent = t('Track not found'); $('tMeta').innerHTML = ''; return; }
   const open = trackHours(tr);
   $('tName').textContent = tr.name;
-  $('tOpen').hidden = !(open && open.open !== null); if (open && open.open !== null) { $('tOpen').textContent = open.open ? t('Open') : t('Closed'); $('tOpen').className = 'pill ' + (open.open ? 'ok' : 'off'); }
+  $('tOpen').hidden = !(open && open.open !== null); if (open && open.open !== null) { $('tOpen').textContent = open.open ? t('Open now') : t('Closed'); $('tOpen').className = 'pill ' + (open.open ? 'ok' : 'off'); }
   $('tEdit').hidden = !STORE.canEditTrack(tr); $('tEdit').onclick = () => go('admin~' + tid);
   const meta = $('tMeta'); meta.innerHTML = '';
   const add = (icon, html) => { const s = el('span'); s.appendChild(svgUse(icon)); const b = el('span'); b.innerHTML = html; s.appendChild(b); meta.appendChild(s); };
@@ -7139,6 +7226,7 @@ const lapKey = (sess, L) => sess.id + '|' + L.n;
 const isAvgKey = (k) => String(k || '').startsWith('avg:');
 const isIdealKey = (k) => String(k || '').startsWith('ideal:');
 const sessOf = (id) => LAB.sessions.find(x => x.id === id) || null;
+const tnv = (n, one, many, vars) => t(tn(n, one, many), Object.assign({ n }, vars || {}));   // a plural with its {n} and other {vars} filled
 function findLap(key) { if (!key) return null; const [sid, n] = String(key).split('|'); const sess = sessOf(sid); if (!sess) return null; const L = sess.laps.find(L => L.n === +n); return L ? { sess, L } : null; }
 function allLaps() { const out = []; for (const sess of LAB.sessions) for (const L of sess.laps) if (L.px) out.push({ sess, L }); return out; }
 const bestLap = (sess) => sess.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a);
@@ -7752,6 +7840,7 @@ function selectCorner(n, scroll) { NATIVE.haptic('light'); LAB.selN = (LAB.selN 
 
 // ----- the start screen: my sessions and what the drivers I follow have published -----
 async function renderLabStart() {
+  try { if (!LAB.current) FINISH.hide(); } catch (e) {}   // the start page never shows a session's finishing touches
   try { OUTBOX.refresh(); } catch (e) {}   // what waits on this phone for the internet
   const box = $('labMine');
   await renderMySessionsTable(box, { hint: $('labMineHint'), sub: $('labMineSub'), compact: true });
@@ -8177,7 +8266,8 @@ async function labTogglePublish() {
   const on = !sess.published; if (on && sess.moderated && !STORE.isAdmin()) { toast(t('The site admins hid this session from the public (a broken recording or a wrong layout) — it cannot be republished. Upload it again if the data is fine.')); return; }
   if (on) { const ok = await confirmDlg(t('Publish this session?'), t('It appears on the track page and in the hot laps; other drivers can compare their laps with it. You can unpublish at any time.'), t('Publish')); if (!ok) return; }
   const pb = $('btnPublish'); pb.classList.add('busy');
-  try { await STORE.updateSession(sess.id, { published: on }); sess.published = on; NATIVE.haptic('success'); toast(on ? t('Published — it is now on the track page.') : t('Unpublished.')); labRender(); if (on) SHARE.sync(sess); else sharePageSync(sess).catch(() => {}); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); }
+  // publishing also ends the draft: the finishing-touches card is for a fresh upload, not for a published session
+  try { const patch = on ? { published: true, draft: false } : { published: false }; await STORE.updateSession(sess.id, patch); Object.assign(sess, patch); if (on) FINISH.hide(); NATIVE.haptic('success'); toast(on ? t('Published — it is now on the track page.') : t('Unpublished.')); labRender(); if (on) SHARE.sync(sess); else sharePageSync(sess).catch(() => {}); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); }
   pb.classList.remove('busy');
 }
 
@@ -8654,13 +8744,17 @@ async function detectLayout(tid, sess) {
   const ls = (await STORE.getLayouts(tid)) || [], cands = [];
   if (!ls.length) return { lid: 'custom', sure: false, how: 'none', cands };
   const clean = sess.laps.filter(L => L.clean), pool = clean.length ? clean : sess.laps;
+  let lined = false;   // a layout here has a line: when none of them takes these laps, the answer is "not in the list", never a guess
   for (const l of ls) {
     let G = null; try { G = await GEOM.build(tid, l.id, null, { noMedia: true }); } catch (e) { G = null; }
     if (!G || !G.track || !G.frame) continue;
+    lined = true;
     if (!GEOM.attach(sess, G).ok) continue;
     const L = pool.filter(x => x.px).reduce((a, b) => (!a || b.timeMs < a.timeMs) ? b : a, null); if (!L) continue;
     const P = DATA.projectLap(L, G.track, G.rev); if (!P) continue;
     const tr = G.track, N = tr.N, ds = tr.ds, bins = Math.max(1, Math.round(N * ds / 20)), hit = new Set();
+    // the direction: along this layout's line the lap has to move forward — the same circuit driven the other way is another layout (Reverse)
+    { let fw = 0, bw = 0, last = -1; for (const i of P.pj) { if (i < 0) continue; if (last >= 0) { let d = i - last; if (d > N / 2) d -= N; else if (d < -N / 2) d += N; if (d > 0) fw += d; else bw -= d; } last = i; } if (bw > fw) continue; }
     for (const i of P.pj) if (i >= 0) hit.add(Math.floor(i * ds / 20));
     let off = 0; for (let i = 0; i < N; i++) off += Math.abs(P.o[i]);
     let len = 0; for (let k = 1; k < L.px.length; k++) len += Math.hypot(L.px[k][0] - L.px[k - 1][0], L.px[k][1] - L.px[k - 1][1]); len *= tr.mpp;
@@ -8670,7 +8764,7 @@ async function detectLayout(tid, sess) {
   for (const L of sess.laps) { delete L._proj; delete L.px; delete L.xy; } delete sess._attached; delete sess._fit;   // the Lab attaches it again
   const ok = cands.filter(c => c.lost <= OFF_LAYOUT && c.cov >= 0.8).sort((a, b) => a.score - b.score);
   if (ok.length) return { lid: ok[0].lid, sure: ok.length === 1 || ok[1].score - ok[0].score >= 2.5, how: 'fit', cands };
-  if (cands.length) return { lid: 'custom', sure: false, how: 'none', cands };
+  if (cands.length || lined) return { lid: 'custom', sure: false, how: 'none', cands };
   return { lid: ls[0].id, sure: ls.length === 1, how: ls.length === 1 ? 'only' : 'guess', cands };
 }
 // ---------- a fresh upload → private drafts (Pasha's point 7): no form. The track by GPS (a new community track named from the map when
@@ -8731,33 +8825,72 @@ const DRAFTS = (() => {
       if (newTrack) { const tr2 = STORE.getTrack(tid) || tr; const desc = t('{length} m, {corners} corners — mapped from a driver’s session on {date}. Know this track? Add the website, hours and a photo on the track page.', { length: lengthM, corners, date: fmtDate(sess.date) }); await STORE.saveTrack(Object.assign({}, tr2, { lengthM, corners, description: tr2.description || desc })); }
     } catch (e) {}
   }
-  async function save(parsed, say) {
+  const centreOfLaps = (laps) => { let la = 0, lo = 0, n = 0; for (const L of laps) for (let i = 0; i < L.pts.length; i += 10) { la += L.pts[i].lat; lo += L.pts[i].lon; n++; } return n ? { lat: la / n, lon: lo / n } : null; };
+  // when it was driven: the lap timer's own name for the session (from inside the zip when the .alf2 was renamed), the recording's clock
+  // (GPX, a CSV with epoch time) — the file's date only as the last resort (it is when the file was saved, not driven)
+  function whenDriven(p) {
+    if (!p.meta.date && p.data.inner) { const m = DATA.parseAlfName(p.data.inner); if (m.date) p.meta = Object.assign({}, m, { track: p.meta.track && p.meta.track !== p.file.name.replace(/\.[^.]+$/, '') ? p.meta.track : m.track }); }
+    return p.meta.date || (isFinite(p.data.startMs) && p.data.startMs > 0 ? fileDate({ lastModified: p.data.startMs }) : '') || fileDate(p.file);
+  }
+  // one session = the start (to the minute) + the best lap (to 1/100 s, the Alfano's own) + the number of laps; a recording with a real
+  // clock (a RaceBox read over Bluetooth, a GPX, a CSV in epoch time) by its start in UTC — its laps are cut again at the layout's start
+  // line when it is saved, so its best lap is no fingerprint (an older upload without the start: by the local minute)
+  const appOf = (x) => (x && x.source && x.source.app) || 'alfano';
+  const sameRun = (q) => (m) => {
+    if (appOf(m) !== q.app) return false;
+    if (q.app !== 'alfano' && q.startMs > 0) return +m.startMs > 0 ? Math.abs(+m.startMs - q.startMs) < 60000 : minute(m.date) === minute(q.date);
+    return minute(m.date) === minute(q.date) && Math.abs((+m.bestMs || 0) - q.best) <= 15 && (!(+m.nLaps) || !q.n || +m.nLaps === q.n);
+  };
+  // one save at a time — the upload window, the outbox and another tab of Hutka never save the same read twice: each one sees what the
+  // one before it saved (navigator.locks across tabs where there is one)
+  let chain = Promise.resolve();
+  function save(parsed, say) {
+    const run = () => (navigator.locks && navigator.locks.request ? navigator.locks.request('hutka-drafts', () => save1(parsed, say)) : save1(parsed, say));
+    const p = chain.then(run, run); chain = p.catch(() => {}); return p;
+  }
+  async function save1(parsed, say) {
+    // the sign-in is live: just after the connection came back the token may still be refreshing, and a request without it reads the
+    // library as a stranger and is refused the save — that waits on this device like no connection does (the outbox goes when it is live)
+    if (STORE.hasIdentity && !(await STORE.live())) { const e = new Error('offline: the sign-in is not live yet'); e.offline = true; throw e; }
     // the library and the tracks as the database has them now: no connection → this throws, and the read waits on the phone (OUTBOX);
     // a list that failed to load is never taken for an empty one (that would save a session twice or open a second page for its track)
-    await STORE.ensureTracks(); const mine = await STORE.mySessionsStrict(), known = [], fresh = [];
+    await STORE.ensureTracks(); const mine = await STORE.mySessionsStrict(), hits = [], fresh = [];
     for (const p of parsed) {
-      const date = p.meta.date || fileDate(p.file), best = bestOfLaps(p.data.laps).timeMs;
-      const hit = mine.find(m => minute(m.date) === minute(date) && Math.abs((+m.bestMs || 0) - best) <= 15);
-      if (hit) known.push(hit.id); else fresh.push(Object.assign(p, { date }));
+      const date = whenDriven(p), fp = { app: appOf(p.data), date, startMs: isFinite(p.data.startMs) && p.data.startMs > 0 ? Math.round(p.data.startMs) : 0, best: bestOfLaps(p.data.laps).timeMs, n: p.data.laps.length };
+      let hit = mine.find(sameRun(fp));
+      // a save cut off between the session and its telemetry leaves a row without data: that one is saved again, into the same row
+      if (hit && STORE.hasIdentity && hit.owner !== 'local' && !(await STORE.hasData(hit.id))) { p.reuse = hit; hit = null; }
+      if (hit) { if (!hits.includes(hit)) hits.push(hit); continue; }
+      if (fresh.some(q => sameRun(fp)({ date: q.date, bestMs: q.fp.best, nLaps: q.fp.n, source: q.data.source, startMs: q.fp.startMs }))) continue;   // the same file twice in one pick ("x.alf2", "x (1).alf2")
+      fresh.push(Object.assign(p, { date, fp }));
     }
+    const known = hits.sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).map(m => m.id);   // the newest first
     if (!fresh.length) return { first: null, known, saved: [] };
-    say(t('Finding the track…'));
-    const T = await trackFor(fresh[0]), tid = T.tid, tr = tid ? STORE.getTrack(tid) : null, kart = kartFor(tr, fresh[0]), batch = 'b' + STORE.uid(), saved = [];
-    for (let k = 0; k < fresh.length; k++) {
-      const p = fresh[k], label = p.meta.driver ? `${p.meta.driver}${p.date ? ', ' + fmtDate(p.date) : ''}` : (p.data.name || '');
-      const sess = { id: 's' + STORE.uid(), name: p.data.name, label, driver: p.meta.driver, date: p.date, trackName: tr ? tr.name : p.meta.track, track: tid, layout: 'custom', note: '', kart: kart.name, kartClass: kart.cls, kartCat: kart.cat || '', format: '', pos: 0, drivers: 0, published: false, draft: true, batch, detect: null, source: p.data.source || null, createdAt: Date.now() + k, laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
-      for (const L of sess.laps) L._sess = sess;
-      if (tid) { say(t('Recognising the layout…')); const D = T.newTrack ? { lid: T.lid, sure: true, how: 'new' } : await detectLayout(tid, sess); sess.layout = D.lid || 'custom'; sess.detect = { sure: !!D.sure, how: D.how }; }
-      // loggers without a start/finish beacon: every lap starts at the layout's S/F, so corners line up with everyone else's
-      if (sess.source && sess.source.app !== 'alfano' && tid && sess.layout !== 'custom') { try { const G = await GEOM.build(tid, sess.layout, null, { noMedia: true }); IMPORT.alignToStart(sess, G); } catch (e) {} for (const L of sess.laps) { delete L.px; delete L.xy; delete L._proj; } delete sess._attached; }
-      say(fresh.length > 1 ? t('Saving {k} of {n}…', { k: k + 1, n: fresh.length }) : t('Saving…'));
-      await STORE.saveSession(sess); saved.push(sess);
-      if (k === 0 && tid && sess.layout !== 'custom') await defineLine(tid, sess.layout, sess, !!T.newTrack);
+    // one batch per place: the files of one pick (or one read of the lap timer) can come from different tracks — each finds its own
+    const places = []; for (const p of fresh) { const c = centreOfLaps(p.data.laps), g = c && places.find(g => g.c && GEO.distKm(g.c, c) < 2); if (g) g.files.push(p); else places.push({ c, files: [p] }); }
+    const saved = []; let k = 0;
+    for (const g of places) {
+      say(t('Finding the track…'));
+      const T = await trackFor(g.files[0]), tid = T.tid, tr = tid ? STORE.getTrack(tid) : null, kart = kartFor(tr, g.files[0]), batch = 'b' + STORE.uid(); let lined = false;
+      for (const p of g.files) {
+        const label = p.meta.driver ? `${p.meta.driver}${p.date ? ', ' + fmtDate(p.date) : ''}` : (p.data.name || '');
+        const sess = { id: p.reuse ? p.reuse.id : 's' + STORE.uid(), name: p.data.name, label, driver: p.meta.driver, date: p.date, trackName: tr ? tr.name : p.meta.track, track: tid, layout: 'custom', note: '', kart: kart.name, kartClass: kart.cls, kartCat: kart.cat || '', format: '', pos: 0, drivers: 0, published: false, draft: true, batch: (p.reuse && p.reuse.batch) || batch, detect: null, source: p.data.source || null, startMs: p.fp.startMs || undefined, createdAt: Date.now() + k, laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) };
+        for (const L of sess.laps) L._sess = sess;
+        if (tid) { say(t('Recognising the layout…')); const D = T.newTrack ? { lid: T.lid, sure: true, how: 'new' } : await detectLayout(tid, sess); sess.layout = D.lid || 'custom'; sess.detect = { sure: !!D.sure, how: D.how }; }
+        // loggers without a start/finish beacon: every lap starts at the layout's S/F, so corners line up with everyone else's
+        if (sess.source && sess.source.app !== 'alfano' && tid && sess.layout !== 'custom') { try { const G = await GEOM.build(tid, sess.layout, null, { noMedia: true }); IMPORT.alignToStart(sess, G); } catch (e) {} for (const L of sess.laps) { delete L.px; delete L.xy; delete L._proj; } delete sess._attached; }
+        say(fresh.length > 1 ? t('Saving {k} of {n}…', { k: k + 1, n: fresh.length }) : t('Saving…'));
+        await STORE.saveSession(sess); saved.push(sess); k++;
+        // the first session on a brand-new layout gives it its line — only when the layout is certain (never from a guess) and the laps split
+        if (!lined && tid && sess.layout !== 'custom' && sess.detect && sess.detect.sure && canLine(sess)) { await defineLine(tid, sess.layout, sess, !!T.newTrack); lined = true; }
+      }
     }
-    STORE.track('upload', { n: fresh.length, kart: kart.cls, app: fresh[0].data.source ? fresh[0].data.source.app : 'alfano', layout: saved[0].detect ? saved[0].detect.how : '', sure: !!(saved[0].detect && saved[0].detect.sure), known: known.length });
+    STORE.track('upload', { n: fresh.length, kart: kartFor(saved[0].track ? STORE.getTrack(saved[0].track) : null, fresh[0]).cls, app: fresh[0].data.source ? fresh[0].data.source.app : 'alfano', layout: saved[0].detect ? saved[0].detect.how : '', sure: !!(saved[0].detect && saved[0].detect.sure), known: known.length, places: places.length });
     return { first: saved[0], known, saved };
   }
-  return { save, detectLayout };
+  // a line is drawn from laps that were really split: at least two clean ones (a recording the importer could not split is one long "lap")
+  const canLine = (sess) => sess.laps.filter(L => L.clean).length >= 2;
+  return { save, detectLayout, defineLine, canLine };
 })();
 const UPLOAD = (() => {
   let ctx = {}, working = false;
@@ -8777,22 +8910,53 @@ const UPLOAD = (() => {
     $('uplModal').hidden = false; $('uplBox').querySelector('.sheet-body').scrollTop = 0;
   }
   function close() { $('uplModal').hidden = true; }
-  async function onFiles(files) {
-    if (!files.length || working) return; working = true; $('uplSrc').hidden = true; setStatus('uplStatus', ''); work(t('Reading {n} file(s)…', { n: files.length }));
-    const parsed = [];
-    for (const f of files) { try { const data = await readAnyLogger(f); parsed.push({ file: f, data, meta: DATA.parseAlfName(f.name || '') }); } catch (e) { setStatus('uplStatus', t('Could not read {f}: {e}', { f: f.name, e: e.message || e }), 'warn'); } }
+  // one pick at a time: files that come while another pick is being saved (a read of the lap timer finishing during a file upload) wait
+  // their turn — never dropped
+  let queue = Promise.resolve();
+  function onFiles(files, o) { const p = queue.then(() => onFiles1(files, o || {})); queue = p.catch(() => {}); return p; }
+  async function onFiles1(files, o) {
+    if (!files.length) return;
+    if (o.show) open({ files: true });
+    working = true; $('uplSrc').hidden = true; setStatus('uplStatus', ''); work(t('Reading {n} file(s)…', { n: files.length }));
+    const parsed = [], bad = [];
+    for (const f of files) { try { const data = await readAnyLogger(f); parsed.push({ file: f, data, meta: DATA.parseAlfName(f.name || '') }); } catch (e) { const msg = t('Could not read {f}: {e}', { f: f.name, e: e.message || e }); bad.push(msg); setStatus('uplStatus', msg, 'warn'); } }
     if (!parsed.length) { working = false; work(''); $('uplSrc').hidden = false; $('uplFile').value = ''; return; }   // nothing readable: the choice comes back, the reason stays above it
     let res = null;
     try { res = await DRAFTS.save(parsed, work); }
     catch (e) {
       working = false; work(''); $('uplFile').value = '';
-      if (STORE.hasIdentity && OUTBOX.offline(e)) { try { await OUTBOX.keep(parsed); $('uplSrc').hidden = true; setStatus('uplStatus', tn(parsed.length, 'No internet right now — the session is kept on this phone and uploads by itself as soon as the connection is back.', 'No internet right now — the {n} sessions are kept on this phone and upload by themselves as soon as the connection is back.').replace('{n}', parsed.length), 'ok'); NATIVE.haptic('success'); STORE.track('outbox_keep', { n: parsed.length }); return; } catch (x) {} }
+      // no connection — or, for a read of the lap timer (the only copy once its memory is erased), any refusal: the read waits on this
+      // device and goes up by itself (after the daily limit, tomorrow)
+      const off = OUTBOX.offline(e);
+      if (STORE.hasIdentity && (off || o.device)) {
+        try {
+          await OUTBOX.keep(parsed, off ? null : e); $('uplSrc').hidden = true;
+          setStatus('uplStatus', off ? tn(parsed.length, 'No internet right now — the session is kept on this device and uploads by itself as soon as the connection is back.', 'No internet right now — the {n} sessions are kept on this device and upload by themselves as soon as the connection is back.').replace('{n}', parsed.length)
+            : STORE.isQuota(e) ? tnv(parsed.length, 'Daily upload limit reached — the session is kept on this device and goes up by itself tomorrow.', 'Daily upload limit reached — the {n} sessions are kept on this device and go up by themselves tomorrow.')
+            : tnv(parsed.length, 'The upload did not go through ({e}) — the session is kept on this device and Hutka tries again by itself.', 'The upload did not go through ({e}) — the {n} sessions are kept on this device and Hutka tries again by itself.', { e: e && e.message || e }), off ? 'ok' : 'warn');
+          NATIVE.haptic(off ? 'success' : 'warning'); STORE.track('outbox_keep', { n: parsed.length, why: off ? 'offline' : (STORE.isQuota(e) ? 'quota' : 'refused') }); return;
+        } catch (x) {}
+      }
       $('uplSrc').hidden = false; setStatus('uplStatus', STORE.isQuota(e) ? t('Daily upload limit reached — the rest tomorrow.') : t('Could not save the session: {e}', { e: e && e.message || e }), 'warn'); return;
     }
     working = false; work(''); close();
-    if (!res.first) { if (res.known.length) { toast(res.known.length > 1 ? t('These sessions are already in Hutka — the newest is open.') : t('This session is already in Hutka — it is open.'), 4000); location.hash = '#lab~' + res.known[0]; } return; }
+    const notes = bad.slice();   // a file of the pick that could not be read is said after the window closes, not lost with it
+    if (!res.first) {
+      if (res.known.length) { notes.unshift(res.known.length > 1 ? t('These sessions are already in Hutka — the newest is open.') : t('This session is already in Hutka — it is open.')); location.hash = '#lab~' + res.known[0]; }
+      if (notes.length) toast(notes.join(' '), 5000);
+      return;
+    }
     NATIVE.haptic('success'); await LAB.open(res.first, false); go('lab');
-    if (res.known.length) toast(tn(res.known.length, '{n} session was already in Hutka — not uploaded again.', '{n} sessions were already in Hutka — not uploaded again.').replace('{n}', res.known.length), 4500);
+    try { history.replaceState(null, '', '#lab~' + res.first.id); } catch (e) {}   // the address is the session's own: a reload or a shared link opens it
+    if (res.known.length) notes.unshift(tn(res.known.length, '{n} session was already in Hutka — not uploaded again.', '{n} sessions were already in Hutka — not uploaded again.').replace('{n}', res.known.length));
+    if (notes.length) toast(notes.join(' '), 5000);
+  }
+  // files saved with no window of their own (what a broken read of the lap timer had already read whole): the library, or the outbox
+  async function saveQuiet(files) {
+    const parsed = []; for (const f of files) { try { parsed.push({ file: f, data: await readAnyLogger(f), meta: DATA.parseAlfName(f.name || '') }); } catch (e) {} }
+    if (!parsed.length) return 0;
+    try { const r = await DRAFTS.save(parsed, () => {}); return r.saved.length + r.known.length; }
+    catch (e) { if (STORE.hasIdentity) { try { await OUTBOX.keep(parsed, OUTBOX.offline(e) ? null : e); return parsed.length; } catch (x) {} } return 0; }
   }
   $('uplFile').addEventListener('change', (e) => onFiles(Array.from(e.target.files || [])));
   if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) $('uplFile').removeAttribute('accept');
@@ -8805,17 +8969,20 @@ const UPLOAD = (() => {
   $('uplModal').addEventListener('drop', (e) => { e.preventDefault(); dragOn(false); if ($('uplSrc').hidden) return; onFiles(Array.from(e.dataTransfer.files || [])); });
   $('uplCancel').onclick = close; $('uplModal').addEventListener('click', (e) => { if (e.target === $('uplModal')) close(); });
   $('uplModal')._back = close;   // the phone's back button
-  async function withFiles(files) { open({ files: true }); await onFiles(files); }
-  return { open, close, withFiles, get working() { return working; } };
+  async function withFiles(files, o) { await onFiles(files, Object.assign({ show: true }, o || {})); }
+  return { open, close, withFiles, saveQuiet, get working() { return working; } };
 })();
 // ---------- no connection after the read (Pasha's point 9): what the lap timer gave is kept on this phone and uploaded by itself when the
 // connection is back — on the browser's "online", when Hutka comes back on screen, at start and once a minute while something waits. Files
 // of one read go up together (one batch, one track and layout check); one that cannot be read any more is dropped; the library's
 // fingerprints keep a half-done batch from being saved twice.
 const OUTBOX = (() => {
-  let busy = false, timer = null, count = 0, fails = 0, lastErr = null;
-  const offline =(e) => (navigator.onLine === false) || /failed to fetch|networkerror|network request failed|load failed|internet connection|err_internet|err_network|timed? ?out|offline/i.test(String((e && (e.message || e)) || ''));
-  async function keep(parsed) {
+  let busy = false, timer = null, count = 0, fails = 0, lastErr = null, nextAt = 0;
+  const offline = (e) => (navigator.onLine === false) || !!(e && e.offline) || /failed to fetch|networkerror|network request failed|load failed|internet connection|err_internet|err_network|timed? ?out|offline|abort/i.test(String((e && (e.message || e)) || ''));
+  async function keep(parsed, refusal) {
+    if (refusal) { fails = Math.max(fails, 1); lastErr = refusal; }
+    // the browser may clear a site's storage when the phone runs low on space: ask it to keep Hutka's (the only copy until the upload)
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch (e) {}
     const batch = 'o' + STORE.uid();
     for (const p of parsed) await STORE.outboxAdd({ batch, name: p.file.name || 'session', type: p.file.type || '', lastModified: p.file.lastModified || Date.now(), blob: p.file, date: p.meta.date || fileDate(p.file), best: p.data.laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a).timeMs, app: (p.data.source && p.data.source.app) || 'alfano' });
     await refresh();
@@ -8825,19 +8992,21 @@ const OUTBOX = (() => {
   const items = async () => (await STORE.outboxAll()).filter(r => r.bad !== APP_VERSION);
   // the next try: a minute after a try with no connection; after a refusal that is not the connection (the daily quota, a server error)
   // 2, 4, 8 … up to 30 minutes, so a session the server keeps refusing is not sent again and again over mobile data
-  function arm() { if (!count) { clearTimeout(timer); timer = null; return; } if (!timer) timer = setTimeout(() => { timer = null; flush(); }, Math.min(60000 * Math.pow(2, fails), 1800000)); }
+  function arm() { if (!count) { clearTimeout(timer); timer = null; return; } if (!timer) { const ms = Math.min(60000 * Math.pow(2, fails), 1800000); nextAt = Date.now() + ms; timer = setTimeout(() => { timer = null; flush(false, true); }, ms); } }
   async function refresh() { const list = await items(); count = list.length; banner(list); arm(); return list; }
   // the banner on the Lab's start page: how many wait, and a button to try now
   const refused = (e) => STORE.isQuota(e) ? t('Daily limit reached — Hutka uploads by itself tomorrow.') : t('The upload did not go through — Hutka tries again by itself.');
   function banner(list, working) {
     const b = $('labOutbox'); if (!b) return; b.hidden = !list.length; if (!list.length) return;
     $('obSpin').hidden = !working; $('obIcon').toggleAttribute('hidden', !!working);   /* an <svg> has no .hidden property */ $('obGo').disabled = !!working;
-    $('obText').textContent = working ? t('Uploading the sessions kept on this phone…')
-      : lastErr ? tn(list.length, '{n} session from the lap timer waits on this phone.', '{n} sessions from the lap timer wait on this phone.').replace('{n}', list.length) + ' ' + refused(lastErr)
-      : tn(list.length, '{n} session from the lap timer waits on this phone for the internet — it uploads by itself.', '{n} sessions from the lap timer wait on this phone for the internet — they upload by themselves.').replace('{n}', list.length);
+    $('obText').textContent = working ? t('Uploading the sessions kept on this device…')
+      : lastErr ? tn(list.length, '{n} session waits on this device.', '{n} sessions wait on this device.').replace('{n}', list.length) + ' ' + refused(lastErr)
+      : tn(list.length, '{n} session waits on this device — it uploads by itself.', '{n} sessions wait on this device — they upload by themselves.').replace('{n}', list.length);
   }
-  async function flush(manual) {
+  async function flush(manual, due) {
     if (busy || !STORE.hasIdentity || !STORE.canWrite()) return;
+    // after a refusal that is not the connection, the 'online', 'visible' and 'auth' calls wait for the next try too (a tap does not)
+    if (!manual && !due && fails && timer && Date.now() < nextAt) return;
     busy = true;   // taken at once: the 'online', 'visible', 'auth' and timer calls come close together, and two runs would save a read twice
     let list = [], up = 0, offl = false, err = null, ran = false;
     try {
@@ -8845,7 +9014,7 @@ const OUTBOX = (() => {
       if (navigator.onLine === false && !manual) { arm(); return; }
       // a session kept on this device with no connection: the token refreshes by itself once the connection is back ('auth' below); until
       // then a request would go out without the driver — wait for it rather than be refused
-      if (!(await STORE.live())) { if (manual) toast(t('Still no connection — the sessions stay on this phone and upload by themselves later.'), 4000); arm(); return; }
+      if (!(await STORE.live())) { if (manual) toast(t('Still no connection — the sessions stay on this device and upload by themselves later.'), 4000); arm(); return; }
       ran = true; banner(list, true);
       const groups = new Map(); for (const r of list) { if (!groups.has(r.batch)) groups.set(r.batch, []); groups.get(r.batch).push(r); }
       for (const recs of groups.values()) {
@@ -8860,9 +9029,9 @@ const OUTBOX = (() => {
     if (!ran) return;
     if (err) { fails++; lastErr = err; } else if (!offl) { fails = 0; lastErr = null; }
     clearTimeout(timer); timer = null; await refresh();
-    if (up) { toast(tn(up, '{n} session from the lap timer is uploaded — it is in your Lab.', '{n} sessions from the lap timer are uploaded — they are in your Lab.').replace('{n}', up), 5000); STORE.track('outbox', { n: up }); if (APP.route === 'lab' && !LAB.current) renderLabStart(); }
+    if (up) { toast(tn(up, '{n} session kept on this device is uploaded — it is in your Lab.', '{n} sessions kept on this device are uploaded — they are in your Lab.').replace('{n}', up), 5000); STORE.track('outbox', { n: up }); if (APP.route === 'lab' && !LAB.current) renderLabStart(); try { DEVICE.refreshKnown(); } catch (e) {} }
     else if (manual && err) toast(refused(err), 4000);
-    else if (manual && offl) toast(t('Still no connection — the sessions stay on this phone and upload by themselves later.'), 4000);
+    else if (manual && offl) toast(t('Still no connection — the sessions stay on this device and upload by themselves later.'), 4000);
   }
   addEventListener('online', () => flush());
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') flush(); });
@@ -8875,34 +9044,46 @@ const OUTBOX = (() => {
 // private. The layout and the publishing go for the whole batch (one read of the lap timer = one evening on one configuration); the type
 // and the place for this session. Everything saves as it is tapped — there is no Save button.
 const FINISH = (() => {
-  let sess = null, batch = [];
+  let sess = null, batch = [], picking = false;
   const shapes = new Map();
   const card = () => $('finishCard');
   function hide() { card().hidden = true; sess = null; batch = []; }
   const layoutName = (s) => (s.layout && s.layout !== 'custom' ? (STORE.getLayout(s.track, s.layout) || {}).name : '') || t('Not in the list');
+  // a session of the same read goes along with this one's publishing only when its own layout is not in doubt: the same layout, or one
+  // Hutka recognised for sure (a read can hold an evening on two configurations — a guess is never published for the driver)
+  const sameWay = (s, m) => m.id === s.id || m.layout === s.layout || !!(m.detect && m.detect.sure && m.layout !== 'custom');
+  const fresh = (m) => m.draft && !m.published && !m.moderated;
+  const failed = () => toast(t('Could not save. Check your access to the Hutka page.'));
   async function show(s) {
     if (!s || !s.draft || !mySession(s) || s.owner === 'local' || !STORE.canWrite()) { hide(); return; }
+    // published another way (the Lab's Publish button, the edit window) or hidden by the admins: not a fresh upload any more — no card,
+    // and the leftover draft flag is cleared quietly (a hidden session is never offered for publishing again from here)
+    if (s.published || s.moderated) { hide(); STORE.updateSession(s.id, { draft: false }).then(() => { s.draft = false; }, () => {}); return; }
     sess = s; batch = [s];
-    if (s.batch) { try { const mates = (await STORE.mySessions()).filter(m => m.draft && m.batch === s.batch && m.id !== s.id); batch = [s].concat(mates); } catch (e) {} }
-    if (sess !== s) return;
+    let list = [s];
+    if (s.batch) { try { const mates = (await STORE.mySessions()).filter(m => fresh(m) && m.batch === s.batch && m.id !== s.id); list = [s].concat(mates); } catch (e) {} }
+    if (sess !== s) return;   // another session was opened meanwhile: its card, not this one
+    batch = list;
     const n = batch.length;
     $('finSub').textContent = n > 1 ? t('{n} sessions from this upload are saved — private for now. A few taps and they are ready to share.', { n }) : t('Saved — private for now. A few taps and it is ready to share.');
     renderFormat(); $('finPos').value = s.pos || ''; $('finDrivers').value = s.drivers || '';
-    $('finPublish').textContent = n > 1 ? t('Publish {n} sessions', { n }) : t('Publish'); $('finPublish').disabled = !s.track;
+    syncPublish();
     $('finKart').textContent = t('Kart: {k}', { k: s.kart || t('rental, model unknown') });
     card().hidden = false;
     await renderLayouts(s);
   }
-  // the layout: sure → one line with a Change button; not sure → every layout as a tile with its shape, the likely one marked
+  function syncPublish() { const s = sess; if (!s) return; const n = batch.filter(m => m.track && sameWay(s, m)).length; $('finPublish').textContent = n > 1 ? t('Publish {n} sessions', { n }) : t('Publish'); $('finPublish').disabled = !s.track; }
+  // the layout: sure (or picked) → one line with a Change button; not sure → every layout as a tile with its shape, the likely one marked
   async function renderLayouts(s) {
     const box = $('finLays'), now = $('finLayNow'), lbl = $('finLayLbl'); box.innerHTML = ''; now.innerHTML = '';
     if (!s.track) { $('finLaySec').hidden = true; return; }
-    const ls = (await STORE.getLayouts(s.track)) || [], d = s.detect || {}, sure = !!d.sure && s.layout !== 'custom';
+    const ls = (await STORE.getLayouts(s.track)) || [], d = s.detect || {}, picked = d.how === 'picked', sure = picked || (!!d.sure && s.layout !== 'custom');
     if (sess !== s) return;
-    $('finLaySec').hidden = sure && ls.length <= 1; if ($('finLaySec').hidden) return;
+    // nothing to choose from (a track with no layouts yet), or its only layout and Hutka is sure of it: no question to ask
+    $('finLaySec').hidden = !ls.length || (sure && !picked && ls.length <= 1); if ($('finLaySec').hidden) return;
     if (sure) {
       lbl.textContent = t('Layout'); now.hidden = false; box.hidden = true;
-      now.innerHTML = `<b>${esc(layoutName(s))}</b><span class="ok">✓ ${esc(d.how === 'picked' ? t('your pick') : t('recognised by the shape of your laps'))}</span>`;
+      now.innerHTML = `<b>${esc(layoutName(s))}</b><span class="ok">✓ ${esc(picked ? t('your pick') : t('recognised by the shape of your laps'))}</span>`;
       const ch = el('button', 'btn ghost sm', t('Change')); ch.type = 'button'; ch.onclick = () => { now.hidden = true; box.hidden = false; tiles(s, ls); }; now.appendChild(ch); return;
     }
     lbl.textContent = s.layout === 'custom' ? t('Which layout? Hutka could not tell — pick it by its shape.') : t('Which layout? The marked one looks most likely — tap the right one.');
@@ -8929,32 +9110,58 @@ const FINISH = (() => {
     const pad = Math.max(x1 - x0, y1 - y0) * 0.08, d = 'M' + pts.map(([x, y]) => `${(x - x0 + pad).toFixed(1)} ${(y - y0 + pad).toFixed(1)}`).join('L') + 'Z';
     host.innerHTML = `<svg viewBox="0 0 ${(x1 - x0 + 2 * pad).toFixed(1)} ${(y1 - y0 + 2 * pad).toFixed(1)}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="${d}"/><circle cx="${(pts[0][0] - x0 + pad).toFixed(1)}" cy="${(pts[0][1] - y0 + pad).toFixed(1)}" r="${((Math.max(x1 - x0, y1 - y0) + 2 * pad) * 0.035).toFixed(1)}"/></svg>`;
   }
+  // the driver's pick: this session first (when it does not save, nothing is marked as picked), then the rest of the read on the same
+  // track — the ones Hutka was not sure of and the ones it had put on the same layout as this one (one recognised for sure elsewhere stays)
   async function pick(lid) {
-    if (!sess) return; const s = sess, patch = { layout: lid, detect: { sure: lid !== 'custom', how: 'picked' } };
-    for (const m of batch) if (m.track === s.track) { try { await STORE.updateSession(m.id, patch); } catch (e) {} }
-    Object.assign(s, patch); STORE.track('layout_pick', { sid: s.id, lid, n: batch.length });
-    await LAB.open(s);   // the Lab again, on that layout's line
+    if (!sess || picking) return; const s = sess, was = s.layout, patch = { layout: lid, detect: { sure: lid !== 'custom', how: 'picked' } };
+    picking = true;
+    try {
+      try { await STORE.updateSession(s.id, patch); } catch (e) { failed(); return; }
+      Object.assign(s, patch);
+      for (const m of batch) if (m !== s && m.track === s.track && (!(m.detect && m.detect.sure) || m.layout === was)) { try { await STORE.updateSession(m.id, patch); Object.assign(m, patch); } catch (e) {} }
+      STORE.track('layout_pick', { sid: s.id, lid, n: batch.length });
+      // a layout of a community track with no line yet takes its line from this session — as an upload does when the layout is certain
+      if (lid !== 'custom' && DRAFTS.canLine(s)) { const l = STORE.getLayout(s.track, lid); if (l && !l.refSession) await DRAFTS.defineLine(s.track, lid, s, false); }
+      await LAB.open(s);   // the Lab again, on that layout's line
+    } finally { picking = false; }
   }
   function renderFormat() {
     const box = $('finFormat'); box.innerHTML = '';
-    for (const [k, n] of FORMATS) { if (!k) continue; const b = el('button', 'btn' + (sess.format === k ? ' on' : ''), t(n)); b.type = 'button'; b.onclick = async () => { await patchThis({ format: sess.format === k ? '' : k }); renderFormat(); }; box.appendChild(b); }
+    for (const [k, n] of FORMATS) { if (!k) continue; const b = el('button', 'btn' + (sess.format === k ? ' on' : ''), t(n)); b.type = 'button'; b.onclick = async () => { if (!sess) return; await patchThis({ format: sess.format === k ? '' : k }); if (sess) renderFormat(); }; box.appendChild(b); }
   }
-  async function patchThis(p) { if (!sess) return; const s = sess; try { await STORE.updateSession(s.id, p); Object.assign(s, p); } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); } }
-  $('finPos').addEventListener('change', () => patchThis({ pos: Math.max(0, Math.min(500, +$('finPos').value || 0)) }));
-  $('finDrivers').addEventListener('change', () => patchThis({ drivers: Math.max(0, Math.min(500, +$('finDrivers').value || 0)) }));
+  async function patchThis(p) { if (!sess) return false; const s = sess; try { await STORE.updateSession(s.id, p); Object.assign(s, p); return true; } catch (e) { failed(); return false; } }
+  // the place: whole numbers, never behind the field (a place past the number of drivers raises the number of drivers); what is saved is what the boxes show
+  const num = (v) => Math.max(0, Math.min(500, Math.round(+v || 0)));
+  async function syncResult() {
+    if (!sess) return; const s = sess; let pos = num($('finPos').value), drivers = num($('finDrivers').value);
+    if (pos && drivers && pos > drivers) drivers = pos;
+    $('finPos').value = pos || ''; $('finDrivers').value = drivers || '';
+    const p = {}; if (pos !== (+s.pos || 0)) p.pos = pos; if (drivers !== (+s.drivers || 0)) p.drivers = drivers;
+    if (Object.keys(p).length && !(await patchThis(p)) && sess === s) { $('finPos').value = s.pos || ''; $('finDrivers').value = s.drivers || ''; }
+  }
+  $('finPos').addEventListener('change', syncResult);
+  $('finDrivers').addEventListener('change', syncResult);
   $('finPublish').onclick = async () => {
-    if (!sess) return; const s = sess, b = $('finPublish'); b.classList.add('busy');
+    const b = $('finPublish'); if (!sess || b.classList.contains('busy')) return; const s = sess, all = batch.slice(); b.classList.add('busy');
     try {
-      for (const m of batch) { if (!m.track) continue; await STORE.updateSession(m.id, { published: true, draft: false }); Object.assign(m, { published: true, draft: false }); }
-      Object.assign(s, { published: true, draft: false }); STORE.track('publish', { sid: s.id, n: batch.length, from: 'finish' }); NATIVE.haptic('success');
-      toast(batch.length > 1 ? t('Published — {n} sessions are on the track page.', { n: batch.length }) : t('Published — it is now on the track page.'));
+      try { await STORE.updateSession(s.id, { published: true, draft: false }); } catch (e) { failed(); return; }
+      Object.assign(s, { published: true, draft: false }); let n = 1;
+      for (const m of all) { if (m === s || !m.track || !sameWay(s, m)) continue; try { await STORE.updateSession(m.id, { published: true, draft: false }); Object.assign(m, { published: true, draft: false }); n++; } catch (e) {} }
+      const left = all.length - n;
+      STORE.track('publish', { sid: s.id, n, left, from: 'finish' }); NATIVE.haptic('success');
+      toast((n > 1 ? t('Published — {n} sessions are on the track page.', { n }) : t('Published — it is now on the track page.')) + (left ? ' ' + tnv(left, 'One more session from this upload stays private — open it from My sessions to check its layout.', '{n} more sessions from this upload stay private — open them from My sessions to check their layout.') : ''), left ? 6000 : 3000);
       hide(); labRender(); SHARE.sync(s);
-    } catch (e) { toast(t('Could not save. Check your access to the Hutka page.')); }
-    b.classList.remove('busy');
+    } finally { b.classList.remove('busy'); }
   };
+  // private: this session and the ones of the read that go with it leave the drafts; one whose layout is in doubt keeps its card for later
   $('finPrivate').onclick = async () => {
-    if (!sess) return; const s = sess; for (const m of batch) { try { await STORE.updateSession(m.id, { draft: false }); Object.assign(m, { draft: false }); } catch (e) {} }
-    Object.assign(s, { draft: false }); hide(); toast(t('Kept private — only you see it. Publish it any time with the button at the top of the Lab.'), 4000);
+    const b = $('finPrivate'); if (!sess || b.classList.contains('busy')) return; const s = sess, all = batch.slice(); b.classList.add('busy');
+    try {
+      try { await STORE.updateSession(s.id, { draft: false }); } catch (e) { failed(); return; }
+      Object.assign(s, { draft: false });
+      for (const m of all) { if (m === s || !sameWay(s, m)) continue; try { await STORE.updateSession(m.id, { draft: false }); Object.assign(m, { draft: false }); } catch (e) {} }
+      hide(); toast(t('Kept private — only you see it. Publish it any time from My sessions.'), 4000);
+    } finally { b.classList.remove('busy'); }
   };
   $('finMore').onclick = () => { if (sess) { const s = sess; SESSEDIT.open(s, () => LAB.open(s)); } };
   return { show, hide, get session() { return sess; } };
@@ -8964,6 +9171,9 @@ const FINISH = (() => {
 // (device.js has the transport and the protocols; this is only the window around them)
 const DEVICE = (() => {
   let H = null, dev = null, drv = null, items = [], busy = false, seen = new Map(), scanT = null, scanning = false, showAll = false, ex = null, logT = null;
+  // gen: every flow of the window (a connection, a list, a read) checks after each wait that it is still the window's own — a read that
+  // was stopped, or a window that started over, never writes to the screen or sends to a device again
+  let gen = 0, stale = false, ticks = new Map(), ticksFor = '';
   const S = (tx, cls) => setStatus('devStatus', tx, cls);
   const when = (ms) => { if (!isFinite(ms)) return ''; return new Date(ms).toLocaleString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
   // one step of the window at a time. The first is what is in the air (the app scans) or the browser's own chooser (Chrome) — there is no
@@ -8979,7 +9189,8 @@ const DEVICE = (() => {
   const anyTimer = () => ({ id: 'any', name: 'lap timer', namePrefixes: [], services: [...new Set(LOGGERS.list.reduce((a, d) => a.concat(d.services || []), []))] });
   function open(o) {
     if (busy || (dev && items.length) || ex) { $('devModal').hidden = false; if (!busy && !ex && cur === 'devStage') loadMine().then(() => { if (!busy && items.length && cur === 'devStage') (drv && drv.sessions ? renderSessions : renderList)(); }); return; }   // a read in progress, a device still connected with its sessions listed (refreshed: what was just uploaded is in Hutka now), or the explorer open
-    items = []; dev = null; H = null; drv = null;
+    gen++; const od = dev, oh = H; items = []; dev = null; H = null; drv = null;
+    if (od || oh) (async () => { try { if (od) await od.close(); else await LOGGERS.ble.disconnect(oh); } catch (e) {} })();   // a device still connected is let go
     $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true; S(''); setStatus('devPickNote', '');
     $('devModal').hidden = false; start(!!(o && o.auto));
   }
@@ -8997,7 +9208,7 @@ const DEVICE = (() => {
   function pill(text) { if (text !== undefined) pillText = text; const p = $('devPill'); const on = busy && $('devModal').hidden && !!pillText; p.hidden = !on; if (on) p.textContent = pillText; }
   $('devPill').onclick = () => { $('devModal').hidden = false; pill(); };
   addEventListener('beforeunload', (e) => { if (busy) { e.preventDefault(); e.returnValue = ''; } });
-  async function drop() { const d = dev, h = H, x = ex; dev = null; H = null; ex = null; items = []; if (x) { try { await x.close(); } catch (e) {} } else if (d) { try { await d.close(); } catch (e) {} } else if (h) { try { await LOGGERS.ble.disconnect(h); } catch (e) {} } }
+  async function drop() { gen++; const d = dev, h = H, x = ex; dev = null; H = null; ex = null; items = []; if (x) { try { await x.close(); } catch (e) {} } else if (d) { try { await d.close(); } catch (e) {} } else if (h) { try { await LOGGERS.ble.disconnect(h); } catch (e) {} } }
   function bar(done, total) { const b = $('devBar'); b.hidden = false; b.firstElementChild.style.width = total ? Math.min(100, Math.round(done / total * 100)) + '%' : '0%'; }
   // the time left: the pace over the last half-minute of reading, said once a few seconds of it have been measured (a read takes minutes)
   let eta = null;
@@ -9011,6 +9222,7 @@ const DEVICE = (() => {
   const withEta = (tx, left) => left ? `${tx} · ${left}` : tx;
   function fail(e, where) {
     const c = e && e.code, m = (e && e.message) || String(e), S = (tx, cls) => setStatus(where || 'devStatus', tx, cls);
+    if (e && e.name === 'NotFoundError' && /adapter|not available|unavailable/i.test(m)) { S(t('Bluetooth is off — turn it on and try again.'), 'warn'); return; }   // Chrome says "not found" for a radio that is off too
     if ((e && e.name === 'NotFoundError') || /cancel/i.test(m)) { S(t('No device picked.')); return; }
     S(c === 'nobt' ? t('Bluetooth works in the Hutka app and in Chrome on Android or a computer — not in this browser.')
       : /unable to find plugin|not implemented|no bridge/i.test(m) ? t('This version of the app has no Bluetooth yet — update the Hutka app.')
@@ -9025,23 +9237,25 @@ const DEVICE = (() => {
   // ---- the scan (the app): every lap timer in the air at once, the strongest first; other devices on request
   async function startScan() {
     seen = new Map(); showAll = false; stage('devScan'); renderScan();
-    try { scanning = true; $('devScanHint').textContent = t('Looking for lap timers nearby…'); await LOGGERS.ble.scan((r) => { const o = seen.get(r.id) || { id: r.id, name: '', rssi: null, n: 0 }; if (r.name) o.name = r.name; if (r.rssi !== null) o.rssi = r.rssi; o.n++; o.at = Date.now(); seen.set(r.id, o); if (!renderScan.t) renderScan.t = setTimeout(() => { renderScan.t = null; renderScan(); }, 300); }); }
+    try { scanning = true; $('devScanHint').textContent = t('Looking for lap timers nearby…'); await LOGGERS.ble.scan((r) => { const o = seen.get(r.id) || { id: r.id, name: '', rssi: null, n: 0, first: Date.now() }; if (r.name) o.name = r.name; if (r.rssi !== null) { o.rssi = r.rssi; if (o.rank === undefined) o.rank = r.rssi; } o.n++; o.at = Date.now(); seen.set(r.id, o); if (!renderScan.t) renderScan.t = setTimeout(() => { renderScan.t = null; renderScan(); }, 300); }); }
     catch (e) { scanning = false; $('devScanHint').textContent = ''; stage('devStage'); fail(e); $('devRetry').hidden = false; STORE.track('device_scan', { os: NATIVE.platform, err: String((e && (e.code || e.message)) || e).slice(0, 80) }); return; }
     // what the scan found goes to the analytics (counts only): a phone that sees nothing is a bug to chase
     clearTimeout(scanT); scanT = setTimeout(() => { if (scanning) { stopScan(); const all = [...seen.values()]; STORE.track('device_scan', { os: NATIVE.platform, found: all.length, named: all.filter(o => o.name).length, fit: all.filter(o => kindOf(o.name)).length }); $('devScanHint').textContent = all.some(o => kindOf(o.name)) ? t('Scan finished — tap your lap timer, or scan again.') : t('No lap timer found. Is it on and in Bluetooth mode? Scan again.'); } }, 20000);
   }
-  async function stopScan() { scanning = false; clearTimeout(scanT); $('devRescan').hidden = false; try { await LOGGERS.ble.stopScan(); } catch (e) {} }
+  async function stopScan() { scanning = false; clearTimeout(scanT); $('devRescan').hidden = false; if (cur === 'devScan') renderScan(); try { await LOGGERS.ble.stopScan(); } catch (e) {} }
   function renderScan() {
     const box = $('devScanList'); box.innerHTML = '';
-    const all = [...seen.values()], timers = all.filter(o => kindOf(o.name)), others = all.filter(o => !kindOf(o.name)), strong = (a, b) => (b.rssi || -999) - (a.rssi || -999);
-    const rows = timers.sort(strong).concat(showAll ? others.sort((a, b) => (b.name ? 1 : 0) - (a.name ? 1 : 0) || strong(a, b)) : []);
+    // the strongest first, by the signal each one had when it was found — a list that re-sorts as the signal flickers moves the row the
+    // driver is aiming at, and the tap lands on another lap timer
+    const all = [...seen.values()], timers = all.filter(o => kindOf(o.name)), others = all.filter(o => !kindOf(o.name)), rank = (o) => (o.rank === undefined ? -999 : o.rank), order = (a, b) => (rank(b) - rank(a)) || ((a.first || 0) - (b.first || 0));
+    const rows = timers.sort(order).concat(showAll ? others.sort((a, b) => (b.name ? 1 : 0) - (a.name ? 1 : 0) || order(a, b)) : []);
     for (const o of rows) {
       const k = kindOf(o.name), b = el('button', 'dev-item dev-found' + (k ? ' fit' : '')); b.type = 'button';
       const bars = o.rssi === null ? '' : (o.rssi > -60 ? '▂▄▆█' : o.rssi > -70 ? '▂▄▆' : o.rssi > -80 ? '▂▄' : '▂');
       b.innerHTML = `<div><b>${esc(o.name || t('(no name)'))}</b><span class="hint">${esc((k ? kindLabel(k) + ' · ' : '') + (o.rssi === null ? '' : o.rssi + ' dBm '))}<span class="rssi">${bars}</span></span></div>`;
       b.onclick = () => connectScanned(o); box.appendChild(b);
     }
-    $('devScanMore').hidden = !others.length; $('devScanMore').textContent = showAll ? t('Hide other devices') : t('Show {n} other device(s)', { n: others.length });
+    $('devScanMore').hidden = !others.length; $('devScanMore').textContent = showAll ? t('Hide other devices') : tnv(others.length, 'Show 1 other device', 'Show {n} other devices');
     $('devScanEmpty').hidden = rows.length > 0 || !scanning; $('devRescan').hidden = scanning;
   }
   // a device that is not a known lap timer goes the Alfano way: the explorer takes over if it does not answer like one
@@ -9055,60 +9269,90 @@ const DEVICE = (() => {
   $('devRetry').onclick = () => { if (!busy) { $('devRetry').hidden = true; open(); } };
   // ---- step 2: connected — the RaceBox read, or the explorer
   async function connectH() {
+    const g = gen, h = H; if (ticksFor !== h.id) { ticks = new Map(); ticksFor = h.id; }   // the driver's own ticks stay for this device (a reopen, Connect again)
     busy = true; stage('devStage'); $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true;
     try {
-      S(t('Connecting to {name}…', { name: H.name || drv.name }));
-      await LOGGERS.ble.connect(H, () => { if (busy || ex || (cur === 'devStage' && items.length)) S(t('The connection dropped — come closer and try again.'), 'warn'); busy = false; if (ex) { ex.live = false; renderExplore(); } dev = null; if (cur === 'devStage' && items.length) syncPick(); });
+      S(t('Connecting to {name}…', { name: h.name || drv.name }));
+      await LOGGERS.ble.connect(h, () => {
+        if (g !== gen) return;   // a link this window has already let go of
+        if (busy || ex || (cur === 'devStage' && items.length)) S(t('The connection dropped — come closer and try again.'), 'warn');
+        busy = false; if (ex) { ex.live = false; renderExplore(); }
+        const d = dev; dev = null; if (d && d.abort) d.abort('lost');   // the command waiting fails now, not at its deadline
+        $('devErase').hidden = true; if (cur === 'devStage' && items.length) syncPick();
+      });
+      if (g !== gen) return;
       if (drv.sessions) {
-        S(t('Connected to {name} — signing in…', { name: H.name || drv.name }));
-        try { dev = await drv.open(H); }
+        S(t('Connected to {name} — signing in…', { name: h.name || drv.name }));
+        let d = null;
+        try { d = await drv.open(h); }
         catch (e) {   // the device did not take the password, or has no serial service: look at it instead, and say why
-          if (!H) throw e;
+          if (g !== gen) return;
+          if (!H || (e.code !== 'auth' && e.code !== 'nouart')) throw e;   // anything else (a link that hiccuped while signing in) is a try again, not the explorer
           S(e.code === 'auth' ? t('{name} did not accept the password — exploring the device instead. Send the log when done.', { name: H.name }) : t('No serial service on {name} — exploring the device instead. Send the log when done.', { name: H.name }), 'warn');
-          await reconnect(); ex = await drv.explore(H); ex.live = true; ex.note = $('devStatus').textContent; await openExplorer(); busy = false; return;
+          await reconnect(); if (g !== gen) return; const x = await drv.explore(h); if (g !== gen) { try { await x.close(); } catch (y) {} return; } ex = x; ex.live = true; ex.note = $('devStatus').textContent; await openExplorer(); busy = false; return;
         }
-        await listSessions(); return;
+        if (g !== gen) { try { await d.close(); } catch (x) {} return; }
+        dev = d; await listSessions(g); return;
       }
-      dev = await drv.open(H);
-      await readAll();
-    } catch (e) { fail(e); busy = false; await drop(); $('devRetry').hidden = false; STORE.track('device_fail', { os: NATIVE.platform, step: 'connect', err: String((e && (e.code || e.message)) || e).slice(0, 80) }); }
+      const d = await drv.open(h); if (g !== gen) { try { await d.close(); } catch (x) {} return; }
+      dev = d; await readAll(g);
+    } catch (e) { if (g !== gen) return; fail(e); busy = false; await drop(); $('devRetry').hidden = false; STORE.track('device_fail', { os: NATIVE.platform, step: 'connect', err: String((e && (e.code || e.message)) || e).slice(0, 80) }); }
   }
   async function reconnect() { const h = H; try { await LOGGERS.ble.disconnect(h); } catch (e) {} h.subs = []; h.chrs = {}; h.lost = null; await new Promise(r => setTimeout(r, 400)); await LOGGERS.ble.connect(h, () => { if (ex) { ex.live = false; renderExplore(); } }); }
   // ---- a logger that keeps sessions (Alfano): the list from its memory, the chosen ones read and handed to the upload window as the app's own files
-  async function listSessions() {
+  async function listSessions(g) {
     S(t('Signed in — reading the session list…'));
     bar(0, 1);
-    const outs = await dev.list((what, k, n) => { if (what === 'scan') { bar(k, 70); S(t('Looking through the memory… {k}', { k: k + 1 })); } else if (what === 'session') { bar(k, n); S(t('Session headers… {k} / {n}', { k, n })); } });
-    await loadMine(); items = outs; busy = false; $('devBar').hidden = true; renderSessions();
+    const outs = await dev.list((what, k, n) => { if (g !== gen) return; if (what === 'scan') { bar(k, 70); S(t('Looking through the memory… {k}', { k: k + 1 })); } else if (what === 'session') { bar(k, n); S(t('Session headers… {k} / {n}', { k, n })); } });
+    if (g !== gen) return; await loadMine(); if (g !== gen) return;
+    items = outs; busy = false; $('devBar').hidden = true; renderSessions();
   }
   const whenStr = (iso) => { const ms = Date.parse(String(iso || '').replace(' ', 'T')); return isFinite(ms) ? new Date(ms).toLocaleString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : String(iso || ''); };
   // ---- what is already in Hutka. A session off the lap timer is known by its start (to the minute) and its best lap (to 1/100 s, the
   // Alfano's own) — the same in a Bluetooth read and in an ADA export; a RaceBox outing by its start. Known ones are greyed and open the
   // Lab; new ones from the newest day on the device are ticked (the day just driven), older new ones wait for a tick
   let mine = [];
-  async function loadMine() { try { mine = (await STORE.mySessions()).map(m => ({ id: m.id, at: String(m.date || '').replace('T', ' ').slice(0, 16), best: +m.bestMs || 0, app: (m.source && m.source.app) || 'alfano' })); } catch (e) { mine = []; } try { mine = mine.concat((await OUTBOX.items()).map(r => ({ id: r.id, at: String(r.date || '').replace('T', ' ').slice(0, 16), best: +r.best || 0, app: r.app || 'alfano', pending: true }))); } catch (e) {} }
+  // with no connection the library is the one this device saw last (stale: the list says so); what waits in the outbox counts as known too
+  async function loadMine() {
+    let list = []; stale = false;
+    try { list = await STORE.mySessionsStrict(); } catch (e) { stale = true; try { list = await STORE.mySessionsKnown(); } catch (x) { list = []; } }
+    mine = list.map(m => ({ id: m.id, at: String(m.date || '').replace('T', ' ').slice(0, 16), best: +m.bestMs || 0, app: (m.source && m.source.app) || 'alfano', startMs: +m.startMs || 0 }));
+    try { mine = mine.concat((await OUTBOX.items()).map(r => ({ id: r.id, at: String(r.date || '').replace('T', ' ').slice(0, 16), best: +r.best || 0, app: r.app || 'alfano', startMs: r.app === 'racebox' ? +r.lastModified || 0 : 0, pending: true }))); } catch (e) {}
+  }
+  const staleNote = () => (stale ? ' ' + t('No connection — sessions already in Hutka are recognised from what this device saw last time.') : '');
+  // the evening just driven: the newest session on the device and those before it with less than five hours between them (a night across
+  // midnight stays one evening) — its new sessions are ticked, older new ones wait for a tick
+  function evening(list, at) {
+    const dated = list.map((o, i) => ({ i, ms: at(o) })).filter(x => isFinite(x.ms)).sort((a, b) => b.ms - a.ms), out = new Set();
+    for (let k = 0; k < dated.length; k++) { if (k && dated[k - 1].ms - dated[k].ms > 5 * 3600000) break; out.add(dated[k].i); }
+    return out;
+  }
   const bestOf = (o) => ((o.bestMin * 60 + o.bestSec) * 1000 + o.bestCs * 10);
   const knownSession = (o) => (o.ok ? mine.find(m => m.at === String(o.date || '').slice(0, 16) && (!m.best || Math.abs(m.best - bestOf(o)) <= 15)) : null) || null;
-  const knownOuting = (o) => (isFinite(o.startMs) ? mine.find(m => m.app === 'racebox' && m.at === fileDate({ lastModified: o.startMs })) : null) || null;
+  const knownOuting = (o) => (isFinite(o.startMs) ? mine.find(m => m.app === 'racebox' && (m.startMs > 0 ? Math.abs(m.startMs - o.startMs) < 60000 : m.at === fileDate({ lastModified: o.startMs }))) : null) || null;   // the start in UTC (a read in another time zone is still the same outing); older uploads by the local minute
   function knownRow(m, title, sub) {
     const b = el('button', 'dev-item known'); b.type = 'button';
-    b.innerHTML = `<span class="dev-in${m.pending ? ' wait' : ''}" aria-hidden="true">${m.pending ? '⏳' : '✓'}</span><div><b>${esc(title)}</b><span class="hint">${esc(sub)}</span><span class="dev-in-tx${m.pending ? ' wait' : ''}">${esc(m.pending ? t('On this phone — uploads by itself when the internet is back') : t('Already in Hutka — tap to open'))}</span></div><svg class="dev-go" aria-hidden="true"><use href="#i-chev"/></svg>`;
+    b.innerHTML = `<span class="dev-in${m.pending ? ' wait' : ''}" aria-hidden="true">${m.pending ? '⏳' : '✓'}</span><div><b>${esc(title)}</b><span class="hint">${esc(sub)}</span><span class="dev-in-tx${m.pending ? ' wait' : ''}">${esc(m.pending ? t('On this device — uploads by itself when the internet is back') : t('Already in Hutka — tap to open'))}</span></div><svg class="dev-go" aria-hidden="true"><use href="#i-chev"/></svg>`;
     b.onclick = () => { if (m.pending) { OUTBOX.flush(true); return; } close(); location.hash = '#lab~' + m.id; }; return b;
   }
-  function sayKnown(nAll, nKnown, name) {
-    if (nKnown && nKnown === nAll) S(t('Everything on {name} is already in Hutka — tap a session to open it.', { name }), 'ok');
-    else if (nKnown) S(t('{n} session(s) on {name}: {k} new, {m} already in Hutka.', { n: nAll, name, k: nAll - nKnown, m: nKnown }), 'ok');
-    else S(t('{n} session(s) on {name} — tick the ones to upload (the newest first).', { n: nAll, name }), 'ok');
+  function sayKnown(nAll, known, name) {
+    const nIn = known.filter(m => m && !m.pending).length, nWait = known.filter(m => m && m.pending).length, k = nAll - nIn - nWait;
+    const msg = (!k && !nWait) ? t('Everything on {name} is already in Hutka — tap a session to open it.', { name })
+      : (nWait && nIn) ? tnv(nAll, '{n} session on {name}: {k} new, {m} already in Hutka, {w} waiting on this device.', '{n} sessions on {name}: {k} new, {m} already in Hutka, {w} waiting on this device.', { name, k, m: nIn, w: nWait })
+      : nWait ? tnv(nAll, '{n} session on {name}: {k} new, {w} waiting on this device.', '{n} sessions on {name}: {k} new, {w} waiting on this device.', { name, k, w: nWait })
+      : nIn ? tnv(nAll, '{n} session on {name}: {k} new, {m} already in Hutka.', '{n} sessions on {name}: {k} new, {m} already in Hutka.', { name, k, m: nIn })
+      : tnv(nAll, '{n} session on {name} — tick it to upload.', '{n} sessions on {name} — tick the ones to upload (the newest first).', { name });
+    S(msg + staleNote(), 'ok');
   }
   function renderSessions() {
     const box = $('devList'); box.innerHTML = '';
     if (!items.length) { S(t('No sessions in the device memory.'), 'warn'); $('devActs').hidden = true; return; }
-    const known = items.map(knownSession), day = (items.find((o, i) => o.ok && !known[i]) || {}).date || '';
-    sayKnown(items.length, known.filter(Boolean).length, H ? H.name : drv.name);
+    const known = items.map(knownSession), ev = evening(items, (o) => (o.ok ? Date.parse(String(o.date || '').replace(' ', 'T')) : NaN));
+    sayKnown(items.length, known, H ? H.name : drv.name);
     items.forEach((o, i) => {
       const best = `${o.bestMin}:${String(o.bestSec).padStart(2, '0')}.${String(o.bestCs).padStart(2, '0')}`, sub = o.ok ? `${o.track}${o.driver ? ' · ' + o.driver : ''} · ${t('{n} laps', { n: o.laps })} · ${t('best')} ${best}` : t('{n} laps · header unreadable', { n: o.laps });
       if (known[i]) { box.appendChild(knownRow(known[i], whenStr(o.date), sub)); return; }
-      const lab = el('label', 'dev-item' + (o.ok ? '' : ' dim')); const cb = el('input'); cb.type = 'checkbox'; cb.checked = o.ok && !!day && String(o.date).slice(0, 10) === day.slice(0, 10); cb.disabled = !o.ok; cb.dataset.i = i;
+      const key = 'a' + o.date + '|' + bestOf(o), lab = el('label', 'dev-item' + (o.ok ? '' : ' dim')); const cb = el('input'); cb.type = 'checkbox'; cb.checked = o.ok && (ticks.has(key) ? ticks.get(key) : ev.has(i)); cb.disabled = !o.ok; cb.dataset.i = i; cb.dataset.k = key;
       const tx = el('div'); tx.innerHTML = `<b>${esc(o.ok ? whenStr(o.date) : t('Session {n}', { n: i + 1 }))}</b><span class="hint">${esc(sub)}</span>`;
       lab.appendChild(cb); lab.appendChild(tx); box.appendChild(lab);
     });
@@ -9123,7 +9367,8 @@ const DEVICE = (() => {
     const someKnown = !!$('devList').querySelector('.dev-item.known'), allKnown = someKnown && !cbs.some(c => !c.disabled);
     b.disabled = !n; b.textContent = n ? (someKnown ? tn(n, 'Upload {n} new session', 'Upload {n} new sessions') : tn(n, 'Upload {n} session', 'Upload {n} sessions')).replace('{n}', n) : (allKnown ? t('Everything is already in Hutka') : t('Tick a session to upload'));
   }
-  $('devList').addEventListener('change', syncPick);
+  // a tick changed: the list as the driver now sees it is theirs — kept when the window is reopened or the device connected again
+  $('devList').addEventListener('change', () => { for (const c of $('devList').querySelectorAll('input[type=checkbox]')) if (c.dataset.k) ticks.set(c.dataset.k, c.checked); syncPick(); });
   // ---- the read: its own step of the window — one big bar over everything chosen (weighted by laps), the percent and the time left,
   // what Hutka can do in turn while it reads; the list is out of reach meanwhile; when the last session is in, the next window opens by itself
   const TIPS = [
@@ -9137,7 +9382,7 @@ const DEVICE = (() => {
     ['i-clock', 'Since last time', 'Each new session on a layout says what changed since your previous one there: the lap, the corners, the kart.'],
     ['i-speed', 'Kart rating', 'Hutka measures how the kart pulls on the main straight — a slow kart shows up as a mark out of 10, not as your fault.'],
     ['i-users', 'Duel a friend', 'Open a friend’s page: your best laps on the tracks you share, and the corners where each of you is faster.']];
-  let tipI = 0, tipT = null, stopping = false;
+  let tipI = 0, tipT = null;
   function tipsBuild() {
     const box = $('drTips'), dots = $('drDots'); box.innerHTML = ''; dots.innerHTML = '';
     for (const [ic, h, tx] of TIPS) { const d = el('div', 'dr-tip'); d.innerHTML = `<span class="dr-ic"><svg><use href="#${ic}"/></svg></span><div><b>${esc(t(h))}</b><span>${esc(t(tx))}</span></div>`; box.appendChild(d); dots.appendChild(el('i')); }
@@ -9147,17 +9392,17 @@ const DEVICE = (() => {
   function tipsStop() { clearInterval(tipT); tipT = null; }
   $('drTips').addEventListener('click', () => { tipShow(tipI + 1); if (tipT) { clearInterval(tipT); tipT = setInterval(() => { if (!$('devModal').hidden) tipShow(tipI + 1); }, 6500); } });
   $('drTips').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('drTips').click(); } });
-  function readOpen(title) { stopping = false; S(''); $('devRead').classList.remove('done'); $('drTitle').textContent = title; $('drSub').textContent = ''; $('drLeft').textContent = t('working out the time left…'); readAt(0); stage('devRead'); tipsStart(); etaStart(); }
+  function readOpen(title) { S(''); $('devRead').classList.remove('done'); $('drTitle').textContent = title; $('drSub').textContent = ''; $('drLeft').textContent = t('working out the time left…'); readAt(0); stage('devRead'); tipsStart(); etaStart(); }
   function readAt(frac) { const f = Math.max(0, Math.min(1, frac || 0)); $('drFill').style.width = (f * 100).toFixed(1) + '%'; $('drPct').textContent = Math.floor(f * 100) + '%'; }
   // the time left over the whole read (all sessions), and the pill when the window is closed
   function readTick(frac, sub) { readAt(frac); if (sub !== undefined) $('drSub').textContent = sub; const left = etaText(Math.round(frac * 1000), 1000); if (left) $('drLeft').textContent = left; pill(withEta(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct: Math.floor(frac * 100) }), left)); }
   async function readDone(title, sub) { $('devRead').classList.add('done'); readAt(1); $('drTitle').textContent = title; $('drSub').textContent = sub; $('drLeft').textContent = ''; tipsStop(); pill(''); NATIVE.haptic('success'); await new Promise(r => setTimeout(r, 650)); }
   // a read that broke: back to the list with the reason (the window comes back if it was closed — the driver has to see it)
-  function readFail(e) { tipsStop(); busy = false; pill(''); if (stopping) return; stage('devStage'); $('devActs').hidden = !items.length; if (items.length) syncPick(); $('devModal').hidden = false; fail(e); STORE.track('device_fail', { os: NATIVE.platform, step: 'read', err: String((e && (e.code || e.message)) || e).slice(0, 80) }); }
+  function readFail(e) { tipsStop(); busy = false; pill(''); stage('devStage'); $('devActs').hidden = !items.length; if (items.length) syncPick(); $('devRetry').hidden = !!items.length; $('devModal').hidden = false; fail(e); STORE.track('device_fail', { os: NATIVE.platform, step: 'read', err: String((e && (e.code || e.message)) || e).slice(0, 80) }); }
   async function importSessions() {
     const picked = [...$('devList').querySelectorAll('input:checked')].map(c => items[+c.dataset.i]).filter(o => o && o.ok);
     if (!picked.length) { S(t('Tick at least one session.'), 'warn'); return; }
-    busy = true; const files = [], name = H ? H.name : drv.name, d = dev;
+    busy = true; const g = gen, files = [], name = H ? H.name : drv.name, d = dev;
     const w = picked.map(o => Math.max(1, +o.laps || 1)), W = w.reduce((a, b) => a + b, 0);
     readOpen(t('Reading {name}', { name }));
     try {
@@ -9166,49 +9411,63 @@ const DEVICE = (() => {
         const o = picked[k], head = (picked.length > 1 ? t('Session {k} of {n}', { k: k + 1, n: picked.length }) + ' · ' : '') + whenStr(o.date);
         readTick(before / W, head);
         if (dev !== d) throw Object.assign(new Error('connection lost'), { code: 'lost' });
-        const f = await d.download(o, (p) => { const part = p.total ? Math.min(1, p.done / p.total) : 0; readTick((before + w[k] * part) / W, head + ' · ' + t('lap {lap} of {laps}', { lap: Math.min(p.lap, p.laps), laps: p.laps })); });
+        const f = await d.download(o, (p) => { if (g !== gen) return; const part = p.total ? Math.min(1, p.done / p.total) : 0; readTick((before + w[k] * part) / W, head + ' · ' + t('lap {lap} of {laps}', { lap: Math.min(p.lap, p.laps), laps: p.laps })); });
+        if (g !== gen) return;   // stopped meanwhile: what came in is not kept (the driver was told so)
         files.push(f); before += w[k];
       }
     } catch (e) {
-      readFail(e); if (stopping) return;
+      if (g !== gen) return;   // a read that was stopped, or a window that started over: nothing of it reaches the screen
+      readFail(e);
+      // the sessions read whole before the break are not lost with it: they go to Hutka now (or wait on this device), and the list says so
+      if (files.length) {
+        const why = $('devStatus').textContent, n = await UPLOAD.saveQuiet(files); if (g !== gen) return;
+        if (n) { await loadMine(); if (g !== gen) return; if (cur === 'devStage' && items.length) renderSessions(); S(why + ' ' + tnv(n, 'The session read before it is saved.', 'The {n} sessions read before it are saved.'), 'warn'); }
+      }
       // what the parser saw goes to Hutka by itself, so the next version reads this device right
       if (e && e.diag && STORE.hasIdentity) { try { await STORE.deviceLog({ device: name, platform: LOGGERS.ble.kind(), kind: 'alfano-download', error: String(e.message || e), info: dev && dev.info, diag: e.diag, at: new Date().toISOString() }); S($('devStatus').textContent + ' — ' + t('diagnostics sent to Hutka, thank you.'), 'warn'); } catch (x) {} }
       return;
     }
     STORE.track('device_import', { app: drv.id, n: files.length });
-    await readDone(tn(files.length, '{n} session read', '{n} sessions read').replace('{n}', files.length), t('Opening…'));
-    busy = false; stage('devStage'); $('devActs').hidden = false; syncPick(); close(); await UPLOAD.withFiles(files);
+    await readDone(tn(files.length, '{n} session read', '{n} sessions read').replace('{n}', files.length), t('Opening…')); if (g !== gen) return;
+    ticks = new Map();   // the choice is used up: next time the list starts from the evening again
+    busy = false; stage('devStage'); $('devActs').hidden = false; syncPick(); close(); await UPLOAD.withFiles(files, { device: true });
   }
   async function again() {
     if (busy || !H) return; const h = H; $('devActs').hidden = true; $('devList').innerHTML = '';
     // a frame torn by the drop may still sit in the lap timer's serial buffer: it lets go of it after a second of silence, so the first
     // command of the new link waits that long
-    h.lost = null; try { await LOGGERS.ble.disconnect(h); } catch (e) {} h.subs = []; h.chrs = {}; await new Promise(r => setTimeout(r, 1300));
+    const g = gen; h.lost = null; try { await LOGGERS.ble.disconnect(h); } catch (e) {} h.subs = []; h.chrs = {}; await new Promise(r => setTimeout(r, 1300));
+    if (g !== gen || H !== h) return;   // the driver went back meanwhile
     await connectH();
   }
-  async function readAll() {
-    let st = null; try { st = await dev.status(); } catch (e) {}
+  async function readAll(g) {
+    const d = dev; let st = null; try { st = await d.status(); } catch (e) {} if (g !== gen) return;
     if (st && st.secured && !st.unlocked) { $('devCodeRow').hidden = false; S(t('The device memory is locked — enter its security code.'), 'warn'); busy = false; return; }
     readOpen(t('Reading {name}', { name: H.name }));
     const sub = st && st.recording ? t('{name} is still recording — stop it (REC) and try again.', { name: H.name }) : (st ? t('{n} records in memory ({p}% full)', { n: st.stored, p: st.level }) : '');
     let outs;
-    try { outs = await dev.download((p) => { readTick(p.total ? p.done / p.total : 0, sub); }); }
-    catch (e) { readFail(e); return; }
-    items = outs; await loadMine(); await readDone(tn(outs.length, '{n} outing found', '{n} outings found').replace('{n}', outs.length), '');
+    try { outs = await d.download((p) => { if (g === gen) readTick(p.total ? p.done / p.total : 0, sub); }); }
+    catch (e) { if (g === gen) readFail(e); return; }
+    if (g !== gen) return;
+    items = outs.slice().sort((a, b) => (b.startMs || 0) - (a.startMs || 0));   // the newest first, as the Alfano list
+    await loadMine(); if (g !== gen) return; await readDone(tn(outs.length, '{n} outing found', '{n} outings found').replace('{n}', outs.length), ''); if (g !== gen) return;
     busy = false; stage('devStage'); $('devBar').hidden = true; renderList();
   }
-  async function unlock() { const code = $('devCode').value.trim(); if (!code || !dev || busy) return; busy = true; try { await dev.unlock(code); $('devCodeRow').hidden = true; await readAll(); } catch (e) { busy = false; fail(e); } }
+  async function unlock() { const code = $('devCode').value.trim(); if (!code || !dev || busy) return; busy = true; const g = gen; try { await dev.unlock(code); if (g !== gen) return; $('devCodeRow').hidden = true; await readAll(g); } catch (e) { if (g !== gen) return; busy = false; fail(e); } }
   function renderList() {
     const box = $('devList'); box.innerHTML = '';
     if (!items.length) { S(t('Nothing recorded on the device yet — press its REC button before the next outing.'), 'warn'); $('devActs').hidden = true; return; }
-    const known = items.map(knownOuting), nKnown = known.filter(Boolean).length;
-    if (nKnown === items.length) S(t('Everything on {name} is already in Hutka — tap a session to open it.', { name: H ? H.name : drv.name }), 'ok');
-    else if (nKnown) S(t('{n} outing(s) on the device: {k} new, {m} already in Hutka.', { n: items.length, k: items.length - nKnown, m: nKnown }), 'ok');
-    else S(t('{n} outing(s) on the device — tick the ones to upload.', { n: items.length }), 'ok');
+    const known = items.map(knownOuting), nIn = known.filter(m => m && !m.pending).length, nWait = known.filter(m => m && m.pending).length, k = items.length - nIn - nWait, ev = evening(items, (o) => o.startMs);
+    const msg = (!k && !nWait) ? t('Everything on {name} is already in Hutka — tap a session to open it.', { name: H ? H.name : drv.name })
+      : (nWait && nIn) ? tnv(items.length, '{n} outing on the device: {k} new, {m} already in Hutka, {w} waiting on this device.', '{n} outings on the device: {k} new, {m} already in Hutka, {w} waiting on this device.', { k, m: nIn, w: nWait })
+      : nWait ? tnv(items.length, '{n} outing on the device: {k} new, {w} waiting on this device.', '{n} outings on the device: {k} new, {w} waiting on this device.', { k, w: nWait })
+      : nIn ? tnv(items.length, '{n} outing on the device: {k} new, {m} already in Hutka.', '{n} outings on the device: {k} new, {m} already in Hutka.', { k, m: nIn })
+      : tnv(items.length, '{n} outing on the device — tick it to upload.', '{n} outings on the device — tick the ones to upload.');
+    S(msg + staleNote(), 'ok');
     items.forEach((o, i) => {
       const sub = t('{min} min · {hz} Hz · up to {v} km/h', { min: Math.max(1, Math.round(o.span / 60)), hz: o.hz, v: Math.round(o.vmax * 3.6) });
       if (known[i]) { box.appendChild(knownRow(known[i], when(o.startMs) || t('Outing {n}', { n: i + 1 }), sub)); return; }
-      const lab = el('label', 'dev-item'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = true; cb.dataset.i = i;
+      const key = 'r' + o.startMs, lab = el('label', 'dev-item'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = ticks.has(key) ? ticks.get(key) : ev.has(i); cb.dataset.i = i; cb.dataset.k = key;
       const tx = el('div'); tx.innerHTML = `<b>${esc(when(o.startMs) || t('Outing {n}', { n: i + 1 }))}</b><span class="hint">${esc(sub)}</span>`;
       lab.appendChild(cb); lab.appendChild(tx); box.appendChild(lab);
     });
@@ -9218,14 +9477,16 @@ const DEVICE = (() => {
     if (drv && drv.sessions) return dev ? importSessions() : again();
     const files = [...$('devList').querySelectorAll('input:checked')].map(c => items[+c.dataset.i].file);
     if (!files.length) { S(t('Tick at least one outing.'), 'warn'); return; }
-    STORE.track('device_import', { app: drv.id, n: files.length });
-    close(); await UPLOAD.withFiles(files);
+    STORE.track('device_import', { app: drv.id, n: files.length }); ticks = new Map();
+    close(); await UPLOAD.withFiles(files, { device: true });
   }
   async function erase() {
     if (!dev || !dev.erase || busy) return;
-    const ok = await confirmDlg(t('Erase the device memory?'), t('Everything recorded on {name} is deleted from the device. Bring the outings you want into the Lab first — what is already in Hutka stays.', { name: H.name }), t('Erase'));
-    if (!ok) return; busy = true;
-    try { bar(0, 100); await dev.erase((p) => { bar(p, 100); S(t('Erasing… {p}%', { p })); }); items = []; busy = false; renderList(); S(t('Device memory erased.'), 'ok'); } catch (e) { busy = false; fail(e); }
+    const known = items.map(knownOuting), notIn = known.filter(m => !m).length, wait = known.filter(m => m && m.pending).length;
+    const more = (notIn ? ' ' + tnv(notIn, 'One outing on it is not in Hutka yet — it would be lost.', '{n} outings on it are not in Hutka yet — they would be lost.') : '') + (wait ? ' ' + tnv(wait, 'One outing is only on this phone so far, waiting for the internet.', '{n} outings are only on this phone so far, waiting for the internet.') : '');
+    const ok = await confirmDlg(t('Erase the device memory?'), t('Everything recorded on {name} is deleted from the device. Bring the outings you want into the Lab first — what is already in Hutka stays.', { name: H.name }) + more, t('Erase'));
+    if (!ok || !dev) return; busy = true; const g = gen;
+    try { bar(0, 100); await dev.erase((p) => { if (g !== gen) return; bar(p, 100); S(t('Erasing… {p}%', { p })); }); if (g !== gen) return; items = []; busy = false; renderList(); S(t('Device memory erased.'), 'ok'); } catch (e) { if (g !== gen) return; busy = false; fail(e); }
   }
   // ---- the explorer (Alfano): the services, the live log, a command line, the log to Hutka
   async function openExplorer() {
@@ -9272,15 +9533,17 @@ const DEVICE = (() => {
     if (cur === 'devScan') { await stopScan(); open(); return; }
     if (cur === 'devExplore') { await disconnect(); return; }
     if (busy && !(await confirmDlg(t('Stop reading the lap timer?'), t('What has been read so far is not kept — the sessions stay on the lap timer.'), t('Stop reading')))) return;
-    if (busy) stopping = true; tipsStop();
-    if (busy && dev && dev.cancel) { try { await dev.cancel(); } catch (e) {} }
+    tipsStop(); gen++;   // the read in progress is let go of: nothing it still does reaches the window or the device
+    if (dev && dev.cancel) { try { await dev.cancel(); } catch (e) {} }
     busy = false; pill(''); await drop(); open();
   }
   $('devBack').onclick = back; $('devModal')._back = back;   // the header's ‹ and the phone's back button
   $('devModal').addEventListener('click', (e) => { if (e.target === $('devModal')) close(); });
   $('uplFromDevice').onclick = () => { UPLOAD.close(); open({ auto: true }); };
   addEventListener('pagehide', () => { drop(); });
-  return { open, close };
+  // the outbox just went up: the sessions it held are in Hutka now — the list on screen says so
+  function refreshKnown() { if (busy || ex || cur !== 'devStage' || !items.length || $('devModal').hidden) return; loadMine().then(() => { if (!busy && items.length && cur === 'devStage') (drv && drv.sessions ? renderSessions : renderList)(); }); }
+  return { open, close, refreshKnown, get busy() { return busy; } };
 })();
 // OSM opening_hours → the track's open / close fields, only when the tag is one plain daily range ("10:00-22:00", "Mo-Su 10:00-23:00"); anything else stays empty
 function parseHours(h) { const m = /^(?:Mo-Su\s+)?(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/.exec(String(h || '').trim()); return m ? { open: m[1].padStart(5, '0'), close: m[2].padStart(5, '0') } : {}; }
@@ -9530,14 +9793,14 @@ async function renderHomePage() {
   // where people drive: layouts by number of sessions in the last 60 days
   { const box = $('homeActive'); box.innerHTML = ''; const by = new Map(); const cut = Date.now() - 60 * 86400000; for (const s of pubs) { if (!s.track) continue; const k = s.track + '~' + (s.layout || 'custom'); const o = by.get(k) || { track: s.track, layout: s.layout, n: 0, recent: 0, best: Infinity }; o.n++; if ((s.createdAt || 0) > cut) o.recent++; o.best = Math.min(o.best, s.bestMs || Infinity); by.set(k, o); }
     const rows = [...by.values()].sort((a, b) => b.recent - a.recent || b.n - a.n).slice(0, 6);
-    if (!rows.length) box.appendChild(el('div', 'hint', t('Nothing yet — the first published session opens the board.')));
+    if (!rows.length) box.appendChild(el('div', 'hint', navigator.onLine === false ? t('No connection — this fills in when it is back.') : t('Nothing yet — the first published session opens the board.')));
     for (const r of rows) { const tr = STORE.getTrack(r.track); const ls = await STORE.getLayouts(r.track); const l = ls.find(x => x.id === r.layout); const a = el('a', 'item'); a.href = r.layout && r.layout !== 'custom' ? `#track~${r.track}~${r.layout}` : `#track~${r.track}`; a.append(el('span', 'name', `${tr ? tr.name : r.track}${l ? ' · ' + l.name : ''}`), el('span', 'meta', `${tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n)} · ${t('best')} ${fmtMs(r.best)}`)); box.appendChild(a); }
   }
   // active drivers: who published in the last 30 days, how much, and where they drove last (tracks differ, so no cross-track times)
   { const box = $('homeTop'); box.innerHTML = ''; const cut = Date.now() - 30 * 86400000; const by = new Map();
     for (const s of pubs) { if ((s.createdAt || 0) < cut) continue; const o = by.get(s.owner) || { owner: s.owner, n: 0, laps: 0, last: null, tracks: new Set() }; o.n++; o.laps += s.nLaps || 0; if (s.track) o.tracks.add(s.track); if (!o.last || (s.createdAt || 0) > (o.last.createdAt || 0)) o.last = s; by.set(s.owner, o); }
     const rows = [...by.values()].sort((a, b) => b.n - a.n || (b.last.createdAt || 0) - (a.last.createdAt || 0)).slice(0, 8);
-    if (!rows.length) box.appendChild(el('div', 'hint', t('Nobody published a session in the last 30 days yet.')));
+    if (!rows.length) box.appendChild(el('div', 'hint', navigator.onLine === false ? t('No connection — this fills in when it is back.') : t('Nobody published a session in the last 30 days yet.')));
     rows.forEach((o, i) => { const s = o.last, tr = STORE.getTrack(s.track); const d = el('div', 'rank'); const im = new Image(); im.src = (names[o.owner] && names[o.owner].avatar) || GENERIC_AVATAR; im.alt = ''; const w = el('div', 'w'); w.innerHTML = `<a href="#driver~${esc(o.owner)}">${esc((names[o.owner] || {}).name || t('Driver'))}</a>${names[o.owner] && names[o.owner].country ? ' ' + flag(names[o.owner].country) : ''}<span>${esc(tn(o.n, '{n} session', '{n} sessions').replace('{n}', o.n))} · ${esc(tn(o.laps, '{n} lap', '{n} laps').replace('{n}', o.laps))}${o.tracks.size > 1 ? ' · ' + esc(tn(o.tracks.size, '{n} track', '{n} tracks').replace('{n}', o.tracks.size)) : ''} · ${esc(tr ? tr.name : (s.trackName || t('Custom')))}</span>`; const tm = el('a', 'tm', fmtDate(s.date)); tm.href = '#lab~' + s.id; tm.style.cssText = 'font-size:12px;color:var(--muted);text-decoration:none'; d.append(el('span', 'n', String(i + 1)), im, w, tm); box.appendChild(d); });
   }
   // the drivers I follow
@@ -9987,7 +10250,8 @@ const SESSEDIT = (() => {
     $('seName').value = meta.label || meta.name || ''; $('seNote').value = meta.note || '';
     fillSelect($('seTrack'), [['', t('— not in the catalogue (custom) —')]].concat(STORE.getTracks().map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), meta.track || '');
     await fillLayouts(meta.track || '', meta.layout || ''); fillKarts(meta); fillFormats($('seFormat'), meta.format || ''); $('sePos').value = meta.pos || ''; $('seDrivers').value = meta.drivers || '';
-    $('sePubField').hidden = !(STORE.canWrite() && meta.owner !== 'local'); $('sePublish').checked = !!meta.published;
+    // a session the admins hid cannot be published again by its owner (setPublished and the Lab's button say the same)
+    { const locked = !!(meta.moderated && !meta.published && !STORE.isAdmin()); $('sePubField').hidden = !(STORE.canWrite() && meta.owner !== 'local'); $('sePublish').checked = !!meta.published; $('sePublish').disabled = locked; $('sePubField').title = locked ? t('The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine.') : ''; }
     { const prof = STORE.hasIdentity ? (await STORE.profile(STORE.me.id) || {}) : {}; const res = prof.swsResults && prof.swsResults.results || []; fillSelect($('seSws'), [['', t('— not an SWS race —')]].concat(res.map((r, i) => [String(i), SWS.label(r)])), meta.sws && meta.sws.i !== undefined ? String(meta.sws.i) : ''); $('seSws').disabled = !res.length; const h = $('seSwsHint'); h.innerHTML = ''; if (!res.length) { h.appendChild(document.createTextNode(t('No SWS results imported yet. ') )); const a = el('a', 'tref', t('Import results from your SWS page')); a.href = '#'; a.onclick = (e) => { e.preventDefault(); SESSEDIT.close(); SWS.open({}); }; h.appendChild(a); } }
     $('sessModal').hidden = false; $('seName').focus();
   }
@@ -10004,9 +10268,13 @@ const SESSEDIT = (() => {
   $('seSave').onclick = async () => {
     if (!cur) return; const tid = $('seTrack').value, tr = tid ? STORE.getTrack(tid) : null;
     const kart = kartFromValue($('seKart').value, $('seKartOther').value);
-    const patch = { label: $('seName').value.trim().slice(0, 80), note: $('seNote').value.trim().slice(0, 120), track: tid, trackName: tr ? tr.name : (cur.trackName || ''), layout: tid ? ($('seLayout').value || 'custom') : 'custom', kart: kart.name, kartClass: kart.cls, kartCat: kart.cat || '', format: $('seFormat').value || '', pos: +$('sePos').value || 0, drivers: +$('seDrivers').value || 0 };
+    const patch = { label: $('seName').value.trim().slice(0, 80), note: $('seNote').value.trim().slice(0, 120), track: tid, trackName: tr ? tr.name : (cur.trackName || ''), layout: tid ? ($('seLayout').value || 'custom') : 'custom', kart: kart.name, kartClass: kart.cls, kartCat: kart.cat || '', format: $('seFormat').value || '' };
+    // the place: whole numbers, never behind the field
+    { const num = (v) => Math.max(0, Math.min(500, Math.round(+v || 0))); patch.pos = num($('sePos').value); patch.drivers = num($('seDrivers').value); if (patch.pos && patch.drivers && patch.pos > patch.drivers) patch.drivers = patch.pos; }
+    // a layout (or track) changed by hand is the driver's pick: the session is placed on it for sure, as from the finishing touches
+    if (patch.track !== (cur.track || '') || patch.layout !== (cur.layout || 'custom')) patch.detect = { sure: patch.layout !== 'custom', how: 'picked' };
     if (tr && kart.name && kart.cls !== 'sport' && STORE.canEditTrack(tr) && !(tr.karts || []).some(k => k.name.toLowerCase() === kart.name.toLowerCase())) { try { await STORE.saveTrack(Object.assign({}, tr, { karts: (tr.karts || []).concat([{ name: kart.name, cls: kart.cls }]) })); } catch (e) {} }
-    if (!$('sePubField').hidden) patch.published = $('sePublish').checked && !!tid;
+    if (!$('sePubField').hidden && !$('sePublish').disabled) { patch.published = $('sePublish').checked && !!tid; if (patch.published) patch.draft = false; }
     if (!$('seSws').disabled) { const i = $('seSws').value; if (i === '') patch.sws = null; else { const prof = await STORE.profile(STORE.me.id) || {}; const r = (prof.swsResults && prof.swsResults.results || [])[+i]; if (r) patch.sws = { i: +i, date: r.date, race: r.race || r.cat, track: r.track, pos: r.pos, best: r.best }; } }
     const b = $('seSave'); b.classList.add('busy'); setStatus('seStatus', t('Saving…'));
     // a sport kart with revs: the gearbox is read from the kart class, so the channel summary follows the kart
