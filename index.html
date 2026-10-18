@@ -1050,14 +1050,6 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .captcha:empty{display:none}
 /* ---------- a lap timer over Bluetooth: the device window ---------- */
 .modal .box.dev-box{width:min(560px,100%)}
-.dev-kinds{display:grid;gap:10px}
-.dev-kind{position:relative;display:flex;flex-direction:column;gap:3px;align-items:flex-start;min-height:70px;justify-content:center;text-align:left;padding:13px 46px 13px 16px;border:1.5px solid var(--line-2);border-radius:16px;background:var(--surface);color:var(--fg);font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.dev-kind::after{content:'';position:absolute;right:20px;top:50%;width:9px;height:9px;border-right:2.2px solid currentColor;border-top:2.2px solid currentColor;transform:translateY(-50%) rotate(45deg);opacity:.4}
-.dev-kind:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
-.dev-kind:active:not(:disabled){transform:scale(.985)}
-.dev-kind b{font-size:16.5px}
-.dev-kind span{font-size:13px;color:var(--muted);line-height:1.4}
-.dev-kind:disabled{cursor:default;opacity:.6}
 .dev-bar{margin:8px 0 4px}
 .dev-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .dev-item{display:flex;gap:12px;align-items:center;min-height:62px;padding:11px 14px;border:1.5px solid var(--line);border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s}
@@ -1067,10 +1059,42 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .dev-item b{font-size:15px}
 .dev-item .hint{font-size:12.5px}
 .dev-item.dim{opacity:.55}
+#devPick{display:flex;flex-direction:column;gap:12px}
+.btn.cta.dev-retry{margin-top:14px}
+#devPick[hidden]{display:none}
+#devPick .status:empty{display:none}
 .dev-scan-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .dev-scan-acts .btn{height:46px;flex:1 1 auto}
 .dev-scan-acts .btn[hidden]{display:none}
 .sheet-foot.dev-acts .btn.ghost.danger-text{align-self:center;height:44px}
+/* the read: a big bar, the percent and the time left, the tips in turn (all in one grid cell — the card is as tall as the longest tip, nothing jumps) */
+.dev-read{display:flex;flex-direction:column;gap:12px;padding-top:4px}
+.dr-head{display:flex;flex-direction:column;gap:4px;min-width:0}
+.dr-head b{font-size:20px;font-weight:700;letter-spacing:-.01em;overflow-wrap:anywhere}
+.dr-head .hint{font-size:14px}
+.dr-bar{position:relative;height:16px;border-radius:999px;background:var(--surface-3);overflow:hidden;margin-top:4px}
+.dr-bar > div{position:relative;height:100%;width:0;border-radius:inherit;background:var(--accent);transition:width .5s ease;overflow:hidden}
+.dr-bar > div::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent);transform:translateX(-100%);animation:drsh 1.6s ease-in-out infinite}
+.dev-read.done .dr-bar > div{background:var(--ok)}
+.dev-read.done .dr-bar > div::after{animation:none;display:none}
+@keyframes drsh{to{transform:translateX(100%)}}
+.dr-nums{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.dr-nums b{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+.dr-nums span{color:var(--muted);font-size:14px;text-align:right}
+.dr-eyebrow{margin-top:8px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.dr-tips{display:grid;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none}
+.dr-tip{grid-area:1/1;display:flex;gap:12px;align-items:flex-start;padding:14px 15px;border-radius:16px;background:var(--surface-2);border:1px solid var(--line);opacity:0;visibility:hidden;transition:opacity .45s,visibility .45s}
+.dr-tip.on{opacity:1;visibility:visible}
+.dr-tips:focus-visible .dr-tip.on{outline:2px solid var(--accent);outline-offset:2px}
+.dr-tip .dr-ic{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.dr-tip .dr-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dr-tip b{display:block;font-size:15.5px;margin:1px 0 3px}
+.dr-tip span{display:block;font-size:13.5px;line-height:1.45;color:var(--muted)}
+.dr-dots{display:flex;gap:6px;justify-content:center}
+.dr-dots i{display:block;width:6px;height:6px;border-radius:50%;background:var(--line-2);transition:background .3s,width .3s}
+.dr-dots i.on{width:16px;border-radius:3px;background:var(--accent)}
+.dr-keep{font-size:12.5px;margin-top:2px}
+@media (prefers-reduced-motion:reduce){.dr-bar > div::after{animation:none;display:none}.dr-tip{transition:none}}
 .dev-pill{position:fixed;left:50%;bottom:calc(24px + var(--sa-bottom));transform:translateX(-50%);z-index:89;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:0;border-radius:999px;background:var(--accent);color:#fff;font:inherit;font-size:13px;font-weight:600;box-shadow:var(--shadow);cursor:pointer;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dev-pill::before{content:'';width:8px;height:8px;border-radius:50%;background:#fff;animation:scanpulse 1.2s ease-in-out infinite;flex:none}
 
@@ -1270,6 +1294,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <symbol id="i-rotate" viewBox="0 0 24 24"><rect x="3" y="7" width="14" height="10" rx="2"/><path d="M20 10v4M17 20l-2-2 2-2M15 18h3a2 2 0 002-2"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
     <symbol id="i-bt" viewBox="0 0 24 24"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></symbol>
     <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
@@ -1708,14 +1733,18 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 <div class="modal" id="devModal" hidden><div class="box sheet dev-box">
   <div class="sheet-head"><button class="sheet-back" id="devBack" type="button" hidden data-tt="Back" title="Back" aria-label="Back"><svg><use href="#i-back"/></svg></button><h3 data-t="From the lap timer">From the lap timer</h3><button class="sheet-x" id="devCancel" type="button" data-tt="Close" title="Close" aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
   <div class="sheet-body">
-  <p class="hint" id="devIntro" data-t="Turn the lap timer on and put it in Bluetooth mode — Hutka reads the sessions straight out of its memory: no vendor app, no files.">Turn the lap timer on and put it in Bluetooth mode — Hutka reads the sessions straight out of its memory: no vendor app, no files.</p>
-  <div class="dev-kinds" id="devKinds"></div>
-  <div class="hint warn" id="devNoBt" hidden data-t="This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.">This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.</div>
+  <p class="hint" id="devIntro" data-t="Put the lap timer in Bluetooth mode: Alfano 7 — turn Bluetooth on in its menu (the green light comes on); RaceBox — just turn it on.">Put the lap timer in Bluetooth mode: Alfano 7 — turn Bluetooth on in its menu (the green light comes on); RaceBox — just turn it on.</p>
+  <!-- a browser (Chrome): its own chooser lists the devices; the button opens it again; no Bluetooth here — where it works -->
+  <div id="devPick" hidden>
+    <div class="hint warn" id="devNoBt" hidden data-t="This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.">This browser has no Bluetooth — use the Hutka app, or Chrome on Android or a computer.</div>
+    <button class="btn cta" id="devFind" type="button" data-t="Find the lap timer">Find the lap timer</button>
+    <div class="status" id="devPickNote"></div>
+  </div>
   <div id="devScan" hidden>
     <div class="row" style="justify-content:space-between;align-items:center"><b data-t="Nearby devices">Nearby devices</b><span class="scan-pulse" aria-hidden="true"></span></div>
     <div class="hint" id="devScanHint"></div>
     <div class="dev-list" id="devScanList"></div>
-    <div class="hint" id="devScanEmpty" hidden data-t="Nothing yet…">Nothing yet…</div>
+    <div class="hint" id="devScanEmpty" hidden data-t="No lap timer yet…">No lap timer yet…</div>
     <div class="dev-scan-acts"><button class="btn" id="devRescan" type="button" hidden data-t="Scan again">Scan again</button><button class="btn ghost" id="devScanMore" type="button" hidden></button></div>
   </div>
   <div id="devExplore" hidden>
@@ -1731,9 +1760,19 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div id="devStage" hidden>
     <div class="status" id="devStatus"></div>
     <div class="progress dev-bar" id="devBar" hidden><div></div></div>
-    <div class="hint" id="devKeep" hidden data-t="Keep Hutka open while it reads — you can move around inside Hutka, but on a phone keep it on screen; in a browser, keep this tab open.">Keep Hutka open while it reads — you can move around inside Hutka, but on a phone keep it on screen; in a browser, keep this tab open.</div>
     <div class="row" id="devCodeRow" hidden><input type="text" id="devCode" inputmode="numeric" placeholder="123456" maxlength="10" style="width:140px"><button class="btn" id="devUnlock" type="button" data-t="Unlock">Unlock</button></div>
     <div class="dev-list" id="devList"></div>
+    <button class="btn cta dev-retry" id="devRetry" type="button" hidden data-t="Try again">Try again</button>
+  </div>
+  <!-- the read: one big bar over everything chosen, the time left, and what Hutka can do meanwhile -->
+  <div id="devRead" class="dev-read" hidden>
+    <div class="dr-head"><b id="drTitle"></b><span class="hint" id="drSub"></span></div>
+    <div class="dr-bar" id="drBar"><div id="drFill"></div></div>
+    <div class="dr-nums"><b id="drPct">0%</b><span id="drLeft"></span></div>
+    <div class="dr-eyebrow" data-t="While it reads">While it reads</div>
+    <div class="dr-tips" id="drTips" role="button" tabindex="0" aria-live="polite"></div>
+    <div class="dr-dots" id="drDots" aria-hidden="true"></div>
+    <p class="hint dr-keep" data-t="Keep Hutka open while it reads — you can move around inside Hutka, but on a phone keep it on screen; in a browser, keep this tab open.">Keep Hutka open while it reads — you can move around inside Hutka, but on a phone keep it on screen; in a browser, keep this tab open.</p>
   </div>
   </div>
   <div class="sheet-foot dev-acts" id="devActs" hidden><button class="btn cta" id="devImport" type="button"></button><button class="btn ghost danger-text" id="devErase" type="button" data-t="Erase the device memory">Erase the device memory</button></div>
@@ -4555,6 +4594,54 @@ Object.assign(I18N.RU, {
   'Check the track, tap Save': 'Проверь трассу, нажми «Сохранить»',
   'Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap “Save and open in the Lab” — the Lab opens with every corner.': 'Hutka узнаёт трассу по GPS и подставляет лейаут и самый частый карт — проверь, поменяй, если надо. «Опубликовать» — другие смогут сравниваться с тобой; сними галочку, чтобы сессия осталась приватной. Нажми «Сохранить и открыть в Лаборатории» — откроется Лаборатория с разбором по поворотам.',
   'Any of these files works the same way: save it on the phone or computer, then Upload → Choose a file.': 'Любой из этих файлов грузится так же: сохрани на телефон или компьютер, потом «Загрузить» → «Выбрать файл».' });
+
+// v34.23 — the read step of the lap-timer window: the big bar, the time left, the tips in turn (Pasha's point 6)
+Object.assign(I18N.RU, {
+  'While it reads': 'Пока читается',
+  'working out the time left…': 'считаю, сколько осталось…',
+  'Reading {name}': 'Читаю {name}',
+  'Session {k} of {n}': 'Сессия {k} из {n}',
+  'lap {lap} of {laps}': 'круг {lap} из {laps}',
+  '{n} session read|{n} sessions read': '{n} сессия прочитана|{n} сессии прочитаны|{n} сессий прочитано',
+  'Opening…': 'Открываю…',
+  '{n} records in memory ({p}% full)': 'в памяти {n} записей (заполнено на {p}%)',
+  '{n} outing found|{n} outings found': 'найден {n} заезд|найдено {n} заезда|найдено {n} заездов',
+  'The gap, corner by corner': 'Отрыв по поворотам',
+  'The Lab puts you next to the fastest driver on this layout in your kart class and shows where the time goes in every corner.': 'Лаборатория ставит тебя рядом с самым быстрым на этой конфигурации в твоём классе картов и показывает, где уходит время в каждом повороте.',
+  'Grades A–E': 'Оценки A–E',
+  'Every corner gets a grade for the entry, the apex and the exit — start with the lowest one.': 'Каждый поворот получает оценку за вход, апекс и выход — начни с самой низкой.',
+  'Accel / decel': 'Разгон / замедление',
+  'Switch the map to Accel / decel: green where you speed up, red where you slow down, yellow where you just roll.': 'Включи на карте «Разгон / замедление»: зелёное — разгоняешься, красное — замедляешься, жёлтое — просто катишься.',
+  'Ask the AI coach': 'Спроси ИИ-тренера',
+  '“Where do I lose the most?” — the answer names the corners, with numbers from your own laps.': '«Где я теряю больше всего?» — ответ назовёт повороты, с цифрами из твоих же кругов.',
+  'Press play': 'Нажми play',
+  'Watch your lap against the reference: the karts run in real time, the faster one pulls ahead.': 'Смотри свой круг против эталона: карты едут в реальном времени, быстрый уходит вперёд.',
+  'Your ideal lap': 'Твой идеальный круг',
+  'Your fastest pass through every corner, stitched into one lap — the time you already have in you.': 'Твой самый быстрый проход каждого поворота, сшитый в один круг, — время, которое в тебе уже есть.',
+  'Bookmarks': 'Закладки',
+  'Star a session or bookmark a corner with a note — next time it waits on the Lab start page.': 'Отметь сессию звёздочкой или поворот закладкой с заметкой — в следующий раз они ждут на старте Лаборатории.',
+  'Each new session on a layout says what changed since your previous one there: the lap, the corners, the kart.': 'Каждая новая сессия на конфигурации скажет, что изменилось с прошлой: круг, повороты, карт.',
+  'Kart rating': 'Оценка карта',
+  'Hutka measures how the kart pulls on the main straight — a slow kart shows up as a mark out of 10, not as your fault.': 'Hutka меряет, как карт тянет на главной прямой, — медленный карт видно по оценке из 10, а не по твоим кругам.',
+  'Duel a friend': 'Дуэль с другом',
+  'Open a friend’s page: your best laps on the tracks you share, and the corners where each of you is faster.': 'Открой страницу друга: ваши лучшие круги на общих трассах и повороты, где каждый из вас быстрее.' ,
+  'Connect again': 'Подключиться снова' });
+
+// v34.23 — no "which lap timer" step: the scan (or the browser chooser) is the first step, the kind is told by the name
+Object.assign(I18N.RU, {
+  'Put the lap timer in Bluetooth mode: Alfano 7 — turn Bluetooth on in its menu (the green light comes on); RaceBox — just turn it on.': 'Переведи прибор в режим Bluetooth: Alfano 7 — включи Bluetooth в его меню (загорится зелёный огонёк); RaceBox — просто включи.',
+  'Find the lap timer': 'Найти прибор',
+  'No lap timer yet…': 'Прибора пока нет…',
+  'Looking for lap timers nearby…': 'Ищу приборы рядом…',
+  'Scan finished — tap your lap timer, or scan again.': 'Поиск закончен — нажми на свой прибор или поищи снова.',
+  'No lap timer found. Is it on and in Bluetooth mode? Scan again.': 'Прибор не найден. Он включён и в режиме Bluetooth? Поищи снова.',
+  'Hide other devices': 'Скрыть другие устройства',
+  'Show {n} other device(s)': 'Показать другие устройства: {n}',
+  'Pick the lap timer in the list…': 'Выбери прибор в списке…' ,
+  'Try again': 'Попробовать снова' });
+Object.assign(I18N.RU, {
+  'The app lists the lap timers in the air at once — tap yours: ALFANO-… (marked Alfano) or RaceBox …. In Chrome the browser’s own list opens instead: pick the device there and press Pair. Hutka signs in to the lap timer and reads its session list.': 'Приложение сразу покажет приборы в эфире — нажми на свой: ALFANO-… (с пометкой Alfano) или RaceBox …. В Chrome вместо этого откроется список самого браузера: выбери прибор там и нажми «Подключить». Hutka войдёт в прибор и прочитает список сессий.',
+  'A 45-lap session takes about five minutes over Bluetooth: a big bar shows the percent, the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. When it is done, the next window opens by itself: check the track, tap “Save and open in the Lab” — the Lab opens with every corner.': 'Сессия на 45 кругов читается по Bluetooth минут пять: большая полоса показывает процент, какой круг читается и сколько осталось. На телефоне держи Hutka на экране (внутри Hutka ходить можно — плашка внизу показывает прогресс), в браузере не закрывай вкладку. Когда всё прочитано, следующее окно откроется само: проверь трассу, нажми «Сохранить и открыть в Лаборатории» — Лаборатория откроется со всеми поворотами.' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -6281,9 +6368,9 @@ function renderHelpPage() {
   const b = card(t('Straight from the lap timer (Bluetooth)'), t('Alfano 7 and RaceBox: no vendor app, no files — the sessions come out of the device memory straight into the Lab. In the Hutka app (iPhone, Android), or in Chrome on a Mac, Windows or Android.'));
   b.appendChild(step(1, t('Put the lap timer in Bluetooth mode'), esc(t('Alfano 7: in its menu turn Bluetooth on (the connection / sharing mode). The screen shows a PIN and the green light comes on — the lap timer is ready to send. Hutka does not need the PIN. RaceBox: just turn it on.')), 'hutka-device-timer.jpg'));
   b.appendChild(step(2, t('Upload → From the lap timer'), esc(t('Open hutka.ai or the Hutka app, tap Upload (the round button in the middle of the bottom bar; on a computer — “Upload session” in the Lab), then the big blue “From the lap timer”. Sign in first if you have not.')), 'hutka-device.jpg'));
-  b.appendChild(step(3, t('Pick the lap timer'), `${esc(t('Tap Alfano 6 / 7 (or RaceBox). The app lists what is in the air — tap yours: ALFANO-… with “looks like an Alfano”. In Chrome the browser’s own list opens instead: pick the device there and press Pair. Hutka signs in to the lap timer and reads its session list.'))}<br><span class="hint">${esc(t('Not in the list? Check the lap timer is on and in Bluetooth mode and the phone’s Bluetooth is on. On Android the app asks for the nearby-devices permission the first time — allow it.'))}</span>`, 'hutka-device-scan.jpg'));
+  b.appendChild(step(3, t('Pick the lap timer'), `${esc(t('The app lists the lap timers in the air at once — tap yours: ALFANO-… (marked Alfano) or RaceBox …. In Chrome the browser’s own list opens instead: pick the device there and press Pair. Hutka signs in to the lap timer and reads its session list.'))}<br><span class="hint">${esc(t('Not in the list? Check the lap timer is on and in Bluetooth mode and the phone’s Bluetooth is on. On Android the app asks for the nearby-devices permission the first time — allow it.'))}</span>`, 'hutka-device-scan.jpg'));
   b.appendChild(step(4, t('Tick the sessions, tap Upload'), esc(t('Every session in the lap timer’s memory: date, track, laps, best lap — the newest is ticked already. Tick the ones you want (one at a time is quickest) and tap the blue “Upload 1 session” at the bottom.')), 'hutka-device-sessions.jpg'));
-  b.appendChild(step(5, t('Wait for the read — a few minutes'), esc(t('A 45-lap session takes about five minutes over Bluetooth: the screen shows the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. Then the usual window opens: check the track, tap “Save and open in the Lab” — the Lab opens with every corner.')), 'hutka-device-reading.jpg'));
+  b.appendChild(step(5, t('Wait for the read — a few minutes'), esc(t('A 45-lap session takes about five minutes over Bluetooth: a big bar shows the percent, the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. When it is done, the next window opens by itself: check the track, tap “Save and open in the Lab” — the Lab opens with every corner.')), 'hutka-device-reading.jpg'));
   box.appendChild(b);
   // Alfano 7 — the ADA app on the phone
   const a = card(t('Alfano 7 — the ADA app on your phone'), t('The other way, without Bluetooth: the app you already use to look at your laps. Every session is one file; you save it on the phone and give it to Hutka.'));
@@ -6301,7 +6388,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.22';
+const APP_VERSION = 'v34.23';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -8471,21 +8558,30 @@ const DEVICE = (() => {
   let H = null, dev = null, drv = null, items = [], busy = false, seen = new Map(), scanT = null, scanning = false, showAll = false, ex = null, logT = null;
   const S = (tx, cls) => setStatus('devStatus', tx, cls);
   const when = (ms) => { if (!isFinite(ms)) return ''; return new Date(ms).toLocaleString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
-  // one step of the window at a time; the header's ‹ goes one step back (it is not there on the first step), ✕ closes
-  let cur = 'devKinds';
-  const stage = (name) => { for (const id of ['devKinds', 'devScan', 'devStage', 'devExplore']) $(id).hidden = true; if (name) $(name).hidden = false; cur = name || 'devKinds';
-    $('devNoBt').hidden = name !== 'devKinds' || !!LOGGERS.ble.kind(); $('devIntro').hidden = name !== 'devKinds'; $('devBack').hidden = name === 'devKinds'; if (name !== 'devStage') $('devActs').hidden = true; $('devModal').querySelector('.sheet-body').scrollTop = 0; };
-  function open() {
-    if (busy || (dev && items.length) || ex) { $('devModal').hidden = false; return; }   // a read in progress, a device still connected with its outings listed, or the explorer open
+  // one step of the window at a time. The first is what is in the air (the app scans) or the browser's own chooser (Chrome) — there is no
+  // "which lap timer" step: Hutka tells an Alfano from a RaceBox by its name. The header's ‹ goes one step back (not on the first step), ✕ closes
+  const first = () => (LOGGERS.ble.canScan() ? 'devScan' : 'devPick');
+  let cur = '';
+  const stage = (name) => { for (const id of ['devPick', 'devScan', 'devStage', 'devRead', 'devExplore']) $(id).hidden = true; if (name) $(name).hidden = false; cur = name || '';
+    $('devIntro').hidden = name !== first() || !LOGGERS.ble.kind(); $('devBack').hidden = name === first(); if (name !== 'devStage') $('devActs').hidden = true; $('devRetry').hidden = true; $('devModal').querySelector('.sheet-body').scrollTop = 0; };
+  // a lap timer by its name (ALFANO-2659, ALFANO7 4695, RaceBox Mini S …); anything else in the air is "another device"
+  const kindOf = (name) => LOGGERS.list.find(d => d.namePrefixes.length ? d.namePrefixes.some(p => (name || '').toLowerCase().startsWith(p.toLowerCase())) : !!(d.looks && d.looks(name))) || null;
+  const kindLabel = (k) => (k ? (k.id === 'alfano' ? 'Alfano' : 'RaceBox') : '');
+  // the browser's chooser for any lap timer: every device in the air, the services of both kinds allowed
+  const anyTimer = () => ({ id: 'any', name: 'lap timer', namePrefixes: [], services: [...new Set(LOGGERS.list.reduce((a, d) => a.concat(d.services || []), []))] });
+  function open(o) {
+    if (busy || (dev && items.length) || ex) { $('devModal').hidden = false; return; }   // a read in progress, a device still connected with its sessions listed, or the explorer open
     items = []; dev = null; H = null; drv = null;
-    const kinds = $('devKinds'); kinds.innerHTML = '';
-    for (const d of LOGGERS.list.slice().sort((a, b) => (a.id === 'alfano' ? 0 : 1) - (b.id === 'alfano' ? 0 : 1))) {   // the Alfano first: most drivers have one
-      const b = el('button', 'dev-kind'); b.type = 'button'; b.dataset.id = d.id;
-      b.innerHTML = `<b>${esc(d.name)}</b><span>${esc(d.sessions ? t('Bluetooth — the sessions in the device memory, straight into the Lab') : t('Bluetooth — the recorded outings go straight into the Lab'))}</span>`;
-      b.onclick = () => choose(d); kinds.appendChild(b);
-    }
-    stage('devKinds'); $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true; S('');
-    $('devModal').hidden = false;
+    $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true; S(''); setStatus('devPickNote', '');
+    $('devModal').hidden = false; start(!!(o && o.auto));
+  }
+  // the first step: the app → the scan list at once; a browser → its chooser, opened at once when the driver came by the "From the lap
+  // timer" button (that tap is what lets a page open it), else by the Find button; no Bluetooth here → why, and where it works
+  async function start(auto) {
+    const bt = !!LOGGERS.ble.kind();
+    if (bt && LOGGERS.ble.canScan()) { await startScan(); return; }
+    stage('devPick'); $('devNoBt').hidden = bt; $('devFind').hidden = !bt;
+    if (bt && auto) await connectPicked();
   }
   function close() { $('devModal').hidden = true; if (scanning) stopScan(); pill(); }
   // the read keeps going with the window closed or on another page of Hutka: a pill says so, a tap brings the window back; a tab close asks first
@@ -8505,54 +8601,56 @@ const DEVICE = (() => {
     return sec < 50 ? t('under a minute left') : t('~{m} min left', { m: Math.max(1, Math.round(sec / 60)) });
   }
   const withEta = (tx, left) => left ? `${tx} · ${left}` : tx;
-  function fail(e) {
-    const c = e && e.code, m = (e && e.message) || String(e);
+  function fail(e, where) {
+    const c = e && e.code, m = (e && e.message) || String(e), S = (tx, cls) => setStatus(where || 'devStatus', tx, cls);
     if ((e && e.name === 'NotFoundError') || /cancel/i.test(m)) { S(t('No device picked.')); return; }
     S(c === 'nobt' ? t('Bluetooth works in the Hutka app and in Chrome on Android or a computer — not in this browser.')
       : /unable to find plugin|not implemented|no bridge/i.test(m) ? t('This version of the app has no Bluetooth yet — update the Hutka app.')
       : c === 'noperm' ? t('Hutka may not use Bluetooth yet — allow it: iPhone — Settings → Hutka → Bluetooth; Android — Settings → Apps → Hutka → Permissions → Nearby devices.')
       : c === 'btoff' ? t('Bluetooth is off — turn it on in the phone settings and try again.')
       : c === 'timeout' ? t('The device stopped answering — bring the phone closer and try again.')
+      : (c === 'lost' || /not connected|disconnected/i.test(m)) ? t('The connection dropped — come closer and try again.')
       : c === 'locked' ? t('The device memory is locked — enter its security code.')
       : c === 'corrupt' ? t('The device answers came back damaged ({e}) — try again, closer to the lap timer.', { e: m })
       : t('Could not read the device: {e}', { e: m }), 'warn');
   }
-  // ---- step 1: which device. The app scans and lists what is in the air (the driver's own devices first); a browser opens its chooser
-  async function choose(d) {
-    if (busy) return; await drop(); drv = d;
-    if (!LOGGERS.ble.kind()) { stage('devStage'); fail({ code: 'nobt' }); return; }
-    if (LOGGERS.ble.canScan()) { await startScan(); return; }
-    await connectPicked();
-  }
-  const fits = (name) => drv && (drv.namePrefixes.length ? drv.namePrefixes.some(p => (name || '').toLowerCase().startsWith(p.toLowerCase())) : (drv.looks ? drv.looks(name) : true));
+  // ---- the scan (the app): every lap timer in the air at once, the strongest first; other devices on request
   async function startScan() {
     seen = new Map(); showAll = false; stage('devScan'); renderScan();
-    try { scanning = true; $('devScanHint').textContent = t('Looking around… turn the lap timer on and put it in Bluetooth / connection mode.'); await LOGGERS.ble.scan((r) => { const o = seen.get(r.id) || { id: r.id, name: '', rssi: null, n: 0 }; if (r.name) o.name = r.name; if (r.rssi !== null) o.rssi = r.rssi; o.n++; o.at = Date.now(); seen.set(r.id, o); if (!renderScan.t) renderScan.t = setTimeout(() => { renderScan.t = null; renderScan(); }, 300); }); }
-    catch (e) { scanning = false; $('devScanHint').textContent = ''; stage('devStage'); fail(e); STORE.track('device_scan', { os: NATIVE.platform, err: String((e && (e.code || e.message)) || e).slice(0, 80) }); return; }
+    try { scanning = true; $('devScanHint').textContent = t('Looking for lap timers nearby…'); await LOGGERS.ble.scan((r) => { const o = seen.get(r.id) || { id: r.id, name: '', rssi: null, n: 0 }; if (r.name) o.name = r.name; if (r.rssi !== null) o.rssi = r.rssi; o.n++; o.at = Date.now(); seen.set(r.id, o); if (!renderScan.t) renderScan.t = setTimeout(() => { renderScan.t = null; renderScan(); }, 300); }); }
+    catch (e) { scanning = false; $('devScanHint').textContent = ''; stage('devStage'); fail(e); $('devRetry').hidden = false; STORE.track('device_scan', { os: NATIVE.platform, err: String((e && (e.code || e.message)) || e).slice(0, 80) }); return; }
     // what the scan found goes to the analytics (counts only): a phone that sees nothing is a bug to chase
-    clearTimeout(scanT); scanT = setTimeout(() => { if (scanning) { stopScan(); const all = [...seen.values()]; STORE.track('device_scan', { os: NATIVE.platform, found: all.length, named: all.filter(o => o.name).length, fit: all.filter(o => fits(o.name)).length }); $('devScanHint').textContent = seen.size ? t('Scan finished — tap the device, or scan again.') : t('Nothing in the air. Is the lap timer on and in Bluetooth mode? Scan again.'); } }, 20000);
+    clearTimeout(scanT); scanT = setTimeout(() => { if (scanning) { stopScan(); const all = [...seen.values()]; STORE.track('device_scan', { os: NATIVE.platform, found: all.length, named: all.filter(o => o.name).length, fit: all.filter(o => kindOf(o.name)).length }); $('devScanHint').textContent = all.some(o => kindOf(o.name)) ? t('Scan finished — tap your lap timer, or scan again.') : t('No lap timer found. Is it on and in Bluetooth mode? Scan again.'); } }, 20000);
   }
   async function stopScan() { scanning = false; clearTimeout(scanT); $('devRescan').hidden = false; try { await LOGGERS.ble.stopScan(); } catch (e) {} }
   function renderScan() {
     const box = $('devScanList'); box.innerHTML = '';
-    const all = [...seen.values()], named = all.filter(o => o.name), rows = (showAll ? all : named).sort((a, b) => (fits(b.name) ? 1 : 0) - (fits(a.name) ? 1 : 0) || (b.rssi || -999) - (a.rssi || -999));
+    const all = [...seen.values()], timers = all.filter(o => kindOf(o.name)), others = all.filter(o => !kindOf(o.name)), strong = (a, b) => (b.rssi || -999) - (a.rssi || -999);
+    const rows = timers.sort(strong).concat(showAll ? others.sort((a, b) => (b.name ? 1 : 0) - (a.name ? 1 : 0) || strong(a, b)) : []);
     for (const o of rows) {
-      const b = el('button', 'dev-item dev-found' + (fits(o.name) ? ' fit' : '')); b.type = 'button';
+      const k = kindOf(o.name), b = el('button', 'dev-item dev-found' + (k ? ' fit' : '')); b.type = 'button';
       const bars = o.rssi === null ? '' : (o.rssi > -60 ? '▂▄▆█' : o.rssi > -70 ? '▂▄▆' : o.rssi > -80 ? '▂▄' : '▂');
-      b.innerHTML = `<div><b>${esc(o.name || t('(no name)'))}</b><span class="hint">${esc((fits(o.name) ? (drv.sessions ? t('looks like an Alfano') : drv.name) + ' · ' : '') + (o.rssi === null ? '' : o.rssi + ' dBm '))}<span class="rssi">${bars}</span></span></div>`;
+      b.innerHTML = `<div><b>${esc(o.name || t('(no name)'))}</b><span class="hint">${esc((k ? kindLabel(k) + ' · ' : '') + (o.rssi === null ? '' : o.rssi + ' dBm '))}<span class="rssi">${bars}</span></span></div>`;
       b.onclick = () => connectScanned(o); box.appendChild(b);
     }
-    $('devScanMore').hidden = !(all.length > named.length); $('devScanMore').textContent = showAll ? t('Hide unnamed devices') : t('Show {n} unnamed device(s) too', { n: all.length - named.length });
+    $('devScanMore').hidden = !others.length; $('devScanMore').textContent = showAll ? t('Hide other devices') : t('Show {n} other device(s)', { n: others.length });
     $('devScanEmpty').hidden = rows.length > 0 || !scanning; $('devRescan').hidden = scanning;
   }
-  async function connectScanned(o) { await stopScan(); H = LOGGERS.ble.handle(o.id, o.name); await connectH(); }
-  async function connectPicked() { stage('devStage'); S(t('Pick the device in the list…')); try { H = await LOGGERS.ble.pick(drv); } catch (e) { fail(e); return; } await connectH(); }
+  // a device that is not a known lap timer goes the Alfano way: the explorer takes over if it does not answer like one
+  async function connectScanned(o) { await stopScan(); drv = kindOf(o.name) || LOGGERS.drivers.alfano; H = LOGGERS.ble.handle(o.id, o.name); await connectH(); }
+  async function connectPicked() {
+    setStatus('devPickNote', t('Pick the lap timer in the list…')); let h;
+    try { h = await LOGGERS.ble.pick(anyTimer()); } catch (e) { stage('devPick'); fail(e, 'devPickNote'); return; }
+    setStatus('devPickNote', ''); H = h; drv = kindOf(H.name) || LOGGERS.drivers.alfano; await connectH();
+  }
+  $('devFind').onclick = () => { if (!busy) connectPicked(); };
+  $('devRetry').onclick = () => { if (!busy) { $('devRetry').hidden = true; open(); } };
   // ---- step 2: connected — the RaceBox read, or the explorer
   async function connectH() {
     busy = true; stage('devStage'); $('devList').innerHTML = ''; $('devActs').hidden = true; $('devBar').hidden = true; $('devCodeRow').hidden = true;
     try {
       S(t('Connecting to {name}…', { name: H.name || drv.name }));
-      await LOGGERS.ble.connect(H, () => { if (busy || ex) S(t('The connection dropped — come closer and try again.'), 'warn'); busy = false; if (ex) { ex.live = false; renderExplore(); } dev = null; });
+      await LOGGERS.ble.connect(H, () => { if (busy || ex || (cur === 'devStage' && items.length)) S(t('The connection dropped — come closer and try again.'), 'warn'); busy = false; if (ex) { ex.live = false; renderExplore(); } dev = null; if (cur === 'devStage' && items.length) syncPick(); });
       if (drv.sessions) {
         S(t('Connected to {name} — signing in…', { name: H.name || drv.name }));
         try { dev = await drv.open(H); }
@@ -8565,7 +8663,7 @@ const DEVICE = (() => {
       }
       dev = await drv.open(H);
       await readAll();
-    } catch (e) { fail(e); busy = false; await drop(); STORE.track('device_fail', { os: NATIVE.platform, step: 'connect', err: String((e && (e.code || e.message)) || e).slice(0, 80) }); }
+    } catch (e) { fail(e); busy = false; await drop(); $('devRetry').hidden = false; STORE.track('device_fail', { os: NATIVE.platform, step: 'connect', err: String((e && (e.code || e.message)) || e).slice(0, 80) }); }
   }
   async function reconnect() { const h = H; try { await LOGGERS.ble.disconnect(h); } catch (e) {} h.subs = []; h.chrs = {}; h.lost = null; await new Promise(r => setTimeout(r, 400)); await LOGGERS.ble.connect(h, () => { if (ex) { ex.live = false; renderExplore(); } }); }
   // ---- a logger that keeps sessions (Alfano): the list from its memory, the chosen ones read and handed to the upload window as the app's own files
@@ -8592,37 +8690,82 @@ const DEVICE = (() => {
   function syncPick() {
     const cbs = [...$('devList').querySelectorAll('input[type=checkbox]')]; for (const c of cbs) c.closest('.dev-item').classList.toggle('on', c.checked);
     const n = cbs.filter(c => c.checked && !c.disabled).length, b = $('devImport');
+    if (drv && drv.sessions && !dev) { b.disabled = false; b.textContent = t('Connect again'); return; }
     b.disabled = !n; b.textContent = n ? tn(n, 'Upload {n} session', 'Upload {n} sessions').replace('{n}', n) : t('Tick a session to upload');
   }
   $('devList').addEventListener('change', syncPick);
+  // ---- the read: its own step of the window — one big bar over everything chosen (weighted by laps), the percent and the time left,
+  // what Hutka can do in turn while it reads; the list is out of reach meanwhile; when the last session is in, the next window opens by itself
+  const TIPS = [
+    ['i-lab', 'The gap, corner by corner', 'The Lab puts you next to the fastest driver on this layout in your kart class and shows where the time goes in every corner.'],
+    ['i-flag', 'Grades A–E', 'Every corner gets a grade for the entry, the apex and the exit — start with the lowest one.'],
+    ['i-track', 'Accel / decel', 'Switch the map to Accel / decel: green where you speed up, red where you slow down, yellow where you just roll.'],
+    ['i-spark', 'Ask the AI coach', '“Where do I lose the most?” — the answer names the corners, with numbers from your own laps.'],
+    ['i-play', 'Press play', 'Watch your lap against the reference: the karts run in real time, the faster one pulls ahead.'],
+    ['i-timer', 'Your ideal lap', 'Your fastest pass through every corner, stitched into one lap — the time you already have in you.'],
+    ['i-star', 'Bookmarks', 'Star a session or bookmark a corner with a note — next time it waits on the Lab start page.'],
+    ['i-clock', 'Since last time', 'Each new session on a layout says what changed since your previous one there: the lap, the corners, the kart.'],
+    ['i-speed', 'Kart rating', 'Hutka measures how the kart pulls on the main straight — a slow kart shows up as a mark out of 10, not as your fault.'],
+    ['i-users', 'Duel a friend', 'Open a friend’s page: your best laps on the tracks you share, and the corners where each of you is faster.']];
+  let tipI = 0, tipT = null, stopping = false;
+  function tipsBuild() {
+    const box = $('drTips'), dots = $('drDots'); box.innerHTML = ''; dots.innerHTML = '';
+    for (const [ic, h, tx] of TIPS) { const d = el('div', 'dr-tip'); d.innerHTML = `<span class="dr-ic"><svg><use href="#${ic}"/></svg></span><div><b>${esc(t(h))}</b><span>${esc(t(tx))}</span></div>`; box.appendChild(d); dots.appendChild(el('i')); }
+  }
+  function tipShow(i) { const n = TIPS.length; tipI = ((i % n) + n) % n; [...$('drTips').children].forEach((d, k) => d.classList.toggle('on', k === tipI)); [...$('drDots').children].forEach((d, k) => d.classList.toggle('on', k === tipI)); }
+  function tipsStart() { tipsBuild(); tipShow(Math.floor(Math.random() * TIPS.length)); clearInterval(tipT); tipT = setInterval(() => { if (!$('devModal').hidden) tipShow(tipI + 1); }, 6500); }
+  function tipsStop() { clearInterval(tipT); tipT = null; }
+  $('drTips').addEventListener('click', () => { tipShow(tipI + 1); if (tipT) { clearInterval(tipT); tipT = setInterval(() => { if (!$('devModal').hidden) tipShow(tipI + 1); }, 6500); } });
+  $('drTips').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('drTips').click(); } });
+  function readOpen(title) { stopping = false; S(''); $('devRead').classList.remove('done'); $('drTitle').textContent = title; $('drSub').textContent = ''; $('drLeft').textContent = t('working out the time left…'); readAt(0); stage('devRead'); tipsStart(); etaStart(); }
+  function readAt(frac) { const f = Math.max(0, Math.min(1, frac || 0)); $('drFill').style.width = (f * 100).toFixed(1) + '%'; $('drPct').textContent = Math.floor(f * 100) + '%'; }
+  // the time left over the whole read (all sessions), and the pill when the window is closed
+  function readTick(frac, sub) { readAt(frac); if (sub !== undefined) $('drSub').textContent = sub; const left = etaText(Math.round(frac * 1000), 1000); if (left) $('drLeft').textContent = left; pill(withEta(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct: Math.floor(frac * 100) }), left)); }
+  async function readDone(title, sub) { $('devRead').classList.add('done'); readAt(1); $('drTitle').textContent = title; $('drSub').textContent = sub; $('drLeft').textContent = ''; tipsStop(); pill(''); NATIVE.haptic('success'); await new Promise(r => setTimeout(r, 650)); }
+  // a read that broke: back to the list with the reason (the window comes back if it was closed — the driver has to see it)
+  function readFail(e) { tipsStop(); busy = false; pill(''); if (stopping) return; stage('devStage'); $('devActs').hidden = !items.length; if (items.length) syncPick(); $('devModal').hidden = false; fail(e); STORE.track('device_fail', { os: NATIVE.platform, step: 'read', err: String((e && (e.code || e.message)) || e).slice(0, 80) }); }
   async function importSessions() {
     const picked = [...$('devList').querySelectorAll('input:checked')].map(c => items[+c.dataset.i]).filter(o => o && o.ok);
     if (!picked.length) { S(t('Tick at least one session.'), 'warn'); return; }
-    busy = true; $('devActs').hidden = true; $('devKeep').hidden = false; const files = [];
+    busy = true; const files = [], name = H ? H.name : drv.name, d = dev;
+    const w = picked.map(o => Math.max(1, +o.laps || 1)), W = w.reduce((a, b) => a + b, 0);
+    readOpen(t('Reading {name}', { name }));
     try {
+      let before = 0;
       for (let k = 0; k < picked.length; k++) {
-        const o = picked[k]; bar(0, 1); etaStart();
-        const f = await dev.download(o, (p) => { bar(p.done, p.total); const pct = Math.min(100, Math.round(p.done / p.total * 100)), left = etaText(p.done, p.total); S(withEta(t('Session {k} of {n}: lap {lap} of {laps}… {pct}%', { k: k + 1, n: picked.length, lap: Math.min(p.lap, p.laps), laps: p.laps, pct }), left)); pill(withEta(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct }), left)); });
-        files.push(f);
+        const o = picked[k], head = (picked.length > 1 ? t('Session {k} of {n}', { k: k + 1, n: picked.length }) + ' · ' : '') + whenStr(o.date);
+        readTick(before / W, head);
+        if (dev !== d) throw Object.assign(new Error('connection lost'), { code: 'lost' });
+        const f = await d.download(o, (p) => { const part = p.total ? Math.min(1, p.done / p.total) : 0; readTick((before + w[k] * part) / W, head + ' · ' + t('lap {lap} of {laps}', { lap: Math.min(p.lap, p.laps), laps: p.laps })); });
+        files.push(f); before += w[k];
       }
     } catch (e) {
-      busy = false; $('devActs').hidden = false; $('devKeep').hidden = true; pill(''); fail(e);
+      readFail(e); if (stopping) return;
       // what the parser saw goes to Hutka by itself, so the next version reads this device right
-      if (e && e.diag && STORE.hasIdentity) { try { await STORE.deviceLog({ device: H ? H.name : drv.name, platform: LOGGERS.ble.kind(), kind: 'alfano-download', error: String(e.message || e), info: dev && dev.info, diag: e.diag, at: new Date().toISOString() }); S($('devStatus').textContent + ' — ' + t('diagnostics sent to Hutka, thank you.'), 'warn'); } catch (x) {} }
+      if (e && e.diag && STORE.hasIdentity) { try { await STORE.deviceLog({ device: name, platform: LOGGERS.ble.kind(), kind: 'alfano-download', error: String(e.message || e), info: dev && dev.info, diag: e.diag, at: new Date().toISOString() }); S($('devStatus').textContent + ' — ' + t('diagnostics sent to Hutka, thank you.'), 'warn'); } catch (x) {} }
       return;
     }
-    busy = false; $('devKeep').hidden = true; pill(''); STORE.track('device_import', { app: drv.id, n: files.length });
-    close(); await UPLOAD.withFiles(files);
+    STORE.track('device_import', { app: drv.id, n: files.length });
+    await readDone(tn(files.length, '{n} session read', '{n} sessions read').replace('{n}', files.length), t('Opening…'));
+    busy = false; stage('devStage'); $('devActs').hidden = false; syncPick(); close(); await UPLOAD.withFiles(files);
+  }
+  async function again() {
+    if (busy || !H) return; const h = H; $('devActs').hidden = true; $('devList').innerHTML = '';
+    // a frame torn by the drop may still sit in the lap timer's serial buffer: it lets go of it after a second of silence, so the first
+    // command of the new link waits that long
+    h.lost = null; try { await LOGGERS.ble.disconnect(h); } catch (e) {} h.subs = []; h.chrs = {}; await new Promise(r => setTimeout(r, 1300));
+    await connectH();
   }
   async function readAll() {
     let st = null; try { st = await dev.status(); } catch (e) {}
     if (st && st.secured && !st.unlocked) { $('devCodeRow').hidden = false; S(t('The device memory is locked — enter its security code.'), 'warn'); busy = false; return; }
-    if (st && st.recording) S(t('{name} is still recording — stop it (REC) and try again.', { name: H.name }), 'warn');
-    else S(st ? t('{name}: {n} records in memory ({p}% full) — reading…', { name: H.name, n: st.stored, p: st.level }) : t('Reading {name}…', { name: H.name }));
-    bar(0, 1); etaStart();
-    $('devKeep').hidden = false;
-    const outs = await dev.download((p) => { bar(p.done, p.total); const left = etaText(p.done, p.total); S(withEta(t('Reading the memory… {done} / {total}', { done: p.done, total: p.total }), left)); pill(withEta(t('Reading {name}: {pct}%', { name: H ? H.name : drv.name, pct: p.total ? Math.min(100, Math.round(p.done / p.total * 100)) : 0 }), left)); });
-    items = outs; busy = false; $('devBar').hidden = true; $('devKeep').hidden = true; pill(''); renderList();
+    readOpen(t('Reading {name}', { name: H.name }));
+    const sub = st && st.recording ? t('{name} is still recording — stop it (REC) and try again.', { name: H.name }) : (st ? t('{n} records in memory ({p}% full)', { n: st.stored, p: st.level }) : '');
+    let outs;
+    try { outs = await dev.download((p) => { readTick(p.total ? p.done / p.total : 0, sub); }); }
+    catch (e) { readFail(e); return; }
+    items = outs; await readDone(tn(outs.length, '{n} outing found', '{n} outings found').replace('{n}', outs.length), '');
+    busy = false; stage('devStage'); $('devBar').hidden = true; renderList();
   }
   async function unlock() { const code = $('devCode').value.trim(); if (!code || !dev || busy) return; busy = true; try { await dev.unlock(code); $('devCodeRow').hidden = true; await readAll(); } catch (e) { busy = false; fail(e); } }
   function renderList() {
@@ -8637,7 +8780,7 @@ const DEVICE = (() => {
     $('devActs').hidden = false; $('devImport').hidden = false; $('devErase').hidden = !(dev && dev.erase); syncPick();
   }
   async function importSel() {
-    if (dev && dev.kind === 'sessions') return importSessions();
+    if (drv && drv.sessions) return dev ? importSessions() : again();
     const files = [...$('devList').querySelectorAll('input:checked')].map(c => items[+c.dataset.i].file);
     if (!files.length) { S(t('Tick at least one outing.'), 'warn'); return; }
     STORE.track('device_import', { app: drv.id, n: files.length });
@@ -8690,16 +8833,17 @@ const DEVICE = (() => {
   $('devSendLog').onclick = sendLog; $('devExDisc').onclick = disconnect;
   // ‹ — one step back: the scan → the kinds; the explorer → disconnected; the device → another device (a read in progress is stopped only after a yes)
   async function back() {
-    if (cur === 'devKinds') { close(); return; }
+    if (!cur || cur === first() || cur === 'devPick') { close(); return; }
     if (cur === 'devScan') { await stopScan(); open(); return; }
     if (cur === 'devExplore') { await disconnect(); return; }
     if (busy && !(await confirmDlg(t('Stop reading the lap timer?'), t('What has been read so far is not kept — the sessions stay on the lap timer.'), t('Stop reading')))) return;
+    if (busy) stopping = true; tipsStop();
     if (busy && dev && dev.cancel) { try { await dev.cancel(); } catch (e) {} }
-    busy = false; pill(''); $('devKeep').hidden = true; await drop(); open();
+    busy = false; pill(''); await drop(); open();
   }
   $('devBack').onclick = back; $('devModal')._back = back;   // the header's ‹ and the phone's back button
   $('devModal').addEventListener('click', (e) => { if (e.target === $('devModal')) close(); });
-  $('uplFromDevice').onclick = () => { UPLOAD.close(); open(); };
+  $('uplFromDevice').onclick = () => { UPLOAD.close(); open({ auto: true }); };
   addEventListener('pagehide', () => { drop(); });
   return { open, close };
 })();
