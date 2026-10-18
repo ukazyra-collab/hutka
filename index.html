@@ -227,7 +227,7 @@ td .gr,.crow .gr{margin-right:5px}.insp-head .gr{margin-left:6px;font-size:11px;
 .auth-col{display:flex;flex-direction:column;gap:10px}.btn.auth-btn{display:flex;align-items:center;justify-content:center;gap:10px;height:50px;font-size:15.5px;font-weight:600;border-radius:13px;width:100%;padding:0 16px}.auth-btn .auth-ic{width:20px;height:20px;flex:none;display:block}
 .btn.auth-btn.apple{background:#000;color:#fff;border-color:#000}.btn.auth-btn.apple:hover{background:#111}.auth-btn .apple-glyph{font:22px/1 -apple-system,"SF Pro Display","Helvetica Neue",sans-serif;height:auto;width:auto;margin-top:-3px}
 .btn.auth-btn.google{background:#fff;color:#1f1f1f;border-color:#dadce0}.btn.auth-btn.google:hover{background:#f6f7f9}
-.auth-email{display:flex;flex-direction:column;gap:10px;padding-top:12px;border-top:1px solid var(--line)}.auth-foot{justify-content:center}
+.auth-email{display:flex;flex-direction:column;gap:10px;padding-top:12px;border-top:1px solid var(--line)}input.otp{font:700 26px/1 var(--mono);letter-spacing:.35em;text-align:center;padding:12px 10px;height:auto}.auth-foot{justify-content:center}
 .modal.auth.gate{background:var(--bg);padding:0}.modal.auth.gate .box.auth-box{box-shadow:none;border:0;border-radius:0;width:100%;max-width:440px;min-height:100%;justify-content:center;padding:max(24px,var(--sa-top,0px)) 24px max(24px,var(--sa-bottom,0px))}.modal.auth.gate .auth-foot{display:none}
 html.native .modal.auth.gate .box.auth-box{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:0}
 /* the app's opening: a full-screen overlay over everything, the mark in the middle (where the native splash left it), the lap under it */
@@ -1726,9 +1726,9 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div class="auth-email" id="authEmailBox" hidden>
     <div class="field"><label>Email</label><input type="text" id="authEmail" placeholder="you@example.com" autocomplete="email"></div>
     <div class="field" id="authPassField" hidden><label data-t="Password">Password</label><input type="password" id="authPass" autocomplete="current-password"></div>
-    <div class="field" id="authCodeField" hidden><label data-t="Code from the e-mail">Code from the e-mail</label><input type="text" id="authCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456"></div>
-    <div class="row"><button class="btn primary" id="authEmailBtn" type="button" data-t="Email me a link">Email me a link</button><button class="btn primary" id="authCodeBtn" type="button" hidden data-t="Confirm code">Confirm code</button><button class="btn primary" id="authPassBtn" type="button" hidden data-t="Sign in">Sign in</button><button class="btn xs ghost" id="authPassToggle" type="button" data-t="I have a password">I have a password</button></div>
-    <div class="hint" id="authEmailHint" data-t="No password needed: we e-mail you a link and a 6-digit code.">No password needed: we e-mail you a link and a 6-digit code.</div>
+    <div class="field" id="authCodeField" hidden><label data-t="Code from the e-mail">Code from the e-mail</label><input type="text" id="authCode" class="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="······"></div>
+    <div class="row"><button class="btn primary" id="authEmailBtn" type="button" data-t="Email me a code">Email me a code</button><button class="btn primary" id="authCodeBtn" type="button" hidden data-t="Confirm code">Confirm code</button><button class="btn primary" id="authPassBtn" type="button" hidden data-t="Sign in">Sign in</button><button class="btn xs ghost" id="authPassToggle" type="button" data-t="I have a password">I have a password</button></div>
+    <div class="hint" id="authEmailHint" data-t="No password needed: we e-mail you a 6-digit code.">No password needed: we e-mail you a 6-digit code.</div>
   </div>
   <div id="authCaptcha" class="captcha" hidden></div>
   <div class="status" id="authStatus"></div>
@@ -4466,6 +4466,11 @@ Object.assign(I18N.RU, { '{p}% of the lap runs away from the “{layout}” line
   'This session was driven on another configuration of the track — comparisons are off until its layout is right (Edit).': 'Эта сессия проехана по другой конфигурации трассы — сравнения выключены, пока конфигурация не исправлена (Edit).',
   'another configuration — not comparable': 'другая конфигурация — не сравнить' });
 Object.assign(I18N.RU, { 'Colour the lap by what the kart is doing: accelerating, decelerating, coasting': 'Раскрасить круг по тому, что делает карт: разгон, замедление, накат' });
+// v34.21 — the sign-in code
+Object.assign(I18N.RU, { 'Email me a code': 'Прислать код на почту', 'Email me a code instead': 'Лучше код на почту', 'No password needed: we e-mail you a 6-digit code.': 'Пароль не нужен: пришлём на почту 6-значный код.',
+  'We sent a 6-digit code to {email}. Type it here — no need to open anything in the e-mail.': 'Отправили 6-значный код на {email}. Введи его здесь — в письме ничего открывать не нужно.',
+  'We sent a 6-digit code to {email}. Type it here (on this device the button in the e-mail works too).': 'Отправили 6-значный код на {email}. Введи его здесь (на этом устройстве сработает и кнопка в письме).',
+  'Could not send the code: {e}': 'Не получилось отправить код: {e}' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -6163,19 +6168,19 @@ const AUTH = {
     const providers = apple || google; $('authEmailOpen').hidden = !providers; $('authEmailBox').hidden = providers; $('authCol').hidden = !providers;
     $('authModal').classList.toggle('gate', gate); AUTH.gated = gate; $('authModal').hidden = false; if (!NATIVE.on && !providers) $('authEmail').focus(); },
   email() { $('authEmailBox').hidden = false; $('authEmailOpen').hidden = true; $('authEmail').focus(); },
-  pass(on) { $('authPassField').hidden = !on; $('authPassBtn').hidden = !on; $('authEmailBtn').hidden = !!on; $('authPassToggle').textContent = on ? t('Email me a link instead') : t('I have a password'); $('authEmailHint').hidden = !!on; if (on) $('authPass').focus(); },
+  pass(on) { $('authPassField').hidden = !on; $('authPassBtn').hidden = !on; $('authEmailBtn').hidden = !!on; $('authPassToggle').textContent = on ? t('Email me a code instead') : t('I have a password'); $('authEmailHint').hidden = !!on; if (on) $('authPass').focus(); },
   close() { if (AUTH.gated) return; $('authModal').hidden = true; },
   // the app asks for a sign-in before anything else: a library, publishing and comparisons all need an account
   gate() { if (NATIVE.on && STORE.hasAuth && !STORE.hasIdentity) AUTH.open({ gate: true }); }
 };
 $('authEmailOpen').onclick = () => AUTH.email();
 $('btnSignIn').onclick = () => AUTH.open(); $('authCancel').onclick = AUTH.close; $('authModal').addEventListener('click', (e) => { if (e.target === $('authModal')) AUTH.close(); });
-$('authEmailBtn').onclick = async () => { const email = $('authEmail').value.trim(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setStatus('authStatus', t('Enter a valid email.'), 'warn'); return; } $('authEmailBtn').disabled = true; try { await STORE.adapter.signInEmail(email, await CAPTCHA.token()); setStatus('authStatus', NATIVE.on ? t('Check your inbox: type the 6-digit code from the e-mail here (or tap the link in it).') : t('Check your inbox: open the link in the email, or type the 6-digit code from it here.'), 'ok'); $('authCodeField').hidden = false; $('authCodeBtn').hidden = false; $('authEmailBtn').hidden = true; $('authCode').focus(); } catch (e) { setStatus('authStatus', t('Could not send the link: {e}', { e: e && e.message || e }), 'warn'); } $('authEmailBtn').disabled = false; };
+$('authEmailBtn').onclick = async () => { const email = $('authEmail').value.trim(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setStatus('authStatus', t('Enter a valid email.'), 'warn'); return; } $('authEmailBtn').disabled = true; try { await STORE.adapter.signInEmail(email, await CAPTCHA.token()); setStatus('authStatus', NATIVE.on ? t('We sent a 6-digit code to {email}. Type it here — no need to open anything in the e-mail.', { email }) : t('We sent a 6-digit code to {email}. Type it here (on this device the button in the e-mail works too).', { email }), 'ok'); $('authCodeField').hidden = false; $('authCodeBtn').hidden = false; $('authEmailBtn').hidden = true; $('authEmailHint').hidden = true; $('authCode').focus(); } catch (e) { setStatus('authStatus', t('Could not send the code: {e}', { e: e && e.message || e }), 'warn'); } $('authEmailBtn').disabled = false; };
 $('authGoogleBtn').onclick = async () => { try { await STORE.adapter.signInGoogle(); } catch (e) { setStatus('authStatus', t('Could not start Google sign-in: {e}', { e: e && e.message || e }), 'warn'); } };
 $('authAppleBtn').onclick = async () => { try { await STORE.adapter.signInApple(); } catch (e) { setStatus('authStatus', t('Could not start Apple sign-in: {e}', { e: e && e.message || e }), 'warn'); } };
 $('authPassToggle').onclick = () => AUTH.pass($('authPassField').hidden);
 $('authCodeBtn').onclick = async () => { const email = $('authEmail').value.trim(), code = $('authCode').value.replace(/\D/g, ''); if (code.length < 6) { setStatus('authStatus', t('Enter the 6-digit code from the e-mail.'), 'warn'); return; } $('authCodeBtn').disabled = true; try { await STORE.adapter.verifyEmailCode(email, code); AUTH.gated = false; AUTH.close(); NATIVE.haptic('success'); } catch (e) { NATIVE.haptic('error'); setStatus('authStatus', t('That code did not work — check the digits, or ask for a new e-mail.'), 'warn'); } $('authCodeBtn').disabled = false; };
-$('authCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authCodeBtn').click(); });
+$('authCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authCodeBtn').click(); }); $('authCode').addEventListener('input', () => { if ($('authCode').value.replace(/\D/g, '').length === 6 && !$('authCodeBtn').disabled) $('authCodeBtn').click(); });   // the sixth digit (or a pasted code) confirms by itself
 $('authPassBtn').onclick = async () => { const email = $('authEmail').value.trim(), pass = $('authPass').value; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !pass) { setStatus('authStatus', t('Enter the email and the password.'), 'warn'); return; } $('authPassBtn').disabled = true; try { await STORE.adapter.signInPassword(email, pass, await CAPTCHA.token()); AUTH.gated = false; AUTH.close(); } catch (e) { setStatus('authStatus', t('Could not sign in: {e}', { e: e && e.message || e }), 'warn'); } $('authPassBtn').disabled = false; };
 $('authPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authPassBtn').click(); });
 $('authEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('authEmailBtn').click(); });
@@ -6212,7 +6217,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.20';
+const APP_VERSION = 'v34.21';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();

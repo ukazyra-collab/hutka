@@ -6,7 +6,7 @@
 
 | Шаблон в Supabase | Файл | Subject |
 |---|---|---|
-| Magic Link | `magic-link.html` | `Your sign-in link to Hutka · Вход в Hutka` |
+| Magic Link | `magic-link.html` | `Your Hutka code · Код для входа в Hutka` |
 | Confirm signup | `confirm-signup.html` | `Confirm your email for Hutka · Подтверди почту` |
 | Change Email Address | `email-change.html` | `Confirm your new email for Hutka` |
 | Reset Password | `recovery.html` | `Reset your Hutka password` |

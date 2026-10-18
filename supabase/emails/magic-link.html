@@ -1,17 +1,16 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Your sign-in link to Hutka</title></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Your Hutka code</title></head>
 <body style="margin:0;padding:0;background:#f3f4f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1a2237">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f4f7;padding:28px 12px"><tr><td align="center">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;background:#ffffff;border:1px solid #e3e6ec;border-radius:16px;overflow:hidden">
   <tr><td style="padding:26px 28px 6px 28px"><img src="https://hutka.ai/logo.png" width="96" height="72" alt="Hutka" style="display:block;width:96px;height:auto;border:0"></td></tr>
-  <tr><td style="padding:10px 28px 0 28px;font-size:22px;font-weight:700;letter-spacing:-.01em">Sign in to Hutka</td></tr>
-  <tr><td style="padding:10px 28px 0 28px;font-size:15px;line-height:1.55;color:#3b4660">Tap the button and you are in — no password needed. The link works once and for one hour.</td></tr>
-  <tr><td style="padding:22px 28px 6px 28px"><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#1f2b48;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;padding:13px 22px;border-radius:12px">Sign in</a></td></tr>
-  <tr><td style="padding:18px 28px 0 28px;font-size:15px;line-height:1.55;color:#3b4660">In the Hutka app, or if the link opens somewhere else: type this code instead</td></tr>
-  <tr><td style="padding:8px 28px 0 28px"><span style="display:inline-block;font-family:Menlo,Consolas,monospace;font-size:28px;font-weight:700;letter-spacing:.18em;color:#1a2237;background:#f3f4f7;border:1px solid #e3e6ec;border-radius:12px;padding:10px 16px">{{ .Token }}</span></td></tr>
-  <tr><td style="padding:14px 28px 0 28px;font-size:13px;line-height:1.55;color:#5f6b84">If you did not ask for this email, ignore it: nobody can sign in without the link or the code.</td></tr>
-  <tr><td style="padding:22px 28px 0 28px;border-top:1px solid #e3e6ec;margin-top:12px"></td></tr>
-  <tr><td style="padding:8px 28px 0 28px;font-size:13px;line-height:1.55;color:#5f6b84"><b style="color:#1a2237">Вход в Hutka</b><br>Нажми кнопку — и ты в системе, без пароля. Ссылка работает один раз в течение часа. В приложении Hutka вместо ссылки введи код: <b style="color:#1a2237;font-family:Menlo,Consolas,monospace">{{ .Token }}</b><br><a href="{{ .ConfirmationURL }}" style="color:#2f6bf0">Войти</a></td></tr>
+  <tr><td style="padding:10px 28px 0 28px;font-size:22px;font-weight:700;letter-spacing:-.01em">Your sign-in code</td></tr>
+  <tr><td style="padding:8px 28px 0 28px;font-size:15px;line-height:1.55;color:#3b4660">Type this code in Hutka — in the app or on the site where you asked for it. It works once, for one hour.</td></tr>
+  <tr><td align="center" style="padding:22px 28px 6px 28px"><span style="display:inline-block;font-family:Menlo,Consolas,monospace;font-size:40px;font-weight:700;letter-spacing:.22em;color:#1a2237;background:#f3f4f7;border:1px solid #e3e6ec;border-radius:14px;padding:14px 22px">{{ .Token }}</span></td></tr>
+  <tr><td style="padding:22px 28px 0 28px;border-top:1px solid #e3e6ec"></td></tr>
+  <tr><td style="padding:0 28px 0 28px;font-size:13px;line-height:1.55;color:#5f6b84">Reading this on the same computer or phone where Hutka is open in a browser? You can also <a href="{{ .ConfirmationURL }}" style="color:#2f6bf0">sign in with one tap</a>. In the Hutka app, use the code.</td></tr>
+  <tr><td style="padding:16px 28px 0 28px;font-size:13px;line-height:1.55;color:#5f6b84"><b style="color:#1a2237">Код для входа в Hutka:</b> <b style="color:#1a2237;font-family:Menlo,Consolas,monospace;font-size:15px;letter-spacing:.12em">{{ .Token }}</b><br>Введи его в Hutka — в приложении или на сайте, где запрашивал. Код работает один раз в течение часа. Если читаешь письмо там же, где открыт сайт, можно <a href="{{ .ConfirmationURL }}" style="color:#2f6bf0">войти в одно касание</a>.</td></tr>
+  <tr><td style="padding:14px 28px 0 28px;font-size:13px;line-height:1.55;color:#5f6b84">If you did not ask for this email, ignore it: nobody can sign in without the code.</td></tr>
   <tr><td style="padding:22px 28px 26px 28px;font-size:12px;line-height:1.5;color:#98a1b3">You received this email because someone entered {{ .Email }} on hutka.ai.<br>Hutka · <a href="https://hutka.ai" style="color:#98a1b3">hutka.ai</a> · <a href="https://hutka.ai/privacy.html" style="color:#98a1b3">Privacy</a></td></tr>
 </table>
 </td></tr></table>
