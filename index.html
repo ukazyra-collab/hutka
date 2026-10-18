@@ -68,6 +68,8 @@
   }
 }
 :root[data-theme="dark"] .brand{color:#e8ebf3}
+:root[data-theme="dark"] .pill.ok,:root[data-theme="dark"] .dev-item .dev-in{color:#0f1420}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill.ok,:root:not([data-theme="light"]) .dev-item .dev-in{color:#0f1420}}
 :root[data-theme="dark"]{
   --bg:#0f1420; --surface:#161c2a; --surface-2:#1c2333; --surface-3:#232b3d; --line:#273043; --line-2:#3a4560;
   --fg:#e8ebf3; --muted:#9aa4ba; --faint:#6b7590;
@@ -152,7 +154,7 @@ p{margin:0}
 .lab-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:2px}
 .lab-tabs::-webkit-scrollbar{display:none}
 .lab-tabs button{flex:1 0 auto;border:1px solid var(--line-2);background:var(--surface);border-radius:999px;padding:8px 14px;font:600 13px var(--body);color:var(--muted);cursor:pointer;white-space:nowrap}
-.lab-tabs button.active{background:var(--btn);border-color:var(--btn);color:#fff}
+.lab-tabs button.active{background:var(--btn);border-color:var(--btn);color:var(--btn-ink)}
 .crows{display:flex;flex-direction:column;gap:6px}
 .crow{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:4px 10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-align:left;font:inherit;color:var(--fg);cursor:pointer}
 .crow.sel{border-color:var(--accent);background:var(--accent-soft)}
@@ -294,6 +296,22 @@ html.native .modal.auth.gate .box.auth-box{background:var(--bg);backdrop-filter:
 .tbl td{padding:8px 8px;border-bottom:1px solid var(--line);font-size:13px;white-space:nowrap}
 .tbl tr:hover td{background:var(--surface-2)}
 .tbl td.num{font-family:var(--mono);font-size:12.5px}
+.tbl .sess-acts{gap:6px;min-width:172px}
+/* My sessions on a tablet or a narrow window (the sidebar takes its share): a card per session, four values to a line, not a table that scrolls sideways */
+@media (min-width:701px) and (max-width:1100px){
+  .tbl.mine{display:block}
+  .tbl.mine thead{display:none}
+  .tbl.mine tbody{display:block}
+  .tbl.mine tr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 14px;padding:12px 2px;border-bottom:1px solid var(--line)}
+  .tbl.mine tr:hover td{background:none}
+  .tbl.mine td{display:block;border:0;padding:0;white-space:normal;min-width:0!important;font-size:13.5px}
+  .tbl.mine td::before{content:attr(data-label);display:block;font-family:var(--body);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .tbl.mine td:first-child{grid-column:1 / 3}
+  .tbl.mine td:nth-child(2){grid-column:3 / -1}
+  .tbl.mine td:last-child{grid-column:1 / -1;padding-top:4px}
+  .tbl.mine td:last-child::before{display:none}
+  .tbl.mine .sess-acts{min-width:0}
+}
 .tbl td.txt{white-space:normal;min-width:220px}
 .tbl td.b{color:var(--brake);font-weight:600}.tbl td.g{color:var(--throttle)}.tbl td.y{color:var(--lift)}
 .tbl td.loss{color:var(--brake);font-weight:600}.tbl td.gain{color:var(--throttle);font-weight:600}.tbl td.m{color:var(--muted)}
@@ -646,7 +664,8 @@ body.onboarding #toast{z-index:90}
 .layout-card .meta{white-space:normal}
 .btn.busy{position:relative;color:transparent!important;pointer-events:none}
 .btn.busy::after{content:"";position:absolute;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite;color:var(--muted);left:calc(50% - 7px);top:calc(50% - 7px)}
-.btn.primary.busy::after{color:#fff}
+.btn.primary.busy::after{color:var(--btn-ink)}
+.btn.cta.busy::after{color:var(--accent-ink)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .skel{position:relative;overflow:hidden;background:var(--surface-2);border-radius:10px;min-height:14px}
 .skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--fg) 6%,transparent),transparent);animation:shimmer 1.2s infinite}
@@ -827,7 +846,7 @@ body.onboarding #toast{z-index:90}
 .hcard h2{margin-bottom:4px}
 .hstep{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:12px 24px;align-items:start;padding:16px 0;border-top:1px solid var(--line)}
 .hstep .tx{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
-.hstep .n{grid-row:1/3;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+.hstep .n{grid-row:1/3;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:14px}
 .hstep h3{font-size:16px;font-weight:700}
 .hstep p{grid-column:2;color:var(--fg);line-height:1.55;font-size:14px}
 .hstep .pic img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:var(--surface-2)}
@@ -884,8 +903,8 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .tabbar svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .tabbar a.active{color:var(--accent)}
   .tabbar a.active svg{stroke-width:2.2}
-  .tabbar .up .circ{display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:var(--btn);color:#fff;margin-top:-22px;box-shadow:0 6px 16px rgba(20,30,60,.25);border:3px solid var(--bg)}
-  .tabbar .up .circ svg{stroke:#fff;width:24px;height:24px}
+  .tabbar .up .circ{display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:var(--btn);color:var(--btn-ink);margin-top:-22px;box-shadow:0 6px 16px rgba(20,30,60,.25);border:3px solid var(--bg)}
+  .tabbar .up .circ svg{stroke:currentColor;width:24px;height:24px}
   .tabbar .up{color:var(--fg)}
   .home-hero{padding:16px}
   .home-hero h1{font-size:24px}
@@ -968,12 +987,13 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .tbl.resp tr{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px;padding:10px 2px;border-bottom:1px solid var(--line)}
   .tbl.resp tr:hover td{background:none}
   .tbl.resp td{display:block;border:0;padding:0;white-space:normal;min-width:0;font-size:13.5px}
-  .tbl.resp td::before{content:attr(data-label);display:block;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .tbl.resp td::before{content:attr(data-label);display:block;font-family:var(--body);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
   .tbl.resp td.num{font-size:14px}
   .tbl.resp td:first-child{grid-column:1 / -1}
   .tbl.resp td:last-child{grid-column:1 / -1;padding-top:4px}
   .tbl.resp td:last-child::before,.tbl.resp td.noLbl::before{display:none}
   .tbl.resp td .row{flex-wrap:wrap}
+  .tbl.resp .sess-acts{min-width:0}
 }
 /* the native app shell: the status bar is native, the page starts right under it */
 html.native .top{padding-top:max(8px,var(--sa-top))}
@@ -997,7 +1017,7 @@ body.cockpit.ck-tools #hero .map-bar{display:flex}
 body.cockpit #hero .map-bar .btn{height:30px;padding:0 9px;font-size:12px;background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.16);flex:none}
 body.cockpit #hero .map-bar .seg,body.cockpit .align-bar .seg{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16)}   /* the button groups keep the light theme's white box otherwise: white text on white */
 body.cockpit #hero .map-bar .seg .btn,body.cockpit .align-bar .seg .btn{border-right-color:rgba(255,255,255,.16)}
-body.cockpit #hero .map-bar .btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+body.cockpit #hero .map-bar .btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 body.cockpit #hero .map-bar #btnFull,body.cockpit #hero .map-bar #tglTiles{display:none}
 body.cockpit .align-bar{position:absolute;left:var(--sl);right:calc(var(--sr) + 48px);top:calc(var(--st) + 62px);z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);color:#fff;backdrop-filter:blur(10px);font-size:12px}
 body.cockpit .align-bar .hint{color:rgba(255,255,255,.8)}
@@ -1013,7 +1033,7 @@ body.cockpit #chDataRpm{display:none}
 body.cockpit .ck-hud{display:flex;position:absolute;left:var(--sl);top:var(--st);align-items:flex-start;gap:8px;z-index:4;max-width:calc(100% - var(--sl) - var(--sr) - 48px)}
 .ck-rb{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(10,14,24,.7);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;font:600 22px/1 var(--body);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25);padding:0;flex:none;-webkit-tap-highlight-color:transparent}
 .ck-rb svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.ck-rb.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.ck-rb.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .ck-rb[hidden]{display:none}
 .ck-panel{background:rgba(10,14,24,.7);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:5px 10px;color:#fff;display:grid;grid-template-columns:12px minmax(40px,1fr) auto auto auto auto;gap:3px 9px;align-items:baseline;min-width:0;box-shadow:0 2px 10px rgba(0,0,0,.25);font:11px/1.25 var(--mono);white-space:nowrap;cursor:pointer}
 .ck-panel.eng{grid-template-columns:12px minmax(40px,1fr) auto auto auto auto auto}
@@ -1148,8 +1168,8 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .dr-dots i.on{width:16px;border-radius:3px;background:var(--accent)}
 .dr-keep{font-size:12.5px;margin-top:2px}
 @media (prefers-reduced-motion:reduce){.dr-bar > div::after{animation:none;display:none}.dr-tip{transition:none}}
-.dev-pill{position:fixed;left:50%;bottom:calc(24px + var(--sa-bottom));transform:translateX(-50%);z-index:89;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:0;border-radius:999px;background:var(--accent);color:#fff;font:inherit;font-size:13px;font-weight:600;box-shadow:var(--shadow);cursor:pointer;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dev-pill::before{content:'';width:8px;height:8px;border-radius:50%;background:#fff;animation:scanpulse 1.2s ease-in-out infinite;flex:none}
+.dev-pill{position:fixed;left:50%;bottom:calc(24px + var(--sa-bottom));transform:translateX(-50%);z-index:89;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:0;border-radius:999px;background:var(--accent);color:var(--accent-ink);font:inherit;font-size:13px;font-weight:600;box-shadow:var(--shadow);cursor:pointer;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dev-pill::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;animation:scanpulse 1.2s ease-in-out infinite;flex:none}
 /* on a phone the pill sits above the tab bar and its raised Upload button (the rule comes after the base one, so it wins) */
 @media (max-width:700px), (max-height:520px) and (orientation:landscape) and (pointer:coarse){.dev-pill{bottom:calc(100px + var(--sa-bottom))}}
 /* the narrowest phones: the Lab's bar keeps the lap time — Compare and Map lose their words; the tab labels shrink to fit Russian */
@@ -1191,6 +1211,9 @@ h2 .h2act{margin-left:auto;font-weight:500}
 /* ---------- the bell (Activity), the Activity list, the push question ---------- */
 .bell{position:relative;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;color:var(--muted);flex:none;text-decoration:none}
 .bell svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.top .bugtop{display:none;border:0;background:none;padding:0;cursor:pointer;font:inherit}
+.top .bugtop svg{width:20px;height:20px}
+@media (max-width:900px){.top .bugtop{display:grid;width:34px}.bugbtn{display:none}}
 .bell:hover{background:var(--surface-2);color:var(--fg)}
 .bell.has{color:var(--fg)}
 .bell .n{position:absolute;top:4px;right:2px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--danger);color:#fff;font:700 10.5px/17px var(--body);text-align:center;border:2px solid var(--bg)}
@@ -1238,7 +1261,7 @@ html.native .side{background:var(--glass);-webkit-backdrop-filter:blur(26px) sat
   html.native .tabbar a,html.native .tabbar button{padding:6px 0;border-radius:22px;transition:background .18s,transform .18s,color .18s}
   html.native .tabbar a.active{background:color-mix(in srgb,var(--accent) 14%,transparent)}
   html.native .tabbar a:active,html.native .tabbar button:active{transform:scale(.92)}
-  html.native .tabbar .up .circ{margin-top:-26px;width:54px;height:54px;border:3px solid var(--glass-line);box-shadow:0 8px 18px rgba(20,30,60,.32);background:linear-gradient(180deg,#2c3a5e,#1b2540)}
+  html.native .tabbar .up .circ{margin-top:-26px;width:54px;height:54px;border:3px solid var(--glass-line);box-shadow:0 8px 18px rgba(20,30,60,.32);background:linear-gradient(180deg,#2c3a5e,#1b2540);color:#fff}
   html.native .page{padding-bottom:calc(106px + var(--sa-bottom))}
   html.native .hero .inspector,html.native #pickbar.open{left:8px;right:8px;bottom:calc(76px + var(--sa-bottom));border-radius:22px;background:var(--glass-strong);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid var(--glass-edge);box-shadow:var(--glass-shadow)}
   html.native .toast{bottom:calc(90px + var(--sa-bottom))}
@@ -1376,20 +1399,22 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       <a href="#admin" data-route="admin" id="navAdmin" hidden><svg><use href="#i-shield"/></svg><span data-t="Admin Panel">Admin Panel</span></a>
     </nav>
     <div class="side-foot">
-      <div class="lang" role="group" aria-label="Language"><button type="button" id="langEn" class="active">EN</button><button type="button" id="langRu">RU</button></div>
+      <div class="lang" role="group" aria-label="Language" data-ta="Language"><button type="button" id="langEn" class="active">EN</button><button type="button" id="langRu">RU</button></div>
       <div class="hint" id="modeNote"></div>
     </div>
   </aside>
   <div class="main">
     <header class="top" id="top">
-      <a class="brand mobile" href="#home" aria-label="Hutka"><img class="mark" src="logo.png?v=2" alt="" width="220" height="164"></a>
+      <a class="brand mobile" href="#home" aria-label="Hutka" data-ta="Hutka"><img class="mark" src="logo.png?v=2" alt="" width="220" height="164"></a>
       <div class="search">
         <svg><use href="#i-search"/></svg>
         <input type="text" id="q" placeholder="Search tracks, drivers..." autocomplete="off">
         <div class="search-drop" id="qDrop" hidden></div>
       </div>
       
-      <a class="bell" href="#activity" id="bell" aria-label="Activity" hidden><svg><use href="#i-bell"/></svg><span class="n" id="bellN" hidden></span></a>
+      <!-- on a phone the bug report sits up here: the floating button would cover the text people read -->
+      <button class="bell bugtop" id="bugTop" type="button" title="Report a problem" aria-label="Report a problem" data-ta="Report a problem"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2l1.9 1.9M16 2l-1.9 1.9M9 7h6a3 3 0 0 1 3 3v5a6 6 0 0 1-12 0v-5a3 3 0 0 1 3-3zM3 13h3M18 13h3M4 20l3-2M20 20l-3-2M12 10v10"/></svg></button>
+      <a class="bell" href="#activity" id="bell" aria-label="Activity" data-ta="Activity" hidden><svg><use href="#i-bell"/></svg><span class="n" id="bellN" hidden></span></a>
       <a class="userchip" href="#profile" id="userChip"><img alt="" id="chipAvatar"><div><div class="nm" id="chipName">—</div><div class="sub" id="chipSub"></div></div></a>
       <button class="btn primary" id="btnSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button>
     </header>
@@ -1516,8 +1541,8 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
         <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><div class="row" style="margin-top:10px"><button class="btn primary" id="labUpload2" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#help"><span data-t="How to get the file — step by step">How to get the file — step by step</span></a></div></div>
       </div>
-      <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button" aria-label="Compare"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button" aria-label="Map"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
-      <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close">×</button></div>
+      <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back" data-ta="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner" data-ta="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner" data-ta="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" data-ta="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button" aria-label="Compare" data-ta="Compare"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button" aria-label="Map" data-ta="Map"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
+      <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close" data-ta="Close">×</button></div>
       <!-- a session just uploaded (a private draft): the layout when it was not recognised for sure, the session type and the result
            (for the feed), publish or keep private — everything else is already filled in -->
       <div class="card finish" id="finishCard" hidden>
@@ -1533,14 +1558,14 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
         </div>
         <div class="fin-sec">
           <div class="fin-lbl"><span data-t="Your place">Your place</span> <span class="hint" data-t="(optional)">(optional)</span></div>
-          <div class="fin-res"><b>P</b><input type="number" id="finPos" min="1" max="500" inputmode="numeric" aria-label="Place"><span data-t="of">of</span><input type="number" id="finDrivers" min="1" max="500" inputmode="numeric" aria-label="Drivers"><span data-t="drivers">drivers</span></div>
+          <div class="fin-res"><b>P</b><input type="number" id="finPos" min="1" max="500" inputmode="numeric" aria-label="Place" data-ta="Place"><span data-t="of">of</span><input type="number" id="finDrivers" min="1" max="500" inputmode="numeric" aria-label="Drivers" data-ta="Drivers"><span data-t="drivers">drivers</span></div>
         </div>
         <div class="fin-acts"><button class="btn cta" id="finPublish" type="button"></button><button class="btn ghost" id="finPrivate" type="button" data-t="Keep it private">Keep it private</button></div>
         <div class="fin-foot"><span class="hint" id="finKart"></span><button class="btn ghost sm" id="finMore" type="button" data-t="Change kart, name, notes">Change kart, name, notes</button></div>
       </div>
       <div id="pickSentinel" style="height:1px;margin:-1px 0 0" hidden></div>
       <div class="card" id="pickbar" hidden>
-        <button class="insp-close mobile-only" id="pickClose" type="button" aria-label="Close">×</button>
+        <button class="insp-close mobile-only" id="pickClose" type="button" aria-label="Close" data-ta="Close">×</button>
         <div class="pickbar">
           <div class="field" id="sessField"><label data-t="Session">Session</label><select id="sessSel"></select></div>
           <div class="field"><label id="refLbl"></label><select id="refSel"></select></div>
@@ -1573,26 +1598,26 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
           <div style="position:relative" id="mapBox"><canvas id="map"></canvas>
           <div class="map-title" id="map1Title" hidden></div>
           <div class="readout" id="readout" hidden></div>
-          <div class="sat-pill" id="satPill" hidden><span id="satPillText"></span><button class="btn xs primary" id="satPillBtn" type="button"></button><button class="x" id="satPillClose" type="button" aria-label="Close">×</button></div>
+          <div class="sat-pill" id="satPill" hidden><span id="satPillText"></span><button class="btn xs primary" id="satPillBtn" type="button"></button><button class="x" id="satPillClose" type="button" aria-label="Close" data-ta="Close">×</button></div>
           <div class="mapnote" id="mapNote" hidden></div>
           <!-- the phone cockpit (sideways, or the full-screen map): a logger-app layout — live data at the top, round buttons on the right, a scrub bar along the lap at the bottom -->
-          <div class="ck-hud" id="ckHud" hidden><button class="ck-rb" id="ckBack" type="button" aria-label="Back">‹</button><div class="ck-panel" id="ckLaps"></div></div>
+          <div class="ck-hud" id="ckHud" hidden><button class="ck-rb" id="ckBack" type="button" aria-label="Back" data-ta="Back">‹</button><div class="ck-panel" id="ckLaps"></div></div>
           <div class="ck-btns" id="ckBtns" hidden>
-            <button class="ck-rb" id="ckSat" type="button" title="Satellite" aria-label="Satellite"><svg><use href="#i-globe"/></svg></button>
-            <button class="ck-rb" id="ckCmp" type="button" title="Compare" aria-label="Compare"><svg><use href="#i-layouts"/></svg></button>
-            <button class="ck-rb" id="ckList" type="button" title="Corners" aria-label="Corners"><svg><use href="#i-corner"/></svg></button>
-            <button class="ck-rb" id="ckChart" type="button" title="Chart" aria-label="Chart"><svg><use href="#i-speed"/></svg></button>
-            <button class="ck-rb" id="ckCoach" type="button" title="Coach" aria-label="Coach"><svg><use href="#i-spark"/></svg></button>
-            <button class="ck-rb" id="ckShare" type="button" title="Share" aria-label="Share"><svg><use href="#i-share"/></svg></button><button class="ck-rb" id="ckMore" type="button" title="More" aria-label="More">⋯</button>
+            <button class="ck-rb" id="ckSat" type="button" title="Satellite" aria-label="Satellite" data-ta="Satellite"><svg><use href="#i-globe"/></svg></button>
+            <button class="ck-rb" id="ckCmp" type="button" title="Compare" aria-label="Compare" data-ta="Compare"><svg><use href="#i-layouts"/></svg></button>
+            <button class="ck-rb" id="ckList" type="button" title="Corners" aria-label="Corners" data-ta="Corners"><svg><use href="#i-corner"/></svg></button>
+            <button class="ck-rb" id="ckChart" type="button" title="Chart" aria-label="Chart" data-ta="Chart"><svg><use href="#i-speed"/></svg></button>
+            <button class="ck-rb" id="ckCoach" type="button" title="Coach" aria-label="Coach" data-ta="Coach"><svg><use href="#i-spark"/></svg></button>
+            <button class="ck-rb" id="ckShare" type="button" title="Share" aria-label="Share" data-ta="Share"><svg><use href="#i-share"/></svg></button><button class="ck-rb" id="ckMore" type="button" title="More" aria-label="More" data-ta="More">⋯</button>
           </div>
-          <div class="ck-scrub" id="ckScrub" hidden><div class="ck-step"><button type="button" id="ckPrev" aria-label="Previous corner">‹</button><button type="button" class="ck-ct" id="ckStepBtn"><b id="ckStepT">T1</b><span id="ckStepX"></span></button><button type="button" id="ckNext" aria-label="Next corner">›</button></div><canvas id="ckScrubC"></canvas></div></div>
-          <div class="replay" id="replay" hidden><button class="btn sm rp-play" id="rpPlay" type="button" title="Play the lap" aria-label="Play">&#9654;</button><input type="range" id="rpRange" min="0" max="1000" value="0" aria-label="Lap position"><span class="rp-t" id="rpTime">0.00 s</span><div class="rp-laps" id="rpLaps"></div></div>
+          <div class="ck-scrub" id="ckScrub" hidden><div class="ck-step"><button type="button" id="ckPrev" aria-label="Previous corner" data-ta="Previous corner">‹</button><button type="button" class="ck-ct" id="ckStepBtn"><b id="ckStepT">T1</b><span id="ckStepX"></span></button><button type="button" id="ckNext" aria-label="Next corner" data-ta="Next corner">›</button></div><canvas id="ckScrubC"></canvas></div></div>
+          <div class="replay" id="replay" hidden><button class="btn sm rp-play" id="rpPlay" type="button" title="Play the lap" aria-label="Play" data-ta="Play">&#9654;</button><input type="range" id="rpRange" min="0" max="1000" value="0" aria-label="Lap position" data-ta="Lap position"><span class="rp-t" id="rpTime">0.00 s</span><div class="rp-laps" id="rpLaps"></div></div>
           <div class="legend" id="legendData"></div>
           <div class="charts under" id="dataPanel"><div class="hint" id="dataSub" style="margin:8px 0 4px"></div><canvas class="chart" id="chDataSpeed" height="150"></canvas><canvas class="chart" id="chDataRpm" height="112" hidden></canvas><canvas class="chart" id="chDataDelta" height="84"></canvas></div>
         </div>
-        <div class="inspector" id="inspector"><button class="insp-close" id="inspClose" type="button" aria-label="Close">×</button><div class="insp-nav mobile-only" id="inspNav"><button class="btn sm" id="inspPrev" type="button" aria-label="Previous corner">‹</button><span id="inspNavLbl"></span><button class="btn sm" id="inspNext" type="button" aria-label="Next corner">›</button></div><div class="insp-empty" id="inspEmpty"></div><div id="inspBody" hidden></div></div>
+        <div class="inspector" id="inspector"><button class="insp-close" id="inspClose" type="button" aria-label="Close" data-ta="Close">×</button><div class="insp-nav mobile-only" id="inspNav"><button class="btn sm" id="inspPrev" type="button" aria-label="Previous corner" data-ta="Previous corner">‹</button><span id="inspNavLbl"></span><button class="btn sm" id="inspNext" type="button" aria-label="Next corner" data-ta="Next corner">›</button></div><div class="insp-empty" id="inspEmpty"></div><div id="inspBody" hidden></div></div>
       </div>
-      <div class="lab-tabs mobile-only" id="labTabs" hidden><button type="button" class="active" data-tab="corners" data-t="Corners">Corners</button><button type="button" data-tab="digest" data-t="Digest">Digest</button><button type="button" data-tab="chart" data-t="Chart">Chart</button><button type="button" data-tab="discuss" data-t="Discussion">Discussion</button><button type="button" data-tab="ai" data-t="Coach">Coach</button><button type="button" class="x" id="labTabsClose" aria-label="Close">×</button></div>
+      <div class="lab-tabs mobile-only" id="labTabs" hidden><button type="button" class="active" data-tab="corners" data-t="Corners">Corners</button><button type="button" data-tab="digest" data-t="Digest">Digest</button><button type="button" data-tab="chart" data-t="Chart">Chart</button><button type="button" data-tab="discuss" data-t="Discussion">Discussion</button><button type="button" data-tab="ai" data-t="Coach">Coach</button><button type="button" class="x" id="labTabsClose" aria-label="Close" data-ta="Close">×</button></div>
       <div class="card" id="digestPanel" hidden><h2><svg><use href="#i-clip"/></svg><span data-t="Session digest">Session digest</span><span class="sub" id="digestSub"></span></h2><div class="digest" id="digest"></div><details class="gloss"><summary class="hint" data-t="What the terms mean">What the terms mean</summary><ul id="glossList"></ul></details></div>
       <div class="card" id="askPanel" hidden><h2><svg><use href="#i-lab"/></svg><span data-t="Ask the AI about this session">Ask the AI about this session</span></h2><div class="chat" id="chatLog"></div><div class="chips" id="askChips"></div><div class="askrow"><textarea id="askInput"></textarea><div class="askbtns"><button class="btn primary" id="askBtn" type="button" data-t="Ask">Ask</button><button class="btn" id="askStop" type="button" hidden data-t="Stop">Stop</button></div></div><div class="hint" id="askNote" style="margin-top:6px"></div></div>
       <div class="card" id="cornersPanel" hidden><h2><svg><use href="#i-corner"/></svg><span data-t="Corner by corner">Corner by corner</span><span class="sub" data-t="click a row to pin it on the map">click a row to pin it on the map</span></h2><div class="crows mobile-only" id="cornersMob"></div><div class="tblwrap" id="cornersWrap"><table class="tbl corners" id="cornersTable"><thead><tr><th>#</th><th data-t="Type">Type</th><th class="you" id="youColHead"></th><th id="cmpColHead"></th><th>Δt</th><th data-t="Reserve">Reserve</th><th data-t="Main difference">Main difference</th></tr></thead><tbody></tbody></table></div><div class="ideal-break" id="idealBreak" hidden></div></div>
@@ -1770,17 +1795,17 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 </div>
 
 <!-- mobile tab bar -->
-<nav class="tabbar" id="tabbar" aria-label="Main">
+<nav class="tabbar" id="tabbar" aria-label="Main" data-ta="Main">
   <a href="#home" data-route="home"><svg><use href="#i-home"/></svg><span data-t="Home">Home</span></a>
   <a href="#lab" data-route="lab"><svg><use href="#i-lab"/></svg><span data-t="Lab">Lab</span></a>
-  <button type="button" id="tabUpload" class="up" aria-label="Upload"><span class="circ"><svg><use href="#i-upload"/></svg></span><span data-t="Upload">Upload</span></button>
+  <button type="button" id="tabUpload" class="up" aria-label="Upload" data-ta="Upload"><span class="circ"><svg><use href="#i-upload"/></svg></span><span data-t="Upload">Upload</span></button>
   <a href="#ai" data-route="ai" id="tabAI"><svg><use href="#i-spark"/></svg><span data-t="AI coach">AI coach</span></a>
   <a href="#profile" data-route="profile"><svg><use href="#i-user"/></svg><span data-t="Profile">Profile</span></a>
 </nav>
 <!-- upload modal -->
 <div class="modal" id="uplModal" hidden>
   <div class="box sheet upl-box" id="uplBox">
-    <div class="sheet-head"><h3 data-t="Upload session">Upload session</h3><button class="sheet-x" id="uplCancel" type="button" data-tt="Close" title="Close" aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+    <div class="sheet-head"><h3 data-t="Upload session">Upload session</h3><button class="sheet-x" id="uplCancel" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
     <div class="sheet-body">
     <!-- where the session comes from: the lap timer over Bluetooth first (one big coloured button), a file second -->
     <div class="upl-src" id="uplSrc">
@@ -1797,7 +1822,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 </div>
 <!-- the device window: a lap timer over Bluetooth -->
 <div class="modal" id="devModal" hidden><div class="box sheet dev-box">
-  <div class="sheet-head"><button class="sheet-back" id="devBack" type="button" hidden data-tt="Back" title="Back" aria-label="Back"><svg><use href="#i-back"/></svg></button><h3 data-t="From the lap timer">From the lap timer</h3><button class="sheet-x" id="devCancel" type="button" data-tt="Close" title="Close" aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="sheet-head"><button class="sheet-back" id="devBack" type="button" hidden data-tt="Back" title="Back" aria-label="Back" data-ta="Back"><svg><use href="#i-back"/></svg></button><h3 data-t="From the lap timer">From the lap timer</h3><button class="sheet-x" id="devCancel" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
   <div class="sheet-body">
   <p class="hint" id="devIntro" data-t="Put the lap timer in Bluetooth mode: Alfano 7 — turn Bluetooth on in its menu (the green light comes on); RaceBox — just turn it on.">Put the lap timer in Bluetooth mode: Alfano 7 — turn Bluetooth on in its menu (the green light comes on); RaceBox — just turn it on.</p>
   <!-- a browser (Chrome): its own chooser lists the devices; the button opens it again; no Bluetooth here — where it works -->
@@ -1921,7 +1946,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div class="row" style="justify-content:flex-end"><button class="btn" id="xferCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="xferGo" type="button" disabled data-t="Transfer">Transfer</button></div>
 </div></div>
 <div class="modal" id="cfModal" hidden><div class="box" style="width:min(440px,100%)"><h3 id="cfTitle"></h3><p class="hint" id="cfText"></p><div class="row" style="justify-content:flex-end"><button class="btn" id="cfNo" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="cfYes" type="button"></button></div></div></div>
-<button class="bugbtn" id="bugBtn" type="button" title="Report a problem" aria-label="Report a problem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l1.9 1.9M16 2l-1.9 1.9M9 7h6a3 3 0 0 1 3 3v5a6 6 0 0 1-12 0v-5a3 3 0 0 1 3-3zM3 13h3M18 13h3M4 20l3-2M20 20l-3-2M12 10v10"/></svg></button>
+<button class="bugbtn" id="bugBtn" type="button" title="Report a problem" aria-label="Report a problem" data-ta="Report a problem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l1.9 1.9M16 2l-1.9 1.9M9 7h6a3 3 0 0 1 3 3v5a6 6 0 0 1-12 0v-5a3 3 0 0 1 3-3zM3 13h3M18 13h3M4 20l3-2M20 20l-3-2M12 10v10"/></svg></button>
 <div class="modal" id="shareModal" hidden><div class="box" style="width:min(520px,100%)">
   <h3 data-t="Share this session">Share this session</h3>
   <div class="share-pv"><canvas id="shareCv" width="1080" height="1350" title="Tap to view full size"></canvas></div>
@@ -3967,6 +3992,7 @@ const I18N = (() => {
     for (const el of document.querySelectorAll('[data-t]')) el.textContent = t(el.getAttribute('data-t'));
     for (const el of document.querySelectorAll('[data-tp]')) el.placeholder = t(el.getAttribute('data-tp'));
     for (const el of document.querySelectorAll('[data-tt]')) el.title = t(el.getAttribute('data-tt'));
+    for (const el of document.querySelectorAll('[data-ta]')) el.setAttribute('aria-label', t(el.getAttribute('data-ta')));   // what a screen reader says, in the page's language
   }
   try { const l = localStorage.getItem('hutka.lang'); if (l === 'ru' || l === 'en') lang = l; } catch (e) {}
   return { t, tn, setLang, applyStatic, RU, EN, get lang() { return lang; } };
@@ -4450,7 +4476,7 @@ Object.assign(I18N.RU, {
   'Other loggers and apps': 'Другие логгеры и приложения', 'Any of these files works the same way: save it on the phone or computer, then Upload → Choose session files.': 'Любой из этих файлов грузится так же: сохрани на телефон или компьютер, потом Upload → Choose session files.',
   'open the session → ⋮ → Export → RaceChrono CSV (v3) → share / save the file.': 'открой сессию → ⋮ → Export → RaceChrono CSV (v3) → поделиться / сохранить.', 'Race Studio 3 on a computer → the session → Export → CSV.': 'Race Studio 3 на компьютере → сессия → Export → CSV.', 'the .vbo file from the logger or VBOX Test Suite.': 'файл .vbo с логгера или из VBOX Test Suite.', 'Export → CSV / GPX → save.': 'Export → CSV / GPX → сохранить.',
   'Any phone GPS app': 'Любое GPS-приложение на телефоне', 'export the session as GPX (RaceChrono free and most “GPS logger” apps do). GPS at 1 Hz is enough to see corners; 10 Hz is better.': 'экспортируй сессию в GPX (бесплатный RaceChrono и большинство «GPS logger» умеют). GPS 1 Гц хватает, чтобы увидеть повороты; 10 Гц лучше.',
-  'Stuck?': 'Не получается?', 'Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.': 'Отправь файл тому, кто тебя позвал — загрузить его за тебя дело минуты. Или нажми жука в углу любой страницы и опиши, что случилось.'
+  'Stuck?': 'Не получается?'
 });
 Object.assign(I18N.RU, { 'Tap the paper plane': 'Нажми бумажный самолётик', 'The paper-plane icon in the bottom row (2 on the picture) — that is “send the session out of the app”. The phone’s share sheet opens. (The box-with-arrow icon on the far right is import — not that one.)': 'Иконка бумажного самолётика в нижнем ряду (2 на картинке) — это «отправить сессию из приложения». Откроется меню «Поделиться». (Коробка со стрелкой справа — это импорт, не она.)' });
 Object.assign(I18N.RU, { 'Help': 'Помощь' });
@@ -4828,6 +4854,11 @@ Object.assign(I18N.RU, {
   'One outing is only on this phone so far, waiting for the internet.|{n} outings are only on this phone so far, waiting for the internet.': '{n} заезд пока только на этом телефоне — ждёт интернета.|{n} заезда пока только на этом телефоне — ждут интернета.|{n} заездов пока только на этом телефоне — ждут интернета.',
   'The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine.': 'Админы сайта скрыли эту сессию от всех (битая запись или не та конфигурация). Если с данными всё в порядке — загрузи заново.',
   'The file has no laps with GPS.': 'В файле нет кругов с GPS.' });
+
+// v34.30 — what a screen reader says on the controls (aria-label), in Russian too
+Object.assign(I18N.RU, {
+  'Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.': 'Отправь файл тому, кто тебя пригласил, — загрузить его за тебя займёт минуту. Или нажми кнопку с жуком (на телефоне — вверху экрана, на компьютере — в углу) и опиши, что случилось.',
+  'Hutka': 'Hutka', 'Previous corner': 'Предыдущий поворот', 'Next corner': 'Следующий поворот', 'Place': 'Место', 'More': 'Ещё', 'Play': 'Воспроизвести', 'Lap position': 'Позиция на круге' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -6619,8 +6650,10 @@ function renderHelpPage() {
   $('helpSub').textContent = t('A few minutes the first time; after that, a couple of taps.');
   const box = $('helpBody'); box.innerHTML = '';
   // a picture arrives whole or not at all: fetched as a blob with retries (a baseline JPEG cut by a dropped mobile connection stays half-grey otherwise); the box keeps the picture's shape meanwhile
+  // Hutka's own screens come in Russian too (the ADA app and the lap timer are as they are)
+  const RU_PICS = new Set(['hutka-upload.jpg', 'hutka-device.jpg', 'hutka-choose.jpg', 'hutka-device-scan.jpg', 'hutka-device-sessions.jpg', 'hutka-device-reading.jpg', 'hutka-finish.jpg']);
   const SIZES = { 'ada-sessions.jpg': [1400, 645], 'hutka-device-timer.jpg': [800, 928] }, loadPic = async (im, url) => { for (let i = 0; i < 3; i++) { try { const r = await fetch(url); if (!r.ok) throw new Error(r.status); const b = await r.blob(); if (b.size < 1000) throw new Error('short'); im.src = URL.createObjectURL(b); return; } catch (e) { await new Promise(res => setTimeout(res, 700 * (i + 1))); } } im.src = url; };
-  const step = (n, title, text, img, alt) => { const d = el('div', 'hstep'); const tx = el('div', 'tx'); tx.innerHTML = `<div class="n">${n}</div><h3>${esc(title)}</h3><p>${text}</p>`; d.appendChild(tx); if (img) { const im = new Image(); const [iw, ih] = SIZES[img] || [780, 1520]; im.width = iw; im.height = ih; im.alt = alt || ''; im.decoding = 'async'; const w = el('div', 'pic'); w.appendChild(im); d.appendChild(w); loadPic(im, 'help/' + img + '?v=' + encodeURIComponent(APP_VERSION)); } return d; };
+  const step = (n, title, text, img, alt) => { const d = el('div', 'hstep'); const tx = el('div', 'tx'); tx.innerHTML = `<div class="n">${n}</div><h3>${esc(title)}</h3><p>${text}</p>`; d.appendChild(tx); if (img) { const im = new Image(); const [iw, ih] = SIZES[img] || [780, 1520]; im.width = iw; im.height = ih; im.alt = alt || ''; im.decoding = 'async'; const w = el('div', 'pic'); w.appendChild(im); d.appendChild(w); loadPic(im, 'help/' + (I18N.lang === 'ru' && RU_PICS.has(img) ? img.replace(/\.jpg$/, '-ru.jpg') : img) + '?v=' + encodeURIComponent(APP_VERSION)); } return d; };
   const card = (title, sub) => { const c = el('div', 'card hcard'); c.innerHTML = `<h2>${esc(title)}</h2>${sub ? `<p class="hint">${esc(sub)}</p>` : ''}`; return c; };
   // straight from the lap timer over Bluetooth — the quickest way
   const b = card(t('Straight from the lap timer (Bluetooth)'), t('Alfano 7 and RaceBox: no vendor app, no files — the sessions come out of the device memory straight into the Lab. In the Hutka app (iPhone, Android), or in Chrome on a Mac, Windows or Android.'));
@@ -6643,10 +6676,10 @@ function renderHelpPage() {
   const o = card(t('Other loggers and apps'), t('Any of these files works the same way: save it on the phone or computer, then Upload → Choose a file.'));
   const ul = el('ul', 'hlist'); for (const [k, v] of [['RaceChrono', t('open the session → ⋮ → Export → RaceChrono CSV (v3) → share / save the file.')], ['AiM (MyChron)', t('Race Studio 3 on a computer → the session → Export → CSV.')], ['VBOX', t('the .vbo file from the logger or VBOX Test Suite.')], ['TrackAddict / Harry’s LapTimer', t('Export → CSV / GPX → save.')], [t('Any phone GPS app'), t('export the session as GPX (RaceChrono free and most “GPS logger” apps do). GPS at 1 Hz is enough to see corners; 10 Hz is better.')]]) { const li = el('li'); li.innerHTML = `<b>${esc(k)}</b> — ${esc(v)}`; ul.appendChild(li); }
   o.appendChild(ul); box.appendChild(o);
-  const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
+  const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.29';
+const APP_VERSION = 'v34.30';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -6695,7 +6728,7 @@ const BUG = { errors: [], shot: null,
   } };
 window.addEventListener('error', (e) => { BUG.note((e.message || 'error') + (e.filename ? ` @${String(e.filename).split('/').pop()}:${e.lineno}` : '')); });
 window.addEventListener('unhandledrejection', (e) => { const r = e.reason; BUG.note('promise: ' + (r && (r.message || r.code) || String(r)).slice(0, 200)); });
-$('bugBtn').onclick = BUG.open; $('bugCancel').onclick = BUG.close; $('bugSend').onclick = BUG.send; $('bugModal').addEventListener('click', (e) => { if (e.target === $('bugModal')) BUG.close(); });
+$('bugBtn').onclick = BUG.open; $('bugTop').onclick = BUG.open; $('bugCancel').onclick = BUG.close; $('bugSend').onclick = BUG.send; $('bugModal').addEventListener('click', (e) => { if (e.target === $('bugModal')) BUG.close(); });
 $('bugShot').onchange = async (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; try { BUG.shot = await imageToDataUrl(f, 1400, 600000); $('bugShotName').textContent = f.name.slice(0, 40); } catch (err) { BUG.shot = null; setStatus('bugStatus', t('Could not read the image.'), 'warn'); } e.target.value = ''; };
 // ---------- visits: Google Analytics when config.js names a measurement id (not a secret) ----------
 (() => { const cfg = window.HUTKA_CONFIG || {}, id = cfg.analytics || cfg.gaId; if (!id || !/^G-[A-Z0-9]+$/.test(id) || location.protocol !== 'https:') return; try { if (navigator.doNotTrack === '1') return; } catch (e) {} const sc = document.createElement('script'); sc.async = true; sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + id; document.head.appendChild(sc); window.dataLayer = window.dataLayer || []; window.gtag = function () { window.dataLayer.push(arguments); }; gtag('js', new Date()); gtag('config', id, { anonymize_ip: true, send_page_view: true }); addEventListener('hashchange', () => gtag('event', 'page_view', { page_location: location.href, page_path: location.pathname + location.hash })); })();
@@ -10227,12 +10260,12 @@ async function renderMySessionsTable(box, opts) {
   if (opts.sub) opts.sub.textContent = list.length ? String(list.length) : '';
   if (opts.hint) opts.hint.textContent = list.length ? (opts.compact ? t('Open a session to analyse it; Edit changes its name, track and layout.') : t('Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.')) : (navigator.onLine === false ? t('No connection — your sessions show when it is back.') : t('No sessions yet. Upload a session to start.'));
   if (!list.length) return;
-  const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Session')}</th><th>${t('Track')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th>${t('Visibility')}</th><th></th></tr></thead>`; const body = el('tbody');
+  const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl mine'); tb.innerHTML = `<thead><tr><th>${t('Session')}</th><th>${t('Track')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th>${t('Visibility')}</th><th></th></tr></thead>`; const body = el('tbody');
   for (const m of list) {
     const tr = el('tr'), trk = STORE.getTrack(m.track); const layouts = m.track ? await STORE.getLayouts(m.track) : []; const l = layouts.find(x => x.id === m.layout);
     const vis = m.owner === 'local' ? `<span class="pill off">${t('This browser')}</span>` : (m.published ? `<span class="pill ok">${t('Published')}</span>` : `<span class="pill off">${t('Private')}</span>`);
     tr.innerHTML = `<td style="font-weight:600;white-space:normal;min-width:160px">${esc(m.label || m.name)}${m.note ? ` <span class="hint">· ${esc(m.note)}</span>` : ''}</td><td style="white-space:normal">${esc(trk ? trk.name : (m.trackName || t('Custom')))}${l ? ' · ' + esc(l.name) : (m.layout === 'custom' || !m.layout ? ' · ' + t('custom') : '')}</td><td>${esc(fmtDate(m.date))}</td><td class="num">${m.nLaps} (${m.cleanLaps})</td><td class="num">${fmtMs(m.bestMs)}</td><td class="num">${fmtMs(m.avgMs)}</td><td>${vis}</td><td></td>`;
-    const acts = el('div', 'row'); acts.style.flexWrap = 'nowrap';
+    const acts = el('div', 'row sess-acts');   // the buttons wrap two by two when the table is tight (the Russian labels are long) — never cut off
     const open = el('a', 'btn xs primary', t('Open')); open.href = '#lab~' + m.id; acts.appendChild(open);
     const ed = el('button', 'btn xs', t('Edit')); ed.type = 'button'; ed.onclick = () => SESSEDIT.open(m, () => { LAB.invalidate(m.id); renderMySessionsTable(box, opts); }); acts.appendChild(ed);
     if (STORE.canWrite() && m.owner !== 'local') { const pub = el('button', 'btn xs', m.published ? t('Unpublish') : t('Publish')); pub.type = 'button'; pub.disabled = !m.track; pub.title = m.track ? '' : t('Assign a track first (Edit).'); pub.onclick = async () => { pub.classList.add('busy'); try { await setPublished(m, !m.published); renderMySessionsTable(box, opts); } catch (e) { pub.classList.remove('busy'); toast(t('Could not save. Check your access to the Hutka page.')); } }; acts.appendChild(pub); }
