@@ -1408,7 +1408,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
             <button class="btn" id="optBand" type="button" data-t="Track edges">Track edges</button>
             <button class="btn" id="optTicks" type="button" data-t="Markers">Markers</button>
             <button class="btn" id="optLabels" type="button" data-t="Labels">Labels</button>
-            <button class="btn" id="optPedals" type="button" data-t="Pedals" title="Colour the lap by what the kart is doing: throttle, brake, coasting">Pedals</button>
+            <button class="btn" id="optPedals" type="button" data-t="Pedals" data-tt="Colour the lap by what the kart is doing: accelerating, decelerating, coasting">Accel / decel</button>
             <div class="seg"><button class="btn" id="rotL" type="button" title="Rotate">↺</button><button class="btn" id="rotR" type="button" title="Rotate">↻</button></div>
             <div class="seg"><button class="btn" id="zoomOut" type="button">−</button><button class="btn" id="zoomIn" type="button">+</button><button class="btn" id="zoomFit" type="button">⌂</button></div>
             <button class="btn" id="btnFull" type="button" title="Full screen"><svg><use href="#i-full"/></svg><span data-t="Full screen">Full screen</span></button>
@@ -3773,9 +3773,9 @@ const DATA = (() => {
 // ---------- i18n: English is the source text, Russian is a dictionary keyed by the English string ----------
 const I18N = (() => {
   let lang = 'en';
-  const RU = {};
+  const RU = {}, EN = {};   // EN: overrides of the English source text (terms renamed after the code was written — terms.js)
   const fmt = (s, vars) => vars ? String(s).replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined && vars[k] !== null ? vars[k] : m)) : String(s);
-  function t(key, vars) { const s = lang === 'ru' ? (RU[key] !== undefined ? RU[key] : key) : key; return fmt(s, vars); }
+  function t(key, vars) { const s = lang === 'ru' ? (RU[key] !== undefined ? RU[key] : (EN[key] !== undefined ? EN[key] : key)) : (EN[key] !== undefined ? EN[key] : key); return fmt(s, vars); }
   // plural forms: tn(n, 'lap', 'laps') → RU looks up 'lap|laps' → 'круг|круга|кругов'
   function tn(n, one, many) {
     if (lang === 'ru') { const f = (RU[one + '|' + many] || (one + '|' + many)).split('|'); const m = n % 10, h = n % 100; return (m === 1 && h !== 11) ? f[0] : (m >= 2 && m <= 4 && (h < 10 || h >= 20)) ? (f[1] || f[0]) : (f[2] || f[1] || f[0]); }
@@ -3788,7 +3788,7 @@ const I18N = (() => {
     for (const el of document.querySelectorAll('[data-tt]')) el.title = t(el.getAttribute('data-tt'));
   }
   try { const l = localStorage.getItem('hutka.lang'); if (l === 'ru' || l === 'en') lang = l; } catch (e) {}
-  return { t, tn, setLang, applyStatic, RU, get lang() { return lang; } };
+  return { t, tn, setLang, applyStatic, RU, EN, get lang() { return lang; } };
 })();
 const t = I18N.t, tn = I18N.tn;
 const fmtDate = (iso) => { if (!iso) return ''; const d = new Date(iso); if (isNaN(d)) return String(iso).slice(0, 16); return d.toLocaleDateString(I18N.lang === 'ru' ? 'ru-RU' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); };
@@ -4458,6 +4458,206 @@ Object.assign(I18N.RU, { 'You vs {name}': 'Ты против {name}', 'Personal 
 Object.assign(I18N.RU, { 'Your sign-in has expired — sign in again to ask the coach.': 'Вход истёк — войди снова, чтобы спросить тренера.' });
 Object.assign(I18N.RU, { 'See where the time is': 'Увидь, где время' });
 Object.assign(I18N.RU, { 'Loading': 'Загрузка' });
+// v34.20 — sessions on another configuration are not compared
+Object.assign(I18N.RU, { '{p}% of the lap runs away from the “{layout}” line — it was driven on another configuration of the track, so it is not compared with the sessions of this one. Pick the right layout (Edit), or ask an admin to add it.': '{p}% круга уходит с линии конфигурации «{layout}» — круг проехан по другой конфигурации трассы, поэтому с сессиями этой он не сравнивается. Выбери правильную конфигурацию (Edit) или попроси админа её добавить.',
+  'this session was driven on another configuration — pick its layout first (Edit)': 'эта сессия проехана по другой конфигурации — сначала выбери её конфигурацию (Edit)',
+  'its lap does not follow this layout — it was driven on another configuration': 'её круг не ложится на эту конфигурацию — она проехана по другой',
+  'another configuration?': 'другая конфигурация?', 'Uploaded under this layout, but the lap follows another configuration of the track — not comparable.': 'Загружена под этой конфигурацией, но круг идёт по другой — сравнивать нельзя.',
+  'This session was driven on another configuration of the track — comparisons are off until its layout is right (Edit).': 'Эта сессия проехана по другой конфигурации трассы — сравнения выключены, пока конфигурация не исправлена (Edit).',
+  'another configuration — not comparable': 'другая конфигурация — не сравнить' });
+Object.assign(I18N.RU, { 'Colour the lap by what the kart is doing: accelerating, decelerating, coasting': 'Раскрасить круг по тому, что делает карт: разгон, замедление, накат' });
+// ---------- terms: GPS measures speed, not pedals (v34.20) ----------
+// The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
+// stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
+// karts differently. The code keeps its original keys; these maps give the words shown, in English and in Russian.
+Object.assign(I18N.EN, {
+"Brake — where the deceleration gets stronger than 2.5 m/s²; the number is metres from the start/finish line.": "Deceleration — where the kart starts slowing harder than 2.5 m/s²; the number is metres from the start/finish line. Every point here comes from the GPS speed, not from the pedals: the same pedal slows different karts differently.",
+"Lift — the throttle closes without braking; eased off — a partial lift.": "Soft decel — the kart slows gently (0.9–2.5 m/s²), without hard slowing; slight decel — gentler still.",
+"Linked corners (an earlier brake that buys the next corner, or the opposite) are judged as pairs: {list}.": "Linked corners (an earlier deceleration that buys the next corner, or the opposite) are judged as pairs: {list}.",
+"Linked with T{n}: the {a} s lost here buys {b} s there — together you are {net} s faster. The earlier brake sets up the next corner; keep it.": "Linked with T{n}: the {a} s lost here buys {b} s there — together you are {net} s faster. The earlier deceleration sets up the next corner; keep it.",
+"Pedals": "Accel / decel",
+"Released — the brake pedal is let go; earlier usually means the kart rolls and rotates on its own.": "Decel ends — the kart stops slowing; earlier usually means it rolls and rotates on its own.",
+"The dots on the map are those laps’ brake and apex points.": "The dots on the map are those laps’ deceleration and apex points.",
+"Throttle — where the full acceleration starts after the apex.": "Acceleration — where the kart starts gaining speed again after the apex.",
+"You will see what the fastest published passes do there: brake point, apex speed, throttle point.": "You will see what the fastest published passes do there: where they start slowing, apex speed, where they start accelerating.",
+"a different braking point": "a different deceleration point",
+"a different lift point": "a different soft-decel point",
+"a pause before the throttle": "a pause before accelerating",
+"a short brake at {s} m": "a short deceleration at {s} m",
+"brake": "decel",
+"brake in the previous corner": "decel from the previous corner",
+"brake point": "decel point",
+"brake point as the best passes": "deceleration point as the best passes",
+"brake point {lo}–{hi} m (wanders {d} m)": "decel point {lo}–{hi} m (wanders {d} m)",
+"brake released": "decel ends",
+"brake released {dir}": "decel ends {dir}",
+"brake {a} vs {b} m ({dir} by {d})": "decel {a} vs {b} m ({dir} by {d})",
+"brake {dir}, at {s} m": "start slowing {dir}, at {s} m",
+"brake {d} m {dir} than the best passes": "decel {d} m {dir} than the best passes",
+"brake {r}": "decel {r}",
+"brake {s} m": "decel {s} m",
+"brakes": "decelerates",
+"brakes where the best passes only lift": "slows hard where the best passes only slow gently",
+"brakes where the best passes stay flat": "slows where the best passes do not",
+"braking": "deceleration",
+"braking and throttle points will be approximate; Alfano at 10 Hz is the reference": "deceleration and acceleration points will be approximate; Alfano at 10 Hz is the reference",
+"braking corner": "slowing corner",
+"different pedal work": "slowing and accelerating differently",
+"eased": "slight decel",
+"eased off {s} m": "slight decel {s} m",
+"flat out": "no slowing",
+"flat out, like the best passes": "no slowing, like the best passes",
+"just a lift": "just a soft decel",
+"lift": "soft decel",
+"lift corner": "soft-slowing corner",
+"lift point": "soft-decel point",
+"lift point as the best passes": "soft decel where the best passes have it",
+"lift point {lo}–{hi} m (wanders {d} m)": "soft-decel point {lo}–{hi} m (wanders {d} m)",
+"lift {a} vs {b} m": "soft decel {a} vs {b} m",
+"lift {dir}, at {s} m": "start slowing gently {dir}, at {s} m",
+"lift {d} m {dir} than the best passes": "soft decel {d} m {dir} than the best passes",
+"lift {r}": "soft decel {r}",
+"lift {s} m": "soft decel {s} m",
+"lifts": "slows gently",
+"lifts where the best passes stay flat": "slows gently where the best passes do not slow",
+"line: on the throttle": "line: accelerating",
+"no brake": "no hard decel",
+"no brake and no lift": "no slowing",
+"no brake where the best passes brake": "no deceleration where the best passes decelerate",
+"no brake, just a lift at {s} m": "no hard slowing, just a soft decel at {s} m",
+"no lift — flat, like the quickest passes": "no slowing, like the quickest passes",
+"open the throttle earlier, at {s} m": "start accelerating earlier, at {s} m",
+"open the throttle right after the apex": "start accelerating right after the apex",
+"opens the throttle": "starts accelerating",
+"pedal": "slowing",
+"release the brake earlier, let the kart rotate": "end the deceleration earlier, let the kart rotate",
+"released": "decel ends",
+"released {a} vs {b} m": "decel ends {a} vs {b} m",
+"released {r}": "decel ends {r}",
+"released {s} m": "decel ends {s} m",
+"releases the brake": "stops slowing",
+"same points, but a higher average speed through the section ({a} vs {b} km/h): smoother steering and throttle, less sliding": "same points, but a higher average speed through the section ({a} vs {b} km/h): smoother driving, less sliding",
+"the best passes are flat out": "the best passes do not slow here",
+"the best passes take it without braking": "the best passes take it without hard slowing",
+"throttle": "accel",
+"throttle after T{n}": "accel after T{n}",
+"throttle earlier, from {s} m": "accelerate earlier, from {s} m",
+"throttle from": "accel from",
+"throttle later": "accel later",
+"throttle point": "accel point",
+"throttle without a pause": "accel without a pause",
+"throttle {a} vs {b} m": "accel {a} vs {b} m",
+"throttle {d} m later": "accel {d} m later",
+"throttle {r}": "accel {r}",
+"throttle {s} m": "accel {s} m",
+"you brake": "you decelerate",
+"you lift": "you slow gently",
+"you open the throttle": "you start accelerating",
+"you release the brake": "you stop slowing",
+"{dir} on the throttle": "{dir} accelerating",
+"{ref}: on the throttle {a} m, braking {b} m, coasting {c} m — {p}% of the lap (neither braking nor accelerating: a lift, a roll through the apex, half throttle).": "{ref}: accelerating {a} m, decelerating {b} m, coasting {c} m — {p}% of the lap (neither slowing hard nor gaining speed: a roll through the apex, partial throttle).",
+"{s}. Alfano at 10 Hz is the reference; at {hz} Hz braking, release and throttle points are accurate to about ±{m} m and apex speeds are smoothed. Treat small differences with care.": "{s}. Alfano at 10 Hz is the reference; at {hz} Hz deceleration and acceleration points are accurate to about ±{m} m and apex speeds are smoothed. Treat small differences with care.",
+"{who} briefly at {a} m, {other} only {does} — the brake gives a better position at the apex": "{who} briefly at {a} m, {other} only {does} — the deceleration gives a better position at the apex",
+"{who} earlier (from {a} m vs {b}) — the acceleration starts earlier and the gain grows until the next braking": "{who} earlier (from {a} m vs {b}) — the acceleration starts earlier and the gain grows until the next deceleration",
+"{who} earlier ({a} m vs {b}) and still faster: a late brake spoils the apex here": "{who} earlier ({a} m vs {b}) and still faster: a late deceleration spoils the apex here",
+"{who} flat out, {other} lifts at {b} m": "{who} without slowing, {other} slows gently at {b} m",
+"{who} without braking ({how}), {other} brakes at {b} m": "{who} without hard slowing ({how}), {other} decelerates at {b} m",
+"Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.": "Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: deceleration, apex and acceleration points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout."
+});
+Object.assign(I18N.RU, {
+"Brake — where the deceleration gets stronger than 2.5 m/s²; the number is metres from the start/finish line.": "Замедление — где карт начинает замедляться сильнее 2,5 м/с²; число — метры от линии старт/финиш. Все точки считаются по GPS-скорости, а не по педалям: одна и та же педаль на разных картах тормозит по-разному.",
+"Lift — the throttle closes without braking; eased off — a partial lift.": "Мягкое замедление — карт замедляется плавно (0,9–2,5 м/с²), без резкого; лёгкое — ещё слабее.",
+"Linked corners (an earlier brake that buys the next corner, or the opposite) are judged as pairs: {list}.": "Связки поворотов (раннее замедление, которое окупается в следующем повороте, или наоборот) оцениваются парами: {list}.",
+"Linked with T{n}: the {a} s lost here buys {b} s there — together you are {net} s faster. The earlier brake sets up the next corner; keep it.": "Связка с T{n}: {a} с, потерянные здесь, окупаются {b} с там — вместе ты быстрее на {net} с. Раннее замедление готовит следующий поворот; оставь как есть.",
+"Pedals": "Разгон / замедление",
+"Released — the brake pedal is let go; earlier usually means the kart rolls and rotates on its own.": "Конец замедления — карт перестаёт замедляться; раньше обычно значит, что он катится и доворачивается сам.",
+"The dots on the map are those laps’ brake and apex points.": "Точки на карте — начала замедления и апексы этих кругов.",
+"Throttle — where the full acceleration starts after the apex.": "Разгон — где после апекса карт снова начинает набирать скорость.",
+"You will see what the fastest published passes do there: brake point, apex speed, throttle point.": "Увидишь, что делают в нём лучшие опубликованные проезды: где начинают замедляться, скорость в апексе, где начинают разгон.",
+"a different braking point": "другая точка замедления",
+"a different lift point": "другая точка мягкого замедления",
+"a pause before the throttle": "пауза перед разгоном",
+"a short brake at {s} m": "коротко замедлиться у {s} м",
+"brake": "замедление",
+"brake in the previous corner": "замедление ещё в предыдущем",
+"brake point": "точка замедления",
+"brake point as the best passes": "точка замедления как у лучших проездов",
+"brake point {lo}–{hi} m (wanders {d} m)": "точка замедления {lo}–{hi} м (гуляет на {d} м)",
+"brake released": "конец замедления",
+"brake released {dir}": "{dir} заканчивается замедление",
+"brake {a} vs {b} m ({dir} by {d})": "замедление {a} vs {b} м ({dir} на {d})",
+"brake {dir}, at {s} m": "начинать замедляться {dir}, у {s} м",
+"brake {d} m {dir} than the best passes": "замедление на {d} м {dir}, чем у лучших проездов",
+"brake {r}": "замедление {r}",
+"brake {s} m": "замедление {s} м",
+"brakes": "замедляется",
+"brakes where the best passes only lift": "резко замедляется там, где лучшие проезды замедляются мягко",
+"brakes where the best passes stay flat": "замедляется там, где лучшие проезды не замедляются",
+"braking": "замедление",
+"braking and throttle points will be approximate; Alfano at 10 Hz is the reference": "точки замедления и разгона будут приблизительными; эталон — Alfano на 10 Гц",
+"braking corner": "с замедлением",
+"different pedal work": "по-другому замедляется и разгоняется",
+"eased": "лёгкое замедление",
+"eased off {s} m": "лёгкое замедление {s} м",
+"flat out": "без замедления",
+"flat out, like the best passes": "без замедления, как лучшие проезды",
+"just a lift": "только мягкое замедление",
+"lift": "мягкое замедление",
+"lift corner": "с мягким замедлением",
+"lift point": "точка мягкого замедления",
+"lift point as the best passes": "мягкое замедление как у лучших проездов",
+"lift point {lo}–{hi} m (wanders {d} m)": "точка мягкого замедления {lo}–{hi} м (гуляет на {d} м)",
+"lift {a} vs {b} m": "мягкое замедление {a} vs {b} м",
+"lift {dir}, at {s} m": "начинать мягко замедляться {dir}, у {s} м",
+"lift {d} m {dir} than the best passes": "мягкое замедление на {d} м {dir}, чем у лучших проездов",
+"lift {r}": "мягкое замедление {r}",
+"lift {s} m": "мягкое замедление {s} м",
+"lifts": "мягко замедляется",
+"lifts where the best passes stay flat": "мягко замедляется там, где лучшие проезды не замедляются",
+"line: on the throttle": "линия: разгон",
+"no brake": "без сильного замедления",
+"no brake and no lift": "без замедления",
+"no brake where the best passes brake": "без замедления там, где лучшие проезды замедляются",
+"no brake, just a lift at {s} m": "без сильного замедления — мягкое у {s} м",
+"no lift — flat, like the quickest passes": "без замедления, как самые быстрые проезды",
+"open the throttle earlier, at {s} m": "начинать разгон раньше, у {s} м",
+"open the throttle right after the apex": "начинать разгон сразу после апекса",
+"opens the throttle": "начинает разгон",
+"pedal": "замедление",
+"release the brake earlier, let the kart rotate": "заканчивать замедление раньше, доворачивать корпусом",
+"released": "конец замедления",
+"released {a} vs {b} m": "конец замедления {a} vs {b} м",
+"released {r}": "конец замедления {r}",
+"released {s} m": "конец замедления {s} м",
+"releases the brake": "перестаёт замедляться",
+"same points, but a higher average speed through the section ({a} vs {b} km/h): smoother steering and throttle, less sliding": "точки совпадают, но средняя скорость по участку выше ({a} против {b} км/ч): ровнее руль, меньше скольжения",
+"the best passes are flat out": "лучшие проезды здесь не замедляются",
+"the best passes take it without braking": "лучшие проезды проходят его без сильного замедления",
+"throttle": "разгон",
+"throttle after T{n}": "разгон после T{n}",
+"throttle earlier, from {s} m": "разгон раньше, с {s} м",
+"throttle from": "разгон с",
+"throttle later": "разгон позже",
+"throttle point": "точка разгона",
+"throttle without a pause": "разгон без паузы",
+"throttle {a} vs {b} m": "разгон {a} vs {b} м",
+"throttle {d} m later": "разгон на {d} м позже",
+"throttle {r}": "разгон {r}",
+"throttle {s} m": "разгон {s} м",
+"you brake": "ты замедляешься",
+"you lift": "ты мягко замедляешься",
+"you open the throttle": "ты начинаешь разгон",
+"you release the brake": "ты перестаёшь замедляться",
+"{dir} on the throttle": "{dir} разгон",
+"{ref}: on the throttle {a} m, braking {b} m, coasting {c} m — {p}% of the lap (neither braking nor accelerating: a lift, a roll through the apex, half throttle).": "{ref}: разгон {a} м, замедление {b} м, накат {c} м — {p}% круга (ни сильного замедления, ни разгона: качение через апекс, неполный газ).",
+"{s}. Alfano at 10 Hz is the reference; at {hz} Hz braking, release and throttle points are accurate to about ±{m} m and apex speeds are smoothed. Treat small differences with care.": "{s}. Эталон — Alfano на 10 Гц; при {hz} Гц точки замедления и разгона точны примерно до ±{m} м, скорости в апексе сглажены. К малым разницам относись осторожно.",
+"{who} briefly at {a} m, {other} only {does} — the brake gives a better position at the apex": "{who} коротко у {a} м, {other} только {does} — замедление здесь даёт лучшее положение на апексе",
+"{who} earlier (from {a} m vs {b}) — the acceleration starts earlier and the gain grows until the next braking": "{who} раньше (с {a} м против {b}) — разгон начинается раньше, выигрыш копится до следующего замедления",
+"{who} earlier ({a} m vs {b}) and still faster: a late brake spoils the apex here": "{who} раньше ({a} м против {b}) и всё равно быстрее: позднее замедление здесь портит апекс",
+"{who} flat out, {other} lifts at {b} m": "{who} без замедления, {other} мягко замедляется у {b} м",
+"{who} without braking ({how}), {other} brakes at {b} m": "{who} без сильного замедления ({how}), {other} замедляется у {b} м",
+"Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.": "Загрузи сессию (Alfano .alf2 — эталон; AiM, RaceChrono, TrackAddict, VBOX и GPX тоже работают), выбери трассу и лейаут — и Лаборатория покажет, где время: точки замедления, апекса и разгона в каждом повороте, выжимку простым языком и, когда нужно, сравнение с любым другим кругом, средним по сессии или другим гонщиком на той же конфигурации."
+});
 // ---------- world map (Natural Earth 50m, own canvas): land, coast, borders, a few city labels, track pins ----------
 const GEO = (() => {
   const PI = Math.PI;
@@ -6012,7 +6212,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.19.3';
+const APP_VERSION = 'v34.20';
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -6551,6 +6751,7 @@ async function duelCorners(myMeta, theirMeta, theirName) {
   if (!GEOM.attach(ms, G).ok) throw new Error('no attach'); GEOM.attach(ts, G);
   const best = (s) => s.laps.filter(L => L.px).reduce((a, b) => (!a || b.timeMs < a.timeMs) ? b : a, null), ml = best(ms), tl = best(ts); if (!ml || !tl) throw new Error('no laps');
   const R = DATA.projectLap(ml, G.track, G.rev), O = DATA.projectLap(tl, G.track, G.rev); if (!R || !O) throw new Error('no projection');
+  if (R.lost > OFF_LAYOUT || O.lost > OFF_LAYOUT) return `<span class="hint">${esc(t('another configuration — not comparable'))}</span>`;   // one of the two was driven on another configuration
   const apexes = GEOM.apexes(G, tl.timeMs < ml.timeMs ? O : R), D = DATA.buildComparisonP(R, [O], 'lap', G.track, () => theirName, apexes, G.corners.R); if (!D) throw new Error('no comparison');
   const them = D.rows.filter(r => r.cmp && r.cmp.dt >= 0.1).sort((a, b) => b.cmp.dt - a.cmp.dt).slice(0, 4), you = D.rows.filter(r => r.cmp && r.cmp.dt <= -0.1).sort((a, b) => a.cmp.dt - b.cmp.dt).slice(0, 4);
   const list = (rs, sign) => rs.map(r => `<a href="#lab~${esc(theirMeta.id)}~t${r.w.n}" style="color:inherit">T${r.w.n}</a> (${sign}${Math.abs(r.cmp.dt).toFixed(2)})`).join(', ');
@@ -6693,8 +6894,8 @@ function analyseFor(G, sess, sessions) {
 LAB.analyseMeta = async function (meta, mine) {
   const sess = await STORE.loadSession(meta); const tid = meta.track || '', lid = meta.layout || 'custom';
   const G = await GEOM.build(tid, lid, sess, { noMedia: true }); if (!G) return null;   // no pictures for background work
-  const list = [], add = (s) => { if (list.some(x => x.id === s.id)) return; const r = GEOM.attach(s, G); if (r.ok) list.push(s); };
-  add(sess); if (!list.length) return null;
+  const list = [], add = (s) => { if (list.some(x => x.id === s.id)) return; const r = GEOM.attach(s, G); if (!r.ok) return; if (s !== sess && (off || !fitsLayout(s, G))) return; list.push(s); };
+  let off = false; add(sess); if (!list.length) return null; off = !fitsLayout(sess, G);
   const same = (m) => kartCompatible(m, sess);
   if (G.refSess && same(G.refSess)) add(G.refSess);
   const own = (sess.owner === STORE.me.id && mine ? mine : []).filter(m => m.id !== sess.id && m.track === tid && (m.layout || 'custom') === lid && same(m));
@@ -6755,6 +6956,17 @@ function cardFrom(D, G, coach) {
 }
 // back to the start page: the session stays in memory, the Lab shows the library again
 LAB.close = function () { replayPlay(false); LAB.cmp2 = 'none'; LAB.scrubT = 0; if (fsOn()) { if (LAB.fsExit) LAB.fsExit(); else $('hero').classList.remove('fs-fallback'); } LAB.current = null; LAB.sessions = []; LAB.G = null; LAB.dcmp = null; LAB.coach = null; LAB.loaded = false; LAB.selN = 0; if (location.hash !== '#lab') history.replaceState(null, '', '#lab'); labRender(); renderLabStart(); window.scrollTo({ top: 0 }); };
+// does a session belong on this layout? Its best clean lap has to follow the layout's line: a lap that leaves it for more than 12 % of
+// its samples was driven on another configuration of the track (a wrong layout picked at upload) and is never compared with laps of
+// this one — not in the default comparison, the coach, the kart mark, "since last time" or the picker. Cached per geometry.
+const OFF_LAYOUT = 0.12;
+function fitsLayout(s, G) {
+  if (!s || !G || !G.track) return false; if (G.refSess && s.id === G.refSess.id) return true;
+  if (s._fit && s._fit.rev === G.rev) return s._fit.ok;
+  const laps = s.laps.filter(L => L.px), clean = laps.filter(L => L.clean), L = (clean.length ? clean : laps).reduce((a, b) => (!a || b.timeMs < a.timeMs) ? b : a, null);
+  const P = L ? DATA.projectLap(L, G.track, G.rev) : null, ok = !!P && !(P.lost > OFF_LAYOUT);
+  s._fit = { rev: G.rev, ok, lost: P ? P.lost : 1 }; return ok;
+}
 // open a session as the reference (or as the comparison against my latest session on the same layout)
 LAB.open = async function (meta, asCmp) {
   labEnsureMap(); setStatus('labStatus', t('Loading session…'));
@@ -6764,10 +6976,10 @@ LAB.open = async function (meta, asCmp) {
   LAB.tid = meta.track || ''; LAB.lid = meta.layout || 'custom'; LAB.trackName = (STORE.getTrack(LAB.tid) || {}).name || meta.trackName || t('Custom track'); loadSatAdj(); if (LAB.aligning) setAligning(false);
   let G = null; try { G = await GEOM.build(LAB.tid, LAB.lid, sess); } catch (e) { G = null; }
   if (!G) { setStatus('labStatus', t('No clean laps with GPS in this session.'), 'warn'); return; }
-  LAB.G = G; LAB.sessions = [];
-  const add = (s) => { if (LAB.sessions.some(x => x.id === s.id)) return false; const r = GEOM.attach(s, G); if (r.ok) LAB.sessions.push(s); return !!r.ok; };
+  LAB.G = G; LAB.sessions = []; LAB.offIds = new Set(); LAB.curOff = false;
+  const add = (s) => { if (LAB.sessions.some(x => x.id === s.id)) return true; const r = GEOM.attach(s, G); if (!r.ok) return false; if (s !== sess && (LAB.curOff || !fitsLayout(s, G))) { if (!LAB.curOff) LAB.offIds.add(s.id); return false; } LAB.sessions.push(s); return true; };
   const sameKart = (m) => LAB.allKarts || kartCompatible(m, sess);
-  add(sess); LAB.otherKarts = 0; if (G.refSess) { if (sameKart(G.refSess)) add(G.refSess); else if (G.refSess.published) LAB.otherKarts++; }   // the layout's reference lap is only a comparison when the kart class matches
+  add(sess); LAB.curOff = !fitsLayout(sess, G); LAB.otherKarts = 0; if (G.refSess) { if (sameKart(G.refSess)) add(G.refSess); else if (G.refSess.published) LAB.otherKarts++; }   // the layout's reference lap is only a comparison when the kart class matches
   // the coach ("reserve", best passes) learns from every lap on this layout: my other sessions and the published ones
   const mine = (await STORE.mySessions()).filter(m => m.id !== sess.id && sameKart(m) && (STORE.hasDb ? (m.track === LAB.tid && m.layout === LAB.lid) : true));
   for (const m of mine.slice(0, 12)) { try { add(await STORE.loadSession(m)); } catch (e) {} }
@@ -6779,11 +6991,17 @@ LAB.open = async function (meta, asCmp) {
   const autoCmp = async () => {
     const my = bestLap(sess).timeMs, cand = pool.filter(m => m.id !== sess.id && m.owner !== sess.owner && m.bestMs > 0 && m.bestMs < my); if (!cand.length) return null;
     const fastest = (list) => list.reduce((a, b) => (!a || b.bestMs < a.bestMs) ? b : a, null);
-    const fol = new Set(await STORE.followingIds()); let m = fastest(cand.filter(x => fol.has(x.owner))), why = 'followed'; if (!m) { m = fastest(cand); why = 'fastest'; }
-    let s = sessOf(m.id); if (!s) { try { const x = await STORE.loadSession(m); if (add(x)) s = x; } catch (e) {} } if (!s) return null;
-    const L = bestLap(s); if (!L.px) return null; return { key: lapKey(s, L), why };
+    const fol = new Set(await STORE.followingIds()), byTime = (a, b) => a.bestMs - b.bestMs;
+    const order = cand.filter(x => fol.has(x.owner)).sort(byTime).map(m => [m, 'followed']).concat(cand.filter(x => !fol.has(x.owner)).sort(byTime).map(m => [m, 'fastest']));
+    let tries = 0;
+    for (const [m, why] of order) {
+      if (LAB.offIds.has(m.id)) continue; if (++tries > 5) break;
+      let s = sessOf(m.id); if (!s) { try { const x = await STORE.loadSession(m); if (add(x)) s = x; } catch (e) {} }
+      if (!s) continue; const L = bestLap(s); if (!L.px) continue; return { key: lapKey(s, L), why };
+    }
+    return null;
   };
-  if (!asCmp) LAB.cmpAuto = await autoCmp();
+  if (!asCmp && !LAB.curOff) LAB.cmpAuto = await autoCmp();
   // the owner's previous session on this layout in the same kart class (and their best before this one): the digest says what changed
   LAB.prev = null;
   try {
@@ -6802,7 +7020,7 @@ LAB.open = async function (meta, asCmp) {
   setStatus('labStatus', G.fitNote || '', 'ok');
   // a session that leaves this layout's line for a good part of the lap was driven on another configuration of the track: say so — the
   // corners along that part cannot be compared with anyone here (the map still draws the lap as it was driven)
-  { const bl = bestLap(sess), BP = bl && bl.px ? DATA.projectLap(bl, G.track, G.rev) : null; if (BP && BP.lost > 0.12) setStatus('labStatus', t('{p}% of the lap runs away from the “{layout}” line — a different configuration of the track? Pick the right layout under the session name, or ask an admin to add it; the corners along that part are not comparable here.', { p: Math.round(BP.lost * 100), layout: (STORE.getLayout(LAB.tid, LAB.lid) || {}).name || LAB.lid }), 'warn'); }
+  { const bl = bestLap(sess), BP = bl && bl.px ? DATA.projectLap(bl, G.track, G.rev) : null; if (LAB.curOff) setStatus('labStatus', t('{p}% of the lap runs away from the “{layout}” line — it was driven on another configuration of the track, so it is not compared with the sessions of this one. Pick the right layout (Edit), or ask an admin to add it.', { p: Math.round(((sess._fit && sess._fit.lost) || (BP && BP.lost) || 0) * 100), layout: (STORE.getLayout(LAB.tid, LAB.lid) || {}).name || LAB.lid }), 'warn'); }
   // older sessions have no shape preview for the feed: add one the first time the owner opens them
   if (mySession(sess) && !sess.preview && sess.owner !== 'local' && STORE.canWrite()) { try { const pv = STORE.previewOf(sess); if (pv) { await STORE.updateSession(sess.id, { preview: pv }); } } catch (e) {} }
   // and the analysis card (the lap line with brake / lift / apex / throttle points, corner numbers, the biggest reserves): computed once, drawn in the feed for everyone
@@ -6813,7 +7031,9 @@ LAB.open = async function (meta, asCmp) {
 // load one more session into the lab (as a comparison candidate) by its meta
 LAB.load = async function (meta) {
   if (sessOf(meta.id)) return sessOf(meta.id);
+  if (LAB.curOff) throw new Error(t('this session was driven on another configuration — pick its layout first (Edit)'));
   const s = await STORE.loadSession(meta); const r = GEOM.attach(s, LAB.G); if (!r.ok) throw new Error(r.error || 'attach');
+  if (!fitsLayout(s, LAB.G)) { (LAB.offIds = LAB.offIds || new Set()).add(s.id); throw new Error(t('its lap does not follow this layout — it was driven on another configuration')); }
   LAB.sessions.push(s); LAB.names = await STORE.names(LAB.sessions.map(x => x.owner)); return s;
 };
 // ask the lab to drop its loaded state (after a session was edited or deleted elsewhere)
@@ -7348,12 +7568,14 @@ function renderCmpPicker() {
     const fav = (r) => STORE.markOf(r.meta.id, 0) ? 1 : 0;
     rows.sort((a, b) => (b.same - a.same) || (fav(b) - fav(a)) || (b.mine - a.mine) || (b.meta.date || '').localeCompare(a.meta.date || ''));
     list.innerHTML = '';
+    if (LAB.curOff) { list.appendChild(el('div', 'hint', t('This session was driven on another configuration of the track — comparisons are off until its layout is right (Edit).'))); return; }
     if (!rows.length) { list.appendChild(el('div', 'hint', t('No other sessions yet. Upload another stint or wait for other drivers to publish on this layout.'))); return; }
     for (const r of rows) {
       const m = r.meta, b = el('button', 'cmp-row'); b.type = 'button'; if (!r.same) b.disabled = true;
       const tr = STORE.getTrack(m.track); const who = el('span', 'who', r.mine ? t('You') : ((names[m.owner] || {}).name || t('Driver')));
       const nm = el('span', 'nm', `${m.label || m.name} · ${fmtDate(m.date)}${!r.same ? ` · ${tr ? tr.name : (m.trackName || t('Custom'))}` : ''}`); if (fav(r)) nm.prepend(el('span', 'star', '★'));
-      const pill = el('span', 'pill ' + (r.same ? 'ok' : 'off'), r.same ? t('same layout') : t('other layout'));
+      const off = r.same && LAB.offIds && LAB.offIds.has(m.id); if (off) b.disabled = true;
+      const pill = el('span', 'pill ' + (r.same && !off ? 'ok' : 'off'), off ? t('another configuration?') : (r.same ? t('same layout') : t('other layout'))); if (off) pill.title = t('Uploaded under this layout, but the lap follows another configuration of the track — not comparable.');
       const pills = el('span', 'pills'); pills.appendChild(pill); if (m.kart || kartClassOf(m) !== kartClassOf(sess)) pills.appendChild(el('span', 'pill ' + (kartCompatible(m, sess) ? '' : 'off'), kartLabel(m)));
       b.append(who, nm, el('span', 'tm', fmtMs(m.bestMs)), pills);   // on a phone the pills take a second line, so the name and the session read
       b.onclick = async () => { b.classList.add('busy'); try { const s = r.loaded ? m : await LAB.load(m); if (LAB.pickerFor === 'cmp2') { LAB.cmp2 = thirdDefault(s); LAB.pickerFor = ''; } else { LAB.cmp = sessAvg(s) ? 'avg:' + s.id : lapKey(s, bestLap(s)); LAB.chat = []; LAB.selN = 0; } LAB.pickerOpen = false; labRender(); } catch (e) { toast(t('Could not load that session: {e}', { e: e && e.message || e })); b.classList.remove('busy'); } };
@@ -7939,12 +8161,12 @@ function aiContext() {
   const D = LAB.dcmp; if (!D) return '';
   const sess = D.sess, coach = LAB.coach, clean = sess.laps.filter(x => x.clean), avg = clean.reduce((s, x) => s + x.timeMs, 0) / Math.max(1, clean.length) / 1000;
   const E = (P, w) => { const e = engWin(P, w); if (!e) return {}; const o = { revs_min: Math.round(e.rmin), revs_max: Math.round(e.rmax) }; if (e.gears.length) o.gears = e.gears.join('>'); if (e.down.length) o.downshift = { to_gear: e.down[0].to, where_m_from_apex: Math.round(e.where(e.down[0])), kmh: +kmh(e.down[0].v) }; if (e.up.length) o.upshift = { to_gear: e.up[0].to, where_m_from_apex: Math.round(e.where(e.up[0])), rpm: Math.round(e.up[0].rpm) }; if (isFinite(e.t1)) o.water_c = +e.t1.toFixed(1); return o; };
-  const M = (m, P, w) => m ? Object.assign({ pedal: pedalText(m), entry_kmh: +kmh(m.vEntry), released_m: m.sRel >= 0 ? Math.round(m.sRel) : null, apex_kmh: +kmh(m.vApex), apex_m: Math.round(m.sApex), throttle_m: m.sThr >= 0 ? Math.round(m.sThr) : null, exit_kmh: +kmh(m.vExit), lateral_g: +m.gmax.toFixed(2), time_s: +m.time.toFixed(2) }, P ? E(P, w) : {}) : null;
+  const M = (m, P, w) => m ? Object.assign({ slowing: pedalText(m), entry_kmh: +kmh(m.vEntry), decel_ends_m: m.sRel >= 0 ? Math.round(m.sRel) : null, apex_kmh: +kmh(m.vApex), apex_m: Math.round(m.sApex), accel_from_m: m.sThr >= 0 ? Math.round(m.sThr) : null, exit_kmh: +kmh(m.vExit), lateral_g: +m.gmax.toFixed(2), time_s: +m.time.toFixed(2) }, P ? E(P, w) : {}) : null;
   const box = sess._box && sess._box.box, engine = box ? { channels: Object.keys(box.ch).filter(k => box.ch[k]), gearbox: box.kind === 'single' ? 'none (direct drive)' : `${box.gears} gears${box.kind === 'dd2' ? ' (Rotax DD2)' : ''}`, revs_peak: Math.round(box.rpmMax), water_c: box.t1 ? { min: +box.t1.min.toFixed(1), max: +box.t1.max.toFixed(1) } : undefined, note: 'shift points are read from the revs against the GPS speed (±0.3 s); gears are numbered from the ratio levels seen in the session' } : undefined;
   const corners = D.rows.map(r => { const c = coach && coach.corners.find(x => x.n === r.w.n); return { corner: 'T' + r.w.n, direction: r.w.dir === 'L' ? 'left' : 'right', radius_m: Math.round(r.w.Rmin), apex_from_sf_m: Math.round(r.R.sApex), reference: M(r.R, D.R, r.w), comparison: M(r.O, D.O, r.w), comparison_lap: r.pick ? r.pick.L.n : undefined, third_time: r.M3 ? +r.M3.time.toFixed(2) : undefined, delta_s: r.cmp ? +r.cmp.dt.toFixed(2) : null, delta_text: r.cmp ? r.cmp.text : null, coach: c ? { best_passes: DATA.coachText(c), reserve_s: +Math.max(0, r.R.time - c.tTop).toFixed(2), time_spread_s: c.tStd !== undefined ? +c.tStd.toFixed(2) : null } : null }; });
   return JSON.stringify({ track: LAB.trackName, layout: LAB.G.layout ? LAB.G.layout.name : LAB.lid, session: { name: shortSess(sess), driver: sess.driver, date: sess.date, kart: kartLabel(sess), kart_class: kartClassOf(sess), laps: sess.laps.length, clean: clean.length, best_lap: bestLap(sess).n, best_time: fmtMs(bestLap(sess).timeMs), avg_clean: fmtLap(avg), is_viewer_own: !!D.ref.mine }, engine, reference_lap: { what: D.ref.name, time: fmtLap(D.R.T) }, third_lap: D.P3 ? { who: D.name3, time: fmtLap(D.P3.T), delta_s: +(D.R.T - D.P3.T).toFixed(2), note: 'a third lap on the screen for visual comparison; per corner: third_time' } : undefined, comparison: D.O ? Object.assign({ who: D.nameOf(D.O), time: fmtLap(D.O.T), delta_s: +D.total.toFixed(2) }, D.O.ideal ? { ideal: true, note: 'the ideal lap stitches the fastest pass through each corner from different laps of this session; approximate — corner combinations are not accounted for; each corner says which lap it came from (comparison_lap)' } : {}) : null, digest: $('digest').innerText, corners });
 }
-const AI_RULES = () => `You are a karting coach — rental karts (Sodi RT10, Honda GX390, up to ~80 km/h) and sport karts (Rotax, X30, DD2, KZ; when the session has an "engine" block, use the revs, gears and shift points too) — and an Alfano telemetry analyst. Below is a JSON breakdown of one session on a track: corners T1…Tn are numbered from the start/finish line; for each one you get what the driver did on the reference lap and on the comparison lap: points in metres from S/F, speeds in km/h, corner time, plus "coach" — statistics of the best passes through that corner across all loaded laps and the reserve. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, briefly and concretely, in plain language without jargon, referring to corner numbers and the numbers in the data. If asked about something not in the data (video, a line more precise than ±1 m, kart condition), say so plainly. Never invent numbers. Plain text, no tables or headings; lists only when short.`;
+const AI_RULES = () => `You are a karting coach — rental karts (Sodi RT10, Honda GX390, up to ~80 km/h) and sport karts (Rotax, X30, DD2, KZ; when the session has an "engine" block, use the revs, gears and shift points too) — and an Alfano telemetry analyst. Below is a JSON breakdown of one session on a track: corners T1…Tn are numbered from the start/finish line; for each one you get what the driver did on the reference lap and on the comparison lap: points in metres from S/F, speeds in km/h, corner time, plus "coach" — statistics of the best passes through that corner across all loaded laps and the reserve. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, briefly and concretely, in plain language without jargon, referring to corner numbers and the numbers in the data. All points come from the GPS speed, not from pedal sensors: say where the kart starts slowing (deceleration) and where it starts gaining speed (acceleration) — never that the driver presses or releases the brake or the throttle. If asked about something not in the data (video, a line more precise than ±1 m, kart condition), say so plainly. Never invent numbers. Plain text, no tables or headings; lists only when short.`;
 async function askAI() {
   if (STORE.aiOn) return askCoachInline();
   const q = $('askInput').value.trim(); if (!q || !sampleFn || !LAB.dcmp) return;
@@ -8651,7 +8873,7 @@ function layoutName(tid, lid) { const l = STORE.getLayout(tid, lid); return l ? 
 $('homeUpload').onclick = () => UPLOAD.open({});
 // ---------- AI coach: chats with memory of the driver's sessions; credits and the Pro plan ----------
 const AI = { chats: [], cur: null, msgs: [], wallet: null, busy: false, ctl: null, newCtx: '' };
-const AI_RULES_V2 = () => `You are Hutka's racing coach: an analyst of karting telemetry (Alfano and similar loggers). Most sessions are rental karts (Sodi RT8/RT10-class, ~70–80 km/h); a session may name a sport kart (Rotax, X30, KZ…) — a different world with far higher speeds and later brake points: never compare times across kart classes and fit the advice to the class named. Everything you say must come from the data below: the driver's own sessions, the corner-by-corner breakdown of the session this chat is about (if any), and the fastest published laps of other drivers on the same layouts. Corners T1…Tn are numbered from the start/finish line; points are metres from S/F, speeds in km/h. Compare the driver with the fast published laps when the layout matches; say which corners and what exactly (brake point, apex speed, throttle point, exit speed). If a question needs data that is not here (another session, video, kart setup, a line more precise than ±1 m), say so and tell the driver what to upload or publish. Never invent numbers or corners. Always name corners as T<number> (T7, T12) — the app turns them into markers on the lap map. Be compact: lead with the one thing that matters, then at most three corners, one or two lines each with the numbers (brake / apex / throttle / exit); about 180 words, never more than 260, unless the driver asks for a full breakdown. Finish every sentence — no trailing lists. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, plain language, no headings or tables; short lists are fine. Address the driver as "you".`;
+const AI_RULES_V2 = () => `You are Hutka's racing coach: an analyst of karting telemetry (Alfano and similar loggers). Most sessions are rental karts (Sodi RT8/RT10-class, ~70–80 km/h); a session may name a sport kart (Rotax, X30, KZ…) — a different world with far higher speeds and later deceleration points: never compare times across kart classes and fit the advice to the class named. Everything you say must come from the data below: the driver's own sessions, the corner-by-corner breakdown of the session this chat is about (if any), and the fastest published laps of other drivers on the same layouts. Corners T1…Tn are numbered from the start/finish line; points are metres from S/F, speeds in km/h. Compare the driver with the fast published laps when the layout matches; say which corners and what exactly (where the kart starts slowing, apex speed, where it starts accelerating, exit speed). All points come from the GPS speed, not from pedal sensors: speak of deceleration and acceleration — never of pressing or releasing the brake or the throttle. If a question needs data that is not here (another session, video, kart setup, a line more precise than ±1 m), say so and tell the driver what to upload or publish. Never invent numbers or corners. Always name corners as T<number> (T7, T12) — the app turns them into markers on the lap map. Be compact: lead with the one thing that matters, then at most three corners, one or two lines each with the numbers (decel / apex / accel / exit); about 180 words, never more than 260, unless the driver asks for a full breakdown. Finish every sentence — no trailing lists. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, plain language, no headings or tables; short lists are fine. Address the driver as "you".`;
 // the memory: profile, the session library, fast laps on the driver's layouts, and the open session in detail
 async function aiSystem(sessionMeta) {
   const parts = [AI_RULES_V2()];
