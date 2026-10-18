@@ -16,7 +16,7 @@
     "contentInset": "never",
     "backgroundColor": "#ffffff",
     "preferredContentMode": "mobile",
-    "limitsNavigationsToAppBoundDomains": false
+    "limitsNavigationsToAppBoundDomains": true
   },
   "android": {
     "backgroundColor": "#ffffff",

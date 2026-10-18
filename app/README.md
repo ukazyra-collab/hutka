@@ -6,7 +6,7 @@
 - **Вход** через Google / Apple / ссылку на почту открывает системный браузер и возвращается в приложение по ссылке `hutka://auth` (Google запрещает вход внутри встроенного браузера — поэтому так).
 - **«Открыть в Hutka»**: файл `.alf2` (и `.gpx`, `.vbo`, `.csv`) из приложения Alfano, Файлов или мессенджера сразу попадает в окно загрузки сессии.
 - Поворот экрана не заблокирован (кокпит в Lab работает горизонтально), сплэш-экран, статус-бар под цвет приложения.
-- Офлайн-страница, если нет сети (`www/offline.html`).
+- Запуск без интернета (с 18 окт 2026): сайт хранится в самом телефоне (service worker), приложение открывается на трассе без связи, читает прибор, а сессии ждут на телефоне и загружаются сами, когда сеть появится. Android — уже (через сайт, без новой сборки); iPhone — со следующей сборки (раздел 4e). Самый первый запуск без сети, пока сайт ещё ни разу не открывался, — офлайн-страница (`www/offline.html`).
 
 Один код — две платформы. Ниже — весь путь до магазинов, по шагам.
 
@@ -193,6 +193,14 @@ iOS: Xcode → Version 1.3, Build +1 → Archive → Upload. Android: `versionCo
 - **RaceBox Mini S / Micro** — готов. Протокол опубликован производителем (RaceBox BLE Protocol Documentation rev. 9): UART-сервис `6E400001-…`, кадры B5 62 | class | id | len | payload | CK_A CK_B; статус памяти `FF 22`, разблокировка `FF 30` (4 байта кода), выгрузка `FF 23` → поток записей `FF 21` (80 байт, как live-сообщение) и меток старт/стоп `FF 26` → ACK `FF 02 [FF 23]`, стирание `FF 24`. Записи режутся на заезды по меткам старта и паузам > 2 мин, идут в универсальный импорт как CSV 25 Гц (`RaceBox <дата>.csv`), круги режутся по замыканию петли и выравниваются по S/F разметки.
 - **Alfano 7** — готов (v34.7): сессии из памяти прибора по BLE-«прозрачному UART» модуля RN4678 (`alfano7.js`), тот же протокол, что у приложения Alfano по SPP; разведка остаётся запасным режимом, если прибор не принял пароль. Подробности — README сайта, раздел v34.7.
 
+## 4e. Запуск без интернета (18 окт 2026)
+
+На трассе часто нет связи. Сайт кладёт себя в телефон (service worker `sw.js`: страница, `config.js`, `supabase.js`, логотипы); открытое без сети приложение стартует из этой копии. Вход сохраняется: если токен истёк, пока не было связи, Hutka держит сохранённую сессию и обновит её сама, когда сеть вернётся. Прочитанные с прибора сессии ждут на телефоне (IndexedDB) и уходят сами; сверху страницы — строка «No internet — reading the lap timer still works…».
+
+- **Android** — работает сразу после выкладки сайта (v34.27): WebView с service worker. Нужен один запуск приложения с интернетом, чтобы сайт сохранился в телефоне.
+- **iPhone** — WKWebView даёт service worker только приложениям с App-Bound Domains. В проекте уже включено: `capacitor.config.json` → `ios.limitsNavigationsToAppBoundDomains: true`, `Info.plist` → `WKAppBoundDomains` (hutka.ai, www.hutka.ai, ukazyra-collab.github.io, tqixfqrludqpxqxypiia.supabase.co, localhost). Попадёт в следующую сборку iOS — **перед релизом проверить на TestFlight**: вход (почта, Google, Apple), загрузка файла, прибор по Bluetooth, пуши, ссылки наружу (открываются в Safari). Если что-то из этого сломается, вернуть `false` и убрать ключ из `Info.plist`.
+- Проверка на телефоне: открыть приложение с интернетом → закрыть совсем (смахнуть из списка приложений) → включить Airplane Mode (Bluetooth снова включить в Control Center) → открыть приложение → Upload → From the lap timer → прочитать сессию → «No internet right now — the session is kept on this phone…» → выключить Airplane Mode → через несколько секунд «1 session from the lap timer is uploaded».
+
 ## 5. Обновления
 
 - **Сайт** (почти всё): просто деплой на GitHub Pages — приложение подхватит само.
@@ -202,7 +210,7 @@ iOS: Xcode → Version 1.3, Build +1 → Archive → Upload. Android: `versionCo
 
 ## 6. Как это устроено (для разработчика)
 
-- `capacitor.config.json` — `server.url` (живой сайт), `errorPath` (офлайн-страница), цвета сплэша и статус-бара.
+- `capacitor.config.json` — `server.url` (живой сайт), `errorPath` (офлайн-страница для самого первого запуска без сети), `ios.limitsNavigationsToAppBoundDomains: true` (service worker в WKWebView, см. 4e), цвета сплэша и статус-бара.
 - `ios/App/App/Info.plist` — URL-схема `hutka`, типы документов `.alf2/.gpx/.vbo/.csv` («Открыть в Hutka»), тексты разрешений на фото/камеру, все ориентации, `ITSAppUsesNonExemptEncryption=false`.
 - `android/app/src/main/AndroidManifest.xml` — intent-filter'ы для `hutka://auth` и файлов; `MainActivity.java` переупаковывает «Поделиться» (ACTION_SEND) в ACTION_VIEW, который Capacitor отдаёт сайту событием `appUrlOpen`.
 - На стороне сайта всё в `NATIVE` (`app_core.js`): `appUrlOpen` → либо `finishSignIn(url)` (токены из `hutka://auth#…` или `?code=` → сессия Supabase), либо чтение файла через плагин Filesystem → `UPLOAD.withFiles`. Вход через Google/Apple в приложении идёт через плагин Browser (`skipBrowserRedirect`).

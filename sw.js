@@ -1,6 +1,7 @@
-// Hutka service worker: offline app shell + "share to Hutka" from the Alfano app (Web Share Target)
-const V = 'hutka-shell-v91';
-const SHELL = ['./', './index.html', './config.js', './geo.txt', './supabase.js', './manifest.webmanifest'];
+// Hutka service worker: offline app shell + "share to Hutka" from the Alfano app (Web Share Target). Since v34.27 it runs inside the
+// Android app too: the app opened at the track with no signal starts from this cache, reads the lap timer and keeps the sessions for later.
+const V = 'hutka-shell-v92';
+const SHELL = ['./', './index.html', './config.js', './geo.txt', './supabase.js', './manifest.webmanifest', './logo.png', './logo-dark.png', './icon-192.png'];
 self.addEventListener('install', (e) => { e.waitUntil((async () => { const c = await caches.open(V); for (const u of SHELL) { try { await c.add(new Request(u, { cache: 'reload' })); } catch (err) {} } self.skipWaiting(); })()); });
 self.addEventListener('activate', (e) => { e.waitUntil((async () => { for (const k of await caches.keys()) if (k !== V && k !== 'hutka-share') await caches.delete(k); await self.clients.claim(); })()); });
 self.addEventListener('fetch', (e) => {
@@ -21,7 +22,7 @@ self.addEventListener('fetch', (e) => {
   e.respondWith((async () => {
     const c = await caches.open(V);
     if (pageLike) { try { const r = await fetch(req, { cache: 'no-cache' }); c.put(req, r.clone()); return r; } catch (err) { return (await c.match(req)) || (await c.match('./index.html')) || Response.error(); } }
-    const hit = await c.match(req); const net = fetch(req).then(r => { c.put(req, r.clone()); return r; }).catch(() => null);
+    const hit = await c.match(req, { ignoreSearch: true }); const net = fetch(req).then(r => { c.put(req, r.clone()); return r; }).catch(() => null);
     return hit || (await net) || Response.error();
   })());
 });

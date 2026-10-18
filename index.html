@@ -30,7 +30,7 @@
 <meta name="apple-mobile-web-app-title" content="Hutka">
 <style>[hidden]{display:none!important}html{color-scheme:light}</style>
 <script src="config.js"></script>
-<script>if ("serviceWorker" in navigator && location.protocol === "https:" && !window.Capacitor) addEventListener("load", () => { navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => { const u = (r.active || r.waiting || r.installing || {}).scriptURL || ""; if (u && !/\/sw\.js$/.test(u)) r.unregister(); })).catch(() => {}); if (window.caches) caches.keys().then(ks => ks.forEach(k => { if (!k.startsWith("hutka-")) caches.delete(k); })).catch(() => {}); navigator.serviceWorker.register("sw.js").catch(() => {}); });</script>
+<script>if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) addEventListener("load", () => { navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => { const u = (r.active || r.waiting || r.installing || {}).scriptURL || ""; if (u && !/\/sw\.js$/.test(u)) r.unregister(); })).catch(() => {}); if (window.caches) caches.keys().then(ks => ks.forEach(k => { if (!k.startsWith("hutka-")) caches.delete(k); })).catch(() => {}); navigator.serviceWorker.register("sw.js").catch(() => {}); });</script>
 <script src="supabase.js"></script>
 </head>
 <body>
@@ -1108,6 +1108,8 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 .dev-item .dev-in.wait{background:var(--warn);font-size:11px}
 .dev-item .dev-in-tx.wait{color:var(--warn)}
 .banner.outbox{align-items:center;gap:10px}
+.offbar{margin:0 28px 8px;align-items:center}
+@media (max-width:860px){.offbar{margin:0 16px 8px}}
 .banner.outbox #obText{flex:1;min-width:0}
 .banner.outbox .btn{flex:none}
 .dev-item .dev-go{margin-left:auto;flex:none;width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.45}
@@ -1349,7 +1351,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
     <symbol id="i-bt" viewBox="0 0 24 24"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></symbol>
-    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol><symbol id="i-offline" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M6.3 8.3A5.5 5.5 0 0 0 7 19h10.5c.6 0 1.1-.1 1.6-.3M21 15.5A4 4 0 0 0 17.5 11h-.7A6.5 6.5 0 0 0 9.9 5.4"/></symbol>
   </defs>
 </svg>
 
@@ -1387,6 +1389,8 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       <a class="userchip" href="#profile" id="userChip"><img alt="" id="chipAvatar"><div><div class="nm" id="chipName">—</div><div class="sub" id="chipSub"></div></div></a>
       <button class="btn primary" id="btnSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button>
     </header>
+    <!-- no connection: one line on every page — the lists cannot load, the lap timer still reads -->
+    <div class="banner warn offbar" id="offBar" role="status" hidden><svg aria-hidden="true"><use href="#i-offline"/></svg><span data-t="No internet — reading the lap timer still works; the sessions upload by themselves once the connection is back.">No internet — reading the lap timer still works; the sessions upload by themselves once the connection is back.</span></div>
 
     <!-- ========== HOME ========== -->
     <section class="page" id="pg-home" hidden>
@@ -4758,6 +4762,13 @@ Object.assign(I18N.RU, {
   '{n} session from the lap timer waits on this phone.|{n} sessions from the lap timer wait on this phone.': '{n} сессия с прибора ждёт на телефоне.|{n} сессии с прибора ждут на телефоне.|{n} сессий с прибора ждут на телефоне.',
   'The upload did not go through — Hutka tries again by itself.': 'Загрузка не прошла — Hutka попробует ещё раз сама.',
   'Daily limit reached — Hutka uploads by itself tomorrow.': 'Дневной лимит исчерпан — Hutka загрузит сама завтра.' });
+
+// v34.27 — the app opened with no internet
+Object.assign(I18N.RU, {
+  'No internet — reading the lap timer still works; the sessions upload by themselves once the connection is back.': 'Нет интернета — прибор читать можно, сессии загрузятся сами, когда появится связь.',
+  'No connection — your sessions show when it is back.': 'Нет связи — твои сессии появятся, когда она вернётся.',
+  'No connection': 'Нет связи',
+  'The latest sessions show when the connection is back.': 'Свежие сессии появятся, когда вернётся связь.' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -5092,7 +5103,7 @@ const STORE = (() => {
     let dbp = null;
     const open = () => dbp || (dbp = new Promise((res, rej) => { try { const r = indexedDB.open('hutka', 1); r.onupgradeneeded = () => { const d = r.result; for (const n of ['sessions', 'chunks', 'reports', 'kv']) if (!d.objectStoreNames.contains(n)) d.createObjectStore(n, { keyPath: 'id' }); }; r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }));
     const tx = async (store, m, fn) => { const d = await open(); return new Promise((res, rej) => { const tr = d.transaction(store, m), rq = fn(tr.objectStore(store)); tr.oncomplete = () => res(rq && rq.result); tr.onerror = () => rej(tr.error); tr.onabort = () => rej(tr.error); }); };
-    return { put: (s, v) => tx(s, 'readwrite', st => st.put(v)), get: (s, id) => tx(s, 'readonly', st => st.get(id)), all: (s) => tx(s, 'readonly', st => st.getAll()), del: (s, id) => tx(s, 'readwrite', st => st.delete(id)) };
+    return { put: (s, v) => tx(s, 'readwrite', st => st.put(v)), get: (s, id) => tx(s, 'readonly', st => st.get(id)), all: (s) => tx(s, 'readonly', st => st.getAll()), range: (s, lo, hi) => tx(s, 'readonly', st => st.getAll(IDBKeyRange.bound(lo, hi))), del: (s, id) => tx(s, 'readwrite', st => st.delete(id)) };
   })();
 
   // ----- packing -----
@@ -5216,19 +5227,37 @@ const STORE = (() => {
     const must = (r) => { if (r.error) { const e = new Error(r.error.message || 'db error'); e.code = r.error.code; throw e; } return r.data; };
     const row2doc = (r) => Object.assign({ id: r.id }, r.data || {});
     const noCol = (err) => /column|schema cache|PGRST204|42703/i.test((err.message || '') + ' ' + (err.code || ''));   // a column the SQL update has not added yet
-    let session = null;
+    let session = null, kept = false;
+    const authKey = (() => { try { return 'sb-' + new URL(cfg.supabaseUrl).hostname.split('.')[0] + '-auth-token'; } catch (e) { return ''; } })();
     const A = {
       kind: 'supabase', sb,
+      // the token is live (a request carries the driver, not the anonymous key): false while a session kept with no connection waits to refresh
+      async live() { try { const r = await sb.auth.getSession(); return !!(r.data && r.data.session); } catch (e) { return false; } },
       async init() {
-        const s = await sb.auth.getSession(); session = s.data ? s.data.session : null;
-        sb.auth.onAuthStateChange((ev, s2) => { const was = session && session.user ? session.user.id : null; session = s2; const now = s2 && s2.user ? s2.user.id : null; if (was !== now) STORE.reload(); });
+        let s = { data: null, error: null }; try { s = await sb.auth.getSession(); } catch (e) { s = { data: null, error: e }; }
+        session = s.data ? s.data.session : null;
+        // no connection and the access token has run out: supabase-js cannot refresh it, so getSession() gives nothing — yet the session is
+        // still on this device and refreshes by itself once the connection is back. Meanwhile the driver stays signed in: the app opened at
+        // the track with no signal reads the lap timer and keeps the sessions for later instead of asking to sign in.
+        if (!session && (navigator.onLine === false || (s.error && /fetch|network|retryable|timed? ?out/i.test((s.error.name || '') + ' ' + (s.error.message || ''))))) {
+          try { const v = JSON.parse(localStorage.getItem(sb.auth.storageKey || authKey) || 'null'); if (v && v.user && v.user.id && v.refresh_token) { session = v; kept = true; } } catch (e) {}
+        }
+        sb.auth.onAuthStateChange((ev, s2) => {
+          if (ev === 'INITIAL_SESSION') return;   // the session init has just read (null with no connection — that is not a sign-out)
+          const was = session && session.user ? session.user.id : null, now = s2 && s2.user ? s2.user.id : null;
+          if (kept && !now && ev !== 'SIGNED_OUT') return;   // still no connection: the session kept on this device stands
+          session = s2; if (kept && now) { kept = false; me.offline = false; notify('auth'); }   // the connection is back and the token refreshed
+          if (was !== now) STORE.reload();
+        });
         if (!session || !session.user) return null;
-        const u = session.user, admin = must(await sb.rpc('is_admin')) === true;
+        const u = session.user; let admin = false;
+        try { admin = must(await sb.rpc('is_admin')) === true; try { localStorage.setItem('hutka.adm.' + u.id, admin ? '1' : '0'); } catch (e) {} }
+        catch (e) { try { admin = localStorage.getItem('hutka.adm.' + u.id) === '1'; } catch (x) {} }   // no connection: as it was the last time
         const name = (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || (u.email || '').split('@')[0];
         // every signed-in person gets a profile row, so comments and search can show a name from the first day
         let firstLogin = false;
         try { const rows = must(await sb.from('profiles').select('id').eq('id', u.id).limit(1)); if (!rows.length) { must(await sb.from('profiles').insert({ id: u.id, racing_name: name })); firstLogin = true; } } catch (e) {}
-        return { id: u.id, name, avatarUrl: (u.user_metadata && u.user_metadata.avatar_url) || '', color: '#2f6bf0', canEdit: admin, isOwner: admin, canWrite: true, email: u.email || '', firstLogin };
+        return { id: u.id, name, avatarUrl: (u.user_metadata && u.user_metadata.avatar_url) || '', color: '#2f6bf0', canEdit: admin, isOwner: admin, canWrite: true, email: u.email || '', firstLogin, offline: kept };
       },
       async subscribeTracks(fn) { const rows = must(await sb.from('tracks').select('id,data')); fn(rows.map(row2doc)); },
       async saveTrack(id, body) { const row = { id, data: body, updated_at: new Date().toISOString() }; if (body.createdBy && A.communityCols !== false) { const r = await sb.from('tracks').upsert(Object.assign({ created_by: body.createdBy }, row)); if (!(r.error && noCol(r.error))) return must(r); A.communityCols = false; } return must(await sb.from('tracks').upsert(row)); },
@@ -5343,13 +5372,21 @@ const STORE = (() => {
       mode = adapter ? adapter.kind : 'local';
       if (adapter) {
         try { const m = await adapter.init(); if (m) Object.assign(me, m); } catch (e) {}
-        try { await adapter.subscribeTracks((list) => { tracks.clear(); for (const d of list) tracks.set(d.id, d); notify('tracks'); }); } catch (e) {}
+        try { await loadTracks(); } catch (e) { try { const c = await LDB.get('kv', 'cache:tracks'); if (c && Array.isArray(c.list) && !tracks.size) setTracks(c.list); } catch (x) {} }   // no connection: the tracks as they were the last time
         if (me.id) { try { const p = await adapter.getProfile(me.id); if (p) profiles.set(me.id, p); } catch (e) {} }
       }
     })();
     return ready;
   }
   function reload() { location.reload(); }
+  // the tracks come from the database and are kept on this device too, so an app opened with no connection still knows them (the Lab
+  // names them, a read of the lap timer finds its track); a draft is filed only against a list that came from the database this time
+  // (ensureTracks) — never a new track for want of the old list
+  let tracksFresh = false;
+  const setTracks = (list) => { tracks.clear(); for (const d of list) tracks.set(d.id, d); notify('tracks'); };
+  async function loadTracks() { await adapter.subscribeTracks((list) => { setTracks(list); tracksFresh = true; LDB.put('kv', { id: 'cache:tracks', at: Date.now(), list }).catch(() => {}); }); }
+  async function ensureTracks() { if (adapter && !tracksFresh) await loadTracks(); }
+  const live = async () => !adapter || !adapter.live || adapter.live();
 
   // ----- tracks & layouts -----
   const getTracks = () => Array.from(tracks.values()).sort(sortTracks);
@@ -5361,8 +5398,8 @@ const STORE = (() => {
   async function deleteTrack(tid) { if (adapter) { const ls = await getLayouts(tid, true); await adapter.deleteTrack(tid, ls.map(l => l.id)); } tracks.delete(tid); layouts.delete(tid); notify('tracks'); }
   async function getLayouts(tid, fresh) {
     if (!fresh && layouts.has(tid)) return layouts.get(tid);
-    let list = []; if (adapter) { try { list = await adapter.listLayouts(tid); } catch (e) { list = []; } }
-    list.sort(sortLayouts); layouts.set(tid, list); return list;
+    let list = [], ok = true; if (adapter) { try { list = await adapter.listLayouts(tid); } catch (e) { list = []; ok = false; } }
+    list.sort(sortLayouts); if (ok) layouts.set(tid, list); return list;   // a failed fetch (no connection) is not kept as "no layouts"
   }
   const getLayout = (tid, lid) => (layouts.get(tid) || []).find(l => l.id === lid) || null;
   async function saveLayout(tid, l) {
@@ -5380,6 +5417,7 @@ const STORE = (() => {
     if (adapter && me.id) { try { return (await adapter.mySessions(me.id)).sort(byDate); } catch (e) { return []; } }
     const all = await LDB.all('sessions').catch(() => []); return all.map(r => r.meta).sort(byDate);
   }
+  async function mySessionsStrict() { if (adapter && me.id) return (await adapter.mySessions(me.id)).sort(byDate); return mySessions(); }
   async function myOnTrack(tid) { if (adapter && me.id) { try { return (await adapter.myOnTrack(me.id, tid)).sort(byDate); } catch (e) { return []; } } return (await mySessions()).filter(m => m.track === tid); }
   // published sessions of a track (or a layout): the track page, the Lab and the feed ask for the same list many times in a row —
   // one network round trip per 20 s per key, dropped as soon as any session changes
@@ -5449,13 +5487,14 @@ const STORE = (() => {
   // IndexedDB keeps the File itself; one record per file, grouped by the read they came from
   const OUT = 'outbox:';
   async function outboxAdd(item) { const id = OUT + uid(); await LDB.put('kv', Object.assign({ id, at: Date.now(), owner: me.id || '' }, item)); return id; }
-  async function outboxAll() { try { return (await LDB.all('kv')).filter(r => String(r.id).startsWith(OUT) && (!r.owner || !me.id || r.owner === me.id)).sort((a, b) => a.at - b.at); } catch (e) { return []; } }
+  async function outboxAll() { try { return (await LDB.range('kv', OUT, OUT + '\uffff')).filter(r => (!r.owner || !me.id || r.owner === me.id)).sort((a, b) => a.at - b.at); } catch (e) { return []; } }
   async function outboxDel(id) { try { await LDB.del('kv', id); } catch (e) {} notify('outbox'); }
   async function outboxPut(rec) { try { await LDB.put('kv', rec); } catch (e) {} notify('outbox'); }   // a record kept back (one this version cannot read stays for the next)
   async function deleteSession(meta) { if (adapter && meta.owner !== 'local') await adapter.deleteSession(meta.id, meta.chunks); else await LDB.del('sessions', meta.id); sessCache.delete(meta.id); notify('sessions'); }
 
   // ----- people -----
-  async function profile(id) { if (profiles.has(id)) return profiles.get(id); let p = null; if (adapter && id && id !== 'local') { try { p = await adapter.getProfile(id); } catch (e) { p = null; } } profiles.set(id, p); return p; }
+  async function profile(id) { if (profiles.has(id)) return profiles.get(id); let p = null; if (adapter && id && id !== 'local') { try { p = await adapter.getProfile(id); } catch (e) { return null; } } profiles.set(id, p); return p; }   // a failed fetch (no connection) is not kept as "no profile"
+  async function profileStrict(id) { if (profiles.has(id)) return profiles.get(id); const p = adapter && id && id !== 'local' ? await adapter.getProfile(id) : null; profiles.set(id, p); return p; }   // throws when it cannot ask
   async function saveProfile(p) { if (!me.id) { try { localStorage.setItem('hutka.profile', JSON.stringify(p)); } catch (e) {} profiles.set('local', p); notify('profile'); return; } const body = Object.assign({}, p, { updatedAt: Date.now() }); if (adapter) await adapter.saveProfile(me.id, body); profiles.set(me.id, body); notify('profile'); }
   function localProfile() { try { return JSON.parse(localStorage.getItem('hutka.profile') || 'null'); } catch (e) { return null; } }
   async function names(ids) {
@@ -5625,8 +5664,8 @@ const STORE = (() => {
 
   return { init, reload, onChange, me, get mode() { return mode; }, get adapter() { return adapter; }, get hasDb() { return !!adapter; }, get hasIdentity() { return !!me.id; }, get hasAuth() { return !!(adapter && adapter.kind === 'supabase'); }, isAdmin: () => !!me.canEdit, canEditTrack: (tr) => !!me.canEdit || !!(tr && me.id && tr.createdBy === me.id), canWrite: () => !!adapter && !!me.id && me.canWrite !== false,
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
-    mySessions, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, outboxAdd, outboxAll, outboxDel, outboxPut, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, marks, markOf, setMark, removeMark, get marksOn() { return marksOk !== false && !!(adapter && adapter.marksOf && me.id); }, visit, adminVisits, track, adminAnalytics,
-    profile, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
+    mySessions, mySessionsStrict, ensureTracks, live, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, outboxAdd, outboxAll, outboxDel, outboxPut, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, marks, markOf, setMark, removeMark, get marksOn() { return marksOk !== false && !!(adapter && adapter.marksOf && me.id); }, visit, adminVisits, track, adminAnalytics,
+    profile, profileStrict, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); }, deviceLog: async (o) => { if (!adapter || !adapter.deviceLog) throw new Error('not configured'); if (!me.id) throw new Error('sign in'); return adapter.deviceLog(o); } };
 })();
@@ -6513,7 +6552,16 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button in the corner of any page and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.26.1';
+const APP_VERSION = 'v34.27';
+// no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
+let wasOffline = false;
+function syncOffline() {
+  const off = navigator.onLine === false, b = $('offBar'); if (b) b.hidden = !off;
+  // back online: once the driver's token is live again (a session kept with no connection refreshes by itself), the lists of the page in view load
+  if (wasOffline && !off) (async () => { for (let i = 0; i < 35 && !(await STORE.live()); i++) await new Promise(r => setTimeout(r, 2000)); if (navigator.onLine === false) return; try { await STORE.ensureTracks(); } catch (e) {} try { if (APP.route === 'home') await renderHomePage(); else if (APP.route === 'lab' && !LAB.current) await renderLabStart(); } catch (e) {} })();
+  wasOffline = off;
+}
+addEventListener('online', () => syncOffline()); addEventListener('offline', () => syncOffline()); syncOffline();
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -8622,7 +8670,9 @@ const DRAFTS = (() => {
     } catch (e) {}
   }
   async function save(parsed, say) {
-    const mine = await STORE.mySessions().catch(() => []), known = [], fresh = [];
+    // the library and the tracks as the database has them now: no connection → this throws, and the read waits on the phone (OUTBOX);
+    // a list that failed to load is never taken for an empty one (that would save a session twice or open a second page for its track)
+    await STORE.ensureTracks(); const mine = await STORE.mySessionsStrict(), known = [], fresh = [];
     for (const p of parsed) {
       const date = p.meta.date || fileDate(p.file), best = bestOfLaps(p.data.laps).timeMs;
       const hit = mine.find(m => minute(m.date) === minute(date) && Math.abs((+m.bestMs || 0) - best) <= 15);
@@ -8726,26 +8776,35 @@ const OUTBOX = (() => {
   }
   async function flush(manual) {
     if (busy || !STORE.hasIdentity || !STORE.canWrite()) return;
-    const list = await items(); count = list.length; if (!count) { banner(list); return; }
-    if (navigator.onLine === false && !manual) { arm(); return; }
-    busy = true; banner(list, true);
-    const groups = new Map(); for (const r of list) { if (!groups.has(r.batch)) groups.set(r.batch, []); groups.get(r.batch).push(r); }
-    let up = 0, offl = false, err = null;
-    for (const recs of groups.values()) {
-      const parsed = [], read = [];
-      for (const r of recs) { try { const f = new File([r.blob], r.name, { type: r.type, lastModified: r.lastModified }); parsed.push({ file: f, data: await readAnyLogger(f), meta: DATA.parseAlfName(f.name || '') }); read.push(r); } catch (e) { await STORE.outboxPut(Object.assign({}, r, { bad: APP_VERSION })); } }
-      if (!parsed.length) continue;
-      try { const res = await DRAFTS.save(parsed, () => {}); for (const r of read) await STORE.outboxDel(r.id); up += res.saved.length; }
-      catch (e) { if (offline(e)) { offl = true; break; } err = e; }   // still no connection: the rest waits too; another error: this read waits for the next try
-    }
+    busy = true;   // taken at once: the 'online', 'visible', 'auth' and timer calls come close together, and two runs would save a read twice
+    let list = [], up = 0, offl = false, err = null, ran = false;
+    try {
+      list = await items(); count = list.length; if (!count) { banner(list); return; }
+      if (navigator.onLine === false && !manual) { arm(); return; }
+      // a session kept on this device with no connection: the token refreshes by itself once the connection is back ('auth' below); until
+      // then a request would go out without the driver — wait for it rather than be refused
+      if (!(await STORE.live())) { if (manual) toast(t('Still no connection — the sessions stay on this phone and upload by themselves later.'), 4000); arm(); return; }
+      ran = true; banner(list, true);
+      const groups = new Map(); for (const r of list) { if (!groups.has(r.batch)) groups.set(r.batch, []); groups.get(r.batch).push(r); }
+      for (const recs of groups.values()) {
+        const parsed = [], read = [];
+        for (const r of recs) { try { const f = new File([r.blob], r.name, { type: r.type, lastModified: r.lastModified }); parsed.push({ file: f, data: await readAnyLogger(f), meta: DATA.parseAlfName(f.name || '') }); read.push(r); } catch (e) { await STORE.outboxPut(Object.assign({}, r, { bad: APP_VERSION })); } }
+        if (!parsed.length) continue;
+        try { const res = await DRAFTS.save(parsed, () => {}); for (const r of read) await STORE.outboxDel(r.id); up += res.saved.length; }
+        catch (e) { if (offline(e)) { offl = true; break; } err = e; }   // still no connection: the rest waits too; another error: this read waits for the next try
+      }
+    } catch (e) { err = err || e; }
+    finally { busy = false; }
+    if (!ran) return;
     if (err) { fails++; lastErr = err; } else if (!offl) { fails = 0; lastErr = null; }
-    busy = false; clearTimeout(timer); timer = null; await refresh();
+    clearTimeout(timer); timer = null; await refresh();
     if (up) { toast(tn(up, '{n} session from the lap timer is uploaded — it is in your Lab.', '{n} sessions from the lap timer are uploaded — they are in your Lab.').replace('{n}', up), 5000); STORE.track('outbox', { n: up }); if (APP.route === 'lab' && !LAB.current) renderLabStart(); }
     else if (manual && err) toast(refused(err), 4000);
     else if (manual && offl) toast(t('Still no connection — the sessions stay on this phone and upload by themselves later.'), 4000);
   }
   addEventListener('online', () => flush());
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') flush(); });
+  STORE.onChange((k) => { if (k === 'auth') flush(); });   // the driver's token is live again
   if ($('obGo')) $('obGo').onclick = () => flush(true);
   return { keep, flush, refresh, offline, items, get count() { return count; } };
 })();
@@ -9397,7 +9456,7 @@ async function renderHomePage() {
   // site-wide totals from hutka_counts; without the function (older database) — what the feed slice shows
   { const st = $('homeStats'); st.innerHTML = ''; const drivers = C ? C.drivers : new Set(pubs.map(s => s.owner)).size, laps = C ? C.laps : pubs.reduce((a, s) => a + (s.nLaps || 0), 0), nSess = C ? C.sessions : pubs.length; for (const [k, v] of [[t('Tracks'), C ? C.tracks : STORE.getTracks().length], [t('Sessions'), nSess], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="v">${v}</div><div class="k">${esc(k)}</div>`; st.appendChild(d); } }
   feed.innerHTML = ''; $('feedSub').textContent = pubs.length ? t('{n} published', { n: C && C.published ? C.published : pubs.length }) : '';
-  if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); e.appendChild(el('div', 't', STORE.hasDb ? t('No sessions published yet') : t('Sign in to see the feed'))); e.appendChild(el('div', '', STORE.hasDb ? t('Be the first: upload your session and publish it on the track page.') : t('The shared library needs a connection. Browse tracks meanwhile.'))); feed.appendChild(e); }
+  if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); const off = navigator.onLine === false; e.appendChild(el('div', 't', off ? t('No connection') : (STORE.hasDb ? t('No sessions published yet') : t('Sign in to see the feed')))); e.appendChild(el('div', '', off ? t('The latest sessions show when the connection is back.') : (STORE.hasDb ? t('Be the first: upload your session and publish it on the track page.') : t('The shared library needs a connection. Browse tracks meanwhile.')))); feed.appendChild(e); }
   // sessions several drivers marked as not helpful sink to the bottom of the feed
   const order = pubs.slice().sort((a, b) => (STORE.lowRated(counts[a.id]) - STORE.lowRated(counts[b.id])) || (b.createdAt || 0) - (a.createdAt || 0));
   // several uploads in a row by one driver fold into a single post: the fastest session with its card, the others as a short list (no flood)
@@ -9747,7 +9806,7 @@ const ONBOARD = {
   // the form shows on the first sign-in of a new account, and for a profile that still has no name at all (the email prefix only)
   needed(prof) { if (!STORE.hasIdentity) return false; if (STORE.me.firstLogin) return true; return !ONBOARD.hasName(prof); },
   async check() {
-    if (!STORE.hasIdentity) return false; let prof = null; try { prof = await STORE.profile(STORE.me.id); } catch (e) {}
+    if (!STORE.hasIdentity) return false; let prof = null; try { prof = await STORE.profileStrict(STORE.me.id); } catch (e) { return false; }   // no connection: the profile is not known, so no form — the next start asks
     if (ONBOARD.needed(prof)) { ONBOARD.open(prof || {}); return true; }
     // an older profile with a racing name but no first / last name: split it quietly, no questions
     const p = prof || {}; if (!(p.firstName || p.lastName) && p.racingName && (STORE.adapter || {}).profilePerson !== false) { const nm = splitName(p); if (nm.first) { try { await STORE.saveProfile(Object.assign({}, p, { firstName: nm.first, lastName: nm.last })); } catch (e) {} } }
@@ -9841,7 +9900,7 @@ async function renderProfile() {
 async function renderMySessionsTable(box, opts) {
   opts = opts || {}; const list = await STORE.mySessions(); box.innerHTML = '';
   if (opts.sub) opts.sub.textContent = list.length ? String(list.length) : '';
-  if (opts.hint) opts.hint.textContent = list.length ? (opts.compact ? t('Open a session to analyse it; Edit changes its name, track and layout.') : t('Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.')) : t('No sessions yet. Upload a session to start.');
+  if (opts.hint) opts.hint.textContent = list.length ? (opts.compact ? t('Open a session to analyse it; Edit changes its name, track and layout.') : t('Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.')) : (navigator.onLine === false ? t('No connection — your sessions show when it is back.') : t('No sessions yet. Upload a session to start.'));
   if (!list.length) return;
   const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl'); tb.innerHTML = `<thead><tr><th>${t('Session')}</th><th>${t('Track')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th>${t('Visibility')}</th><th></th></tr></thead>`; const body = el('tbody');
   for (const m of list) {
