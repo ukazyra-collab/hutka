@@ -41,6 +41,8 @@
             ".alf2",
             ".csv",
             ".zip",
+            ".xrz",
+            ".xrk",
             "application/octet-stream",
             "application/zip",
             "text/csv",

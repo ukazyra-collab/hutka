@@ -1961,8 +1961,8 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <!-- where the session comes from: the lap timer over Bluetooth first (one big coloured button), a file second -->
     <div class="upl-src" id="uplSrc">
       <button class="big-btn primary" id="uplFromDevice" type="button"><span class="bb-ic"><svg><use href="#i-bt"/></svg></span><span class="bb-tx"><b data-t="From the lap timer">From the lap timer</b><span id="uplBtSub" data-t="Bluetooth · Alfano 7, RaceBox">Bluetooth · Alfano 7, RaceBox</span></span><svg class="bb-chev"><use href="#i-chev"/></svg></button>
-      <button class="big-btn" id="uplDrop" type="button"><span class="bb-ic"><svg><use href="#i-file"/></svg></span><span class="bb-tx"><b data-t="Choose a file">Choose a file</b><span id="uplFileSub" data-t="Alfano .alf2 / .zip · AiM · RaceChrono · VBOX · GPX">Alfano .alf2 / .zip · AiM · RaceChrono · VBOX · GPX</span></span><svg class="bb-chev"><use href="#i-chev"/></svg></button>
-      <input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,application/zip" multiple hidden>
+      <button class="big-btn" id="uplDrop" type="button"><span class="bb-ic"><svg><use href="#i-file"/></svg></span><span class="bb-tx"><b data-t="Choose a file">Choose a file</b><span id="uplFileSub" data-t="Alfano .alf2 / .zip · AiM .xrk · RaceChrono · VBOX · GPX">Alfano .alf2 / .zip · AiM .xrk · RaceChrono · VBOX · GPX</span></span><svg class="bb-chev"><use href="#i-chev"/></svg></button>
+      <input type="file" id="uplFile" accept=".alf2,.csv,.zip,.vbo,.gpx,.txt,.xrk,.xrz,.drk,application/zip" multiple hidden>
       <a class="btn ghost upl-help" href="#help" id="uplHelpLink"><svg><use href="#i-help"/></svg><span data-t="How to get the file out of an Alfano">How to get the file out of an Alfano</span></a>
     </div>
     <div class="status" id="uplStatus"></div>
@@ -1991,13 +1991,13 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   </div>
   <div id="devExplore" hidden>
     <div class="dev-ex-head"><b id="devExTitle"></b><span class="hint" id="devExSub"></span></div>
-    <p class="hint" data-t="Hutka does not speak this device's language yet. Everything it says is recorded here: put it in Bluetooth mode, press its buttons, start a transfer in its menu — then send the log. That is how the download gets written.">Hutka does not speak this device's language yet. Everything it says is recorded here: put it in Bluetooth mode, press its buttons, start a transfer in its menu — then send the log. That is how the download gets written.</p>
-    <div class="hint warn" id="devExNone" hidden data-t="The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.">The browser could not open any of this device's services — Chrome only reaches services it knows in advance, and this device uses its own. The Hutka app on a phone sees everything: use it for this device.</div>
+    <p class="hint" id="devExHow" data-t="Hutka does not speak this device's language yet. Everything it says is recorded here: put it in Bluetooth mode, press its buttons, start a transfer in its menu — then send the log. That is how the download gets written.">Hutka does not speak this device's language yet. Everything it says is recorded here: put it in Bluetooth mode, press its buttons, start a transfer in its menu — then send the log. That is how the download gets written.</p>
+    <div class="hint warn" id="devExNone" hidden data-t="The browser cannot open this device's services, so Hutka cannot read it over Bluetooth here. Upload the session file instead — for an AiM MyChron, the .xrk file Race Studio 3 downloads from it.">The browser cannot open this device's services, so Hutka cannot read it over Bluetooth here. Upload the session file instead — for an AiM MyChron, the .xrk file Race Studio 3 downloads from it.</div>
     <pre class="dev-log" id="devLog"></pre>
-    <div class="hint" style="text-align:right"><span id="devLogN">0</span> <span data-t="lines">lines</span></div>
+    <div class="hint" id="devLogFoot" style="text-align:right"><span id="devLogN">0</span> <span data-t="lines">lines</span></div>
     <div class="row" id="devPinRow" hidden style="gap:6px;flex-wrap:wrap;margin-top:8px"><input type="text" id="devPin" inputmode="numeric" maxlength="8" placeholder="PIN" style="width:110px;font-family:var(--mono)"><button class="btn xs primary" id="devPinTry" type="button" data-t="Try the PIN">Try the PIN</button><button class="btn xs primary" id="devAlfHello" type="button" data-t="Alfano handshake">Alfano handshake</button><span class="hint" style="flex:1 1 200px" data-t="A code on the device's screen? Hutka sends it the common ways and listens for an answer.">A code on the device's screen? Hutka sends it the common ways and listens for an answer.</span></div>
     <div id="devConsole" hidden><div class="row" style="gap:6px;flex-wrap:wrap"><select id="devChr" style="flex:1 1 180px"></select><input type="text" id="devHex" placeholder="b5 62 ff 22 00 00   or   &quot;HELLO\r\n&quot;" style="flex:2 1 220px;font-family:var(--mono)"><button class="btn xs" id="devExSend" type="button" data-t="Send">Send</button><button class="btn xs ghost" id="devExSendNr" type="button" data-t="no response" title="write without response">no response</button></div><div class="hint" id="devExSent"></div></div>
-    <div class="row" style="justify-content:space-between;margin-top:10px"><button class="btn ghost" id="devExDisc" type="button" data-t="Disconnect">Disconnect</button><button class="btn primary" id="devSendLog" type="button" data-t="Send the log to Hutka">Send the log to Hutka</button></div>
+    <div class="row" style="justify-content:space-between;margin-top:10px"><button class="btn ghost" id="devExDisc" type="button" data-t="Disconnect">Disconnect</button><button class="btn primary" id="devSendLog" type="button" data-t="Send the log to Hutka">Send the log to Hutka</button><button class="btn primary" id="devToFile" type="button" hidden data-t="Upload the file instead">Upload the file instead</button></div>
   </div>
   <div id="devStage" hidden>
     <div class="status" id="devStatus"></div>
@@ -2934,7 +2934,7 @@ const IMPORT = (() => {
     const rows = src.rows; const out = [];
     const hasLap = rows.some(r => isFinite(r.lap)) && new Set(rows.map(r => r.lap).filter(isFinite)).size >= 2;
     if (hasLap) { let cur = null; for (const r of rows) { if (!cur || cur.n !== r.lap) { cur = { n: r.lap, rows: [] }; out.push(cur); } cur.rows.push(r); } return { laps: out.filter(L => L.rows.length > 20), how: 'column' }; }
-    if (src.beacons && src.beacons.length >= 2) { const b = src.beacons.slice().sort((p, q) => p - q); for (let k = 0; k + 1 < b.length; k++) { const seg = rows.filter(r => r.t >= b[k] && r.t < b[k + 1]); if (seg.length > 20) out.push({ n: k + 1, rows: seg }); } if (out.length) return { laps: out, how: 'beacons' }; }
+    if (src.beacons && src.beacons.length >= 2) { const b = src.beacons.slice().sort((p, q) => p - q); for (let k = 0; k + 1 < b.length; k++) { const seg = rows.filter(r => r.t >= b[k] && r.t < b[k + 1]); if (seg.length > 20) out.push({ n: k + 1, rows: seg, ms: src.lapMs ? src.lapMs[k] : 0 }); } if (out.length) return { laps: out, how: 'beacons' }; }
     // loop closure: an anchor a bit into the recording (past the pit exit), every return to it after ≥250 m closes a lap
     const kx = 111320 * Math.cos(rows[0].lat * Math.PI / 180), ky = 110574; const xy = rows.map(r => [(r.lon - rows[0].lon) * kx, (r.lat - rows[0].lat) * ky]);
     const dist = [0]; for (let i = 1; i < xy.length; i++) dist.push(dist[i - 1] + Math.hypot(xy[i][0] - xy[i - 1][0], xy[i][1] - xy[i - 1][1]));
@@ -2949,14 +2949,77 @@ const IMPORT = (() => {
     for (let k = 0; k + 1 < best.length; k++) out.push({ n: k + 1, rows: rows.slice(best[k], best[k + 1]) });
     return { laps: out, how: 'loop' };
   }
+  // ---- AiM (MyChron, Solo, EVO): the native file Race Studio and the device keep — .xrk (.xrz is the same, zlib-packed). Tagged blocks
+  // "<hTAG" + length (u32) + "\x01>" + payload + "<TAG" + 2 check bytes + ">". The GPS fixes are u-blox NAV-SOL records (position and
+  // velocity in ECEF, cm, cm/s) behind the logger's own clock (ms), up to 25 Hz; the laps are LAP blocks (number, lap time, end on the
+  // logger's clock); TRK holds the track's name, NDV the device's, TMD/TMT the local date and time. The engine: every channel is declared
+  // in a CHS block (index, type, short and long name, sample period in µs) and sampled in "(S" records — "(S" + time (ms, the logger's) +
+  // channel (u16) + value + ")": the revs a whole number, the temperatures half-precision floats (°C)
+  function parseXrk(u8) {
+    const n = u8.length, dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    if (!(n > 64 && u8[0] === 0x3c && u8[1] === 0x68 && u8[2] === 0x43 && u8[3] === 0x4e && u8[4] === 0x46)) return null;   // "<hCNF"
+    const up = (c) => c >= 65 && c <= 90, str = (i, len) => { let s = ''; for (let k = 0; k < len && u8[i + k]; k++) s += String.fromCharCode(u8[i + k]); return s.trim(); };
+    const A = 6378137, F = 1 / 298.257223563, B = A * (1 - F), E2 = F * (2 - F), EP2 = (A * A - B * B) / (B * B), D = 180 / Math.PI;
+    const rows = [], laps = [], meta = {}; let first = null;
+    const want = {}, eng = { rpm: [], t1: [] }, half = (h) => { const e = (h >> 10) & 0x1f, f = h & 0x3ff, sg = h & 0x8000 ? -1 : 1; return e === 31 ? NaN : e === 0 ? sg * f * 2 ** -24 : sg * (1 + f / 1024) * 2 ** (e - 15); };
+    const nm = (i, len) => { let s = ''; for (let k = 0; k < len; k++) s += u8[i + k] ? String.fromCharCode(u8[i + k]) : '\0'; return s.replace(/\0+$/, '').replace(/\0/g, '.').trim(); };
+    for (let i = 0; i + 12 < n; i++) {
+      if (u8[i] === 0x28 && u8[i + 1] === 0x53) {   // "(S": one sample of one channel — only the revs and the water are kept
+        const w = want[dv.getUint16(i + 6, true)];
+        if (w && u8[i + 10] === 0x29) { const raw = dv.getUint16(i + 8, true); eng[w].push([dv.getUint32(i + 2, true) / 1000, w === 'rpm' ? raw : half(raw)]); i += 10; }
+        continue;
+      }
+      if (u8[i] !== 0x3c || u8[i + 1] !== 0x68 || !up(u8[i + 2]) || !up(u8[i + 3]) || !up(u8[i + 4]) || u8[i + 11] !== 0x3e) continue;   // "<h" TAG … ">"
+      const tag = String.fromCharCode(u8[i + 2], u8[i + 3], u8[i + 4]) + (up(u8[i + 5]) ? String.fromCharCode(u8[i + 5]) : ''), len = dv.getUint32(i + 6, true), p = i + 12;
+      if (len > n - p) continue;
+      if (tag === 'GPS' && len === 56) {
+        const tl = dv.getUint32(p, true), tow = dv.getUint32(p + 4, true), week = dv.getUint16(p + 12, true), fix = u8[p + 14];
+        const x = dv.getInt32(p + 16, true) / 100, y = dv.getInt32(p + 20, true) / 100, z = dv.getInt32(p + 24, true) / 100, acc = dv.getUint32(p + 28, true) / 100;
+        const vx = dv.getInt32(p + 32, true) / 100, vy = dv.getInt32(p + 36, true) / 100, vz = dv.getInt32(p + 40, true) / 100;
+        if (fix >= 2 && (x || y || z) && acc <= 25) {
+          const P = Math.hypot(x, y), th = Math.atan2(z * A, P * B), lat = Math.atan2(z + EP2 * B * Math.sin(th) ** 3, P - E2 * A * Math.cos(th) ** 3), lon = Math.atan2(y, x);
+          rows.push({ t: tl / 1000, lat: lat * D, lon: lon * D, v: Math.hypot(vx, vy, vz) });
+          if (!first && week > 1000) first = { tl, tow, week };
+        }
+        i = p + len - 1; continue;
+      }
+      if (tag === 'CHS' && len >= 64) {   // a channel: the revs (a whole number) and the water temperature (a half float) are the ones the Lab draws
+        const idx = dv.getUint16(p, true), type = u8[p + 12] & 0x7f, sn = nm(p + 24, 8), ln = nm(p + 32, 24);
+        if (type === 0x0f && /^rpm\b|engine.?rpm/i.test(sn + ' ' + ln)) want[idx] = 'rpm';
+        else if (type === 0x11 && (/^(t\.?1|water|h2o|wat)\b/i.test(sn) || /water|temp.tr1/i.test(ln))) want[idx] = want[idx] || 't1';
+        i = p + len - 1; continue;
+      }
+      if (tag === 'LAP' && len === 20) { laps.push({ n: dv.getUint16(p + 2, true), ms: dv.getUint32(p + 4, true), end: dv.getUint32(p + 16, true) }); i = p + len - 1; continue; }
+      if (tag === 'TRK') meta.track = str(p, Math.min(len, 32)); else if (tag === 'NDV') meta.device = str(p, len); else if (tag === 'RCR') meta.racer = str(p, len); else if (tag === 'TMD') meta.date = str(p, len); else if (tag === 'TMT') meta.time = str(p, len);
+    }
+    if (rows.length < 50) return null;
+    rows.sort((a, b) => a.t - b.t);
+    // the engine onto the GPS fixes (both on the logger's clock), only when it looks like a real sensor: revs up to 25 000 and most of
+    // them running, the water between 0 and 110 °C (a head temperature on an air-cooled engine is not water)
+    const onRows = (key, S) => { S.sort((a, b) => a[0] - b[0]); let j = 0; for (const r of rows) { while (j + 1 < S.length && S[j + 1][0] <= r.t) j++; const a = S[j], b = S[Math.min(S.length - 1, j + 1)]; const f = b[0] > a[0] ? Math.min(1, Math.max(0, (r.t - a[0]) / (b[0] - a[0]))) : 0; r[key] = a[1] + (b[1] - a[1]) * f; } };
+    const R = eng.rpm.filter(x => isFinite(x[1])), W = eng.t1.filter(x => isFinite(x[1]));
+    if (R.length > 100 && R.every(x => x[1] >= 0 && x[1] <= 25000) && R.filter(x => x[1] > 500).length > R.length * 0.5) onRows('rpm', R);
+    if (W.length > 100 && W.every(x => x[1] > 0 && x[1] <= 110)) onRows('t1', W);
+    // lap boundaries on the logger's clock: every lap ends at its own end and starts its lap time earlier
+    laps.sort((a, b) => a.end - b.end);
+    const beacons = laps.length ? [Math.max(0, laps[0].end - laps[0].ms) / 1000].concat(laps.map(L => L.end / 1000)) : null, lapMs = laps.map(L => L.ms);
+    // when it was driven: the first fix's GPS week and time of week (UTC = GPS − 18 leap seconds), back to the logger's zero
+    const startMs = first ? 315964800000 + first.week * 604800000 + first.tow - 18000 - first.tl : NaN;
+    return { rows, app: 'aim', beacons, lapMs, startMs, meta };
+  }
+  // a zlib stream (.xrz) unpacked in the browser
+  async function inflate(u8) { const ds = new DecompressionStream('deflate'); const out = new Response(new Blob([u8]).stream().pipeThrough(ds)); return new Uint8Array(await out.arrayBuffer()); }
   // ---- uniform 10 Hz samples, longitudinal and lateral g from the motion itself
   function resample(lapRows) {
     const t0 = lapRows[0].t, T = lapRows[lapRows.length - 1].t - t0; if (!(T > 5)) return null;
     const n = Math.max(20, Math.round(T * HZ)), pts = []; let j = 0;
+    const extra = ['rpm', 't1'].filter(k => isFinite(lapRows[0][k]));   // the engine (an AiM with the revs and the water wired)
     for (let i = 0; i < n; i++) {
       const tt = t0 + i / HZ; while (j + 1 < lapRows.length - 1 && lapRows[j + 1].t <= tt) j++;
       const a = lapRows[j], b = lapRows[Math.min(lapRows.length - 1, j + 1)], f = b.t > a.t ? Math.min(1, Math.max(0, (tt - a.t) / (b.t - a.t))) : 0;
-      pts.push({ lat: a.lat + (b.lat - a.lat) * f, lon: a.lon + (b.lon - a.lon) * f, v: (isFinite(a.v) ? a.v : 0) + ((isFinite(b.v) ? b.v : 0) - (isFinite(a.v) ? a.v : 0)) * f, gx: 0, gy: 0 });
+      const pt = { lat: a.lat + (b.lat - a.lat) * f, lon: a.lon + (b.lon - a.lon) * f, v: (isFinite(a.v) ? a.v : 0) + ((isFinite(b.v) ? b.v : 0) - (isFinite(a.v) ? a.v : 0)) * f, gx: 0, gy: 0 };
+      for (const k of extra) { const x = a[k] + (b[k] - a[k]) * f; pt[k] = k === 'rpm' ? Math.round(x) : Math.round(x * 10) / 10; }
+      pts.push(pt);
     }
     const kx = 111320 * Math.cos(pts[0].lat * Math.PI / 180), ky = 110574, dt = 1 / HZ;
     for (let i = 1; i < pts.length - 1; i++) {
@@ -2969,22 +3032,35 @@ const IMPORT = (() => {
   const APP_NAMES = { racebox: 'RaceBox', racechrono: 'RaceChrono', trackaddict: 'TrackAddict', aim: 'AiM', harrys: "Harry's LapTimer", garmin: 'Garmin Catalyst', apexpro: 'Apex Pro', vbox: 'VBOX', gpx: 'GPX', csv: 'GPS CSV' };
   function grade(hz, app) { const g = hz >= 9 ? 'high' : (hz >= 4 ? 'medium' : 'low'); return { hz: Math.round(hz * 10) / 10, grade: g, app, appName: APP_NAMES[app] || app }; }
   async function parse(file) {
-    const name = file.name || 'session', text = await file.text(); let src = null;
-    if (/\.vbo$/i.test(name) || /^\[header\]/i.test(text.trim())) src = parseVbo(text);
+    const name = file.name || 'session'; let src = null, text = '';
+    // AiM's own files: binary — read as bytes (an .xrz is unpacked first); an old .drk (MyChron 4) is another format
+    const head = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+    const isXrk = head[0] === 0x3c && head[1] === 0x68 && head[2] === 0x43, isZ = head[0] === 0x78 && [0x01, 0x5e, 0x9c, 0xda].includes(head[1]);
+    if (/\.drk$/i.test(name)) throw new Error(t('This is an older AiM file (.drk). Open it in Race Studio and export it as CSV, then upload the CSV.'));
+    if (isXrk || (isZ && /\.(xrz|xrk)$/i.test(name))) {
+      let u8 = new Uint8Array(await file.arrayBuffer()); if (isZ) { try { u8 = await inflate(u8); } catch (e) { throw new Error(t('Could not unpack this AiM file.')); } }
+      src = parseXrk(u8); if (!src) throw new Error(t('No GPS in this AiM file.'));
+    } else if (/\.(xrk|xrz)$/i.test(name)) throw new Error(t('This AiM file could not be read — export the session from Race Studio as CSV and upload that.'));
+    else text = await file.text();
+    if (src) { /* AiM: done */ }
+    else if (/\.vbo$/i.test(name) || /^\[header\]/i.test(text.trim())) src = parseVbo(text);
     else if (/\.gpx$/i.test(name) || /<gpx/i.test(text.slice(0, 500))) src = parseGpx(text);
     else src = parseCsv(text, name);
     if (!src) throw new Error(t('Could not find GPS columns (latitude, longitude, speed) in this file.'));
     const rows = src.rows; const span = rows[rows.length - 1].t - rows[0].t; const hz = span > 0 ? (rows.length - 1) / span : 10;
     const { laps: raw, how } = splitLaps(src);
-    const laps = []; for (const L of raw) { const r = resample(L.rows); if (r) laps.push({ n: laps.length + 1, timeMs: r.timeMs, pts: r.pts }); }
+    // the lap time the logger itself measured (AiM's LAP blocks) when there is one: the GPS samples bracket a lap only to a sample
+    let laps = []; for (const L of raw) { const r = resample(L.rows); if (r) laps.push({ n: laps.length + 1, timeMs: L.ms > 0 && Math.abs(L.ms - r.timeMs) < 1500 ? L.ms : r.timeMs, pts: r.pts }); }
     if (!laps.length) throw new Error(t('No complete laps with GPS in this file.'));
     const lat0 = laps[0].pts[0].lat, lon0 = laps[0].pts[0].lon, kx = 111320 * Math.cos(lat0 * Math.PI / 180), ky = 110574;
     for (const L of laps) { L.xy = L.pts.map(p => [(p.lon - lon0) * kx, (p.lat - lat0) * ky]); L.len = 0; for (let i = 1; i < L.xy.length; i++) L.len += Math.hypot(L.xy[i][0] - L.xy[i - 1][0], L.xy[i][1] - L.xy[i - 1][1]); }
+    // a piece of a lap at either end of the recording (the logger stopped in the pit lane: AiM keeps it as a "lap" of 20 s) is not a lap
+    if (laps.length >= 3) { const lens = laps.map(L => L.len).sort((a, b) => a - b), med = lens[lens.length >> 1]; while (laps.length > 1 && laps[laps.length - 1].len < med * 0.5) laps.pop(); while (laps.length > 1 && laps[0].len < med * 0.5) laps.shift(); laps.forEach((L, i) => L.n = i + 1); }
     const bestT = Math.min(...laps.filter(L => L.len > 200).map(L => L.timeMs).concat([Infinity]));
     for (const L of laps) L.clean = L.timeMs <= bestT * CLEAN_TOL && L.len > 200;
     if (!laps.some(L => L.clean)) laps[0].clean = true;
-    const q = grade(hz, src.app);
-    return { laps, best: laps.reduce((a, b) => b.timeMs < a.timeMs ? b : a).n, name: name.replace(/\.[^.]+$/, ''), source: q, lapsHow: how, startMs: src.startMs };
+    const q = grade(hz, src.app), real = laps.filter(L => L.clean);
+    return { laps, best: real.reduce((a, b) => b.timeMs < a.timeMs ? b : a).n, name: name.replace(/\.[^.]+$/, ''), source: q, lapsHow: how, startMs: src.startMs, device: src.meta || null };
   }
   // laps from a logger without a start/finish beacon: start every lap at the layout's S/F when the layout has a GPS line
   function alignToStart(sess, G) {
@@ -3767,7 +3843,10 @@ const DATA = (() => {
     // the join of the lap's end with its start is two different passes of the S/F: a light smoothing (±1.5 m) rounds that notch
     const kxy = Math.max(1, Math.round(1.5 / ds)), xsm = smooth(xs, N, kxy), ysm = smooth(ys, N, kxy);
     let lost = 0; for (let j = 0; j < M; j++) if (pj[j] < 0) lost++;
-    const P = { key, N, ds, T, v: vs, t, o: os, x: xsm, y: ysm, at, t0, s0, lost: lost / M, a: accelFrom(vs, N, ds), g: gs, lap: L, pj };
+    // how far to the side the lap runs on its widest twentieth: on the layout it was driven on under ~6.5 m (the width of the track and the
+    // GPS), on the same circuit with or without a bus stop 11 m and more — there the lap never strays 20 m, so "lost" alone cannot tell
+    const ao = Array.from(os, Math.abs).sort((p, q) => p - q), p95 = ao[Math.min(N - 1, Math.floor(N * 0.95))] || 0;
+    const P = { key, N, ds, T, v: vs, t, o: os, x: xsm, y: ysm, at, t0, s0, lost: lost / M, p95, a: accelFrom(vs, N, ds), g: gs, lap: L, pj };
     if (eng) { P.rpm = smooth(rpm, N, Math.max(1, Math.round(2 / ds))); if (t1) P.t1 = t1; if (gearAt) { for (let i = 0; i < N; i++) if (gearAt[i] < 0) gearAt[i] = gearAt[(i - 1 + N) % N]; P.gear = gearAt; } P.shifts = shiftsOnTrack(L, pj, N); }
     L._proj = P; return P;
   }
@@ -5063,6 +5142,51 @@ Object.assign(I18N.RU, {
   'Where to brake and get back on the gas, on any layout': 'Где тормозить и где газ — на любой конфигурации', 'Where the time goes and what to change': 'Где теряешь время и что поменять',
   'What got better and what to work on next': 'Что стало лучше и над чем работать дальше', 'A photo, a link or a place: the line for a track you have never driven': 'Фото, ссылка или место — и как ехать трассу, где ты ещё не был',
   'Hutka AI can make mistakes — check it on track.': 'Hutka AI может ошибаться — проверяй на трассе.' });
+// v34.32 — AiM .xrk files, the explorer when the browser sees nothing
+Object.assign(I18N.RU, {
+  "Alfano .alf2 / .zip · AiM .xrk · RaceChrono · VBOX · GPX": "Alfano .alf2 / .zip · AiM .xrk · RaceChrono · VBOX · GPX",
+  "The browser cannot open this device's services, so Hutka cannot read it over Bluetooth here. Upload the session file instead — for an AiM MyChron, the .xrk file Race Studio 3 downloads from it.": "Браузер не может открыть сервисы этого прибора, поэтому здесь Hutka не прочитает его по Bluetooth. Загрузи файл сессии — для AiM MyChron это файл .xrk, который Race Studio 3 скачивает с прибора.",
+  "Upload the file instead": "Загрузить файл",
+  "the .xrk file Race Studio 3 downloads from the device — upload it as it is, no export needed (a CSV export works too).": "файл .xrk, который Race Studio 3 скачивает с прибора, — загружай как есть, экспорт не нужен (CSV тоже подойдёт).",
+  "This is an older AiM file (.drk). Open it in Race Studio and export it as CSV, then upload the CSV.": "Это старый файл AiM (.drk). Открой его в Race Studio, экспортируй в CSV и загрузи CSV.",
+  "Could not unpack this AiM file.": "Не получилось распаковать этот файл AiM.",
+  "No GPS in this AiM file.": "В этом файле AiM нет GPS.",
+  "This AiM file could not be read — export the session from Race Studio as CSV and upload that.": "Этот файл AiM не читается — экспортируй сессию из Race Studio в CSV и загрузи его."
+});
+// v34.32 — points in metres (a kart length or two only for those short distances); a lap beside the line
+Object.assign(I18N.RU, {
+  "a kart length": "корпус",
+  "two kart lengths": "два корпуса",
+  "{m} m": "{m} м",
+  "Brake {d} before the turn-in": "Тормоз за {d} до входа",
+  "Brake {d} after the turn-in": "Тормоз через {d} после входа",
+  "Lift {d} before the turn-in": "Сброс газа за {d} до входа",
+  "Lift {d} after the turn-in": "Сброс газа через {d} после входа",
+  "off the brake {d} before the apex": "отпусти тормоз за {d} до апекса",
+  "off the brake {d} after the apex": "отпусти тормоз через {d} после апекса",
+  "gas {d} before the apex": "газ за {d} до апекса",
+  "gas {d} after the apex": "газ через {d} после апекса",
+  "full throttle {d} before the apex": "в пол за {d} до апекса",
+  "full throttle {d} after the apex": "в пол через {d} после апекса",
+  "you start slowing {d} earlier": "замедляешься на {d} раньше",
+  "you start slowing {d} later": "замедляешься на {d} позже",
+  "back on the gas {d} later": "газ на {d} позже",
+  "back on the gas {d} earlier": "газ на {d} раньше",
+  "Part of the lap runs {m} m beside the “{layout}” line (a bus stop or a section of another configuration) — it was driven on another configuration of the track, so it is not compared with the sessions of this one. Pick the right layout (Edit), or ask an admin to add it.": "Часть круга идёт в {m} м в стороне от линии «{layout}» (бас-стоп или участок другой конфигурации) — его проехали на другой конфигурации трассы, поэтому с сессиями этой он не сравнивается. Выбери правильную конфигурацию (Изменить) или попроси админа её добавить."
+});
+// v34.32 — New track: a layout read from a photo, never "nothing found"
+Object.assign(I18N.RU, {
+  "This layout, read from the photo": "Эта конфигурация — с фото",
+  "The corners as the picture draws them, the points from similar corners on Hutka": "Повороты как на картинке, точки — из похожих поворотов на Hutka",
+  "Found {p}, but no karting raceway is drawn there on the map. Send a photo of its layout — Hutka reads the corners from it.": "Нашёл {p}, но картинговой трассы там на карте нет. Пришли фото схемы — Hutka прочитает по ней повороты.",
+  "Not on the map. Send a photo of its layout — Hutka reads the corners from it.": "На карте не нашлось. Пришли фото схемы трассы — Hutka прочитает по ней повороты.",
+  "Could not open this picture.": "Не получилось открыть эту картинку.",
+  "Layout from the photo": "Конфигурация с фото",
+  "Could not read the layout from this picture. A straight-on picture of the map, the track a clear band on a plain background, works best.": "Не получилось прочитать схему с этой картинки. Лучше всего — схема прямо, без перспективы: трасса чёткой полосой на ровном фоне.",
+  "Read from the photo · {m} m, the length the picture gives": "С фото · {m} м — длина с картинки",
+  "Read from the photo · about {m} m: the length is a guess, so the corners are right and the distances only roughly": "С фото · примерно {m} м: длина — догадка, поэтому повороты верные, а расстояния примерные"
+});
+Object.assign(I18N.RU, {"A forecast from similar corners of {n} layouts on Hutka — check it on track": "Прогноз по похожим поворотам {n} конфигураций на Hutka — проверь на трассе"});
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -6883,12 +7007,12 @@ function renderHelpPage() {
   box.appendChild(a);
   // other loggers
   const o = card(t('Other loggers and apps'), t('Any of these files works the same way: save it on the phone or computer, then Upload → Choose a file.'));
-  const ul = el('ul', 'hlist'); for (const [k, v] of [['RaceChrono', t('open the session → ⋮ → Export → RaceChrono CSV (v3) → share / save the file.')], ['AiM (MyChron)', t('Race Studio 3 on a computer → the session → Export → CSV.')], ['VBOX', t('the .vbo file from the logger or VBOX Test Suite.')], ['TrackAddict / Harry’s LapTimer', t('Export → CSV / GPX → save.')], [t('Any phone GPS app'), t('export the session as GPX (RaceChrono free and most “GPS logger” apps do). GPS at 1 Hz is enough to see corners; 10 Hz is better.')]]) { const li = el('li'); li.innerHTML = `<b>${esc(k)}</b> — ${esc(v)}`; ul.appendChild(li); }
+  const ul = el('ul', 'hlist'); for (const [k, v] of [['RaceChrono', t('open the session → ⋮ → Export → RaceChrono CSV (v3) → share / save the file.')], ['AiM (MyChron)', t('the .xrk file Race Studio 3 downloads from the device — upload it as it is, no export needed (a CSV export works too).')], ['VBOX', t('the .vbo file from the logger or VBOX Test Suite.')], ['TrackAddict / Harry’s LapTimer', t('Export → CSV / GPX → save.')], [t('Any phone GPS app'), t('export the session as GPX (RaceChrono free and most “GPS logger” apps do). GPS at 1 Hz is enough to see corners; 10 Hz is better.')]]) { const li = el('li'); li.innerHTML = `<b>${esc(k)}</b> — ${esc(v)}`; ul.appendChild(li); }
   o.appendChild(ul); box.appendChild(o);
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.31';
+const APP_VERSION = 'v34.32';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -7436,7 +7560,7 @@ async function duelCorners(myMeta, theirMeta, theirName) {
   if (!GEOM.attach(ms, G).ok) throw new Error('no attach'); GEOM.attach(ts, G);
   const best = (s) => s.laps.filter(L => L.px).reduce((a, b) => (!a || b.timeMs < a.timeMs) ? b : a, null), ml = best(ms), tl = best(ts); if (!ml || !tl) throw new Error('no laps');
   const R = DATA.projectLap(ml, G.track, G.rev), O = DATA.projectLap(tl, G.track, G.rev); if (!R || !O) throw new Error('no projection');
-  if (R.lost > OFF_LAYOUT || O.lost > OFF_LAYOUT) return `<span class="hint">${esc(t('another configuration — not comparable'))}</span>`;   // one of the two was driven on another configuration
+  if (offLine(R, G, ms) || offLine(O, G, ts)) return `<span class="hint">${esc(t('another configuration — not comparable'))}</span>`;   // one of the two was driven on another configuration (or with a bus stop the other has not)
   const apexes = GEOM.apexes(G, tl.timeMs < ml.timeMs ? O : R), D = DATA.buildComparisonP(R, [O], 'lap', G.track, () => theirName, apexes, G.corners.R); if (!D) throw new Error('no comparison');
   const them = D.rows.filter(r => r.cmp && r.cmp.dt >= 0.1).sort((a, b) => b.cmp.dt - a.cmp.dt).slice(0, 4), you = D.rows.filter(r => r.cmp && r.cmp.dt <= -0.1).sort((a, b) => a.cmp.dt - b.cmp.dt).slice(0, 4);
   const list = (rs, sign) => rs.map(r => `<a href="#lab~${esc(theirMeta.id)}~t${r.w.n}" style="color:inherit">T${r.w.n}</a> (${sign}${Math.abs(r.cmp.dt).toFixed(2)})`).join(', ');
@@ -7467,7 +7591,7 @@ async function renderSessionsTable(box, pubs, subEl) {
 // and stays small (a few passes per corner); a prediction reads atlases only, so it costs the same with ten sessions or ten thousand.
 const BRAIN = (() => {
   // PLAT: the slow part of a corner — where the kart is within 6 % of its apex speed; KART: one kart length (m), the unit drivers think in
-  const VER = 2, K_TOP = 8, PROF = { from: -80, to: 80, step: 4 }, PLAT = 0.06, KART = 2;
+  const VER = 3, K_TOP = 8, PROF = { from: -80, to: 80, step: 4 }, PLAT = 0.06, KART = 2;
   const fwd = (a, b, N) => ((b - a) % N + N) % N;
   const fin = (x) => typeof x === 'number' && isFinite(x);
   const med = (arr) => { const s = arr.filter(fin).sort((p, q) => p - q); return s.length ? s[Math.floor(s.length / 2)] : NaN; };
@@ -7705,7 +7829,7 @@ const BRAIN = (() => {
     const md = (x) => ((x % L) + L) % L, p = c.pts || {}, at = (base, d) => fin(base) && fin(d) ? md(base + d) : null;
     return { in: at(c.tinS, p.in), off: at(c.geoS, p.off), min: at(c.geoS, p.min), thr: at(c.geoS, p.thr), full: at(c.geoS, p.full), tin: fin(c.tinS) ? c.tinS : null, tout: fin(c.toutS) ? c.toutS : null, geo: fin(c.geoS) ? c.geoS : null };
   }
-  // ---- a corner as a driver is told it: the pedal and where, in kart lengths from what can be seen — the start of the bend, the apex,
+  // ---- a corner as a driver is told it: the pedal and where, in metres from what can be seen — the start of the bend, the apex,
   // the end of the bend. rel: { in, off, min, thr, full } (metres; negative = before the landmark); kind: brake | lift | flat
   function steps(rel, kind) {
     const kl = (m) => Math.max(1, Math.round(Math.abs(m) / KART)), side = (m, tol) => (Math.abs(m) <= (tol || 1.5) ? 0 : (m < 0 ? -1 : 1));   // whole kart lengths
@@ -7910,13 +8034,19 @@ LAB.close = function () { if (typeof FINISH !== 'undefined') FINISH.hide(); repl
 // does a session belong on this layout? Its best clean lap has to follow the layout's line: a lap that leaves it for more than 12 % of
 // its samples was driven on another configuration of the track (a wrong layout picked at upload) and is never compared with laps of
 // this one — not in the default comparison, the coach, the kart mark, "since last time" or the picker. Cached per geometry.
-const OFF_LAYOUT = 0.12;
+// The same circuit with or without a bus stop (Switchback laps put on Monaco Switchback) never leaves the line by 20 m, so nothing is
+// "lost" — but a twentieth of the line it runs more than 9 m to the side (on its own layout under 6.5 m). That is measured against a
+// line from real laps only (a hand-drawn trace sits a few metres off by itself), and half as wide again for a phone's GPS.
+const OFF_LAYOUT = 0.12, OFF_WIDE = 9;
+function offLine(P, G, s) { if (!P) return true; if (P.lost > OFF_LAYOUT) return true; return !!(G && G.source === 'gps' && P.p95 > OFF_WIDE * (s && s.source && s.source.grade === 'low' ? 1.5 : 1)); }
 function fitsLayout(s, G) {
   if (!s || !G || !G.track) return false; if (G.refSess && s.id === G.refSess.id) return true;
   if (s._fit && s._fit.rev === G.rev) return s._fit.ok;
-  const laps = s.laps.filter(L => L.px), clean = laps.filter(L => L.clean), L = (clean.length ? clean : laps).reduce((a, b) => (!a || b.timeMs < a.timeMs) ? b : a, null);
-  const P = L ? DATA.projectLap(L, G.track, G.rev) : null, ok = !!P && !(P.lost > OFF_LAYOUT);
-  s._fit = { rev: G.rev, ok, lost: P ? P.lost : 1 }; return ok;
+  // the best clean lap — and when that one strays, the middle one of the clean laps (a best lap with a GPS jump in it is no other layout)
+  const laps = s.laps.filter(L => L.px), clean = laps.filter(L => L.clean), pool = (clean.length ? clean : laps).slice().sort((a, b) => a.timeMs - b.timeMs);
+  let P = pool.length ? DATA.projectLap(pool[0], G.track, G.rev) : null, ok = !offLine(P, G, s);
+  if (!ok && pool.length > 2) { const P2 = DATA.projectLap(pool[pool.length >> 1], G.track, G.rev); if (P2 && !offLine(P2, G, s)) { ok = true; P = P2; } }
+  s._fit = { rev: G.rev, ok, lost: P ? P.lost : 1, p95: P ? P.p95 : 99 }; return ok;
 }
 // open a session as the reference (or as the comparison against my latest session on the same layout)
 LAB.open = async function (meta, asCmp) {
@@ -7972,7 +8102,9 @@ LAB.open = async function (meta, asCmp) {
   FINISH.show(sess);   // a fresh upload: the finishing touches above the map
   // a session that leaves this layout's line for a good part of the lap was driven on another configuration of the track: say so — the
   // corners along that part cannot be compared with anyone here (the map still draws the lap as it was driven)
-  { const bl = bestLap(sess), BP = bl && bl.px ? DATA.projectLap(bl, G.track, G.rev) : null; if (LAB.curOff) setStatus('labStatus', t('{p}% of the lap runs away from the “{layout}” line — it was driven on another configuration of the track, so it is not compared with the sessions of this one. Pick the right layout (Edit), or ask an admin to add it.', { p: Math.round(((sess._fit && sess._fit.lost) || (BP && BP.lost) || 0) * 100), layout: (STORE.getLayout(LAB.tid, LAB.lid) || {}).name || LAB.lid }), 'warn'); }
+  { const bl = bestLap(sess), BP = bl && bl.px ? DATA.projectLap(bl, G.track, G.rev) : null, lost = (sess._fit && sess._fit.lost) || (BP && BP.lost) || 0, lay = (STORE.getLayout(LAB.tid, LAB.lid) || {}).name || LAB.lid;
+    if (LAB.curOff) setStatus('labStatus', lost > OFF_LAYOUT ? t('{p}% of the lap runs away from the “{layout}” line — it was driven on another configuration of the track, so it is not compared with the sessions of this one. Pick the right layout (Edit), or ask an admin to add it.', { p: Math.round(lost * 100), layout: lay })
+      : t('Part of the lap runs {m} m beside the “{layout}” line (a bus stop or a section of another configuration) — it was driven on another configuration of the track, so it is not compared with the sessions of this one. Pick the right layout (Edit), or ask an admin to add it.', { m: Math.round((sess._fit && sess._fit.p95) || (BP && BP.p95) || 0), layout: lay }), 'warn'); }
   // older sessions have no shape preview for the feed: add one the first time the owner opens them
   if (mySession(sess) && !sess.preview && sess.owner !== 'local' && STORE.canWrite()) { try { const pv = STORE.previewOf(sess); if (pv) { await STORE.updateSession(sess.id, { preview: pv }); } } catch (e) {} }
   // and the analysis card (the lap line with brake / lift / apex / throttle points, corner numbers, the biggest reserves): computed once, drawn in the feed for everyone
@@ -9257,7 +9389,7 @@ async function detectLayout(tid, sess) {
     if (!G || !G.track || !G.frame) continue;
     lined = true;
     if (!GEOM.attach(sess, G).ok) continue;
-    const L = pool.filter(x => x.px).reduce((a, b) => (!a || b.timeMs < a.timeMs) ? b : a, null); if (!L) continue;
+    const byT = pool.filter(x => x.px).sort((a, b) => a.timeMs - b.timeMs), L = byT[byT.length >> 1]; if (!L) continue;   // the middle clean lap: a best lap with a GPS jump is no other layout
     const P = DATA.projectLap(L, G.track, G.rev); if (!P) continue;
     const tr = G.track, N = tr.N, ds = tr.ds, bins = Math.max(1, Math.round(N * ds / 20)), hit = new Set();
     // the direction: along this layout's line the lap has to move forward — the same circuit driven the other way is another layout (Reverse)
@@ -9266,10 +9398,10 @@ async function detectLayout(tid, sess) {
     let off = 0; for (let i = 0; i < N; i++) off += Math.abs(P.o[i]);
     let len = 0; for (let k = 1; k < L.px.length; k++) len += Math.hypot(L.px[k][0] - L.px[k - 1][0], L.px[k][1] - L.px[k - 1][1]); len *= tr.mpp;
     const cov = Math.min(1, hit.size / bins), meanOff = off / N, dLen = Math.abs(len - N * ds);
-    cands.push({ lid: l.id, lost: P.lost, cov, meanOff, dLen, score: P.lost * 100 + meanOff + dLen / 10 + (1 - cov) * 60 });
+    cands.push({ lid: l.id, lost: P.lost, p95: P.p95, wide: offLine(P, G, sess) && !(P.lost > OFF_LAYOUT), cov, meanOff, dLen, score: P.lost * 100 + meanOff + dLen / 10 + (1 - cov) * 60 });
   }
   for (const L of sess.laps) { delete L._proj; delete L.px; delete L.xy; } delete sess._attached; delete sess._fit;   // the Lab attaches it again
-  const ok = cands.filter(c => c.lost <= OFF_LAYOUT && c.cov >= 0.8).sort((a, b) => a.score - b.score);
+  const ok = cands.filter(c => c.lost <= OFF_LAYOUT && !c.wide && c.cov >= 0.8).sort((a, b) => a.score - b.score);
   if (ok.length) return { lid: ok[0].lid, sure: ok.length === 1 || ok[1].score - ok[0].score >= 2.5, how: 'fit', cands };
   if (cands.length || lined) return { lid: 'custom', sure: false, how: 'none', cands };
   return { lid: ls[0].id, sure: ls.length === 1, how: ls.length === 1 ? 'only' : 'guess', cands };
@@ -9304,8 +9436,10 @@ const DRAFTS = (() => {
     //    track), and two tracks can sit side by side (Dubai's indoor and outdoor circuits)
     const probe = { laps: p.data.laps.map(L => ({ n: L.n, timeMs: L.timeMs, clean: L.clean, pts: L.pts })) }; for (const L of probe.laps) L._sess = probe;
     for (const o of all.filter(o => o.d < 15).slice(0, 4)) { try { const D = await detectLayout(o.x.id, probe); if (D.how === 'fit') return { tid: o.x.id }; } catch (e) {} }
-    // 2. the name the lap timer gives the track, against the tracks around (a page with no laps on it yet has no line to match)
-    const town = GEO.nearestCity(c.lat, c.lon), named = sameTrackName.key(p.data.source && p.data.source.app !== 'alfano' ? '' : (p.meta.track || ''), town && town.km < 60 ? town.name : '');
+    // 2. the name the lap timer gives the track, against the tracks around (a page with no laps on it yet has no line to match): the
+    //    Alfano's file name, an AiM file's own track name ("RAK T-Shape")
+    const fileTrack = p.data.source && p.data.source.app !== 'alfano' ? ((p.data.device && p.data.device.track) || '') : (p.meta.track || '');
+    const town = GEO.nearestCity(c.lat, c.lon), named = sameTrackName.key(fileTrack, town && town.km < 60 ? town.name : '');
     if (named) { const hits = all.filter(o => o.d < 30 && sameTrackName(named, o.x.name)); if (hits.length === 1 || (hits.length > 1 && hits[0].d < 3)) return { tid: hits[0].x.id }; }
     // 3. the nearest within 3 km
     const near = all[0];
@@ -9314,7 +9448,7 @@ const DRAFTS = (() => {
     // a track Hutka does not know yet: its page and a first layout, named from the map (OSM) — the name can be changed on the track page
     let v = {}; try { v = (await Promise.race([VENUE.lookup(c), new Promise(r => setTimeout(() => r(null), 8000))])) || {}; } catch (e) { v = {}; }
     const city = GEO.nearestCity(c.lat, c.lon), cityName = v.city || (city && city.km < 60 ? city.name : ''), cc = v.cc || (city && city.km < 150 ? city.cc : '');
-    const fromFile = p.data.source && p.data.source.app !== 'alfano' ? '' : (p.meta.track || ''), guess = fromFile && !/alfano|lap|session|driver/i.test(fromFile) ? fromFile.replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase()) : '';
+    const fromFile = fileTrack, guess = fromFile && !/alfano|lap|session|driver/i.test(fromFile) ? fromFile.replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase()) : '';
     const name = v.venue || guess || (cityName ? t('{city} Karting', { city: cityName }) : t('Kart track'));
     const best = bestOfLaps(p.data.laps), lengthM = best && best.len ? Math.round(best.len) : 0, kart = kartFor(null, p);
     const tid = await STORE.saveTrack(Object.assign({ name, city: cityName, country: cc, lat: +c.lat.toFixed(5), lon: +c.lon.toFixed(5), address: v.address || '', website: v.website || '', phone: v.phone || '', indoor: !!v.indoor, lengthM, karts: kart.name && kart.cls !== 'sport' ? [{ name: kart.name, cls: kart.cls }] : [], community: true, osm: v.osm || '' }, parseHours(v.hours || '')));
@@ -9408,7 +9542,7 @@ const UPLOAD = (() => {
     $('uplFromDevice').classList.toggle('primary', bt); $('uplDrop').classList.toggle('primary', !bt);
     if (bt) src.insertBefore($('uplFromDevice'), $('uplDrop')); else src.insertBefore($('uplDrop'), $('uplFromDevice'));
     $('uplBtSub').textContent = bt ? t('Bluetooth · Alfano 7, RaceBox') : t('Bluetooth works in the Hutka app, or in Chrome on a computer or Android');
-    $('uplFileSub').textContent = t('Alfano .alf2 / .zip · AiM · RaceChrono · VBOX · GPX') + (finePointer ? ' — ' + t('or drop the files here') : '');
+    $('uplFileSub').textContent = t('Alfano .alf2 / .zip · AiM .xrk · RaceChrono · VBOX · GPX') + (finePointer ? ' — ' + t('or drop the files here') : '');
   }
   const work = (tx) => { $('uplWork').hidden = !tx; if (tx) $('uplWorkTx').textContent = tx; };
   function open(o) {
@@ -9997,7 +10131,10 @@ const DEVICE = (() => {
   }
   // ---- the explorer (Alfano): the services, the live log, a command line, the log to Hutka
   async function openExplorer() {
-    stage('devExplore'); $('devLog').textContent = ''; $('devExSent').textContent = ''; $('devExNone').hidden = !(ex.services.length === 0 && LOGGERS.ble.kind() === 'web');
+    stage('devExplore'); $('devLog').textContent = ''; $('devExSent').textContent = '';
+    // nothing the browser may open (a MyChron: its own services): the way in is its file, not a log of nothing
+    const none = ex.none = ex.services.length === 0 && LOGGERS.ble.kind() === 'web'; $('devExNone').hidden = !none; $('devToFile').hidden = !none;
+    for (const id of ['devSendLog', 'devExHow', 'devLog', 'devLogFoot']) $(id).hidden = none;
     ex.onLog = () => { if (!logT) logT = setTimeout(() => { logT = null; renderLog(); }, 120); };
     const w = ex.writable(); fillSelect($('devChr'), w.map((o, i) => [String(i), o.label]), w.length ? '0' : ''); $('devConsole').hidden = !w.length; $('devPinRow').hidden = !w.length; $('devPin').value = '';
     renderExplore(); renderLog();
@@ -10006,7 +10143,7 @@ const DEVICE = (() => {
   function renderExplore() {
     if (!ex) return; const n = ex.services.reduce((k, s) => k + s.chrs.length, 0);
     $('devExTitle').textContent = H ? (H.name || drv.name) : '';
-    $('devExSub').textContent = (ex.live ? t('connected') : t('disconnected')) + ` · ${t('{n} service(s), {m} characteristic(s)', { n: ex.services.length, m: n })}` + (ex.listening ? ' · ' + t('listening on {k}', { k: ex.subscribed }) : '');
+    $('devExSub').textContent = (ex.live ? t('connected') : t('disconnected')) + (ex.none ? '' : ` · ${t('{n} service(s), {m} characteristic(s)', { n: ex.services.length, m: n })}` + (ex.listening ? ' · ' + t('listening on {k}', { k: ex.subscribed }) : ''));
     $('devExSend').disabled = !ex.live; $('devExSendNr').disabled = !ex.live;
   }
   function renderLog() {
@@ -10034,6 +10171,8 @@ const DEVICE = (() => {
   $('devPinTry').onclick = async () => { if (!ex || !ex.live) return; const pin = $('devPin').value.trim(); if (!pin) return; $('devPinTry').disabled = true; try { await ex.tryPin(pin, (k, n, how) => { $('devExSent').textContent = t('PIN {k}/{n}: {how}', { k, n, how }); renderLog(); }); $('devExSent').textContent = t('PIN tried {n} ways — see what came back above, then send the log.', { n: 6 }); } catch (e) { $('devExSent').textContent = t('write failed: {e}', { e: e && e.message || e }); } $('devPinTry').disabled = false; renderLog(); };
   $('devAlfHello').onclick = async () => { if (!ex || !ex.live) return; $('devAlfHello').disabled = true; try { await ex.alfanoHello((k, n, how) => { $('devExSent').textContent = `${k}/${n}: ${how}`; renderLog(); }); $('devExSent').textContent = t('Handshake sent — see the answers above, then send the log.'); } catch (e) { $('devExSent').textContent = t('write failed: {e}', { e: e && e.message || e }); } $('devAlfHello').disabled = false; renderLog(); };
   $('devSendLog').onclick = sendLog; $('devExDisc').onclick = disconnect;
+  // the upload window and its file chooser in the same tap (a chooser opens only on a tap), the device let go
+  $('devToFile').onclick = () => { UPLOAD.open(); $('uplFile').click(); close(); drop(); };
   // ‹ — one step back: the scan → the kinds; the explorer → disconnected; the device → another device (a read in progress is stopped only after a yes)
   async function back() {
     if (!cur || cur === first() || cur === 'devPick') { close(); return; }
@@ -10058,10 +10197,10 @@ const fileDate = (f) => { try { const d = new Date(f.lastModified || Date.now())
 // ---------- the racing brain in the app: the ideal lap of any layout, and the driver against it ----------
 // Where a layout has been driven, its ideal is what its fastest real passes do, corner by corner (several drivers, at most three passes
 // each). Where it has not, every corner takes what the fastest drivers did in the most similar corners driven elsewhere (BRAIN.predict).
-// Points are told against what a driver sees — the turn-in, the apex — in kart lengths. The atlases are built here from the published
+// Points are told against what a driver sees — the turn-in, the apex — in metres. The atlases are built here from the published
 // sessions (one per layout and kart class, rebuilt only when its sessions change); a stored copy on the server comes later.
 const BRAINS = (() => {
-  const OFF = 0.12, MIN_LAPS = 5, mem = new Map(), inflight = new Map(), rows = {};
+  const MIN_LAPS = 5, mem = new Map(), inflight = new Map(), rows = {};
   const clsOf = (m) => kartClassOf(m) === 'sport' ? 'sport' : 'rental';
   const fin = (x) => typeof x === 'number' && isFinite(x);
   const layoutName = (tid, lid) => { const tr = STORE.getTrack(tid), l = STORE.getLayout(tid, lid); return [tr ? tr.name : tid, l ? l.name : (lid === 'custom' ? '' : lid)].filter(Boolean).join(' · '); };
@@ -10070,16 +10209,30 @@ const BRAINS = (() => {
   const sigOf = (metas) => metas.map(m => m.id + ':' + (m.bestMs || 0)).sort().join(',');
   // the stored atlases of a class, read once a page load (and kept up to date by the rebuilds below)
   async function stored(cls) { if (!rows[cls]) { const rs = await STORE.brainRows(cls); rows[cls] = new Map((rs || []).map(r => [r.key, r])); } return rows[cls]; }
-  // a layout's atlas built from its sessions (every session loaded: heavy), its line from the fastest one; an admin stores the result
+  // the line an atlas is read on: the one the drivers agree on. Among the fastest sessions of up to four drivers, the one whose line the
+  // most other drivers keep to (their best laps — or their middle ones — on it: nothing lost, no stretch run beside it); counted by
+  // drivers, not sessions (forty single-lap uploads of one driver are one voice). A session put on the wrong layout (Switchback laps on
+  // Monaco Switchback: no bus stop) agrees with nobody, and its laps stay out of the atlas
+  const who = (x) => x.meta.owner || x.meta.driver || x.meta.id;
+  async function consensus(tid, lid, ss) {
+    const firsts = [], seen = new Set(); for (const x of ss) { if (seen.has(who(x))) continue; seen.add(who(x)); firsts.push(x); }
+    let best = null;
+    for (const c of firsts.slice(0, 4)) {
+      let G = null; try { G = await GEOM.build(tid, lid, c.sess, { noMedia: true, selfRef: true }); } catch (e) { G = null; } if (!G) continue;
+      let votes = 0; for (const v of firsts.slice(0, 12)) { if (v === c) { votes++; continue; } if (!GEOM.attach(v.sess, G).error && fitsLayout(v.sess, G)) votes++; }
+      if (!best || votes > best.votes) best = { G, ref: c, votes };
+    }
+    return best;
+  }
+  // a layout's atlas built from its sessions (every session loaded: heavy) on the line its drivers agree on; an admin stores the result
   async function build(tid, lid, cls, metas, sig) {
     const ss = [];
     for (const m of metas.slice().sort((a, b) => (a.bestMs || 1e12) - (b.bestMs || 1e12))) { try { ss.push({ meta: m, sess: await STORE.loadSession(m) }); } catch (e) {} }
     if (!ss.length) return null;
-    let G = null; try { G = await GEOM.build(tid, lid, ss[0].sess, { noMedia: true, selfRef: true }); } catch (e) { G = null; }
-    if (!G) return null;
-    const entries = [];
-    for (const x of ss) { const at = GEOM.attach(x.sess, G); if (at.error) continue; for (const L of x.sess.laps) { if (!L.clean) continue; const P = DATA.projectLap(L, G.track, G.rev); if (P && P.lost <= OFF) entries.push({ P, sid: x.meta.id, owner: x.meta.owner, driver: x.meta.driver || '', lap: L.n }); } }
-    const A = BRAIN.atlas(G, entries, { cls, name: layoutName(tid, lid), refSid: ss[0].meta.id }); if (!A) return null;
+    const cs = await consensus(tid, lid, ss); if (!cs) return null;
+    const G = cs.G, entries = [];
+    for (const x of ss) { const at = GEOM.attach(x.sess, G); if (at.error) continue; for (const L of x.sess.laps) { if (!L.clean) continue; const P = DATA.projectLap(L, G.track, G.rev); if (P && !offLine(P, G, x.sess)) entries.push({ P, sid: x.meta.id, owner: x.meta.owner, driver: x.meta.driver || '', lap: L.n }); } }
+    const A = BRAIN.atlas(G, entries, { cls, name: layoutName(tid, lid), refSid: cs.ref.meta.id }); if (!A) return null;
     const C = BRAIN.compact(A), key = `${tid}|${lid}|${cls}`;
     if (STORE.me.canEdit && await STORE.brainSave({ key, track_id: tid, layout_id: lid, cls, ver: BRAIN.VER, sig, laps: A.laps, drivers: A.drivers, best: A.best, data: C, updated_at: new Date().toISOString() })) (await stored(cls)).set(key, { key, sig, data: C });
     return { C, G };
@@ -10120,7 +10273,7 @@ const BRAINS = (() => {
     let metas = []; try { metas = (await STORE.mySessions()).filter(m => m.track === tid && (m.layout || 'custom') === lid && clsOf(m) === cls); } catch (e) { metas = []; }
     if (!metas.length) return null;
     const tr = G.track, laps = [];
-    for (const m of metas.slice(0, 12)) { let s = null; try { s = await STORE.loadSession(m); } catch (e) { s = null; } if (!s || GEOM.attach(s, G).error) continue; for (const L of s.laps) { if (!L.clean) continue; const P = DATA.projectLap(L, tr, G.rev); if (P && P.lost <= OFF) laps.push(P); } }
+    for (const m of metas.slice(0, 12)) { let s = null; try { s = await STORE.loadSession(m); } catch (e) { s = null; } if (!s || GEOM.attach(s, G).error) continue; for (const L of s.laps) { if (!L.clean) continue; const P = DATA.projectLap(L, tr, G.rev); if (P && !offLine(P, G, s)) laps.push(P); } }
     if (!laps.length) return null;
     laps.sort((a, b) => a.T - b.T);
     const best = laps.slice(0, 6), out = {};
@@ -10158,30 +10311,33 @@ const BRAINS = (() => {
     return Object.assign({ mode: 'predicted' }, o, { G, L, corners, info: { pool: pred.pool, books: books.length, T: pred.T, names: [...new Set(books.map(A => A.name || A.key))] } });
   }
 
-  // ---- words: one corner as a driver is told it, in kart lengths from the turn-in and the apex
-  const KL = (n) => tn(n, 'kart length', 'kart lengths');
+  // ---- words: one corner as a driver is told it, in metres from the turn-in and the apex ("5 m before the apex"); "a kart length" and
+  // "two kart lengths" only for those short distances — what a driver sees from the seat — and never more kart lengths than two.
+  // Whole metres, to the nearest five past 20 m (GPS points are good to a few metres, not to one)
+  const metres = (m) => { const a = Math.abs(m); return a < 20 ? Math.round(a) : Math.round(a / 5) * 5; };
+  const dist = (m) => { const a = Math.abs(m); return { d: a < 3 ? t('a kart length') : a < 5 ? t('two kart lengths') : t('{m} m', { m: metres(a) }).replace(' ', '\u00a0') }; };   // "5 m" never split over two lines
   function lines(pts) {
     const out = [];
     for (const s of BRAIN.steps(pts, pts && pts.kind)) {
-      const v = { n: s.n, k: KL(s.n) };
+      const v = dist(s.m);
       if (s.k === 'flat') out.push(t('Flat out, no lift'));
-      else if (s.k === 'brake') out.push(s.side < 0 ? t('Brake {n} {k} before the turn-in', v) : s.side > 0 ? t('Brake {n} {k} after the turn-in', v) : t('Brake at the turn-in'));
-      else if (s.k === 'lift') out.push(s.side < 0 ? t('Lift {n} {k} before the turn-in', v) : s.side > 0 ? t('Lift {n} {k} after the turn-in', v) : t('Lift at the turn-in'));
-      else if (s.k === 'off') out.push(s.side < 0 ? t('off the brake {n} {k} before the apex', v) : s.side > 0 ? t('off the brake {n} {k} after the apex', v) : t('off the brake at the apex'));
-      else if (s.k === 'thr') out.push(s.side < 0 ? t('gas {n} {k} before the apex', v) : s.side > 0 ? t('gas {n} {k} after the apex', v) : t('gas at the apex'));
-      else if (s.k === 'full') out.push(s.side < 0 ? t('full throttle {n} {k} before the apex', v) : s.side > 0 ? t('full throttle {n} {k} after the apex', v) : t('full throttle at the apex'));
+      else if (s.k === 'brake') out.push(s.side < 0 ? t('Brake {d} before the turn-in', v) : s.side > 0 ? t('Brake {d} after the turn-in', v) : t('Brake at the turn-in'));
+      else if (s.k === 'lift') out.push(s.side < 0 ? t('Lift {d} before the turn-in', v) : s.side > 0 ? t('Lift {d} after the turn-in', v) : t('Lift at the turn-in'));
+      else if (s.k === 'off') out.push(s.side < 0 ? t('off the brake {d} before the apex', v) : s.side > 0 ? t('off the brake {d} after the apex', v) : t('off the brake at the apex'));
+      else if (s.k === 'thr') out.push(s.side < 0 ? t('gas {d} before the apex', v) : s.side > 0 ? t('gas {d} after the apex', v) : t('gas at the apex'));
+      else if (s.k === 'full') out.push(s.side < 0 ? t('full throttle {d} before the apex', v) : s.side > 0 ? t('full throttle {d} after the apex', v) : t('full throttle at the apex'));
     }
     return out;
   }
   // the driver against the ideal in one corner: what he does differently, in the same words (nothing when it is the same within a kart)
   function diffLines(ideal, mine) {
     if (!ideal || !mine) return [];
-    const out = [], a = ideal, b = mine, v = (m) => { const n = Math.max(1, Math.round(Math.abs(m) / BRAIN.KART)); return { n, k: KL(n) }; };
+    const out = [], a = ideal, b = mine, v = dist;
     if (a.kind === 'flat' && b.kind !== 'flat') out.push(b.kind === 'brake' ? t('the fastest take it flat — you brake') : t('the fastest take it flat — you lift'));
     else if (a.kind === 'lift' && b.kind === 'brake') out.push(t('the fastest only lift here — you brake'));
     else if (a.kind === 'brake' && b.kind === 'flat') out.push(t('the fastest brake here — you stay flat'));
-    if (a.kind !== 'flat' && b.kind !== 'flat' && fin(a.in) && fin(b.in) && Math.abs(b.in - a.in) >= 2.5) out.push(b.in < a.in ? t('you start slowing {n} {k} earlier', v(b.in - a.in)) : t('you start slowing {n} {k} later', v(b.in - a.in)));
-    if (fin(a.thr) && fin(b.thr) && Math.abs(b.thr - a.thr) >= 2.5) out.push(b.thr > a.thr ? t('back on the gas {n} {k} later', v(b.thr - a.thr)) : t('back on the gas {n} {k} earlier', v(b.thr - a.thr)));
+    if (a.kind !== 'flat' && b.kind !== 'flat' && fin(a.in) && fin(b.in) && Math.abs(b.in - a.in) >= 2.5) out.push(b.in < a.in ? t('you start slowing {d} earlier', v(b.in - a.in)) : t('you start slowing {d} later', v(b.in - a.in)));
+    if (fin(a.thr) && fin(b.thr) && Math.abs(b.thr - a.thr) >= 2.5) out.push(b.thr > a.thr ? t('back on the gas {d} later', v(b.thr - a.thr)) : t('back on the gas {d} earlier', v(b.thr - a.thr)));
     return out;
   }
   const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
@@ -10191,13 +10347,13 @@ const BRAINS = (() => {
     if (!res || !res.corners) return '';
     const head = res.mode === 'real' ? `IDEAL LAP of ${res.name} (${res.cls} karts) from its fastest real passes: ${res.info.laps} clean laps, ${res.info.drivers} drivers, best ${res.info.best.toFixed(2)} s.` : `IDEAL LAP of ${res.name} (${res.cls} karts) PREDICTED from similar corners of ${res.info.books} driven layouts (nobody has enough laps here): about ${res.info.T.toFixed(1)} s.`;
     const ls = res.corners.map(c => { return `T${c.n} (${c.dir === 'L' ? 'left' : 'right'}): ${describeEN(c.pts)}` + (c.mine ? ` | the driver: ${describeEN(c.mine.pts)}${fin(c.mine.time) && fin(c.time) ? `, ${(c.mine.time - c.time >= 0 ? '+' : '') + (c.mine.time - c.time).toFixed(2)} s vs the fastest` : ''}` : ''); });
-    return head + '\nPoints in kart lengths (1 kart length = 2 m) from the turn-in (start of the bend) and from the apex; "gas" = where the kart stops slowing (the throttle is on), "full throttle" = where it clearly accelerates.\n' + ls.join('\n');
+    return head + '\nPoints in metres from the turn-in (start of the bend) and from the apex; "gas" = where the kart stops slowing (the throttle is on), "full throttle" = where it clearly accelerates.\n' + ls.join('\n');
   }
   function describeEN(pts) {
-    const p = [], kl = (m) => Math.max(1, Math.round(Math.abs(m) / BRAIN.KART));
+    const p = [];
     for (const s of BRAIN.steps(pts, pts && pts.kind)) {
-      if (s.k === 'flat') p.push('flat out'); else if (s.k === 'brake' || s.k === 'lift') p.push(`${s.k} ${s.side === 0 ? 'at the turn-in' : kl(s.m) + ' kart lengths ' + (s.side < 0 ? 'before' : 'after') + ' the turn-in'}`);
-      else if (s.k === 'off' || s.k === 'thr' || s.k === 'full') p.push(`${s.k === 'off' ? 'off the brake' : s.k === 'thr' ? 'gas' : 'full throttle'} ${s.side === 0 ? 'at the apex' : kl(s.m) + ' kart lengths ' + (s.side < 0 ? 'before' : 'after') + ' the apex'}`);
+      if (s.k === 'flat') p.push('flat out'); else if (s.k === 'brake' || s.k === 'lift') p.push(`${s.k} ${s.side === 0 ? 'at the turn-in' : metres(s.m) + ' m ' + (s.side < 0 ? 'before' : 'after') + ' the turn-in'}`);
+      else if (s.k === 'off' || s.k === 'thr' || s.k === 'full') p.push(`${s.k === 'off' ? 'off the brake' : s.k === 'thr' ? 'gas' : 'full throttle'} ${s.side === 0 ? 'at the apex' : metres(s.m) + ' m ' + (s.side < 0 ? 'before' : 'after') + ' the apex'}`);
     }
     return p.join(', ');
   }
@@ -10233,10 +10389,205 @@ const BRAINS = (() => {
   }
   return { layoutAtlas, allAtlases, ideal, predictOn, mineOn, lines, diffLines, text, asText, draw, clsOf, layoutName, geomOf };
 })();
+// Auto-trace: layout image -> track mask -> skeleton -> closed centreline loop + band width (all in image pixels).
+const AT = (() => {
+  function prepare(src, w0, h0, maxDim) {
+    const k = Math.min(1, maxDim / Math.max(w0, h0)), w = Math.max(16, Math.round(w0 * k)), h = Math.max(16, Math.round(h0 * k));
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(src, 0, 0, w, h);
+    return { data: g.getImageData(0, 0, w, h).data, w, h, k };
+  }
+  function borderColor(img) {
+    const { data, w, h } = img, rs = [], gs = [], bs = [];
+    const push = (i) => { if (data[i + 3] < 128) return; rs.push(data[i]); gs.push(data[i + 1]); bs.push(data[i + 2]); };
+    for (let x = 0; x < w; x += 2) { push((x) * 4); push(((h - 1) * w + x) * 4); }
+    for (let y = 0; y < h; y += 2) { push((y * w) * 4); push((y * w + w - 1) * 4); }
+    const med = (a) => { if (!a.length) return 255; a.sort((p, q) => p - q); return a[a.length >> 1]; };
+    return [med(rs), med(gs), med(bs)];
+  }
+  function maskFrom(img, mode, seed, tol) {
+    const { data, w, h } = img, m = new Uint8Array(w * h);
+    let ref = null;
+    if (mode === 'auto') ref = borderColor(img);
+    if (mode === 'seed') { let r = 0, g = 0, b = 0, n = 0; for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) { const x = seed.x + dx, y = seed.y + dy; if (x < 0 || y < 0 || x >= w || y >= h) continue; const i = (y * w + x) * 4; r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; } ref = [r / n, g / n, b / n]; }
+    for (let i = 0, p = 0; i < w * h; i++, p += 4) {
+      if (data[p + 3] < 128) { m[i] = 0; continue; }
+      const r = data[p], g = data[p + 1], b = data[p + 2];
+      if (mode === 'dark') m[i] = (0.299 * r + 0.587 * g + 0.114 * b) < tol ? 1 : 0;
+      else { const d = Math.sqrt((r - ref[0]) ** 2 + (g - ref[1]) ** 2 + (b - ref[2]) ** 2); m[i] = mode === 'auto' ? (d > tol ? 1 : 0) : (d < tol ? 1 : 0); }
+    }
+    return m;
+  }
+  function morph(m, w, h, r, isDilate) {
+    const out = new Uint8Array(w * h), tmp = new Uint8Array(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = isDilate ? 0 : 1; for (let d = -r; d <= r; d++) { const xx = x + d; if (xx < 0 || xx >= w) { if (!isDilate) v = 0; continue; } const q = m[y * w + xx]; if (isDilate ? q : !q) { v = isDilate ? 1 : 0; break; } } tmp[y * w + x] = v; }
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = isDilate ? 0 : 1; for (let d = -r; d <= r; d++) { const yy = y + d; if (yy < 0 || yy >= h) { if (!isDilate) v = 0; continue; } const q = tmp[yy * w + x]; if (isDilate ? q : !q) { v = isDilate ? 1 : 0; break; } } out[y * w + x] = v; }
+    return out;
+  }
+  function components(m, w, h, val) { // 4-connected labelling of pixels == val; returns {label(Int32), sizes[], touchesBorder[]}
+    const label = new Int32Array(w * h).fill(-1), sizes = [], border = [], stack = new Int32Array(w * h);
+    for (let i = 0; i < w * h; i++) {
+      if (m[i] !== val || label[i] >= 0) continue;
+      const id = sizes.length; let sp = 0, size = 0, tb = false; stack[sp++] = i; label[i] = id;
+      while (sp) { const c = stack[--sp]; size++; const x = c % w, y = (c / w) | 0; if (x === 0 || y === 0 || x === w - 1 || y === h - 1) tb = true;
+        const nb = [c - 1, c + 1, c - w, c + w];
+        if (x === 0) nb[0] = -1; if (x === w - 1) nb[1] = -1; if (y === 0) nb[2] = -1; if (y === h - 1) nb[3] = -1;
+        for (const q of nb) if (q >= 0 && m[q] === val && label[q] < 0) { label[q] = id; stack[sp++] = q; } }
+      sizes.push(size); border.push(tb);
+    }
+    return { label, sizes, border };
+  }
+  function distTransform(m, w, h) { // chamfer 3-4, in pixel units
+    const d = new Float32Array(w * h); const INF = 1e9;
+    for (let i = 0; i < w * h; i++) d[i] = m[i] ? INF : 0;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const i = y * w + x; if (!d[i]) continue; let v = d[i];
+      if (x > 0) v = Math.min(v, d[i - 1] + 3); if (y > 0) { v = Math.min(v, d[i - w] + 3); if (x > 0) v = Math.min(v, d[i - w - 1] + 4); if (x < w - 1) v = Math.min(v, d[i - w + 1] + 4); } d[i] = v; }
+    for (let y = h - 1; y >= 0; y--) for (let x = w - 1; x >= 0; x--) { const i = y * w + x; if (!d[i]) continue; let v = d[i];
+      if (x < w - 1) v = Math.min(v, d[i + 1] + 3); if (y < h - 1) { v = Math.min(v, d[i + w] + 3); if (x < w - 1) v = Math.min(v, d[i + w + 1] + 4); if (x > 0) v = Math.min(v, d[i + w - 1] + 4); } d[i] = v; }
+    for (let i = 0; i < w * h; i++) d[i] /= 3;
+    return d;
+  }
+  function thin(m, w, h) { // Zhang–Suen
+    const s = Uint8Array.from(m); const del = [];
+    for (let y = 0; y < h; y++) { s[y * w] = 0; s[y * w + w - 1] = 0; } for (let x = 0; x < w; x++) { s[x] = 0; s[(h - 1) * w + x] = 0; }
+    let changed = true, iter = 0;
+    while (changed && iter < 200) {
+      changed = false; iter++;
+      for (let pass = 0; pass < 2; pass++) {
+        del.length = 0;
+        for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+          const i = y * w + x; if (!s[i]) continue;
+          const p2 = s[i - w], p3 = s[i - w + 1], p4 = s[i + 1], p5 = s[i + w + 1], p6 = s[i + w], p7 = s[i + w - 1], p8 = s[i - 1], p9 = s[i - w - 1];
+          const B = p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9; if (B < 2 || B > 6) continue;
+          let A = 0; const seq = [p2, p3, p4, p5, p6, p7, p8, p9, p2]; for (let q = 0; q < 8; q++) if (seq[q] === 0 && seq[q + 1] === 1) A++; if (A !== 1) continue;
+          if (pass === 0) { if (p2 * p4 * p6 !== 0 || p4 * p6 * p8 !== 0) continue; } else { if (p2 * p4 * p8 !== 0 || p2 * p6 * p8 !== 0) continue; }
+          del.push(i);
+        }
+        if (del.length) { changed = true; for (const i of del) s[i] = 0; }
+      }
+    }
+    return s;
+  }
+  const N8 = (w) => [-w - 1, -w, -w + 1, -1, 1, w - 1, w, w + 1];
+  function degree(s, w, i, offs) { let d = 0; for (const o of offs) if (s[i + o]) d++; return d; }
+  function prune(s, w, h) { // eat every branch from its tip until only cycles remain
+    const offs = N8(w); let q = [];
+    for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) { const i = y * w + x; if (s[i] && degree(s, w, i, offs) <= 1) q.push(i); }
+    let guard = 0;
+    while (q.length && guard++ < 5e6) {
+      const i = q.pop(); if (!s[i]) continue; if (degree(s, w, i, offs) > 1) continue; s[i] = 0;
+      for (const o of offs) { const j = i + o; if (s[j] && degree(s, w, j, offs) <= 1) q.push(j); }
+    }
+    return s;
+  }
+  function walkLoop(s, w, h, dist) {
+    const offs = N8(w); let start = -1, count = 0;
+    for (let i = w; i < w * (h - 1); i++) if (s[i]) { count++; if (start < 0) start = i; }
+    if (start < 0) return null;
+    const visited = new Uint8Array(w * h), path = [];
+    let cur = start, pdx = 1, pdy = 0; visited[cur] = 1; path.push(cur);
+    for (let step = 0; step < count + 5; step++) {
+      let best = -1, bestScore = -Infinity;
+      for (const o of offs) { const j = cur + o; if (!s[j] || visited[j]) continue; const dx = (j % w) - (cur % w), dy = ((j / w) | 0) - ((cur / w) | 0); const l = Math.hypot(dx, dy); const score = (dx * pdx + dy * pdy) / l + (l < 1.2 ? 0.3 : 0) + (dist ? 0.15 * dist[j] / (dist[cur] + 1e-6) : 0); if (score > bestScore) { bestScore = score; best = j; } }
+      if (best < 0) break;
+      const dx = (best % w) - (cur % w), dy = ((best / w) | 0) - ((cur / w) | 0); const l = Math.hypot(dx, dy); pdx = dx / l; pdy = dy / l;
+      cur = best; visited[cur] = 1; path.push(cur);
+    }
+    const ex = path[path.length - 1] % w, ey = (path[path.length - 1] / w) | 0, sx = start % w, sy = (start / w) | 0;
+    const closed = Math.hypot(ex - sx, ey - sy) <= 2.5;
+    return { path, closed, count };
+  }
+  // Constant-width assumption: push each centreline pixel to the middle between the two band edges along the local normal,
+  // ignoring an edge that is further than ~1.15 half-widths away (a pit-lane stub or a label glued to the band).
+  function recenter(pts, m, w, h, halfW) {
+    const n = pts.length, out = new Array(n), lim = halfW * 1.15, maxS = halfW * 2.2;
+    const inside = (x, y) => { const xi = Math.round(x), yi = Math.round(y); return xi >= 0 && yi >= 0 && xi < w && yi < h && m[yi * w + xi]; };
+    for (let t = 0; t < n; t++) {
+      const a = pts[(t - 5 + n) % n], b = pts[(t + 5) % n]; let tx = b[0] - a[0], ty = b[1] - a[1]; const l = Math.hypot(tx, ty) || 1; tx /= l; ty /= l;
+      const nx = -ty, ny = tx, [px, py] = pts[t];
+      let dR = 0; while (dR < maxS && inside(px + nx * (dR + 0.5), py + ny * (dR + 0.5))) dR += 0.5;
+      let dL = 0; while (dL < maxS && inside(px - nx * (dL + 0.5), py - ny * (dL + 0.5))) dL += 0.5;
+      const shift = (Math.min(dR, lim) - Math.min(dL, lim)) / 2;
+      out[t] = [px + nx * shift, py + ny * shift];
+    }
+    return out;
+  }
+  function smoothLoop(pts, win) {
+    const n = pts.length, out = new Array(n);
+    for (let t = 0; t < n; t++) { let sx = 0, sy = 0, c = 0; for (let o = -win; o <= win; o++) { const q = pts[(t + o + n) % n]; sx += q[0]; sy += q[1]; c++; } out[t] = [sx / c, sy / c]; }
+    return out;
+  }
+  function simplify(pts, tol) { // Douglas–Peucker on an open polyline
+    if (pts.length < 3) return pts.slice();
+    const keep = new Uint8Array(pts.length); keep[0] = keep[pts.length - 1] = 1; const stack = [[0, pts.length - 1]];
+    while (stack.length) {
+      const [a, b] = stack.pop(); const ax = pts[a][0], ay = pts[a][1], bx = pts[b][0], by = pts[b][1]; const L = Math.hypot(bx - ax, by - ay) || 1e-9;
+      let md = -1, mi = -1;
+      for (let i = a + 1; i < b; i++) { const d = Math.abs((bx - ax) * (ay - pts[i][1]) - (ax - pts[i][0]) * (by - ay)) / L; if (d > md) { md = d; mi = i; } }
+      if (md > tol && mi > 0) { keep[mi] = 1; stack.push([a, mi], [mi, b]); }
+    }
+    return pts.filter((_, i) => keep[i]);
+  }
+  function run(src, w0, h0, mode, seed, tol) {
+    let last = null;
+    for (const closeR of [1, 2, 0]) { const r = runOnce(src, w0, h0, mode, seed, tol, closeR); if (!r.error) return r; last = r; }
+    return last;
+  }
+  function runOnce(src, w0, h0, mode, seed, tol, closeR) {
+    const img = prepare(src, w0, h0, 900), { w, h, k } = img;
+    const sd = seed ? { x: Math.round(seed.x * k), y: Math.round(seed.y * k) } : null;
+    let m = maskFrom(img, mode, sd, tol);
+    if (closeR > 0) m = morph(morph(m, w, h, closeR, true), w, h, closeR, false);   // close small gaps (dashes, text crossing the band)
+    m = morph(morph(m, w, h, 1, false), w, h, 1, true);   // open: drop specks
+    const cleanRing = (mask, holeMax) => { // largest blob, holes smaller than holeMax px² filled (lettering, dashes); null if it is not a ring
+      const cc = components(mask, w, h, 1); if (!cc.sizes.length) return null;
+      let big = 0; for (let i = 1; i < cc.sizes.length; i++) if (cc.sizes[i] > cc.sizes[big]) big = i;
+      const out = new Uint8Array(w * h); for (let i = 0; i < w * h; i++) out[i] = cc.label[i] === big ? 1 : 0;
+      const bg = components(out, w, h, 0); let holes = 0;
+      for (let i = 0; i < w * h; i++) if (!out[i]) { const id = bg.label[i]; if (!bg.border[id] && bg.sizes[id] < holeMax) out[i] = 1; }
+      for (let id = 0; id < bg.sizes.length; id++) if (!bg.border[id] && bg.sizes[id] >= holeMax) holes++;
+      return holes ? out : null;
+    };
+    const ring = cleanRing(m, 0.002 * w * h); if (!ring) return { error: 'Не нашёл кольцо трассы: нет замкнутого полотна с внутренней областью.' };
+    m = ring;
+    // typical half-width of the band from the raw skeleton, then an opening that removes anything narrower (pit lane, link roads, text)
+    let dist = distTransform(m, w, h); const skel0 = thin(m, w, h);
+    const dv = []; for (let i = 0; i < w * h; i++) if (skel0[i]) dv.push(dist[i]); dv.sort((a, b) => a - b);
+    const halfW0 = dv.length ? dv[(dv.length * 0.6) | 0] : 0;
+    const rOpen = Math.min(14, Math.round(halfW0 * 0.6));
+    if (rOpen >= 2 && halfW0 >= 4) {
+      let area = 0; for (let i = 0; i < w * h; i++) area += m[i];
+      const m2 = cleanRing(morph(morph(m, w, h, rOpen, false), w, h, rOpen, true), Math.max(0.002 * w * h, 9 * halfW0 * halfW0));
+      if (m2) { let a2 = 0; for (let i = 0; i < w * h; i++) a2 += m2[i]; if (a2 >= 0.6 * area) { m = m2; dist = distTransform(m, w, h); } }
+    }
+    const skel = prune(thin(m, w, h), w, h);
+    const loop = walkLoop(skel, w, h, dist);
+    if (!loop || loop.path.length < 60) return { error: 'Не удалось выделить замкнутый контур.' };
+    if (!loop.closed || loop.path.length < 0.5 * loop.count) return { error: `Контур не замыкается (несколько конфигураций или разрыв полотна).`, debug: { closed: loop.closed, len: loop.path.length, count: loop.count } };
+    const ds = []; for (const i of loop.path) ds.push(dist[i]); ds.sort((a, b) => a - b);
+    const halfW = ds[ds.length >> 1];
+    let pts = loop.path.map(i => [i % w, (i / w) | 0]);
+    pts = recenter(pts, m, w, h, halfW);
+    pts = smoothLoop(pts, Math.max(2, Math.round(halfW * 0.6)));
+    let simp = simplify(pts, 1.2);
+    for (let t = 1.2; simp.length > 140 && t < 6; t += 0.6) simp = simplify(pts, t);
+    // merge points closer than ~0.8 band width, keep at least 12
+    const minGap = Math.max(4, halfW * 1.6); const out = [];
+    for (const q of simp) { if (!out.length || Math.hypot(q[0] - out[out.length - 1][0], q[1] - out[out.length - 1][1]) >= minGap) out.push(q); }
+    if (out.length > 3 && Math.hypot(out[0][0] - out[out.length - 1][0], out[0][1] - out[out.length - 1][1]) < minGap) out.pop();
+    if (out.length < 4) return { error: 'Контур слишком мал.' };
+    return { pts: out.map(q => ({ x: q[0] / k, y: q[1] / k })), widthPx: 2 * halfW / k, lengthPx: loop.path.length / k, mode };
+  }
+  return { run };
+})();
+
+// Alfano 7 import: .alf2 is a zip of per-lap CSVs (10 Hz: GPS speed, lat/lon, heading, accelerometer) plus a session summary.
 // ---------- a track nobody has driven on Hutka: found by its name, a map link, coordinates or a photo of its map ----------
 // Hutka's own tracks first (by name, or within 3 km of the place). Otherwise the karting raceways drawn on OpenStreetMap around the place
 // (Overpass, straight from the browser like the admin's import): the ways are joined at their shared nodes and every closed loop of a
 // track's size (300 m – 3.5 km) is a candidate layout. A loop becomes a line the racing brain can read (KLL.buildTrack, metres).
+// A photo of a layout is read too: the AI says which venue it is (and the lap length or the direction when the picture shows them), and
+// the picture itself is traced (AT: the band of the track → its centreline) — a layout that is on no map is still read corner by corner.
 const TRACKFIND = (() => {
   const RE = 6371000, rad = Math.PI / 180;
   const kmBetween = (a, b) => { const x = (b.lon - a.lon) * rad * Math.cos((a.lat + b.lat) / 2 * rad), y = (b.lat - a.lat) * rad; return Math.hypot(x, y) * RE / 1000; };
@@ -10264,6 +10615,19 @@ const TRACKFIND = (() => {
     for (const u of mirrors()) { const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 30000);
       try { const r = await fetch(u, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, signal: ctl.signal }); clearTimeout(to); if (r.ok) { const j = await r.json(); if (j && Array.isArray(j.elements)) return j; } last = new Error('http ' + r.status); } catch (e) { clearTimeout(to); last = e; } }
     throw last || new Error('overpass');
+  }
+  // what was typed can be longer than any place the map knows ("Kart Silverstone Grand Prix Circuit (EKS), Silverstone, Northamptonshire,
+  // United Kingdom"): the whole of it, then without what is in brackets, the name with its town, the name alone, the place alone
+  function variants(q) {
+    const s = String(q || '').replace(/\s+/g, ' ').trim(), nb = s.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').replace(/\s+,/g, ',').trim(), parts = nb.split(',').map(x => x.trim()).filter(Boolean);
+    const out = [s, nb]; if (parts.length > 1) out.push(parts.slice(0, 2).join(', '), parts[0], parts.slice(1).join(', '));
+    return [...new Set(out)].filter(x => x.length >= 3).slice(0, 5);
+  }
+  // the map's search, one variant after another (a second apart: the service asks for no more), the first that finds a place
+  async function geocodeAny(q) {
+    let err = null; const vs = variants(q);
+    for (let k = 0; k < vs.length; k++) { if (k) await new Promise(r => setTimeout(r, 1100)); try { const g = await geocode(vs[k]); if (g.length) return Object.assign(g[0], { broad: k > 0 && vs[k] === vs[vs.length - 1] && vs.length > 2 }); } catch (e) { err = e; } }
+    if (err) throw err; return null;
   }
   // a name → a place (OpenStreetMap's own search; the first answer)
   async function geocode(q) {
@@ -10323,10 +10687,16 @@ const TRACKFIND = (() => {
   // a loop as a line the brain reads: metres around its middle, the way round asked for, the start/finish in the middle of the longest
   // straight (the map does not say where it is; it only numbers the corners)
   function geometry(lp, cw) {
-    let pts = lp.pts.slice(); if (pts.length > 2 && pts[0].lat === pts[pts.length - 1].lat && pts[0].lon === pts[pts.length - 1].lon) pts.pop(); if (pts.length < 8) return null;
-    if (clockwise({ pts }) !== !!cw) pts.reverse();
-    const lat0 = pts.reduce((a, p) => a + p.lat, 0) / pts.length, lon0 = pts.reduce((a, p) => a + p.lon, 0) / pts.length, kx = Math.cos(lat0 * rad) * rad * RE, ky = rad * RE;
-    const xy = pts.map(p => ({ x: (p.lon - lon0) * kx, y: -(p.lat - lat0) * ky }));   // y down, north up on the map
+    let xy;
+    if (lp.xy) {   // a traced picture: metres, y down as drawn — clockwise on the picture is the same sum with y turned up
+      xy = lp.xy.slice(); if (xy.length < 8) return null;
+      if (clockwise({ pts: xy.map(p => ({ lat: -p.y, lon: p.x })) }) !== !!cw) xy.reverse();
+    } else {
+      let pts = lp.pts.slice(); if (pts.length > 2 && pts[0].lat === pts[pts.length - 1].lat && pts[0].lon === pts[pts.length - 1].lon) pts.pop(); if (pts.length < 8) return null;
+      if (clockwise({ pts }) !== !!cw) pts.reverse();
+      const lat0 = pts.reduce((a, p) => a + p.lat, 0) / pts.length, lon0 = pts.reduce((a, p) => a + p.lon, 0) / pts.length, kx = Math.cos(lat0 * rad) * rad * RE, ky = rad * RE;
+      xy = pts.map(p => ({ x: (p.lon - lon0) * kx, y: -(p.lat - lat0) * ky }));   // y down, north up on the map
+    }
     let L = 0; for (let i = 0; i < xy.length; i++) { const a = xy[i], b = xy[(i + 1) % xy.length]; L += Math.hypot(b.x - a.x, b.y - a.y); }
     let tr = null; try { tr = KLL.buildTrack(xy, L, 0, false); } catch (e) { tr = null; } if (!tr || !(tr.mpp > 0) || !isFinite(tr.mpp)) return null;
     // the driven line, unless asked for the map's own middle (o.raw)
@@ -10344,7 +10714,8 @@ const TRACKFIND = (() => {
     if (navigator.onLine === false) return { error: 'offline' };
     let at = coords(q), place = null;
     const hit0 = onHutka(at ? '' : q, at);
-    if (!at && !hit0.length) { try { const g = await geocode(q); if (g.length) { at = g[0]; place = g[0].name; } } catch (e) { return { error: 'map' }; } }
+    let broad = false;
+    if (!at && !hit0.length) { try { const g = await geocodeAny(q); if (g) { at = g; place = g.name; broad = !!g.broad; } } catch (e) { return { error: 'map' }; } }
     const near = at ? onHutka('', at) : [];
     const seen = new Set(), hutka = [];
     for (const h of hit0.concat(near)) {
@@ -10356,18 +10727,33 @@ const TRACKFIND = (() => {
     let loops = [];
     if (!hutka.some(h => h.lined)) {
       const c = at || (hutka[0] && isFinite(hutka[0].tr.lat) ? { lat: hutka[0].tr.lat, lon: hutka[0].tr.lon } : null);
-      if (c) { try { loops = await raceways(c, 6000); } catch (e) { if (!hutka.length) return { error: 'map' }; } }
+      if (c) { try { loops = await raceways(c, broad ? 12000 : 6000); } catch (e) { if (!hutka.length) return { error: 'map' }; } }   // a town, not the venue: a wider look around
     }
     return { hutka, loops, place, at };
   }
-  // a photo of the track map → its name and place, read by the AI; then searched like a typed name
+  // a photo of the track map → its name and place (and the lap length or the way round, when the picture shows them), read by the AI;
+  // then searched like a typed name. The picture is kept: it can be traced whatever the search finds
+  const loadImg = (file) => new Promise((res, rej) => { const img = new Image(), u = URL.createObjectURL(file); img.onload = () => { URL.revokeObjectURL(u); res(img); }; img.onerror = () => { URL.revokeObjectURL(u); rej(new Error('image')); }; img.src = u; });
   async function fromPhoto(file) {
-    const b64 = await new Promise((res, rej) => { const img = new Image(), u = URL.createObjectURL(file); img.onload = () => { const s = Math.min(1, 1400 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg', 0.85).split(',')[1]); }; img.onerror = () => { URL.revokeObjectURL(u); rej(new Error('image')); }; img.src = u; });
-    const g = await STORE.identifyTrack(b64, 'image/jpeg');
-    if (!g || !g.name) return null;
-    return { query: [g.name, g.city, g.country].filter(Boolean).join(', '), guess: g };
+    const img = await loadImg(file), s = Math.min(1, 1400 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    let g = null; try { g = await STORE.identifyTrack(c.toDataURL('image/jpeg', 0.85).split(',')[1], 'image/jpeg'); } catch (e) { g = null; }
+    return { query: g && g.name ? [g.name, g.city, g.country].filter(Boolean).join(', ') : '', guess: g || {}, img };
   }
-  return { coords, onHutka, geocode, raceways, loopsOf, clockwise, geometry, find, fromPhoto };
+  // the picture traced: the band of the track (whatever differs from the picture's border, else whatever is dark) → its centreline, in
+  // pixels. Its size in metres: the lap length the picture or the AI gives; else a guess between the band's width (a kart track is about
+  // 8 m wide, but a drawing paints it one and a half to two times as wide) and a usual kart track's kilometre; else 1 km. { lp, lengthM, how } or null
+  function fromImage(img, hint) {
+    if (typeof AT === 'undefined' || !img) return null;
+    const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height; let r = null;
+    try { r = AT.run(img, w, h, 'auto', null, 60); if (r.error) { const r2 = AT.run(img, w, h, 'dark', null, 110); if (!r2.error) r = r2; } } catch (e) { r = null; }
+    if (!r || r.error || !r.pts || r.pts.length < 8) return null;
+    let per = 0; for (let i = 0; i < r.pts.length; i++) { const a = r.pts[i], b = r.pts[(i + 1) % r.pts.length]; per += Math.hypot(b.x - a.x, b.y - a.y); }
+    const given = hint && +hint.length_m, byWidth = r.widthPx > 0 ? per * 8 * 1.6 / r.widthPx : 0, ok = given >= 300 && given <= 3500;
+    const lengthM = ok ? given : (byWidth ? Math.max(600, Math.min(1500, Math.sqrt(byWidth * 1000))) : 1000), how = ok ? 'given' : 'guess';
+    const sc = lengthM / per, xy = r.pts.map(p => ({ x: p.x * sc, y: p.y * sc }));
+    return { lp: { xy, lengthM, widthM: 8, ways: ['img' + Math.round(per)] }, lengthM: Math.round(lengthM), how };
+  }
+  return { coords, onHutka, geocode, geocodeAny, variants, raceways, loopsOf, clockwise, geometry, find, fromPhoto, fromImage };
 })();
 // ---------- home: the feed of published sessions, where people drive, who is fastest ----------
 // the analysis card from the session meta (LAB.cardOf): the lap line, the Lab's points, the corner numbers — y grows downwards
@@ -10885,7 +11271,7 @@ const HAI = (() => {
 const AI = { chats: [], cur: null, log: [], wallet: null, busy: false, ctl: null, ctx: {}, seq: 0, lay: null };
 const AI_RULES_V3 = () => `You are Hutka AI, the driver's racing AI on Hutka, a karting telemetry platform. You talk about anything in karting: driving technique, lines, braking, tracks and layouts, karts and conditions, racecraft, the driver's sessions and progress. Rental karts are the default world (Sodi RT8/RT10-class, about 9–13 hp, no differential, built-in understeer); a session may name a sport kart (Rotax, X30, KZ…) — a different world: never compare times across kart classes and fit the advice to the class.
 How you know things. (1) THE COACH'S METHOD below, when present, is your philosophy of driving: explain technique in its terms and never contradict it. (2) The data below — the driver's sessions and progress, the ideal points of layouts computed from the fastest real passes on Hutka (or predicted from similar corners when a layout has not been driven), the corner breakdown of a session: every number and corner you give comes from it, never invented. If a question needs data that is not here, say what to upload or which layout to open in the Ideal lap. (3) General karting knowledge for the rest, plainly, saying when it depends on the track, the kart or the conditions.
-Telemetry is GPS: speak of where the slowing starts, where the kart stops slowing (the gas is on) and where it accelerates hard (full throttle) — never of pedal pressure you cannot see. Points are in kart lengths (one kart length ≈ 2 m) from the turn-in and the apex. Name corners as T<number> (T7) — the app turns them into markers.
+Telemetry is GPS: speak of where the slowing starts, where the kart stops slowing (the gas is on) and where it accelerates hard (full throttle) — never of pedal pressure you cannot see. Points are in metres from the turn-in and the apex: say them in metres ("brake 12 m before the turn-in", "gas 5 m before the apex of T1"); "a kart length" or "two kart lengths" only for distances of about 2 or 4 m, never more kart lengths than two. Name corners as T<number> (T7) — the app turns them into markers.
 Be compact: lead with the one thing that matters, then at most three corners or points, one or two lines each; about 150 words, never more than 250, unless the driver asks for a full breakdown. Finish every sentence. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, plain language, no headings or tables; short lists are fine. Address the driver as "you". You can be wrong: when something is a guess (a predicted layout, little data), say so in a few words.`;
 // the coach's method: Uladzislau's course (served with the preview only; on the server it comes from a private table)
 let aiKnow = null;
@@ -11140,7 +11526,7 @@ function renderIdeal(body, sub, res) {
   body.innerHTML = '';
   if (!res || res.mode === 'none' || !res.corners) { body.appendChild(el('div', 'hint', t('This layout has no line yet — nobody has uploaded a lap on it and it has no drawing. Upload a session there, or try New track.'))); return; }
   const trName = res.tid && STORE.getTrack(res.tid) ? STORE.getTrack(res.tid).name + ' · ' : '';
-  sub.textContent = res.mode === 'real' ? trName + t('Real laps here: {n} · drivers: {d} · best {b}', { n: res.info.laps, d: res.info.drivers, b: fmtMs(res.info.best * 1000) }) : trName + t('Too few laps here yet: built from similar corners of other layouts ({n}) — a forecast, check it on track', { n: res.info.books });
+  sub.textContent = res.mode === 'real' ? trName + t('Real laps here: {n} · drivers: {d} · best {b}', { n: res.info.laps, d: res.info.drivers, b: fmtMs(res.info.best * 1000) }) : res.tid ? trName + t('Too few laps here yet: built from similar corners of other layouts ({n}) — a forecast, check it on track', { n: res.info.books }) : t('A forecast from similar corners of {n} layouts on Hutka — check it on track', { n: res.info.books });   // a track off the map or a photo: nobody drove it here
   const cv = el('canvas', 'ai2-map'); body.appendChild(cv);
   const lg = el('div', 'ai2-legend'); lg.innerHTML = `<span><i class="b"></i>${esc(t('Braking zone'))}</span><span><i class="l"></i>${esc(t('Lift zone'))}</span><span><i class="g"></i>${esc(t('back on the gas'))}</span><span><i class="f"></i>${esc(t('Flat-out corner'))}</span>`; body.appendChild(lg);
   const list = el('div', 'ai2-crn'); body.appendChild(list);
@@ -11226,27 +11612,42 @@ function actTrack() {
   const out = el('div', 'ai2-found');
   inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); run(inp.value); } });
   card.append(row, row2, out); pushCard(card); setTimeout(() => inp.focus(), 50);
-  async function run(q) {
-    q = String(q || '').trim(); if (!q) return; out.innerHTML = ''; out.appendChild(el('div', 'hint', t('Looking…'))); go.classList.add('busy');
-    let res = null; try { res = await TRACKFIND.find(q); } catch (e) { res = { error: String(e && e.message || e) }; }
+  // ph: the photo this search came from — its own layout is always one of the answers (it may be a configuration no map has), and the
+  // answer by itself when the search finds nothing: a new track never ends in "nothing found" while there is a picture to read
+  async function run(q, ph) {
+    q = String(q || '').trim(); if (!q && !ph) return; out.innerHTML = ''; out.appendChild(el('div', 'hint', t('Looking…'))); go.classList.add('busy');
+    let res = null; if (q) { try { res = await TRACKFIND.find(q); } catch (e) { res = { error: String(e && e.message || e) }; } } else res = { hutka: [], loops: [] };
     go.classList.remove('busy'); out.innerHTML = '';
-    if (!res || res.error) { out.appendChild(el('div', 'hint warn', res && res.error === 'offline' ? t('No connection to the map — try again online.') : t('Could not search the map just now — try again in a minute.'))); return; }
+    if (ph) { const b = el('button', 'ai2-hit'); b.type = 'button'; b.innerHTML = `<b>${esc(t('This layout, read from the photo'))}</b><span>${esc(t('The corners as the picture draws them, the points from similar corners on Hutka'))}</span>`; b.onclick = () => idealFromPhoto(ph); out.appendChild(b); }
+    if (!res || res.error) { if (ph) { await idealFromPhoto(ph); return; } out.appendChild(el('div', 'hint warn', res && res.error === 'offline' ? t('No connection to the map — try again online.') : t('Could not search the map just now — try again in a minute.'))); return; }
     // tracks already on Hutka: their layouts straight to the ideal
     for (const h of res.hutka) { const b = el('button', 'ai2-hit'); b.type = 'button'; const far = h.km !== null && h.km !== undefined ? ' · ' + esc(t('{d} km away', { d: h.km.toFixed(h.km < 10 ? 1 : 0) })) : ''; b.innerHTML = `<b>${esc(h.tr.name)}</b><span>${esc(h.lined ? t('On Hutka · {n} layouts', { n: h.ls.length }) : t('On Hutka, but nobody has uploaded a lap there yet'))}${far}</span>`; if (h.lined) b.onclick = () => actIdeal(h.tr.id, (h.ls[0] || {}).id); else b.disabled = true; out.appendChild(b); }
     // raceways on the map: every closed loop found, longest first
     for (const lp of res.loops) { const b = el('button', 'ai2-hit'); b.type = 'button'; b.innerHTML = `<b>${esc(lp.name || t('Raceway on the map'))}</b><span>${esc(t('OpenStreetMap · loop of {m} m', { m: Math.round(lp.lengthM) }))}</span>`; b.onclick = () => idealFromLoop(lp); out.appendChild(b); }
-    if (!res.hutka.length && !res.loops.length) out.appendChild(el('div', 'hint', res.place ? t('Found {p}, but no karting raceway is drawn there on OpenStreetMap. Upload a session there and Hutka maps it from your GPS.', { p: res.place }) : t('Nothing found. Try the track\'s name with the city, or a map link.')));
+    if (!res.hutka.some(h => h.lined) && !res.loops.length) {
+      if (ph) { await idealFromPhoto(ph); return; }   // nothing on the map: the picture is the layout
+      out.appendChild(el('div', 'hint', res.place ? t('Found {p}, but no karting raceway is drawn there on the map. Send a photo of its layout — Hutka reads the corners from it.', { p: res.place }) : t('Not on the map. Send a photo of its layout — Hutka reads the corners from it.')));
+    }
   }
   async function fromPhoto(f) {
     out.innerHTML = ''; out.appendChild(el('div', 'hint', t('Reading the photo…')));
-    let guess = null; try { guess = await TRACKFIND.fromPhoto(f); } catch (e) { guess = null; }
+    let ph = null; try { ph = await TRACKFIND.fromPhoto(f); } catch (e) { ph = null; }
     out.innerHTML = '';
-    if (!guess || !guess.query) { out.appendChild(el('div', 'hint warn', t('Could not tell which track this is. Type its name or the city.'))); return; }
-    inp.value = guess.query; out.appendChild(el('div', 'hint', t('Looks like {q}', { q: guess.query }))); await run(guess.query);
+    if (!ph) { out.appendChild(el('div', 'hint warn', t('Could not open this picture.'))); return; }
+    if (ph.query) inp.value = ph.query;
+    await run(ph.query, ph);
   }
 }
+// a layout from a picture: traced, sized (the length the picture gives, else a guess) and read like any line — corner by corner from
+// the similar corners on Hutka; which way round from the picture's arrows when the AI saw them, clockwise otherwise
+async function idealFromPhoto(ph) {
+  const T = TRACKFIND.fromImage(ph.img, ph.guess), name = (ph.guess && ph.guess.name) || t('Layout from the photo');
+  if (!T) { const card = aiCard(name, ''); card.appendChild(el('div', 'hint warn', t('Could not read the layout from this picture. A straight-on picture of the map, the track a clear band on a plain background, works best.'))); pushCard(card); return; }
+  const note = T.how === 'given' ? t('Read from the photo · {m} m, the length the picture gives', { m: T.lengthM }) : t('Read from the photo · about {m} m: the length is a guess, so the corners are right and the distances only roughly', { m: T.lengthM });
+  await idealFromLoop(Object.assign({ name }, T.lp), !(ph.guess && ph.guess.direction === 'ccw'), note);
+}
 // a loop off the map read like a layout: the ideal from similar corners, both ways round (the map does not say which way it is driven)
-async function idealFromLoop(lp, cw) {
+async function idealFromLoop(lp, cw, note) {
   const card = aiCard(lp.name || t('Raceway on the map'), ''), sub = card.querySelector('[data-sub]'), body = el('div', 'ai2-body');
   const dirs = el('div', 'seg ai2-dir'); const bCw = aiBtn(t('Clockwise'), '', () => draw(true)), bCcw = aiBtn(t('Anticlockwise'), '', () => draw(false)); dirs.append(bCw, bCcw);
   card.querySelector('.hd .tt').appendChild(dirs); card.appendChild(body); pushCard(card);
@@ -11256,6 +11657,7 @@ async function idealFromLoop(lp, cw) {
     let res = null; try { res = await BRAINS.predictOn(G, { name: lp.name || t('Raceway on the map'), cls: aiCls() }); } catch (e) { res = null; }
     AI.ctx = Object.assign({}, AI.ctx, { found: res, layouts: [] });
     renderIdeal(body, sub, res);
+    if (note) body.insertBefore(el('div', 'hint', note), body.firstChild);
   }
   await draw(cw === undefined ? true : !!cw);   // the map does not say which way it is driven: clockwise first, one tap for the other
 }
@@ -11801,7 +12203,7 @@ const ADMIN = (() => {
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
   try { AUTH.gate(); } catch (e) {}   // the app: sign in first
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, sameTrackName, lineOf, BRAIN, DATA, KLL, readAnyLogger, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, sameTrackName, lineOf, BRAIN, BRAINS, TRACKFIND, fitsLayout, DATA, KLL, readAnyLogger, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { if (typeof INTRO !== 'undefined') INTRO.ready(); } catch (e) {}   // the opening may finish: the app is up
