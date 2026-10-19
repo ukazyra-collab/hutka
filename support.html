@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hutka — Support</title>
+<meta name="description" content="Support for Hutka (hutka.ai) and the Hutka app, operated by KOZYRA MEDIA GROUP - FZCO, Dubai, UAE.">
+<link rel="icon" href="favicon.ico?v=3" sizes="32x32 48x48 64x64">
+<style>
+  body{margin:0;background:#f5f6f8;color:#1a2237;font:16px/1.6 -apple-system,"Segoe UI",system-ui,Arial,sans-serif}
+  main{max-width:760px;margin:0 auto;padding:32px 20px 60px}
+  h1{font-size:28px;margin:0 0 4px}h2{font-size:20px;margin:28px 0 8px}
+  .sub{color:#5b6475;margin-bottom:24px}
+  a{color:#2f6bf0}
+  .lang{display:flex;gap:10px;margin-bottom:20px}
+  .lang button{border:1px solid #cdd3dd;background:#fff;border-radius:999px;padding:6px 14px;font:600 14px inherit;cursor:pointer}
+  .lang button.on{background:#1f2b48;color:#fff;border-color:#1f2b48}
+  [hidden]{display:none!important}
+  ul{padding-left:20px}
+  .card{background:#fff;border:1px solid #e3e6ec;border-radius:16px;padding:18px 18px 16px}
+  label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}
+  input,textarea{box-sizing:border-box;width:100%;border:1px solid #cdd3dd;border-radius:12px;padding:11px 12px;font:16px/1.4 inherit;color:inherit;background:#fff}
+  textarea{min-height:130px;resize:vertical}
+  .field{margin-bottom:14px}
+  .send{display:block;width:100%;border:0;border-radius:12px;padding:14px 18px;background:#2f6bf0;color:#fff;font:700 16px inherit;cursor:pointer}
+  .send[disabled]{opacity:.6;cursor:default}
+  .status{margin-top:10px;font-size:15px;min-height:1.4em}
+  .status.ok{color:#1e8e4e}.status.warn{color:#b4421f}
+  .foot{margin-top:36px;color:#5b6475;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <div class="lang"><button id="en" class="on" type="button">English</button><button id="ru" type="button">Русский</button></div>
+
+  <section id="s-en">
+    <h1>Hutka — Support</h1>
+    <div class="sub">Help with the Hutka website (hutka.ai) and the Hutka iOS / Android app</div>
+
+    <h2>Who we are</h2>
+    <p>Hutka and the Hutka app are operated by <b>KOZYRA MEDIA GROUP - FZCO</b>, a free zone company registered in Dubai, United Arab Emirates (IFZA / Dubai Integrated Economic Zones Authority, licence no. 41793), IFZA Properties, Dubai Silicon Oasis, Dubai, UAE.</p>
+
+    <h2>Contact us</h2>
+    <p>Email <a href="mailto:hello@hutka.ai">hello@hutka.ai</a>, or write to us here — we reply by email.</p>
+    <form class="card" data-lang="en">
+      <div class="field"><label for="e-mail">Your email</label><input id="e-mail" name="email" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="e-text">How can we help?</label><textarea id="e-text" name="text" required></textarea></div>
+      <button class="send" type="submit">Send</button>
+      <div class="status" role="status"></div>
+    </form>
+
+    <h2>Common questions</h2>
+    <ul>
+      <li><b>How do I upload a session?</b> The step-by-step guide is in the app: <a href="https://hutka.ai/#help">hutka.ai → Help</a>.</li>
+      <li><b>Which lap timers work?</b> Alfano (the .alf2 / .zip file, or straight from an Alfano 7 over Bluetooth), RaceBox (Bluetooth), AiM MyChron (the .xrk file or a CSV export), RaceChrono, TrackAddict, VBOX and any GPX file.</li>
+      <li><b>Something does not work?</b> In the app, the bug button sends us a report with the page it happened on.</li>
+      <li><b>Delete your account</b>: Profile → Delete account in the app, or see <a href="delete-account.html">how to delete your account</a>.</li>
+      <li><b>Privacy</b>: <a href="privacy.html">Privacy Policy</a>.</li>
+    </ul>
+    <div class="foot">© 2026 KOZYRA MEDIA GROUP - FZCO · Dubai, UAE · <a href="https://hutka.ai/">hutka.ai</a></div>
+  </section>
+
+  <section id="s-ru" hidden>
+    <h1>Hutka — поддержка</h1>
+    <div class="sub">Помощь с сайтом Hutka (hutka.ai) и приложением Hutka для iOS / Android</div>
+
+    <h2>Кто мы</h2>
+    <p>Hutka и приложение Hutka принадлежат и управляются компанией <b>KOZYRA MEDIA GROUP - FZCO</b>, зарегистрированной в свободной зоне Дубая, ОАЭ (IFZA / Dubai Integrated Economic Zones Authority, лицензия № 41793), IFZA Properties, Dubai Silicon Oasis, Дубай, ОАЭ.</p>
+
+    <h2>Написать нам</h2>
+    <p>Почта <a href="mailto:hello@hutka.ai">hello@hutka.ai</a> — или напишите здесь, ответим на почту.</p>
+    <form class="card" data-lang="ru">
+      <div class="field"><label for="r-mail">Ваша почта</label><input id="r-mail" name="email" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="r-text">Чем помочь?</label><textarea id="r-text" name="text" required></textarea></div>
+      <button class="send" type="submit">Отправить</button>
+      <div class="status" role="status"></div>
+    </form>
+
+    <h2>Частые вопросы</h2>
+    <ul>
+      <li><b>Как загрузить сессию?</b> Пошаговая инструкция — в приложении: <a href="https://hutka.ai/#help">hutka.ai → Помощь</a>.</li>
+      <li><b>Какие лап-таймеры подходят?</b> Alfano (файл .alf2 / .zip или прямо с Alfano 7 по Bluetooth), RaceBox (Bluetooth), AiM MyChron (файл .xrk или экспорт CSV), RaceChrono, TrackAddict, VBOX и любой GPX.</li>
+      <li><b>Что-то не работает?</b> В приложении кнопка с жуком отправит нам отчёт вместе со страницей, где это случилось.</li>
+      <li><b>Удалить аккаунт</b>: в приложении Профиль → Удалить аккаунт, или <a href="delete-account.html">как удалить аккаунт</a>.</li>
+      <li><b>Конфиденциальность</b>: <a href="privacy.html#ru">Политика конфиденциальности</a>.</li>
+    </ul>
+    <div class="foot">© 2026 KOZYRA MEDIA GROUP - FZCO · Дубай, ОАЭ · <a href="https://hutka.ai/">hutka.ai</a></div>
+  </section>
+</main>
+<script src="config.js"></script>
+<script>
+  const pick = (l) => { document.getElementById('s-en').hidden = l !== 'en'; document.getElementById('s-ru').hidden = l !== 'ru'; document.getElementById('en').classList.toggle('on', l === 'en'); document.getElementById('ru').classList.toggle('on', l === 'ru'); document.documentElement.lang = l; };
+  document.getElementById('en').onclick = () => pick('en'); document.getElementById('ru').onclick = () => pick('ru');
+  if (/^ru/i.test(navigator.language || '') || location.hash === '#ru') pick('ru');
+  // the message goes where the app's bug reports go: stored for the team and emailed to it, the sender's address to reply to
+  const T = { en: { sending: 'Sending…', sent: 'Sent — we will reply to your email.', fail: 'Could not send just now. Please email hello@hutka.ai.', many: 'Too many messages from this network today. Please email hello@hutka.ai.' },
+              ru: { sending: 'Отправляем…', sent: 'Отправлено — ответим вам на почту.', fail: 'Сейчас не отправилось. Напишите, пожалуйста, на hello@hutka.ai.', many: 'Сегодня из этой сети уже много сообщений. Напишите, пожалуйста, на hello@hutka.ai.' } };
+  for (const f of document.querySelectorAll('form[data-lang]')) f.addEventListener('submit', async (ev) => {
+    ev.preventDefault(); const L = T[f.dataset.lang], st = f.querySelector('.status'), b = f.querySelector('.send');
+    const email = f.elements.email.value.trim(), text = f.elements.text.value.trim(); if (!email || !text) return;
+    const c = window.HUTKA_CONFIG || {}, base = String(c.askUrl || ((c.supabaseUrl || '') + '/functions/v1/ask')).replace(/\/ask\/?$/, ''), key = c.supabaseAnonKey || '';
+    b.disabled = true; st.className = 'status'; st.textContent = L.sending;
+    try {
+      const r = await fetch(base + '/report', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': key, 'Authorization': 'Bearer ' + key }, body: JSON.stringify({ text: '[Support] ' + text, email, page: location.href, ua: navigator.userAgent, screen: screen.width + 'x' + screen.height, version: 'support' }) });
+      if (r.ok) { st.className = 'status ok'; st.textContent = L.sent; f.elements.text.value = ''; }
+      else { st.className = 'status warn'; st.textContent = r.status === 429 ? L.many : L.fail; }
+    } catch (e) { st.className = 'status warn'; st.textContent = L.fail; }
+    b.disabled = false;
+  });
+</script>
+</body>
+</html>

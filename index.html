@@ -1456,6 +1456,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 .ai2-dir{align-self:flex-start}
 .ai2-hist .chatlist{max-height:none}
 .ai2-hist .wallet{border-top:1px solid var(--line);padding-top:14px}
+.site-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 18px;margin:28px 2px 6px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.site-foot nav{display:flex;flex-wrap:wrap;gap:6px 16px}.site-foot a{color:inherit;text-decoration:none}.site-foot a:hover{color:var(--fg);text-decoration:underline}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -1591,6 +1592,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
           <div class="card" id="homeFollowCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="Drivers you follow">Drivers you follow</span></h2><div class="list" id="homeFollowing" style="gap:4px"></div></div>
         </div>
       </div>
+      <footer class="site-foot"><span>© 2026 KOZYRA MEDIA GROUP - FZCO · <span data-t="Dubai, UAE">Dubai, UAE</span></span><nav><a href="support.html" data-t="Support">Support</a><a href="privacy.html" data-t="Privacy">Privacy</a><a href="delete-account.html" data-t="Delete account">Delete account</a></nav></footer>
     </section>
 
     <!-- ========== TRACKS ========== -->
@@ -5189,6 +5191,8 @@ Object.assign(I18N.RU, {
 Object.assign(I18N.RU, {"A forecast from similar corners of {n} layouts on Hutka — check it on track": "Прогноз по похожим поворотам {n} конфигураций на Hutka — проверь на трассе"});
 // v34.33 — Hutka AI for everyone
 Object.assign(I18N.RU, {"Hutka AI is not connected yet.": "Hutka AI ещё не подключён.", "Sign in to talk to Hutka AI — it knows your sessions.": "Войди, чтобы говорить с Hutka AI — он знает твои сессии."});
+// v34.33 — the site footer: who runs Hutka, support, privacy
+Object.assign(I18N.RU, {"Dubai, UAE": "Дубай, ОАЭ", "Support": "Поддержка", "Privacy": "Конфиденциальность"});
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -7014,7 +7018,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.33';
+const APP_VERSION = 'v34.34';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
