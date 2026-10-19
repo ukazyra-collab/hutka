@@ -31,10 +31,15 @@ export function nameKey(s: string): string {
 }
 const similar = (a: string, b: string) => { const x = nameKey(a), y = nameKey(b); if (!x || !y) return false; return x === y || (x.length >= 4 && y.includes(x)) || (y.length >= 4 && x.includes(y)); };
 
-// which elements are venues: something named with karting among its sports, not a shop, an office or a closed place
+// a name that says karting in the map's languages: "kart"/"karts" as a word (Go Karts, E-Kart), karting, kartbahn, kartbaan, kart
+// center, kartódromo, kartodrom, gokart, картинг, картодром, motokáry, mikroautorata — not Kartause, Kartoffel, kartano, Kartverket
+export const KART_NAME = /(^|[^\p{L}])(go[- ]?)?karts?(?![\p{L}])|karting|kartbahn|kartbaan|kartsport|kart[- ]?(center|centre|centrum|club|klub|arena|hall|halle|park|ring|land|world|zone|racing|track|circuit|bane|bana)|kart[oó]drom|kartdrom|gokart|go-kart|картинг|картодром|motok[aá]r|mikroauto/iu;
+export const kartName = (s: string) => KART_NAME.test(String(s || "")) && !/orient|kompass/i.test(String(s || ""));
+// which elements are venues: something with karting among its sports, or named for karts (a raceway, a track or a hall with no sport
+// given, a motor-sport venue), not a shop, an office or a closed place
 function isVenue(e: El): boolean {
-  const t = e.tags || {};
-  if (!/karting/i.test(t.sport || "") && !(t.highway === "raceway" && !t.sport && /kart/i.test(t.name || ""))) return false;   // or a raceway named for karts
+  const t = e.tags || {}, nm = tag(t, "name", "name:en");
+  if (!/karting/i.test(t.sport || "") && !(t.highway === "raceway" && !t.sport && kartName(nm)) && !(/^(motor|motorsport)$/i.test(t.sport || "") && kartName(nm))) return false;
   if (t.shop || t.office || t.craft) return false;
   if (Object.keys(t).some(k => /^(disused|abandoned|demolished|razed|was|removed):/.test(k))) return false;
   if (/^(no|closed)$/i.test(t.opening_hours || "") || t["end_date"]) return false;

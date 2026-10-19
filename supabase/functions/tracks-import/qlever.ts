@@ -1,7 +1,7 @@
 // Hutka — OpenStreetMap through QLever (a SPARQL database of the whole planet, University of Freiburg): the public Overpass servers
 // refuse or never answer requests from the functions' network. Five light questions an area — its karting venues' tags and
 // outlines, its raceways' lines and tags, its towns — turned into the elements lib.ts reads.
-import type { El } from "./lib.ts";
+import { kartName, type El } from "./lib.ts";
 
 export const QLEVER = "https://qlever.cs.uni-freiburg.de/api/osm-planet";
 const PRE = `PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:> PREFIX ogc: <http://www.opengis.net/rdf#> PREFIX geo: <http://www.opengis.net/ont/geosparql#> `;
@@ -10,8 +10,10 @@ const areaOf = (area: string) => `?area osmkey:${/^US-[A-Z]{2}$/.test(area) ? "I
 const KEY = "https://www.openstreetmap.org/wiki/Key:";
 // the tags a venue is read by (lib.ts): its name, contacts, address, what kind of place it is, whether it is closed — all its tags,
 // one row a tag (a row per venue with thirty optional columns is what makes the database slow)
-// the venues: sport=karting, karting among other sports ("karting;paintball"), and a raceway named for karts with no sport given
-const VENUE = `{ ?el osmkey:sport "karting" } UNION { ?el osmkey:sport ?sp . FILTER(?sp != "karting" && CONTAINS(LCASE(?sp), "karting")) } UNION { ?el osmkey:highway "raceway" . ?el osmkey:name ?nm . FILTER(REGEX(?nm, "kart", "i")) MINUS { ?el osmkey:sport ?sp2 } } `;
+// the venues: sport=karting, karting among other sports ("karting;paintball"), and — named for karts (lib.ts kartName decides; here
+// the rough cut) — a raceway or a track, sports centre, sports hall or amusement hall with no sport given, a motor-sport venue
+const KN = (v: string) => `(CONTAINS(LCASE(${v}), "kart") || CONTAINS(LCASE(${v}), "картинг") || CONTAINS(LCASE(${v}), "картодром") || CONTAINS(LCASE(${v}), "motokár") || CONTAINS(LCASE(${v}), "mikroauto"))`;
+const VENUE = `{ ?el osmkey:sport "karting" } UNION { ?el osmkey:sport ?sp . FILTER(?sp != "karting" && CONTAINS(LCASE(?sp), "karting")) } UNION { ?el osmkey:highway "raceway" . ?el osmkey:name ?nm . FILTER(${KN("?nm")}) MINUS { ?el osmkey:sport ?sp2 } } UNION { VALUES ?lv { "track" "sports_centre" "sports_hall" "amusement_arcade" } ?el osmkey:leisure ?lv . ?el osmkey:name ?nl . FILTER(${KN("?nl")}) MINUS { ?el osmkey:sport ?sp3 } } UNION { VALUES ?sm { "motor" "motorsport" } ?el osmkey:sport ?sm . ?el osmkey:name ?nn . FILTER(${KN("?nn")}) } `;
 export const qVenueTags = (area: string) => PRE + `SELECT ?el ?key ?val WHERE { ${areaOf(area)}${VENUE}?el ?key ?val . FILTER(STRSTARTS(STR(?key), "${KEY}")) }`;
 export const qVenueGeom = (area: string) => PRE + `SELECT ?el ?wkt WHERE { ${areaOf(area)}${VENUE}?el geo:hasGeometry/geo:asWKT ?wkt . }`;
 export const qRacewayGeom = (area: string) => PRE + `SELECT ?el ?wkt WHERE { ${areaOf(area)}?el osmkey:highway "raceway" . ?el geo:hasGeometry/geo:asWKT ?wkt . }`;
@@ -45,7 +47,8 @@ export function venueEls(tagRows: Row[], geomRows: Row[]): El[] {
   for (const r of geomRows) {
     const iri = r.el ? r.el.value : "", k = idOf(iri); if (!k || seen.has(iri) || !r.wkt) continue; seen.add(iri);
     const pts = coords(r.wkt.value); if (!pts.length) continue;
-    const t = Object.assign({ sport: "karting" }, tags.get(iri) || {});
+    // no sport given: a karting venue when its name says so (the query's cut is rough: "Kartause" is not one)
+    const own = tags.get(iri) || {}, t = own.sport ? Object.assign({}, own) : Object.assign({ sport: kartName(own.name || own["name:en"] || "") ? "karting" : "" }, own);
     if (k.type === "node" || pts.length === 1) { out.push({ type: k.type, id: k.id, lat: pts[0].lat, lon: pts[0].lon, tags: t }); continue; }
     const ring = coords(r.wkt.value, true), c = { lat: ring.reduce((a, p) => a + p.lat, 0) / ring.length, lon: ring.reduce((a, p) => a + p.lon, 0) / ring.length };
     out.push({ type: k.type, id: k.id, center: c, bounds: { minlat: Math.min(...pts.map(p => p.lat)), minlon: Math.min(...pts.map(p => p.lon)), maxlat: Math.max(...pts.map(p => p.lat)), maxlon: Math.max(...pts.map(p => p.lon)) }, tags: t });

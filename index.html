@@ -6000,7 +6000,8 @@ const GEO = (() => {
       cv.addEventListener('dblclick', (e) => { const [sx, sy] = pos(e); this.zoomAt(2, sx, sy); });
     }
   }
-  const initials = (name) => String(name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+  // a name's first two words' first letters (or digits): "Briggs & Stratton Motorplex" → BS, not B&
+  const initials = (name) => { const ls = String(name || '').split(/\s+/).map(w => (w.match(/[\p{L}\p{N}]/u) || [''])[0]).filter(Boolean); return ls.length ? ls.slice(0, 2).join('').toUpperCase() : '?'; };
   const distKm = (a, b) => { const R = 6371, dLat = (b.lat - a.lat) * PI / 180, dLon = (b.lon - a.lon) * PI / 180, s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * PI / 180) * Math.cos(b.lat * PI / 180) * Math.sin(dLon / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(s)); };
   return { load, GeoMap, initials, distKm, nearestCity, ready: () => !!land };
 })();
@@ -7584,7 +7585,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.42';
+const APP_VERSION = 'v34.43';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {

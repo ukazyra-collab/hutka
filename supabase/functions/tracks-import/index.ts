@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
   }
   const withLine = fresh.filter(v => v.line).length;
   const summary = { area, mirror, elements: els.length, venues: venues.length, fresh: fresh.length, withLine, indoor: fresh.filter(v => v.indoor).length, skipped: skipped.length, sample: fresh.slice(0, 12).map(v => ({ name: v.name, city: v.city, line: v.line ? v.line.lengthM : 0, indoor: v.indoor })), skippedSample: skipped.slice(0, 8), dry, ms: 0 };
-  if (dry) { summary.ms = Date.now() - t0; return done(summary); }
+  if (dry) { summary.ms = Date.now() - t0; return done(Object.assign(summary, { names: fresh.map(v => `${v.name} · ${v.city}${v.line ? " · " + v.line.lengthM + " m" : ""}`) })); }
   // the pages: the track (light: the catalogue loads them all), its "Main" layout, the line in media
   const now = new Date().toISOString(), ts = Date.now();
   const tracks = fresh.map(v => ({ id: v.id, data: Object.assign({ name: v.name, city: v.city, country: cc, lat: v.lat, lon: v.lon, address: v.address, website: v.website, phone: v.phone, indoor: v.indoor, osm: v.osm, source: "osm", createdAt: ts, updatedAt: ts }, v.line ? { lengthM: v.line.lengthM } : {}), updated_at: now }));
