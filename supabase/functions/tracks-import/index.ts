@@ -1,4 +1,4 @@
-// Hutka — tracks from OpenStreetMap: every named karting venue of an area (a country "FR", or a US state "US-CA") becomes a track
+// Hutka — tracks from OpenStreetMap (read through QLever, qlever.ts): every named karting venue of an area (a country "FR", or a US state "US-CA") becomes a track
 // page with a "Main" layout; where the map has the raceway drawn, the middle of the asphalt is the layout's line (kept in media:
 // tracks/<id>/layouts/main/media/line, so the catalogue stays light), with its length. Idempotent: ids come from the OSM element
 // (osm-w123); a venue Hutka has already (the same element, a track within 300 m, or within 1 km under the same name) is left alone.
@@ -8,44 +8,11 @@
 // Deploy as `tracks-import` with "Verify JWT" OFF (checked here).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { venuesOf, distM, nameKey, type El, type Venue } from "./lib.ts";
+import { QLEVER, qVenues, qRaceways, qTowns, sparql, venueEls, racewayEls, townEls } from "./qlever.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-import-token", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
-const MIRRORS = ["https://overpass.kumi.systems/api/interpreter", "https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
-
-// three light questions (an "around" over the venues' outlines is slow on the public servers): the area's karting
-// venues; the raceways in small boxes around them; the towns (for a venue whose address has none). The whole run stays inside the
-// function's time (a server that hangs is left for the next one, and the area for the queue's next try)
-const areaOf = (area: string) => /^US-[A-Z]{2}$/.test(area) ? `area["ISO3166-2"="${area}"]->.a;` : `area["ISO3166-1"="${area}"]["admin_level"="2"]->.a;`;
-const qVenues = (area: string) => `[out:json][timeout:90];${areaOf(area)}nwr["sport"="karting"](area.a);out tags center bb;`;   // the exact value: the tag index answers it
-const qTowns = (area: string) => `[out:json][timeout:90];${areaOf(area)}node["place"~"^(city|town)$"](area.a);out body;`;
-function qRaceways(venues: El[]): string | null {
-  const boxes: number[][] = [];   // [south, west, north, east], 800 m round each venue, overlapping ones merged
-  for (const e of venues) {
-    const p = e.lat !== undefined && e.lon !== undefined ? { lat: e.lat, lon: e.lon } : e.center; if (!p) continue;
-    const dLat = 800 / 111320, dLon = 800 / (111320 * Math.cos(p.lat * Math.PI / 180));
-    let b = [p.lat - dLat, p.lon - dLon, p.lat + dLat, p.lon + dLon];
-    if (e.bounds) b = [Math.min(b[0], e.bounds.minlat), Math.min(b[1], e.bounds.minlon), Math.max(b[2], e.bounds.maxlat), Math.max(b[3], e.bounds.maxlon)];
-    const hit = boxes.find(x => !(b[2] < x[0] || b[0] > x[2] || b[3] < x[1] || b[1] > x[3]));
-    if (hit) { hit[0] = Math.min(hit[0], b[0]); hit[1] = Math.min(hit[1], b[1]); hit[2] = Math.max(hit[2], b[2]); hit[3] = Math.max(hit[3], b[3]); } else boxes.push(b);
-  }
-  if (!boxes.length) return null;
-  return `[out:json][timeout:90];(${boxes.map(b => `way["highway"="raceway"](${b.map(x => x.toFixed(5)).join(",")});`).join("")});out tags geom;`;
-}
-let deadline = 0;   // when the run has to stop asking (set per request)
-async function overpass(q: string, ms = 55000): Promise<{ elements: El[]; mirror: string }> {
-  let last = "";
-  for (const m of MIRRORS) {
-    const left = deadline - Date.now(); if (left < 8000) { last = last || "out of time"; break; }
-    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), Math.min(ms, left));
-    try {
-      const r = await fetch(m, { method: "POST", body: "data=" + encodeURIComponent(q), headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": "Hutka track import (https://hutka.ai)" }, signal: ctl.signal });
-      if (r.ok) { const j = await r.json(); if (j && Array.isArray(j.elements)) { if (j.remark && /runtime error|timed out|out of memory/i.test(j.remark)) { last = `${m}: ${j.remark}`.slice(0, 200); continue; } return { elements: j.elements, mirror: m }; } }
-      last = `${m}: ${r.status}`;
-    } catch (e) { last = `${m}: ${(e as Error).message || e}`; } finally { clearTimeout(timer); }
-  }
-  throw new Error("overpass: " + last);
-}
+let deadline = 0;   // when the run has to stop asking (set per request): the writes need the rest of the function's 150 s
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -65,32 +32,24 @@ Deno.serve(async (req) => {
   let body: { area?: string; dry?: boolean } = {};
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
   const area = String(body.area || "").toUpperCase(), dry = !!body.dry;
-  if (area === "PING") {   // which map servers answer from here, and how (a run from the queue: area "PING")
-    const q = "[out:json][timeout:10];node(1);out;", out: Record<string, unknown> = {};
-    const tries: [string, string, RequestInit][] = [
-      ["de post", "https://overpass-api.de/api/interpreter", { method: "POST", body: "data=" + encodeURIComponent(q), headers: { "Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json", "User-Agent": "Hutka/1.0 (+https://hutka.ai; track catalogue)" } }],
-      ["de get", "https://overpass-api.de/api/interpreter?data=" + encodeURIComponent(q), { headers: { "Accept": "*/*", "User-Agent": "Mozilla/5.0 (compatible; Hutka/1.0; +https://hutka.ai)" } }],
-      ["z.de", "https://z.overpass-api.de/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
-      ["lz4.de", "https://lz4.overpass-api.de/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
-      ["mail.ru", "https://maps.mail.ru/osm/tools/overpass/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
-      ["osm.jp", "https://overpass.osm.jp/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
-      ["osm.fr", "https://overpass.openstreetmap.fr/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
-      ["kumi get", "https://overpass.kumi.systems/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
-      ["qlever", "https://qlever.cs.uni-freiburg.de/api/osm-planet?query=" + encodeURIComponent('PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:> PREFIX ogc: <http://www.opengis.net/rdf#> SELECT (COUNT(DISTINCT ?el) AS ?n) WHERE { ?area osmkey:ISO3166-1 "BE" ; osmkey:admin_level "2" . ?area ogc:sfContains ?el . ?el osmkey:sport "karting" . }'), { headers: { "Accept": "application/sparql-results+json", "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
-    ];
-    await Promise.all(tries.map(async ([k, u, init]) => { const t1 = Date.now(), ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 25000); try { const r = await fetch(u, { ...init, signal: ctl.signal }); out[k] = { status: r.status, ms: Date.now() - t1, body: (await r.text()).slice(0, 90) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 90), ms: Date.now() - t1 }; } finally { clearTimeout(timer); } }));
+  if (area === "PING") {   // does the map database answer from here, how fast (a run from the queue: area "PING")
+    const out: Record<string, unknown> = {}, t1 = Date.now();
+    try { const rows = await sparql('PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:> PREFIX ogc: <http://www.opengis.net/rdf#> SELECT (COUNT(DISTINCT ?el) AS ?n) WHERE { ?area osmkey:ISO3166-1 "BE" ; osmkey:admin_level "2" . ?area ogc:sfContains ?el . ?el osmkey:sport "karting" . }', 25000); out[QLEVER] = { ms: Date.now() - t1, n: rows[0] && rows[0].n ? rows[0].n.value : null }; } catch (e) { out[QLEVER] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; }
     await db.from("import_queue").update({ status: "done", result: out, finished_at: new Date().toISOString() }).eq("area", area); return json(out);
   }
   if (!/^([A-Z]{2}|US-[A-Z]{2})$/.test(area)) return json({ error: "bad_area" }, 400);
   const t0 = Date.now(), cc = area.slice(0, 2); deadline = t0 + 125000;   // the writes need the rest of the function's 150 s
   const done = async (result: Record<string, unknown>, status = "done") => { await db.from("import_queue").update({ status, result, finished_at: new Date().toISOString() }).eq("area", area); return json(result, status === "done" ? 200 : 502); };
   await db.from("import_queue").update({ status: "running", started_at: new Date().toISOString() }).eq("area", area);
-  let els: El[] = [], mirror = "";
+  let els: El[] = [], mirror = "qlever";
   try {
-    const v = await overpass(qVenues(area)); mirror = v.mirror.replace(/^https:\/\/|\/api.*$/g, ""); els = v.elements;
-    const qr = qRaceways(v.elements); if (qr) els = els.concat((await overpass(qr)).elements);
-    const needTowns = v.elements.some(e => e.tags && e.tags.name && !(e.tags["addr:city"] || e.tags["addr:town"] || e.tags["addr:village"]));
-    if (needTowns && Date.now() - t0 < 80000) { try { els = els.concat((await overpass(qTowns(area), 45000)).elements); } catch { /* no towns: the venues keep the address they have */ } }
+    const left = (cap: number) => Math.max(5000, Math.min(cap, deadline - Date.now()));
+    const vEls = venueEls(await sparql(qVenues(area), left(70000))); els = vEls;
+    if (vEls.length) {
+      els = els.concat(racewayEls(await sparql(qRaceways(area), left(60000))));
+      const needTowns = vEls.some(e => e.tags && !(e.tags["addr:city"] || e.tags["addr:town"] || e.tags["addr:village"]));
+      if (needTowns && deadline - Date.now() > 20000) { try { els = els.concat(townEls(await sparql(qTowns(area), left(40000)))); } catch { /* no towns: the venues keep the address they have */ } }
+    }
   } catch (e) { return done({ area, error: String((e as Error).message || e).slice(0, 300), ms: Date.now() - t0 }, "error"); }
   const venues = venuesOf(els);
   // what Hutka has: the same element, a track within 300 m, or within 1 km under the same name
