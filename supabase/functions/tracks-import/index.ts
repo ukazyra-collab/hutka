@@ -8,7 +8,7 @@
 // Deploy as `tracks-import` with "Verify JWT" OFF (checked here).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { venuesOf, distM, nameKey, type El, type Venue } from "./lib.ts";
-import { QLEVER, qVenues, qRaceways, qTowns, sparql, venueEls, racewayEls, townEls } from "./qlever.ts";
+import { QLEVER, qVenueTags, qVenueGeom, qRacewayGeom, qRacewayTags, qTowns, sparql, venueEls, racewayEls, townEls } from "./qlever.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-import-token", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
@@ -32,16 +32,9 @@ Deno.serve(async (req) => {
   let body: { area?: string; dry?: boolean } = {};
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
   const area = String(body.area || "").toUpperCase(), dry = !!body.dry;
-  if (area === "PING") {   // how fast the map database answers the import's questions from here (a run from the queue: area "PING")
-    const P = 'PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:> PREFIX ogc: <http://www.opengis.net/rdf#> PREFIX geo: <http://www.opengis.net/ont/geosparql#> ';
-    const A = '?area osmkey:ISO3166-1 "BE" ; osmkey:admin_level "2" . ?area ogc:sfContains ?el . ?el osmkey:sport "karting" . ';
-    const R = 'PREFIX osmrel: <https://www.openstreetmap.org/relation/> ';
-    const tests: [string, string][] = [
-      ["one", P + R + 'SELECT ?p ?o WHERE { osmrel:52411 ogc:sfContains ?el . ?el osmkey:sport "karting" . ?el osmkey:name ?nm . ?el ?p ?o . FILTER(!STRSTARTS(STR(?p), "http://www.opengis.net/rdf#")) } LIMIT 80'],
-      ["geo", P + R + 'SELECT ?p2 ?o2 WHERE { osmrel:52411 ogc:sfContains ?el . ?el osmkey:sport "karting" . ?el osmkey:name ?nm . ?el geo:hasGeometry ?g . ?g ?p2 ?o2 } LIMIT 10'],
-    ];
+  if (area === "PING") {   // how fast the map database answers the import's five questions from here (Belgium; a queue run: "PING")
     const out: Record<string, unknown> = {};
-    for (const [k, q] of tests) { const t1 = Date.now(); try { const rows = await sparql(q, 30000); out[k] = { ms: Date.now() - t1, rows: rows.length, sample: JSON.stringify(rows.map(r => Object.fromEntries(Object.entries(r).map(([k, b]) => [k, String((b as { value: string }).value).slice(0, 140)])))).slice(0, 6000) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }
+    for (const [k, q] of [["venueTags", qVenueTags("BE")], ["venueGeom", qVenueGeom("BE")], ["racewayGeom", qRacewayGeom("BE")], ["racewayTags", qRacewayTags("BE")], ["towns", qTowns("BE")]] as [string, string][]) { const t1 = Date.now(); try { const rows = await sparql(q, 30000); out[k] = { ms: Date.now() - t1, rows: rows.length, kb: Math.round(JSON.stringify(rows).length / 1024) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }
     await db.from("import_queue").update({ status: "done", result: out, finished_at: new Date().toISOString() }).eq("area", area); return json(out);
   }
   if (!/^([A-Z]{2}|US-[A-Z]{2})$/.test(area)) return json({ error: "bad_area" }, 400);
@@ -51,9 +44,9 @@ Deno.serve(async (req) => {
   let els: El[] = [], mirror = "qlever";
   try {
     const left = (cap: number) => Math.max(5000, Math.min(cap, deadline - Date.now()));
-    const vEls = venueEls(await sparql(qVenues(area), left(70000))); els = vEls;
+    const vEls = venueEls(await sparql(qVenueTags(area), left(50000)), await sparql(qVenueGeom(area), left(50000))); els = vEls;
     if (vEls.length) {
-      els = els.concat(racewayEls(await sparql(qRaceways(area), left(60000))));
+      els = els.concat(racewayEls(await sparql(qRacewayGeom(area), left(50000)), await sparql(qRacewayTags(area), left(40000))));
       const needTowns = vEls.some(e => e.tags && !(e.tags["addr:city"] || e.tags["addr:town"] || e.tags["addr:village"]));
       if (needTowns && deadline - Date.now() > 20000) { try { els = els.concat(townEls(await sparql(qTowns(area), left(40000)))); } catch { /* no towns: the venues keep the address they have */ } }
     }
