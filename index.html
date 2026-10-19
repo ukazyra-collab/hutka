@@ -1635,6 +1635,77 @@ input.sw:checked::after{transform:translateX(18px)}
   .seg2{max-width:none}
   .lead-card{width:212px}
 }
+/* ---------- v34.41: the Lab — the session as one field on top (tap: the picker), an example for someone with no sessions ---------- */
+.lab-ph{align-items:flex-start}
+.lab-sess{display:flex;align-items:center;gap:14px;min-width:0;max-width:760px;padding:10px 14px 10px 10px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--fg);font:inherit;text-align:left;cursor:pointer;box-shadow:var(--shadow)}
+.lab-sess:hover{border-color:var(--accent)}
+.lab-sess .sh{width:72px;height:54px;flex:none;border-radius:12px;background:var(--surface-2);position:relative;overflow:hidden}
+.lab-sess .sh canvas{position:absolute;inset:0;width:100%;height:100%}
+.lab-sess .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lab-sess .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.lab-sess b{font-size:20px;line-height:1.2;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lab-sess .s{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lab-sess .chg{flex:none;display:inline-flex;align-items:center;gap:4px;color:var(--accent);font-weight:600;font-size:14px;padding-left:6px}
+.lab-sess .chg svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg)}
+.lab-demo{display:flex;align-items:center;gap:14px 18px;flex-wrap:wrap;border-color:color-mix(in srgb,var(--accent) 35%,var(--line));background:var(--accent-soft)}
+.lab-demo .tx{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:3px}
+.lab-demo .tx b{font-size:15.5px}
+.lab-demo .tx span{font-size:13.5px;color:var(--muted);line-height:1.45}
+.lab-demo .btn{flex:none;height:48px;font-size:15px;border-radius:12px}
+.lab-demo .btn svg{width:18px;height:18px}
+/* the phone's bar: the session's name on a row of its own (tap: the picker), then the lap and the buttons */
+.lab-mob{flex-wrap:wrap;row-gap:4px}
+.lab-mob .lm-name{flex:1 1 100%;order:-1;display:flex;align-items:center;gap:6px;min-width:0;min-height:30px;border:0;background:none;padding:0;margin:0;text-align:left;cursor:pointer;font:inherit;color:var(--fg)}
+.lab-mob .lm-name b{font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:0 1 auto}
+.lab-mob .lm-name span{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:0 1 auto}
+.lab-mob .lm-name svg{width:15px;height:15px;flex:none;stroke:var(--accent);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg)}
+@media (orientation:landscape) and (max-height:500px){.lab-mob .lm-name{display:none}}
+/* the session picker */
+.lab-pick .seg2{max-width:none}
+/* a layout read from a picture, added to Hutka: the block under the line (one main action), the sheet with the picture on top */
+.ai2-addtrk{display:flex;flex-direction:column;gap:10px;margin-top:4px;padding:14px;border-radius:14px;border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));background:var(--accent-soft)}
+.ai2-addtrk .tx{font-size:14px;color:var(--muted);line-height:1.45}
+.ai2-addtrk .ok{font-size:14.5px;font-weight:600;line-height:1.45}
+.ai2-addtrk .btn{align-self:stretch;justify-content:center;min-height:52px;font-size:15.5px;border-radius:12px;text-decoration:none}
+.add-trk .at-pv{display:flex;justify-content:center;margin:0 0 12px}
+.add-trk .at-pv canvas{display:block;border-radius:10px;border:1px solid var(--line);background:#fff;max-width:100%}
+.add-trk .form{grid-template-columns:minmax(0,1fr)}
+.add-trk .form input{height:48px;font-size:16px}
+.add-trk .at-hint{margin-top:10px;line-height:1.45}
+.add-trk .at-near{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--warn-soft,#fff6e0);border:1px solid color-mix(in srgb,var(--warn,#d99a00) 40%,var(--line));font-size:14px;line-height:1.45}
+.add-trk .at-near .btn{height:44px;justify-content:center;text-decoration:none}
+.add-trk .sheet-foot .btn{height:56px;font-size:16px;border-radius:14px}
+.add-trk .at-near .btn.primary{height:52px}
+.lp-list{display:flex;flex-direction:column;gap:6px;min-height:120px}
+.lp-sec{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:8px 2px 0}
+.lp-item{display:flex;align-items:center;gap:12px;padding:8px 10px 8px 8px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);text-decoration:none;min-height:64px}
+@media (hover:hover){.lp-item:hover{border-color:var(--accent)}}   /* a phone keeps :hover on what was tapped */
+/* my sessions: a list like the session sheet — the row opens the session, ⋯ holds the rest (edit, publish, delete) in a sheet */
+.ms-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.ms-item{padding-right:4px}
+.ms-item .tx span .tm{font:600 12.5px var(--mono);color:var(--fg)}
+.lp-item .sh > svg{width:22px;height:22px;color:var(--muted)}
+.lp-item .tx span .lp-pill{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.01em;padding:1px 6px;border-radius:6px;background:var(--surface-2);color:var(--muted);margin-right:6px}
+.ms-item .more{flex:none;width:44px;height:44px;border:0;border-radius:12px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.ms-item .more svg{width:22px;height:22px;fill:currentColor;stroke:none}
+@media (hover:hover){.ms-item .more:hover{background:var(--surface-2);color:var(--fg)}}
+.act-list{display:flex;flex-direction:column;gap:8px;padding-bottom:6px}
+.act-list .btn{justify-content:flex-start;height:52px;font-size:16px;border-radius:12px;padding:0 16px;gap:12px}
+.act-list .btn svg{width:20px;height:20px}
+.lp-item.cur{box-shadow:0 0 0 2px var(--accent);border-color:var(--accent)}
+.lp-item .sh{width:56px;height:44px;flex:none;border-radius:10px;background:var(--surface-2);position:relative;overflow:hidden;display:grid;place-items:center}
+.lp-item .sh canvas{position:absolute;inset:0;width:100%;height:100%}
+.lp-item .sh .t{font:700 12px var(--mono);color:var(--fg)}
+.lp-item .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lp-item .tx b{font-size:14.5px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lp-item .tx span{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lp-item .tm{flex:none;font:600 14px var(--mono)}
+.lp-item .pill{flex:none}
+.lp-empty{color:var(--muted);font-size:14px;line-height:1.5;padding:14px 4px}
+@media (max-width:700px){
+  .lab-demo{margin:0 0 4px;padding:14px}
+  .lab-demo .btn{width:100%;height:52px}
+}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -1679,7 +1750,7 @@ input.sw:checked::after{transform:translateX(18px)}
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></symbol>
-    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a9.8 9.8 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
     <symbol id="i-bt" viewBox="0 0 24 24"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></symbol>
     <symbol id="i-side" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16M5.6 8.5h1.4M5.6 11.5h1.4"/></symbol><symbol id="i-feed" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol><symbol id="i-how" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.6l5.2 3.4-5.2 3.4z"/></symbol>
     <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol><symbol id="i-offline" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M6.3 8.3A5.5 5.5 0 0 0 7 19h10.5c.6 0 1.1-.1 1.6-.3M21 15.5A4 4 0 0 0 17.5 11h-.7A6.5 6.5 0 0 0 9.9 5.4"/></symbol>
@@ -1857,16 +1928,20 @@ input.sw:checked::after{transform:translateX(18px)}
     <!-- ========== LAYOUT ========== -->
     <!-- ========== LAB ========== -->
     <section class="page" id="pg-lab" hidden>
-      <div class="ph"><div class="row" style="gap:12px;align-items:center"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn fav" id="btnFav" type="button" hidden title="Favourite">☆</button><button class="btn" id="btnShare" type="button" hidden><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="btnModerate" type="button" hidden></button><button class="btn" id="btnTransfer" type="button" hidden data-t="Transfer to…">Transfer to…</button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn primary" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
+      <div class="ph lab-ph"><div class="row" style="gap:12px;align-items:center;min-width:0"><button class="btn sm ghost" id="labBack" type="button" hidden title="All sessions">‹ <span data-t="Sessions">Sessions</span></button><div id="labTitle"><h1 data-t="Lab">Lab</h1><div class="sub" id="labSub"></div></div>
+        <!-- the session in the Lab, as a field: tap — choose another (a sheet: mine, favourites, other drivers'; upload) -->
+        <button class="lab-sess" id="labSessBtn" type="button" hidden><span class="sh" id="labSessPv"></span><span class="tx"><span class="k" data-t="Session">Session</span><b id="labSessName"></b><span class="s" id="labSessSub"></span></span><span class="chg"><span data-t="Change">Change</span><svg><use href="#i-chev"/></svg></span></button></div><div class="row sess-acts" id="sessActs"><span id="voteBox" hidden></span><span class="soon" id="lowRated" hidden data-t="rated not helpful">rated not helpful</span><button class="btn fav" id="btnFav" type="button" hidden title="Favourite">☆</button><button class="btn" id="btnShare" type="button" hidden><svg><use href="#i-share"/></svg><span data-t="Share">Share</span></button><button class="btn" id="btnModerate" type="button" hidden></button><button class="btn" id="btnTransfer" type="button" hidden data-t="Transfer to…">Transfer to…</button><button class="btn" id="btnPublish" type="button"></button><button class="btn" id="btnEditSess" type="button" hidden data-t="Edit">Edit</button><button class="btn" id="labUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
+      <div class="card lab-demo" id="labDemo" hidden><div class="tx"><b data-t="This is an example">This is an example</b><span id="labDemoText"></span></div><button class="btn primary" id="labDemoUp" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload my session">Upload my session</span></button></div>
+      <div class="banner info outbox" id="labOutbox" hidden><span class="spin" id="obSpin" hidden></span><svg id="obIcon"><use href="#i-clock"/></svg><div id="obText"></div><button class="btn sm" id="obGo" type="button" data-t="Upload now">Upload now</button></div>
       <div class="banner info" id="labGuestNote" hidden><svg><use href="#i-info"/></svg><div id="labGuestText"></div><button class="btn primary sm" id="labSignIn" style="margin-left:auto;flex:none" hidden data-t="Sign in">Sign in</button></div>
       <div id="labStart" hidden>
-        <div class="banner info outbox" id="labOutbox" hidden><span class="spin" id="obSpin" hidden></span><svg id="obIcon"><use href="#i-clock"/></svg><div id="obText"></div><button class="btn sm" id="obGo" type="button" data-t="Upload now">Upload now</button></div>
+        
         <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="labMineSub"></span></h2><div id="labMine"></div><div class="hint" id="labMineHint"></div></div>
         <div class="card" id="labMarksCard" hidden><h2><span class="star">★</span><span data-t="Bookmarks and favourites">Bookmarks and favourites</span><span class="sub" id="labMarksSub"></span></h2><div id="labMarks"></div><div class="hint" data-t="A star on a session keeps it here; a bookmark on a corner (in the corner inspector) keeps that corner with your note.">A star on a session keeps it here; a bookmark on a corner (in the corner inspector) keeps that corner with your note.</div></div>
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
         <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><div class="row" style="margin-top:10px"><button class="btn primary" id="labUpload2" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#help"><span data-t="How to get the file — step by step">How to get the file — step by step</span></a></div></div>
       </div>
-      <div class="lab-mob mobile-only" id="labMob" hidden><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back" data-ta="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner" data-ta="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner" data-ta="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" data-ta="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button" aria-label="Compare" data-ta="Compare"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button" aria-label="Map" data-ta="Map"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
+      <div class="lab-mob mobile-only" id="labMob" hidden><button class="lm-name" id="lmPick" type="button" aria-label="Choose a session" data-ta="Choose a session"><b id="lmName"></b><span id="lmNameSub"></span><svg><use href="#i-chev"/></svg></button><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back" data-ta="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner" data-ta="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner" data-ta="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" data-ta="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button" aria-label="Compare" data-ta="Compare"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button" aria-label="Map" data-ta="Map"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
       <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close" data-ta="Close">×</button></div>
       <!-- a session just uploaded (a private draft): the layout when it was not recognised for sure, the session type and the result
            (for the feed), publish or keep private — everything else is already filled in -->
@@ -2254,6 +2329,38 @@ input.sw:checked::after{transform:translateX(18px)}
     <div class="list chatlist" id="haiChats"></div>
     <div class="hint" id="haiWallet"></div>
   </div>
+</div></div>
+<!-- the Lab's session picker: mine, favourites, other drivers' (this layout first); upload at the foot -->
+<div class="modal" id="labPick" hidden><div class="box sheet lab-pick">
+  <div class="sheet-head"><h3 data-t="Choose a session">Choose a session</h3><button class="sheet-x" id="labPickX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="sheet-body">
+    <div class="seg2" id="labPickSeg" role="tablist"><button type="button" role="tab" data-v="mine"><span data-t="Mine">Mine</span></button><button type="button" role="tab" data-v="fav"><span data-t="Favourites">Favourites</span></button><button type="button" role="tab" data-v="others"><span data-t="Other drivers">Other drivers</span></button></div>
+    <div class="lp-list" id="labPickList"></div>
+  </div>
+  <div class="sheet-foot"><button class="btn primary" id="labPickUp" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload a session">Upload a session</span></button></div>
+</div></div>
+<!-- a layout read from a picture, added to Hutka (Hutka AI → New track → a photo): the name the AI read (or typed), the layout, the place;
+     the picture and its line become the track's page -->
+<div class="modal" id="addTrk" hidden><div class="box sheet add-trk">
+  <div class="sheet-head"><h3 id="addTrkH" data-t="Add the track to Hutka">Add the track to Hutka</h3><button class="sheet-x" id="addTrkX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="sheet-body">
+    <div class="at-pv"><canvas id="addTrkPv"></canvas></div>
+    <div class="form">
+      <div class="field wide" id="addTrkNameF"><label for="addTrkName" data-t="Track name">Track name</label><input type="text" id="addTrkName" maxlength="80" autocomplete="off" data-tp="e.g. City Karting" placeholder="e.g. City Karting"></div>
+      <div class="field wide" id="addTrkWhichF" hidden><label for="addTrkWhich" data-t="Which layout is it?">Which layout is it?</label><select id="addTrkWhich"></select></div>
+      <div class="field wide" id="addTrkLayF"><label for="addTrkLay" data-t="Layout">Layout</label><input type="text" id="addTrkLay" maxlength="60" autocomplete="off"></div>
+      <div class="field wide" id="addTrkPlaceF"><label for="addTrkPlace" data-t="City and country">City and country</label><input type="text" id="addTrkPlace" maxlength="120" autocomplete="off" data-tp="e.g. Dubai, UAE" placeholder="e.g. Dubai, UAE"></div>
+    </div>
+    <div class="hint at-hint" data-t="The picture and its line become the track’s page. The first session uploaded there makes the line exact.">The picture and its line become the track’s page. The first session uploaded there makes the line exact.</div>
+    <div class="at-near" id="addTrkNear" hidden><span id="addTrkNearT"></span><a class="btn" id="addTrkNearGo" href="#tracks"></a></div>
+    <span class="status" id="addTrkStatus"></span>
+  </div>
+  <div class="sheet-foot"><button class="btn primary" id="addTrkGo" type="button" data-t="Add the track">Add the track</button></div>
+</div></div>
+<!-- a row's actions (the ⋯ of a session in "My sessions"): one verb a row, the destructive one last, in red -->
+<div class="modal" id="actSheet" hidden><div class="box sheet act-sheet">
+  <div class="sheet-head"><h3 id="actSheetH"></h3><button class="sheet-x" id="actSheetX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="sheet-body"><div class="act-list" id="actSheetList"></div></div>
 </div></div>
 <!-- the profile form: a sheet over the profile (Edit profile) -->
 <div class="modal" id="profEditSheet" hidden><div class="box sheet pf-edit">
@@ -4512,10 +4619,10 @@ Object.assign(I18N.RU, {
   'Offline mode: sessions stay in this browser. Open the shared Hutka link signed in to claude.ai to publish and compare with others.': 'Офлайн-режим: сессии хранятся в этом браузере. Открой общую ссылку Hutka, войдя в claude.ai, чтобы публиковать и сравниваться с другими.',
   'Tracks': 'Трассы', 'Nothing found': 'Ничего не найдено', 'Search tracks, drivers...': 'Поиск трасс, гонщиков…', 'Lab': 'Лаборатория', 'Profile': 'Профиль', 'Admin Panel': 'Админка',
   // geometry
-  'GPS matched to the layout drawing ({r} m residual)': 'GPS совмещён с рисунком лейаута (невязка {r} м)', 'This layout has no GPS reference yet.': 'У этого лейаута пока нет GPS-эталона.',
-  'This session was recorded {d} km away from this layout — a different track.': 'Эта сессия записана в {d} км от этого лейаута — другая трасса.',
+  'GPS matched to the layout drawing ({r} m residual)': 'GPS совмещён с рисунком конфигурации (невязка {r} м)', 'This layout has no GPS reference yet.': 'У этой конфигурации пока нет GPS-эталона.',
+  'This session was recorded {d} km away from this layout — a different track.': 'Эта сессия записана в {d} км от этой конфигурации — другая трасса.',
   // tracks page
-  '{n} tracks · pick one to see layouts, hot laps and the corner guide': '{n} трасс · выбери одну, чтобы увидеть лейауты, лучшие круги и гид по поворотам', 'No tracks yet — add the first one.': 'Трасс пока нет — добавь первую.', 'No tracks yet.': 'Трасс пока нет.',
+  '{n} tracks · pick one to see layouts, hot laps and the corner guide': '{n} трасс · выбери одну, чтобы увидеть конфигурации, лучшие круги и гид по поворотам', 'No tracks yet — add the first one.': 'Трасс пока нет — добавь первую.', 'No tracks yet.': 'Трасс пока нет.',
   'Sign in to claude.ai and open the shared Hutka link to see the track catalogue.': 'Войди в claude.ai и открой общую ссылку Hutka, чтобы видеть каталог трасс.',
   'Tracks near {name}': 'Трассы рядом с {name}', 'Tracks near you': 'Трассы рядом', 'Set your home track in the profile to see distances.': 'Укажи домашнюю трассу в профиле, чтобы видеть расстояния.', 'Tracks appear here once you are signed in.': 'Трассы появятся здесь после входа.',
   'Add track': 'Добавить трассу', 'Click a pin to open the track': 'Нажми на точку, чтобы открыть трассу', 'All tracks': 'Все трассы',
@@ -4523,7 +4630,7 @@ Object.assign(I18N.RU, {
   'Track not found': 'Трасса не найдена', 'Open': 'Открыть', 'Open now': 'Открыто', 'Closed': 'Закрыто', 'Website': 'Сайт', 'Closes at {t}': 'Закрывается в {t}', 'Opens at {t}': 'Открывается в {t}',
   'Reserve your spot at {name} through their official booking site.': 'Забронируй заезд на {name} через официальный сайт.', "Experience {name} from a driver's perspective": '{name} глазами гонщика',
   '{n} corners': '{n} поворотов', 'be the first': 'будь первым', 'No layouts yet — add them in the admin panel.': 'Лейаутов пока нет — добавь их в админке.', 'No layouts listed yet.': 'Лейауты пока не указаны.',
-  '{n} published sessions': 'опубликовано сессий: {n}', 'No hot laps posted yet — open a layout to add yours.': 'Лучших кругов пока нет — открой лейаут и добавь свой.',
+  '{n} published sessions': 'опубликовано сессий: {n}', 'No hot laps posted yet — open a layout to add yours.': 'Лучших кругов пока нет — открой конфигурацию и добавь свой.',
   'Lap': 'Круг', 'Layout': 'Конфигурация', 'Session': 'Сессия', 'Date': 'Дата', 'Custom': 'Свой', 'Track length': 'Длина трассы', 'Corners': 'Поворотов', 'Max speed': 'Макс. скорость', 'Avg session': 'Средний заезд', 'FIA accredited': 'Аккредитация FIA', 'Yes': 'Да', 'No': 'Нет', 'No track facts yet.': 'Данных о трассе пока нет.',
   'Follow {name}': 'Следи за {name}', '{name} is listed from public information. Claim it to keep the details, photos and events accurate.': '{name} добавлена по открытым данным. Заяви права, чтобы самому вести описание, фото и события.',
   'Claim this track': 'Это моя трасса', 'Send a request to the Hutka admins to manage this track page?': 'Отправить админам Hutka запрос на управление этой страницей?', 'Send request': 'Отправить', 'Request sent — the admins will get in touch.': 'Запрос отправлен — админы свяжутся с тобой.', 'Could not send the request. Sign in to claude.ai and try again.': 'Не удалось отправить запрос. Войди в claude.ai и попробуй снова.',
@@ -4531,20 +4638,20 @@ Object.assign(I18N.RU, {
   // layout page
   'Layout not found': 'Лейаут не найден', 'clockwise': 'по часовой', 'counter-clockwise': 'против часовой', 'no sessions yet': 'сессий пока нет',
   'Nobody has published a session on this layout yet. Be the first: upload your session and it will appear here for others to compare with.': 'На этой конфигурации ещё никто не опубликовал сессию. Будь первым: загрузи свою сессию, и она появится здесь для сравнения.',
-  'Nobody has published a session on this layout yet, so there is no track line to show. The first uploaded session defines it — be the first.': 'На этом лейауте ещё никто не опубликовал сессию, поэтому линии трассы пока нет. Её задаст первая загруженная сессия — будь первым.',
+  'Nobody has published a session on this layout yet, so there is no track line to show. The first uploaded session defines it — be the first.': 'На этой конфигурации ещё никто не опубликовал сессию, поэтому линии трассы пока нет. Её задаст первая загруженная сессия — будь первым.',
   'brake': 'тормоз', 'brake released': 'отпустил тормоз', 'throttle': 'газ', 'number — corner from the S/F line': 'номер — поворот от линии старт/финиш',
   'Fastest published lap · {t} · {who}': 'Лучший опубликованный круг · {t} · {who}',
-  'Careful: nobody has uploaded a real session on this layout yet. This advice comes from a physics model of a rental kart (Sodi RT10, ~80 km/h) driven on the drawn line, not from real laps. Use it as a starting point and check it against your own data.': 'Осторожно: на этом лейауте ещё никто не загружал реальную сессию. Эти советы — из физической модели прокатного карта (Sodi RT10, ~80 км/ч) на нарисованной линии, а не из реальных кругов. Используй как отправную точку и сверяй со своими данными.',
-  'The track line appears after the first published session.': 'Линия трассы появится после первой опубликованной сессии.', '{n} corners found on this layout': 'На этом лейауте найдено поворотов: {n}', 'Hover a corner once sessions are published to see how the fastest drivers take it.': 'Когда появятся сессии, наведи на поворот — увидишь, как его проходят самые быстрые.',
+  'Careful: nobody has uploaded a real session on this layout yet. This advice comes from a physics model of a rental kart (Sodi RT10, ~80 km/h) driven on the drawn line, not from real laps. Use it as a starting point and check it against your own data.': 'Осторожно: на этой конфигурации ещё никто не загружал реальную сессию. Эти советы — из физической модели прокатного карта (Sodi RT10, ~80 км/ч) на нарисованной линии, а не из реальных кругов. Используй как отправную точку и сверяй со своими данными.',
+  'The track line appears after the first published session.': 'Линия трассы появится после первой опубликованной сессии.', '{n} corners found on this layout': 'На этой конфигурации найдено поворотов: {n}', 'Hover a corner once sessions are published to see how the fastest drivers take it.': 'Когда появятся сессии, наведи на поворот — увидишь, как его проходят самые быстрые.',
   'Hover or click a corner on the map': 'Наведи или кликни на поворот на карте', 'You will see what the fastest published passes do there: brake point, apex speed, throttle point.': 'Увидишь, что делают в нём лучшие опубликованные проезды: точка тормоза, скорость в апексе, точка газа.',
   'left': 'левый', 'right': 'правый', 'apex {s} m from S/F': 'апекс {s} м от S/F', 'Fastest published lap': 'Лучший опубликованный круг', 'Best passes · {n} laps': 'Лучшие проезды · {n} кругов',
-  'The guide needs at least 4 clean laps.': 'Для гида нужно минимум 4 чистых круга.', 'The corner guide is built from everything drivers publish on this layout: the best quarter of all passes through each corner. Nothing here yet.': 'Гид по поворотам собирается из всего, что гонщики публикуют на этом лейауте: лучшая четверть всех проездов каждого поворота. Пока пусто.',
+  'The guide needs at least 4 clean laps.': 'Для гида нужно минимум 4 чистых круга.', 'The corner guide is built from everything drivers publish on this layout: the best quarter of all passes through each corner. Nothing here yet.': 'Гид по поворотам собирается из всего, что гонщики публикуют на этой конфигурации: лучшая четверть всех проездов каждого поворота. Пока пусто.',
   'built from {n} clean laps of {m}': 'собран из {n} чистых кругов · {m}', 'Ranges are the middle half of the best passes. Hover a card to see the corner on the map.': 'Диапазоны — средняя половина лучших проездов. Наведи на карточку, чтобы увидеть поворот на карте.',
   'braking corner': 'тормозной', 'lift corner': 'со сбросом', 'flat-out corner': 'на полном газу', 'No sessions yet': 'Сессий пока нет', 'Upload your session and publish it — it becomes the reference others compare with.': 'Загрузи свою сессию и опубликуй её — она станет эталоном, с которым сравниваются другие.',
   'Upload my session': 'Загрузить мою сессию', 'Laps': 'Кругов', 'Best': 'Лучший', 'Avg clean': 'Средний чистый', 'Compare with mine': 'Сравнить с моей',
   'Model lap {t} · {n} corners · numbers are from the model, not from drivers': 'Модельный круг {t} · {n} поворотов · цифры из модели, не от гонщиков', 'The model could not run on this line.': 'Модель не смогла посчитать эту линию.',
   '{n} session|{n} sessions': '{n} сессия|{n} сессии|{n} сессий', '{m} driver|{m} drivers': '{m} гонщик|{m} гонщика|{m} гонщиков',
-  'Edit layout': 'Редактировать лейаут', 'Corner guide': 'Гид по поворотам', 'Sessions on this layout': 'Сессии на этом лейауте', 'Model advice': 'Советы модели', 'Compute model advice': 'Посчитать советы модели', 'Direction': 'Направление', 'Brake': 'Тормоз', 'Apex': 'Апекс', 'Throttle': 'Газ', 'Exit': 'Выход',
+  'Edit layout': 'Редактировать конфигурацию', 'Corner guide': 'Гид по поворотам', 'Sessions on this layout': 'Сессии на этой конфигурации', 'Model advice': 'Советы модели', 'Compute model advice': 'Посчитать советы модели', 'Direction': 'Направление', 'Brake': 'Тормоз', 'Apex': 'Апекс', 'Throttle': 'Газ', 'Exit': 'Выход',
   // lab
   'Smoothing the line…': 'Сглаживаю линию…', 'Placing apexes… {i}/{n}': 'Расставляю апексы… {i}/{n}', 'Optimising the lap… {t}': 'Оптимизирую круг… {t}',
   'average lap': 'средний круг', 'lap {n}': 'круг {n}', 'best': 'лучший', 'dirty': 'грязный', 'eased': 'прикрыл',
@@ -4553,8 +4660,8 @@ Object.assign(I18N.RU, {
   'Offline mode: sessions you upload stay in this browser. Open the shared Hutka link signed in to claude.ai to publish them and compare with other drivers.': 'Офлайн-режим: загруженные сессии хранятся в этом браузере. Открой общую ссылку Hutka, войдя в claude.ai, чтобы публиковать их и сравниваться с другими.',
   'Session not found': 'Сессия не найдена', 'Loading session…': 'Загружаю сессию…', 'Could not load this session.': 'Не удалось загрузить сессию.', 'Custom track': 'Своя трасса', 'No clean laps with GPS in this session.': 'В сессии нет чистых кругов с GPS.',
   'Aerial': 'Спутник', 'Lap traces': 'Следы кругов', 'Computing the model line…': 'Считаю модельную линию…', 'Model lap {t} (grip scaled ×{m} to match the reference lap)': 'Модельный круг {t} (сцепление ×{m}, чтобы совпасть с опорным кругом)',
-  'Upload an Alfano .alf2 export, pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and a comparison with any other lap or driver.': 'Загрузи выгрузку Alfano (.alf2), выбери трассу и лейаут — и Лаборатория покажет, где время: точки тормоза, апекса и газа в каждом повороте, выжимку простым языком и сравнение с любым другим кругом или гонщиком.',
-  'custom layout': 'свой лейаут', 'Session analysis': 'Разбор сессий', 'Could not project this lap onto the track line.': 'Не удалось спроецировать круг на линию трассы.',
+  'Upload an Alfano .alf2 export, pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and a comparison with any other lap or driver.': 'Загрузи выгрузку Alfano (.alf2), выбери трассу и конфигурацию — и Лаборатория покажет, где время: точки тормоза, апекса и газа в каждом повороте, выжимку простым языком и сравнение с любым другим кругом или гонщиком.',
+  'custom layout': 'своя конфигурация', 'Session analysis': 'Разбор сессий', 'Could not project this lap onto the track line.': 'Не удалось спроецировать круг на линию трассы.',
   'Average of all other clean laps': 'Средний из всех других чистых кругов', 'published': 'опубликовано', 'average clean lap': 'средний чистый круг',
   'Reference · {s}': 'Опорный · {s}', 'Reference — a lap or the session average': 'Опорный — круг или средний круг сессии', 'Compare with · {s}': 'Сравнить с · {s}', 'Compare with · all other clean laps': 'Сравнить с · все другие чистые круги', 'Compare with — a lap or the session average': 'Сравнить с — круг или средний круг сессии',
   'Average lap': 'Средний круг', 'No corners found on this line.': 'На этой линии не найдено поворотов.', 'Reference': 'Опорный', 'Comparison': 'Сравнение', 'points of this lap': 'точки этого круга',
@@ -4603,7 +4710,7 @@ Object.assign(I18N.RU, {
   '(answer cut off — ask a shorter question)': '(ответ обрезан — спроси короче)', '(answer interrupted)': '(ответ прерван)', 'Too many requests or the limit is used up — try again later.': 'Слишком много запросов или исчерпан лимит — попробуй позже.', 'Claude declined to answer this question — rephrase it.': 'Claude отказался отвечать на этот вопрос — переформулируй.', 'No answer ({code}). Try again.': 'Не удалось получить ответ ({code}). Попробуй ещё раз.', 'Thinking…': 'Думаю…',
   'Saved': 'Сохранено',
   'Reading {n} file(s)…': 'Читаю файлы: {n}…', 'Could not read {f}: {e}': 'Не удалось прочитать {f}: {e}', '— not in the catalogue (custom) —': '— нет в каталоге (своя) —', '{n} laps, best {b}': '{n} кругов, лучший {b}', 'GPS puts this session at {name} ({d} km)': 'По GPS это {name} ({d} км)', 'GPS does not match any track in the catalogue — it will be saved as a custom track.': 'GPS не совпадает ни с одной трассой каталога — сессия сохранится как своя трасса.',
-  '{n} files: one session each, the same track and layout': 'файлов: {n} — по сессии на каждый, одна трасса и лейаут', 'Custom / not listed': 'Свой / нет в списке', 'Saving…': 'Сохраняю…', 'Could not save the session: {e}': 'Не удалось сохранить сессию: {e}',
+  '{n} files: one session each, the same track and layout': 'файлов: {n} — по сессии на каждый, одна трасса и конфигурация', 'Custom / not listed': 'Свой / нет в списке', 'Saving…': 'Сохраняю…', 'Could not save the session: {e}': 'Не удалось сохранить сессию: {e}',
   'Upload Alfano session': 'Загрузить сессию Alfano', 'No session loaded': 'Сессия не загружена', 'Whole sessions': 'Сессии целиком', 'Average vs average': 'Средний vs средний', 'Show on map': 'Показать на карте', 'This session': 'Эта сессия', 'Track edges': 'Кромки', 'Markers': 'Метки', 'Labels': 'Подписи',
   'Session digest': 'Выжимка по сессии', 'What the terms mean': 'Что значат термины', 'Ask the AI about this session': 'Спросить ИИ об этой сессии', 'Ask': 'Спросить', 'Stop': 'Стоп', 'Corner by corner': 'По поворотам', 'click a row to pin it on the map': 'клик по строке закрепит поворот на карте', 'Type': 'Тип', 'Reserve': 'Резерв', 'Main difference': 'Главное отличие', 'Speed and time delta': 'Скорость и дельта времени',
   // profile
@@ -4612,23 +4719,23 @@ Object.assign(I18N.RU, {
   'Published': 'Опубликована', 'Private': 'Приватная', 'custom': 'свой', 'Rename': 'Переименовать', 'Delete': 'Удалить', 'Delete this session?': 'Удалить сессию?', 'The file data is removed from your library and from the track page.': 'Данные файла удалятся из библиотеки и со страницы трассы.',
     'Racing name': 'Гоночное имя', 'Country': 'Страна', 'Home track': 'Домашняя трасса', 'Save': 'Сохранить', 'My sessions': 'Мои сессии', 'Track': 'Трасса', 'Visibility': 'Видимость',
   // admin
-  'Track pages, layouts and the track line every analysis is built on. Site admins only.': 'Страницы трасс, лейауты и линия трассы, на которой строится каждый разбор. Только для админов сайта.', 'New track': 'Новая трасса', 'No requests.': 'Запросов нет.', 'Could not read the image.': 'Не удалось прочитать картинку.', 'Could not save: {e}': 'Не удалось сохранить: {e}',
-  'Delete this track?': 'Удалить трассу?', 'The track page and its layouts are removed. Sessions uploaded by drivers stay in their libraries.': 'Страница трассы и её лейауты удалятся. Сессии гонщиков останутся в их библиотеках.',
+  'Track pages, layouts and the track line every analysis is built on. Site admins only.': 'Страницы трасс, конфигурации и линия трассы, на которой строится каждый разбор. Только для админов сайта.', 'New track': 'Новая трасса', 'No requests.': 'Запросов нет.', 'Could not read the image.': 'Не удалось прочитать картинку.', 'Could not save: {e}': 'Не удалось сохранить: {e}',
+  'Delete this track?': 'Удалить трассу?', 'The track page and its layouts are removed. Sessions uploaded by drivers stay in their libraries.': 'Страница трассы и её конфигурации удалятся. Сессии гонщиков останутся в их библиотеках.',
   'traced': 'размечен', 'reference set': 'эталон задан', 'No layouts yet — add one below (for example Standard, Extended, Reverse).': 'Лейаутов пока нет — добавь ниже (например, Standard, Extended, Reverse).', 'automatic — the earliest published session': 'автоматически — самая ранняя опубликованная сессия',
   'From GPS: the reference session defines the line and the S/F. {n} m, {c} corners.': 'По GPS: эталонная сессия задаёт линию и S/F. {n} м, поворотов: {c}.', 'Drawing + GPS: the line is traced from the image, the GPS of the reference session is matched to it.': 'Рисунок + GPS: линия размечена по картинке, GPS эталонной сессии совмещён с ней.',
-  'Drawing only: traced from an image, no GPS session yet. The model advice uses this line.': 'Только рисунок: размечен по картинке, GPS-сессии пока нет. Советы модели считаются по этой линии.', 'Nothing yet: either publish a session on this layout (GPS defines the line) or trace it from an image below.': 'Пока ничего: либо опубликуй сессию на этом лейауте (GPS задаст линию), либо разметь по картинке ниже.',
-  'Upload a layout image and press Detect, or use “Click track” and click on the asphalt. Or place points by hand along the middle of the track. Wheel — zoom, right click — delete a point.': 'Загрузи картинку лейаута и нажми «Распознать», либо «Клик по полотну» и кликни на асфальт. Или расставь точки вручную по центру полотна. Колесо — масштаб, правый клик — удалить точку.',
+  'Drawing only: traced from an image, no GPS session yet. The model advice uses this line.': 'Только рисунок: размечен по картинке, GPS-сессии пока нет. Советы модели считаются по этой линии.', 'Nothing yet: either publish a session on this layout (GPS defines the line) or trace it from an image below.': 'Пока ничего: либо опубликуй сессию на этой конфигурации (GPS задаст линию), либо разметь по картинке ниже.',
+  'Upload a layout image and press Detect, or use “Click track” and click on the asphalt. Or place points by hand along the middle of the track. Wheel — zoom, right click — delete a point.': 'Загрузи картинку конфигурации и нажми «Распознать», либо «Клик по полотну» и кликни на асфальт. Или расставь точки вручную по центру полотна. Колесо — масштаб, правый клик — удалить точку.',
   '{n} points. Continue along the track and close the loop by clicking the first point.': 'Точек: {n}. Продолжай вдоль трассы и замкни контур кликом по первой точке.', 'Loop closed ({n} points). Click near the line to add a point, drag to adjust. Set the length and the S/F.': 'Контур замкнут (точек: {n}). Клик рядом с линией добавляет точку, перетаскивание правит. Задай длину и S/F.',
-  'Corners: {n} (save the geometry to keep the edits)': 'Поворотов: {n} (сохрани геометрию, чтобы оставить правки)', 'Upload a layout image first.': 'Сначала загрузи картинку лейаута.', 'Detecting…': 'Распознаю…', 'Detection failed.': 'Распознавание не удалось.', 'Try “Click track” on the asphalt, or place the points by hand.': 'Попробуй «Клик по полотну» на асфальте или расставь точки вручную.',
-  'Outline found: {n} points, track width ≈ {w} m. Check the points and the S/F.': 'Контур найден: точек {n}, ширина полотна ≈ {w} м. Проверь точки и S/F.', 'The aerial photo needs a GPS reference session on this layout first.': 'Для спутникового фото сначала нужна GPS-сессия-эталон на этом лейауте.',
+  'Corners: {n} (save the geometry to keep the edits)': 'Поворотов: {n} (сохрани геометрию, чтобы оставить правки)', 'Upload a layout image first.': 'Сначала загрузи картинку конфигурации.', 'Detecting…': 'Распознаю…', 'Detection failed.': 'Распознавание не удалось.', 'Try “Click track” on the asphalt, or place the points by hand.': 'Попробуй «Клик по полотну» на асфальте или расставь точки вручную.',
+  'Outline found: {n} points, track width ≈ {w} m. Check the points and the S/F.': 'Контур найден: точек {n}, ширина полотна ≈ {w} м. Проверь точки и S/F.', 'The aerial photo needs a GPS reference session on this layout first.': 'Для спутникового фото сначала нужна GPS-сессия-эталон на этой конфигурации.',
   'Drag the photo until the asphalt sits under the blue line; wheel scales it. Then save the geometry.': 'Перетащи фото так, чтобы асфальт лёг под синюю линию; колесо — масштаб. Потом сохрани геометрию.', 'Photo removed (save the geometry to apply).': 'Фото убрано (сохрани геометрию, чтобы применить).',
-  'Delete this layout?': 'Удалить лейаут?', 'Sessions already uploaded on it keep their data but lose the layout link.': 'Загруженные на него сессии сохранят данные, но потеряют привязку к лейауту.', 'Geometry saved': 'Геометрия сохранена',
+  'Delete this layout?': 'Удалить конфигурацию?', 'Sessions already uploaded on it keep their data but lose the layout link.': 'Загруженные на него сессии сохранят данные, но потеряют привязку к конфигурации.', 'Geometry saved': 'Геометрия сохранена',
   'Claim requests': 'Запросы на трассы', 'Pick a track to edit, or add one': 'Выбери трассу для редактирования или добавь новую', 'Track page': 'Страница трассы', 'Name': 'Название', 'City': 'Город', 'Latitude': 'Широта', 'Longitude': 'Долгота', 'Address': 'Адрес', 'Phone': 'Телефон', 'Booking link': 'Ссылка на бронирование', 'Onboard video link': 'Ссылка на онборд-видео', 'Opens': 'Открывается', 'Closes': 'Закрывается',
   'Track length, m': 'Длина трассы, м', 'Max speed, km/h': 'Макс. скорость, км/ч', 'Avg session, min': 'Средний заезд, мин', 'Description': 'Описание', 'Logo': 'Логотип', 'Upload image': 'Загрузить картинку', 'Remove': 'Убрать', 'Cover photo': 'Обложка', 'Save track': 'Сохранить трассу', 'Open track page': 'Открыть страницу', 'Delete track': 'Удалить трассу',
-  'Add layout': 'Добавить лейаут', 'Length, m': 'Длина, м', '—': '—', 'Clockwise': 'По часовой', 'Counter-clockwise': 'Против часовой', 'Note': 'Заметка', 'Reference session (defines the track line and S/F)': 'Эталонная сессия (задаёт линию трассы и S/F)', 'Corner radius threshold, m': 'Порог радиуса поворота, м', 'Save layout': 'Сохранить лейаут', 'Open layout page': 'Открыть страницу лейаута', 'Delete layout': 'Удалить лейаут',
-  'Source of the track line': 'Источник линии трассы', 'Trace from an image (no sessions yet)': 'Разметка по картинке (сессий пока нет)', 'Layout image': 'Картинка лейаута', 'Detect': 'Распознать', 'Clear': 'Очистить', 'Pan': 'Рука', 'Points': 'Точки', 'Click track': 'Клик по полотну', 'Width, m': 'Ширина, м',
+  'Add layout': 'Добавить конфигурацию', 'Length, m': 'Длина, м', '—': '—', 'Clockwise': 'По часовой', 'Counter-clockwise': 'Против часовой', 'Note': 'Заметка', 'Reference session (defines the track line and S/F)': 'Эталонная сессия (задаёт линию трассы и S/F)', 'Corner radius threshold, m': 'Порог радиуса поворота, м', 'Save layout': 'Сохранить конфигурацию', 'Open layout page': 'Открыть страницу конфигурации', 'Delete layout': 'Удалить конфигурацию',
+  'Source of the track line': 'Источник линии трассы', 'Trace from an image (no sessions yet)': 'Разметка по картинке (сессий пока нет)', 'Layout image': 'Картинка конфигурации', 'Detect': 'Распознать', 'Clear': 'Очистить', 'Pan': 'Рука', 'Points': 'Точки', 'Click track': 'Клик по полотну', 'Width, m': 'Ширина, м',
   'Aerial photo under the GPS line': 'Спутниковое фото под GPS-линией', 'Upload aerial photo': 'Загрузить фото', 'A screenshot from a satellite map. It is matched to the GPS line automatically; check that the asphalt sits under the blue line.': 'Скриншот со спутниковой карты. Совмещается с GPS-линией вручную: проверь, что асфальт лежит под синей линией.', 'Save geometry': 'Сохранить геометрию',
-  'Choose .alf2 files': 'Выбери файлы .alf2', 'Export from the Alfano app; one file per session. Several files at once are fine.': 'Экспорт из приложения Alfano; один файл — одна сессия. Можно несколько сразу.', 'Session name': 'Название сессии', 'Kart / notes': 'Карт / заметки', 'Cancel': 'Отмена', 'Analyse': 'Разобрать', 'Pasha, Al Forsan, stint 1': 'Паша, Аль-Форсан, 1-й стинт', 'Sodi RT10 #14, wet': 'Sodi RT10 №14, дождь', 'New layout name': 'Название нового лейаута',
+  'Choose .alf2 files': 'Выбери файлы .alf2', 'Export from the Alfano app; one file per session. Several files at once are fine.': 'Экспорт из приложения Alfano; один файл — одна сессия. Можно несколько сразу.', 'Session name': 'Название сессии', 'Kart / notes': 'Карт / заметки', 'Cancel': 'Отмена', 'Analyse': 'Разобрать', 'Pasha, Al Forsan, stint 1': 'Паша, Аль-Форсан, 1-й стинт', 'Sodi RT10 #14, wet': 'Sodi RT10 №14, дождь', 'New layout name': 'Название новой конфигурации',
 
   // ----- v16: home feed, comparison modes, social layer, layout photos -----
   'Follow': 'Подписаться',
@@ -4643,7 +4750,7 @@ Object.assign(I18N.RU, {
   'Sign in to like sessions.': 'Войди, чтобы ставить лайки.',
   'Could not save the like.': 'Не удалось сохранить лайк.',
   'Follow a driver on their page and their new published sessions appear here.': 'Подпишись на гонщика на его странице — его новые опубликованные сессии появятся здесь.',
-  'Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.': 'Загрузи сессию (Alfano .alf2 — эталон; AiM, RaceChrono, TrackAddict, VBOX и GPX тоже работают), выбери трассу и лейаут — и Лаборатория покажет, где время: точки тормоза, апекса и газа в каждом повороте, выжимку простым языком и, когда нужно, сравнение с любым другим кругом, средним по сессии или другим гонщиком на той же конфигурации.',
+  'Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.': 'Загрузи сессию (Alfano .alf2 — эталон; AiM, RaceChrono, TrackAddict, VBOX и GPX тоже работают), выбери трассу и конфигурацию — и Лаборатория покажет, где время: точки тормоза, апекса и газа в каждом повороте, выжимку простым языком и, когда нужно, сравнение с любым другим кругом, средним по сессии или другим гонщиком на той же конфигурации.',
   'Published on this layout': 'Опубликованные на этой конфигурации',
   'Compare with — this session': 'Сравнить с — эта сессия',
   'Assign a track first (Edit).': 'Сначала укажи трассу («Изменить»).',
@@ -4893,10 +5000,10 @@ Object.assign(I18N.RU, {
   // v23: sideways lab, community tracks, karts, votes
   'sport kart': 'спортивный карт', 'rental kart': 'прокатный карт', 'sport': 'спорт', 'kart': 'карт', 'Kart': 'Карт', 'Kart model': 'Модель карта', 'Notes': 'Заметки',
   'Helpful': 'Полезно', 'Not helpful — irrelevant or misleading': 'Не полезно — нерелевантная или вводит в заблуждение', 'Sign in to rate sessions.': 'Войдите, чтобы оценивать сессии.', 'Could not save the vote.': 'Не удалось сохранить оценку.', 'rated not helpful': 'оценили как неполезную', 'votes & comments soon': 'оценки и комментарии скоро',
-  'My tracks': 'Мои трассы', 'added by {who}': 'добавил {who}', 'a driver': 'гонщик', 'The tracks you added: their page, layouts and corners. Admins can edit everything.': 'Трассы, которые добавили вы: страница, лейауты и повороты. Админы могут править всё.',
+  'My tracks': 'Мои трассы', 'added by {who}': 'добавил {who}', 'a driver': 'гонщик', 'The tracks you added: their page, layouts and corners. Admins can edit everything.': 'Трассы, которые добавили вы: страница, конфигурации и повороты. Админы могут править всё.',
   'Turn the phone sideways: the map and the corners side by side, step corner by corner.': 'Поверните телефон горизонтально: карта и повороты рядом, листайте от поворота к повороту.', 'Corner': 'Поворот',
   'Showing every kart class — a sport kart and a rental kart are not comparable corner by corner.': 'Показаны все классы картов — спортивный и прокатный карт по поворотам не сравнить.', '{n} session(s) on another kart class are hidden (a sport kart and a rental kart are not comparable).': 'Скрыто сессий на другом классе картов: {n} (спортивный и прокатный карт не сравнить).', 'Hide them': 'Скрыть', 'Show anyway': 'Всё равно показать',
-  'Add a new track…': 'Добавить новую трассу…', '— no track (private, custom) —': '— без трассы (приватно, своя) —', 'Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.': 'Трассы ещё нет в Hutka? Назовите её — страница трассы создастся вместе с этой сессией, потом её можно править, а другие гонщики найдут её по GPS.', 'Other rental kart…': 'Другой прокатный карт…', 'Rental kart (model below)': 'Прокатный карт (модель ниже)', 'Sport kart (Rotax, X30, KZ…)': 'Спортивный карт (Rotax, X30, KZ…)', 'Give the new track a name.': 'Дайте новой трассе название.', 'Main': 'Основной', 'Could not create the track: {e}': 'Не удалось создать трассу: {e}', 'Track name': 'Название трассы',
+  'Add a new track…': 'Добавить новую трассу…', '— no track (private, custom) —': '— без трассы (приватно, своя) —', 'Not in Hutka yet? Name it — the track page is created with this session, you can edit it later, and other drivers find it by GPS from then on.': 'Трассы ещё нет в Hutka? Назовите её — страница трассы создастся вместе с этой сессией, потом её можно править, а другие гонщики найдут её по GPS.', 'Other rental kart…': 'Другой прокатный карт…', 'Rental kart (model below)': 'Прокатный карт (модель ниже)', 'Sport kart (Rotax, X30, KZ…)': 'Спортивный карт (Rotax, X30, KZ…)', 'Give the new track a name.': 'Дайте новой трассе название.', 'Main': 'Основная', 'Could not create the track: {e}': 'Не удалось создать трассу: {e}', 'Track name': 'Название трассы',
   'Turn the phone sideways: the Lab becomes a full-screen cockpit — the satellite photo, the lap line, live numbers and a scrub bar along the lap.': 'Поверните телефон горизонтально: Лаборатория становится кокпитом на весь экран — спутниковый снимок, линия круга, живые цифры и бегунок по кругу.', '{n} corners · ‹ › to step': 'Поворотов: {n} · ‹ › листать', 'The photo can sit a few metres off the GPS line.': 'Снимок может быть смещён на несколько метров от линии GPS.', 'Move': 'Сдвинуть', 'Signed in.': 'Вы вошли.', 'Password': 'Пароль', 'I have a password': 'У меня есть пароль', 'Email me a link instead': 'Лучше пришлите ссылку', 'Enter the email and the password.': 'Введите почту и пароль.', 'Could not start Apple sign-in: {e}': 'Не удалось начать вход через Apple: {e}', 'Could not sign in: {e}': 'Не удалось войти: {e}', 'Could not open the file: {e}': 'Не удалось открыть файл: {e}',
   'Compare': 'Сравнить', 'Comments': 'Комментарии', 'Lap on the map': 'Круг на карте', 'No layouts yet — the first uploaded session creates one.': 'Лейаутов пока нет — первая загруженная сессия создаст его.', 'Rental karts at this track': 'Прокатные карты этой трассы', 'Rental': 'Прокат', 'Other sport kart…': 'Другой спортивный карт…', 'Other': 'Другое', 'Showing every kart — different karts are not comparable corner by corner.': 'Показаны все карты — разные карты по поворотам не сравнить.', '{n} session(s) on another kart are hidden (different karts are not comparable corner by corner).': 'Скрыто сессий на другом карте: {n} (разные карты по поворотам не сравнить).', 'Each kart has its own ranking — a 270 cc rental and a KZ2 are different sports.': 'У каждого карта свой рейтинг — прокатный 270 cc и KZ2 это разные виды спорта.',
   'Upload session': 'Загрузить сессию', 'Karts people drive here': 'Карты, на которых здесь ездят', 'Karts — one per line (add “sport” after a sport kart)': 'Карты — по одному в строке (после спортивного допишите «sport»)', "Alfano .alf2 (the reference), AiM, RaceChrono, TrackAddict, Harry's LapTimer, VBOX, GPX — one file per session; several at once are fine.": 'Alfano .alf2 (эталон), AiM, RaceChrono, TrackAddict, Harry\'s LapTimer, VBOX, GPX — один файл на сессию; можно несколько сразу.',
@@ -4914,8 +5021,8 @@ Object.assign(I18N.RU, {
   'Karts — one per line: * before the most common one, “· note” after the name, “· sport” for a sport kart': 'Карты — по одному в строке: * перед самым частым, «· заметка» после названия, «· sport» для спортивного'
 });
 Object.assign(I18N.RU, {
-  'racing AI': 'racing AI', 'Upload a session from your lap timer: Hutka reads every corner — where you braked, where the apex was, where the throttle came back — and shows where the fastest drivers on the same layout gain on you.': 'Загрузи сессию с лап-таймера: Hutka читает каждый поворот — где ты тормозил, где был апекс, где снова открыл газ — и показывает, где самые быстрые на этом лейауте выигрывают у тебя.',
-  'Every braking point, apex and throttle point': 'Каждая точка торможения, апекс и точка газа', 'Corner-by-corner comparison with the fastest on the same layout': 'Сравнение по поворотам с самыми быстрыми на этом лейауте', 'An AI coach that has read your data before you ask': 'ИИ-тренер, который прочитал твои данные ещё до вопроса'
+  'racing AI': 'racing AI', 'Upload a session from your lap timer: Hutka reads every corner — where you braked, where the apex was, where the throttle came back — and shows where the fastest drivers on the same layout gain on you.': 'Загрузи сессию с лап-таймера: Hutka читает каждый поворот — где ты тормозил, где был апекс, где снова открыл газ — и показывает, где самые быстрые на этой конфигурации выигрывают у тебя.',
+  'Every braking point, apex and throttle point': 'Каждая точка торможения, апекс и точка газа', 'Corner-by-corner comparison with the fastest on the same layout': 'Сравнение по поворотам с самыми быстрыми на этой конфигурации', 'An AI coach that has read your data before you ask': 'ИИ-тренер, который прочитал твои данные ещё до вопроса'
 });
 Object.assign(I18N.RU, {
   'best lap': 'лучший круг', 'avg clean': 'ср. чистый', 'laps': 'кругов', 'reserve': 'резерв', 'Open in the Lab': 'Открыть в Lab', 'Reading the corners…': 'Читаю повороты…',
@@ -4926,10 +5033,10 @@ Object.assign(I18N.RU, {
 Object.assign(I18N.RU, {
   'Statistics': 'Статистика', 'live, admins only': 'живые цифры, только для админов', 'Run supabase/stats.sql in the SQL editor once — the numbers appear here.': 'Запусти один раз supabase/stats.sql в SQL editor — цифры появятся здесь.',
   'Active drivers': 'Активные гонщики', 'signed in within 7 days · {n} in 30': 'заходили за 7 дней · {n} за 30', 'Profiles filled': 'Профили заполнены', 'of {n}': 'из {n}', '+{n} in 7 days': '+{n} за 7 дней', '+{n} in 7 days · {p} published': '+{n} за 7 дней · {p} опубликовано',
-  '{n} comments · {f} follows': '{n} комментариев · {f} подписок', 'AI questions': 'Вопросов ИИ', '{n} layouts': '{n} лейаутов', 'Sign-ups, last 30 days': 'Регистрации за 30 дней', 'Uploads, last 30 days': 'Загрузки за 30 дней', 'today': 'сегодня', 'Tracks by sessions': 'Трассы по сессиям',
+  '{n} comments · {f} follows': '{n} комментариев · {f} подписок', 'AI questions': 'Вопросов ИИ', '{n} layouts': 'конфигураций: {n}', 'Sign-ups, last 30 days': 'Регистрации за 30 дней', 'Uploads, last 30 days': 'Загрузки за 30 дней', 'today': 'сегодня', 'Tracks by sessions': 'Трассы по сессиям',
   'Visits and devices: Google Analytics (analytics.google.com), when the measurement ID is in config.js.': 'Посещения и устройства — в Google Analytics (analytics.google.com), когда measurement ID прописан в config.js.', 'Could not load: {e}': 'Не загрузилось: {e}'
 });
-Object.assign(I18N.RU, { 'Upload a session — every corner, compared with the fastest on the same layout.': 'Загрузи сессию — каждый поворот в сравнении с самыми быстрыми на этом лейауте.' });
+Object.assign(I18N.RU, { 'Upload a session — every corner, compared with the fastest on the same layout.': 'Загрузи сессию — каждый поворот в сравнении с самыми быстрыми на этой конфигурации.' });
 Object.assign(I18N.RU, { 'Tap a corner to open it in the Lab': 'Нажми на поворот — откроется в Lab', 'Open T{n} in the Lab': 'Открыть T{n} в Lab', 'The answer was cut short — continue': 'Ответ оборвался — продолжить', 'Continue exactly where you stopped, briefly.': 'Продолжи ровно с того места, где остановился, коротко.' });
 Object.assign(I18N.RU, {
   'Report a problem': 'Сообщить о проблеме', 'What went wrong, what you expected, which track or session. The page address, device and recent errors are attached automatically.': 'Что пошло не так, что ожидал, какая трасса или сессия. Адрес страницы, устройство и последние ошибки прикрепятся сами.',
@@ -4949,7 +5056,7 @@ Object.assign(I18N.RU, {
   'The file name starts with ALFANO7 and ends with .alf2. A shortcut that also works: share it to yourself in Telegram or WhatsApp — you can pick it from there in the next step.': 'Файл начинается с ALFANO7 и заканчивается на .alf2. Короткий путь, который тоже работает: отправь его себе в Telegram или WhatsApp — на следующем шаге его можно взять оттуда.',
   'Open hutka.ai and tap Upload': 'Открой hutka.ai и нажми «Загрузить»', 'The round button in the middle of the bottom bar (on a computer — “Upload session” at the top right of the Lab). Sign in first if you have not — it takes one email.': 'Круглая кнопка посередине нижней панели (на компьютере — «Загрузить сессию» справа вверху в Лаборатории). Если ещё не вошёл — войди, нужна только почта.',
   'Choose the file': 'Выбери файл', 'Tap “Choose session files”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.': 'Нажми «Choose session files» и найди свой .alf2: iPhone — Обзор → Downloads (или папка Telegram / WhatsApp); Android — Загрузки.',
-  'Check the track, tap Analyse': 'Проверь трассу, нажми Analyse', 'Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap Analyse — the Lab opens with every corner.': 'Hutka узнаёт трассу по GPS и подставляет лейаут и самый частый карт — проверь, поменяй, если надо. «Publish» — другие смогут сравниваться с тобой; сними галочку, чтобы сессия осталась приватной. Нажми Analyse — откроется Lab с разбором по поворотам.',
+  'Check the track, tap Analyse': 'Проверь трассу, нажми Analyse', 'Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap Analyse — the Lab opens with every corner.': 'Hutka узнаёт трассу по GPS и подставляет конфигурацию и самый частый карт — проверь, поменяй, если надо. «Publish» — другие смогут сравниваться с тобой; сними галочку, чтобы сессия осталась приватной. Нажми Analyse — откроется Lab с разбором по поворотам.',
   'Other loggers and apps': 'Другие логгеры и приложения', 'Any of these files works the same way: save it on the phone or computer, then Upload → Choose session files.': 'Любой из этих файлов грузится так же: сохрани на телефон или компьютер, потом Upload → Choose session files.',
   'open the session → ⋮ → Export → RaceChrono CSV (v3) → share / save the file.': 'открой сессию → ⋮ → Export → RaceChrono CSV (v3) → поделиться / сохранить.', 'Race Studio 3 on a computer → the session → Export → CSV.': 'Race Studio 3 на компьютере → сессия → Export → CSV.', 'the .vbo file from the logger or VBOX Test Suite.': 'файл .vbo с логгера или из VBOX Test Suite.', 'Export → CSV / GPX → save.': 'Export → CSV / GPX → сохранить.',
   'Any phone GPS app': 'Любое GPS-приложение на телефоне', 'export the session as GPX (RaceChrono free and most “GPS logger” apps do). GPS at 1 Hz is enough to see corners; 10 Hz is better.': 'экспортируй сессию в GPX (бесплатный RaceChrono и большинство «GPS logger» умеют). GPS 1 Гц хватает, чтобы увидеть повороты; 10 Гц лучше.',
@@ -5016,11 +5123,11 @@ Object.assign(I18N.RU, { 'Not in Hutka yet — looking the place up on the map�
   'Checking the map…': 'Сверяюсь с картой…', '{length} m, {corners} corners — mapped from a driver’s session on {date}. Know this track? Add the website, hours and a photo on the track page.': '{length} м, {corners} поворотов — снято с сессии гонщика {date}. Знаешь эту трассу? Добавь сайт, часы работы и фото на странице трассы.' });
 // v34 — the landing for guests
 Object.assign(I18N.RU, { 'Racing AI for karting': 'Гоночный ИИ для картинга', 'See where your lap loses time — corner by corner': 'Увидь, где твой круг теряет время — поворот за поворотом',
-  'Upload the file from your Alfano or any GPS logger. Hutka compares every braking point, apex and exit with the fastest drivers on the same layout — and tells you what to change.': 'Загрузи файл с Alfano или любого GPS-логгера. Hutka сравнит каждую точку торможения, апекс и выход с самыми быстрыми гонщиками на этом же лейауте — и скажет, что менять.',
+  'Upload the file from your Alfano or any GPS logger. Hutka compares every braking point, apex and exit with the fastest drivers on the same layout — and tells you what to change.': 'Загрузи файл с Alfano или любого GPS-логгера. Hutka сравнит каждую точку торможения, апекс и выход с самыми быстрыми гонщиками на этой же конфигурации — и скажет, что менять.',
   'Upload a session': 'Загрузить сессию', 'Open a live example': 'Открыть живой пример', 'RESERVE PER CORNER': 'РЕЗЕРВ ПО ПОВОРОТАМ', '{s} s': '{s} с', 'on the table in one lap': 'на столе за один круг', 'Biggest: corner {n} · +{s} s': 'Самый большой: поворот {n} · +{s} с', 'a driver': 'гонщик',
-  'a real session: the seconds each corner leaves against the best passes on this layout': 'настоящая сессия: секунды, которые каждый поворот оставляет относительно лучших проездов на этом лейауте',
+  'a real session: the seconds each corner leaves against the best passes on this layout': 'настоящая сессия: секунды, которые каждый поворот оставляет относительно лучших проездов на этой конфигурации',
   'tracks': 'трасс', 'laps analysed': 'кругов разобрано', 'sessions published': 'сессий опубликовано',
-  'Corner {n} · the biggest reserve': 'Поворот {n} · самый большой резерв', 'Corner {n} · the second biggest': 'Поворот {n} · второй по величине', 'vs the fastest on this layout': 'против самых быстрых на этом лейауте', 'Fastest here: {s}': 'Самые быстрые здесь: {s}', 'a real session': 'настоящая сессия', 'The example session': 'Сессия-пример', 'Imagery © Esri, Maxar, Earthstar Geographics': 'Снимок © Esri, Maxar, Earthstar Geographics', 'Open this session in the Lab': 'Открыть эту сессию в Лаборатории',
+  'Corner {n} · the biggest reserve': 'Поворот {n} · самый большой резерв', 'Corner {n} · the second biggest': 'Поворот {n} · второй по величине', 'vs the fastest on this layout': 'против самых быстрых на этой конфигурации', 'Fastest here: {s}': 'Самые быстрые здесь: {s}', 'a real session': 'настоящая сессия', 'The example session': 'Сессия-пример', 'Imagery © Esri, Maxar, Earthstar Geographics': 'Снимок © Esri, Maxar, Earthstar Geographics', 'Open this session in the Lab': 'Открыть эту сессию в Лаборатории',
   'Export the session from your logger app': 'Выгрузи сессию из приложения логгера', 'Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — one file per session.': 'Alfano, AiM, RaceChrono, TrackAddict, VBOX, GPX — один файл на сессию.',
   'Upload it — the track is recognised by GPS': 'Загрузи — трасса узнаётся по GPS', 'A track that is not in Hutka yet gets its own page from your session.': 'Трасса, которой ещё нет в Hutka, получает свою страницу из твоей сессии.',
   'See every corner, compare, ask the coach': 'Смотри каждый поворот, сравнивай, спрашивай тренера', 'Brake point, apex, throttle, exit — against the fastest; three laps on one map, a replay, an AI coach in plain words.': 'Точка торможения, апекс, газ, выход — против самых быстрых; три круга на одной карте, реплей, ИИ-тренер простыми словами.' });
@@ -5181,7 +5288,7 @@ Object.assign(I18N.RU, {
   'A 45-lap session takes about five minutes over Bluetooth: the screen shows the lap being read and the time left. Keep Hutka on screen on the phone (you can move around inside Hutka — the pill at the bottom shows the progress); in a browser keep the tab open. Then the usual window opens: check the track, tap “Save and open in the Lab” — the Lab opens with every corner.': 'Сессия на 45 кругов читается по Bluetooth минут пять: на экране видно, какой круг читается и сколько осталось. На телефоне держи Hutka на экране (внутри Hutka ходить можно — плашка внизу показывает прогресс), в браузере не закрывай вкладку. Потом откроется обычное окно: проверь трассу, нажми «Сохранить и открыть в Лаборатории» — Лаборатория откроется со всеми поворотами.',
   'Tap “Choose a file”, then find your .alf2: iPhone — Browse → Downloads (or the Telegram / WhatsApp folder); Android — Downloads.': 'Нажми «Выбрать файл» и найди свой .alf2: iPhone — Обзор → Downloads (или папка Telegram / WhatsApp); Android — Загрузки.',
   'Check the track, tap Save': 'Проверь трассу, нажми «Сохранить»',
-  'Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap “Save and open in the Lab” — the Lab opens with every corner.': 'Hutka узнаёт трассу по GPS и подставляет лейаут и самый частый карт — проверь, поменяй, если надо. «Опубликовать» — другие смогут сравниваться с тобой; сними галочку, чтобы сессия осталась приватной. Нажми «Сохранить и открыть в Лаборатории» — откроется Лаборатория с разбором по поворотам.',
+  'Hutka recognises the track by GPS and picks the layout and the kart most people drive there — check them, change if needed. “Publish” lets other drivers compare with you; untick it to keep the session private. Tap “Save and open in the Lab” — the Lab opens with every corner.': 'Hutka узнаёт трассу по GPS и подставляет конфигурацию и самый частый карт — проверь, поменяй, если надо. «Опубликовать» — другие смогут сравниваться с тобой; сними галочку, чтобы сессия осталась приватной. Нажми «Сохранить и открыть в Лаборатории» — откроется Лаборатория с разбором по поворотам.',
   'Any of these files works the same way: save it on the phone or computer, then Upload → Choose a file.': 'Любой из этих файлов грузится так же: сохрани на телефон или компьютер, потом «Загрузить» → «Выбрать файл».' });
 
 // v34.23 — the read step of the lap-timer window: the big bar, the time left, the tips in turn (Pasha's point 6)
@@ -5511,6 +5618,50 @@ Object.assign(I18N.RU, {
   "you +{s} s": "ты +{s} с",
   "a tap — compare with yours": "тап — сравнить со своим",
   "a tap opens the lap": "тап — открыть круг"
+});
+// v34.41 — the Lab opens on a session; the session picker
+Object.assign(I18N.RU, {
+  "This is an example": "Это пример",
+  "A session by {who}: every corner against the fastest. Upload yours and the Lab does the same for you.": "Сессия: {who}. Каждый поворот против самых быстрых. Загрузи свою — Лаборатория разберёт её так же.",
+  "Choose a session": "Выбери сессию",
+  "Mine": "Мои",
+  "Favourites": "Избранное",
+  "Other drivers": "Другие",
+  "No sessions of yours yet. Upload the first — the Lab shows where the time goes, corner by corner.": "Своих сессий пока нет. Загрузи первую — Лаборатория покажет, где уходит время, поворот за поворотом.",
+  "Sign in to keep your sessions here. Meanwhile, open another driver's session.": "Войди, чтобы твои сессии были здесь. А пока открой сессию другого гонщика.",
+  "A star on a session (at the top of the Lab) keeps it here; a bookmark on a corner keeps that corner with your note.": "Звёздочка на сессии (вверху Лаборатории) сохраняет её здесь, закладка на повороте — этот поворот с твоей заметкой.",
+  "Nothing published by other drivers yet.": "Другие гонщики пока ничего не опубликовали.",
+  "On this layout": "На этой конфигурации",
+  "The latest": "Свежие",
+  // v34.41 — a layout read from a picture, added to Hutka
+  "Add the track to Hutka": "Добавить трассу в Hutka",
+  "Which layout is it?": "Какая это конфигурация?",
+  "Tap a session to analyse it; ⋯ edits, publishes or deletes it.": "Тапни сессию, чтобы разобрать её; ⋯ — изменить, опубликовать или удалить.",
+  "A new layout": "Новая конфигурация",
+  "Add the layout to Hutka": "Добавить конфигурацию в Hutka",
+  "New layout · {track}": "Новая конфигурация · {track}",
+  "Add the track": "Добавить трассу",
+  "Add the layout": "Добавить конфигурацию",
+  "This track is not on Hutka yet.": "Этой трассы ещё нет в Hutka.",
+  "{track} has no page for this layout yet.": "У трассы {track} пока нет страницы этой конфигурации.",
+  "{name} is on Hutka now — anyone can find it.": "{name} теперь в Hutka — её найдёт любой.",
+  "Open the track page": "Открыть страницу трассы",
+  "City and country": "Город и страна",
+  "e.g. City Karting": "например, City Karting",
+  "e.g. Dubai, UAE": "например, Дубай, ОАЭ",
+  "The picture and its line become the track’s page. The first session uploaded there makes the line exact.": "Схема и линия с фото станут страницей трассы. Первая загруженная там сессия сделает линию точной.",
+  "Type the track's name.": "Впиши название трассы.",
+  "Type the layout's name.": "Впиши название конфигурации.",
+  "Sign in to add the track.": "Войди, чтобы добавить трассу.",
+  "Adding tracks is not available yet.": "Добавлять трассы пока нельзя.",
+  "Finding it on the map…": "Ищу на карте…",
+  "Could not find “{p}” on the map. Type the city and the country.": "Не нашёл «{p}» на карте. Впиши город и страну.",
+  "{name} is already on Hutka, {d} km from there. Is it the same track?": "{name} уже есть в Hutka, в {d} км отсюда. Это она?",
+  "Yes — open {name}": "Да — открыть {name}",
+  "No, it is another track — add it": "Нет, это другая — добавить",
+  "Track added to Hutka": "Трасса добавлена в Hutka",
+  "Layout added to Hutka": "Конфигурация добавлена в Hutka",
+  "Added from a picture of its layout. The first session uploaded here makes the line exact. Know this track? Add the website, hours and a photo on the track page.": "Добавлена по схеме конфигурации. Первая загруженная здесь сессия сделает линию точной. Знаешь эту трассу? Добавь сайт, часы работы и фото на странице трассы."
 });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
@@ -7402,7 +7553,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.40';
+const APP_VERSION = 'v34.41';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -7799,13 +7950,15 @@ function trkShape(cv, pic) {
 $('trAddUp').onclick = () => UPLOAD.open({});
 $('trAddFind').onclick = () => { const q = $('q').value.trim(); HAI.queue({ act: 'track', q }); $('q').value = ''; location.hash = '#ai'; };
 // a generated cover: the layout's shape from a published session on a brand gradient (until the track has a real photo)
-function drawCoverShape(cv, pv, name) {
+// a layout's drawing (a trace: picture pixels, y down) as a shape for the cover (y up, the longer side 1)
+const traceShape = (trc) => { const xs = trc.pts.map(p => +p.x), ys = trc.pts.map(p => +p.y), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), S = Math.max(x1 - x0, y1 - y0) || 1; return { w: (x1 - x0) / S, h: (y1 - y0) / S, pts: trc.pts.map(p => [(+p.x - x0) / S, (y1 - +p.y) / S]) }; };
+function drawCoverShape(cv, pv, name, tag) {
   const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1)), w = cv.clientWidth || 900, h = cv.clientHeight || 300; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#1b2340'); g.addColorStop(1, '#30406f'); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   const pad = 26, sw = (w * 0.55 - 2 * pad) / Math.max(pv.w || 1, 0.05), sh = (h - 2 * pad) / Math.max(pv.h || 1, 0.05), s = Math.min(sw, sh), ox = w - pad - (pv.w || 1) * s, oy = (h - (pv.h || 1) * s) / 2;
   const path = () => { ctx.beginPath(); pv.pts.forEach((p, i) => { const x = ox + p[0] * s, y = h - (oy + p[1] * s); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath(); };
   ctx.lineJoin = 'round'; ctx.lineCap = 'round'; path(); ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 22; ctx.stroke(); path(); ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 4; ctx.stroke();
-  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `600 12px ${getComputedStyle(document.documentElement).getPropertyValue('--mono') || 'monospace'}`; ctx.fillText('GPS · ' + (name || ''), pad, pad + 10);   // top left: the bottom of the cover fades into the page
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `600 12px ${getComputedStyle(document.documentElement).getPropertyValue('--mono') || 'monospace'}`; ctx.fillText((tag === undefined ? 'GPS · ' : tag ? tag + ' · ' : '') + (name || ''), pad, pad + 10);   // top left: the bottom of the cover fades into the page
 }
 $('btnAddTrack').onclick = () => ADMIN.addTrack();
 
@@ -7826,9 +7979,10 @@ async function renderTrackPage(tid, lid) {
   if (tr.community && tr.createdBy) { const nm = await STORE.names([tr.createdBy]); add('i-users', t('added by {who}', { who: `<a href="#driver~${esc(tr.createdBy)}">${esc((nm[tr.createdBy] || {}).name || t('a driver'))}</a>` })); }
   const cover = await STORE.getMedia(`tracks/${tid}/media/cover`);
   $('tCoverImg').hidden = !cover; if (cover) $('tCoverImg').src = cover;
-  const pubsEarly = cover ? [] : await STORE.sessionsFor(tid); const shape = pubsEarly.map(s => s.preview).find(p => p && p.pts);
+  const pubsEarly = cover ? [] : await STORE.sessionsFor(tid); let shape = pubsEarly.map(s => s.preview).find(p => p && p.pts), tag;
+  if (!cover && !shape) { const tl = (await STORE.getLayouts(tid).catch(() => [])).find(l => l.trace && l.trace.closed && Array.isArray(l.trace.pts) && l.trace.pts.length >= 8); if (tl) { shape = traceShape(tl.trace); tag = ''; } }   // nobody has driven here yet: the layout's drawing (a picture read in Hutka AI)
   $('tCover').classList.toggle('nocover', !cover && !shape); $('tCover').classList.toggle('gen', !cover && !!shape); $('tCoverGen').hidden = !(!cover && shape);
-  if (!cover && shape) requestAnimationFrame(() => drawCoverShape($('tCoverGen'), shape, tr.name));
+  if (!cover && shape) requestAnimationFrame(() => drawCoverShape($('tCoverGen'), shape, tr.name, tag));
   logoInto($('tLogo'), tr);
   $('tBook').hidden = !safeUrl(tr.booking); if (safeUrl(tr.booking)) { $('tBookBtn').href = safeUrl(tr.booking); $('tBookSub').textContent = t('Reserve your spot at {name} through their official booking site.', { name: tr.name }); }
   $('tVideo').hidden = !safeUrl(tr.video); if (safeUrl(tr.video)) { $('tVideoBtn').href = safeUrl(tr.video); $('tVideoSub').textContent = t("Experience {name} from a driver's perspective", { name: tr.name }); }
@@ -8432,8 +8586,21 @@ LAB.show = async function (sid, mode) {
   if (LAB.current && LAB.G && LAB.G.layout) { const l = STORE.getLayout(LAB.tid, LAB.lid); if (l && (l.updatedAt || 0) !== (LAB.G.layout.updatedAt || 0)) { await LAB.open(LAB.current, false); return; } }
   if (LAB.needFit && LAB.G) { LAB.map.fit(); LAB.needFit = false; }
   labRender(); showDiscuss();
-  if (!LAB.current) renderLabStart();
+  if (!LAB.current && !(await labAutoOpen())) renderLabStart();
 };
+// nothing chosen: the Lab opens straight into a session — the driver's latest; with none of his own, an example (the one the landing
+// shows) under a card that says so, with the upload button. The list is only what is left when there is nothing to open (offline, an
+// empty site)
+async function labAutoOpen() {
+  let meta = null, demo = false;
+  try { meta = (await STORE.mySessions())[0] || null; } catch (e) {}
+  if (!meta && STORE.hasDb) { try { const pubs = await STORE.recentPublished(100); meta = (typeof LANDING !== 'undefined' && LANDING.pick(pubs)) || pubs.find(s => s.card && s.track) || pubs[0] || null; demo = !!meta; } catch (e) {} }
+  if (!meta || APP.route !== 'lab' || LAB.current) return false;
+  LAB.demo = demo ? meta.id : null;
+  await LAB.open(meta, false);
+  if (LAB.current && !demo && location.hash === '#lab') try { history.replaceState(null, '', '#lab~' + meta.id); } catch (e) {}   // his own: the address says which (back returns to it); an example stays #lab
+  return !!LAB.current;
+}
 // the feed card: the best lap's real line (normalised), the Lab's points, the corner badges and the biggest reserves — ~4 KB
 const CARD_V = 1;
 LAB.cardOf = function () { const D = LAB.dcmp, G = LAB.G; if (!D || !G || !LAB.current) return null; return cardFrom(D, G, LAB.coach); };
@@ -8535,7 +8702,13 @@ function fitsLayout(s, G) {
   s._fit = { rev: G.rev, ok, lost: P ? P.lost : 1, p95: P ? P.p95 : 99 }; return ok;
 }
 // open a session as the reference (or as the comparison against my latest session on the same layout)
+// one open at a time, the latest wins: a quick second pick in the session sheet (or a session chosen while the example is still loading)
+// waits for the open in flight, and an open overtaken while it waited never starts — the Lab's state is one session's, never a mix
 LAB.open = async function (meta, asCmp) {
+  const seq = (LAB.openSeq = (LAB.openSeq || 0) + 1), prev = LAB.opening; let done; LAB.opening = new Promise(r => { done = r; });
+  try { if (prev) await prev; if (seq !== LAB.openSeq) return; return await labOpenNow(meta, asCmp); } finally { done(); }
+};
+async function labOpenNow(meta, asCmp) {
   labEnsureMap(); setStatus('labStatus', t('Loading session…'));
   if (!(LAB.current && LAB.current.id === meta.id)) LAB.allKarts = false;
   let sess; try { sess = await STORE.loadSession(meta); } catch (e) { setStatus('labStatus', STORE.isQuota(e) ? (STORE.hasIdentity ? t('Daily limit of sessions reached — more tomorrow.') : t('Daily limit for guests reached — sign in to keep going.')) : t('Could not load this session.'), 'warn'); return; }
@@ -8597,7 +8770,7 @@ LAB.open = async function (meta, asCmp) {
   if (mySession(sess) && sess.owner !== 'local' && STORE.canWrite() && !(sess.card && sess.card.v === CARD_V && !sess.card.none)) { try { const card = LAB.cardOf(); if (card) { await STORE.updateSession(sess.id, { card }); } } catch (e) {} }
   // and the link preview (hutka.ai/s/<id>): the picture and the page, when they are missing or stale
   if ((mySession(sess) || STORE.isAdmin()) && sess.published && sess.owner !== 'local' && STORE.canWrite() && shareStale(sess)) SHARE.sync(sess);
-};
+}
 // load one more session into the lab (as a comparison candidate) by its meta
 LAB.load = async function (meta) {
   if (sessOf(meta.id)) return sessOf(meta.id);
@@ -8980,6 +9153,75 @@ async function renderLabStart() {
   feedBox.appendChild(list);
 }
 
+// ----- the session in the Lab: its shape on the field, and the picker (a sheet: mine · favourites · other drivers'; upload at the foot) -----
+function labThumb() {
+  const box = $('labSessPv'), G = LAB.G; if (!box || !G || !G.track) return; box.innerHTML = ''; const cv = document.createElement('canvas'); box.appendChild(cv);
+  requestAnimationFrame(() => {
+    const tr = G.track, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), W = box.clientWidth || 72, H = box.clientHeight || 54; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (let i = 0; i < tr.N; i++) { x0 = Math.min(x0, tr.cx[i]); x1 = Math.max(x1, tr.cx[i]); y0 = Math.min(y0, tr.cy[i]); y1 = Math.max(y1, tr.cy[i]); }
+    const pad = 7, k = Math.min((W - 2 * pad) / Math.max(1, x1 - x0), (H - 2 * pad) / Math.max(1, y1 - y0)), ox = (W - k * (x1 - x0)) / 2, oy = (H - k * (y1 - y0)) / 2;
+    ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const x = ox + k * (tr.cx[i] - x0), y = oy + k * (tr.cy[i] - y0); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath();
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--actual').trim() || '#1f6fe0'; ctx.lineWidth = 2; ctx.stroke();
+  });
+}
+const LABPICK = (() => {
+  let seg = 'mine', mine = null;
+  async function open(s) {
+    mine = await STORE.mySessions().catch(() => []);
+    seg = s || (mine.length ? 'mine' : 'others');
+    $('labPick').hidden = false; NATIVE.haptic('light');
+    await STORE.allLayouts().catch(() => {});
+    await render();
+  }
+  const close = () => { $('labPick').hidden = true; };
+  // one session: its shape, its name (who first, for anyone else's), where and when, the best lap; the one in the Lab ringed
+  function item(m, who, href, extra) {
+    const a = el('a', 'lp-item' + (LAB.current && LAB.current.id === m.id && !extra ? ' cur' : '')); a.href = href || '#lab~' + m.id; a.onclick = close;
+    const sh = el('div', 'sh'), pic = m.preview && m.preview.pts ? m.preview : (m.card && m.card.v && m.card.pts ? m.card : null);
+    if (extra) sh.appendChild(el('span', 't', extra)); else if (pic) { const cv = document.createElement('canvas'); sh.appendChild(cv); requestAnimationFrame(() => trkShape(cv, pic)); }
+    const tr = STORE.getTrack(m.track), lay = m.track && m.layout && m.layout !== 'custom' ? STORE.getLayout(m.track, m.layout) : null;
+    const tx = el('div', 'tx'), sub = el('span', ''); if (!who && !extra && m.owner !== 'local' && !m.published) sub.appendChild(el('i', 'lp-pill', t('Private')));   // in the line under the name: the name keeps its width
+    sub.appendChild(document.createTextNode([tr ? tr.name : (m.trackName || t('Custom track')), lay ? lay.name : '', fmtDate(m.date)].filter(Boolean).join(' · ')));
+    tx.append(el('b', '', [who, m.label || m.name || t('Session')].filter(Boolean).join(' · ')), sub);
+    a.append(sh, tx);
+    if (!extra) a.appendChild(el('span', 'tm', fmtMs(m.bestMs)));
+    return a;
+  }
+  async function render() {
+    for (const b of $('labPickSeg').querySelectorAll('button')) { b.classList.toggle('on', b.dataset.v === seg); b.setAttribute('aria-selected', String(b.dataset.v === seg)); }
+    const favBtn = $('labPickSeg').querySelector('[data-v="fav"]'); favBtn.hidden = !STORE.marksOn;
+    const box = $('labPickList'); box.innerHTML = '';
+    const empty = (txt) => box.appendChild(el('div', 'lp-empty', txt));
+    if (seg === 'mine') {
+      if (!mine.length) { empty(STORE.hasIdentity || !STORE.hasAuth ? t('No sessions of yours yet. Upload the first — the Lab shows where the time goes, corner by corner.') : t('Sign in to keep your sessions here. Meanwhile, open another driver\'s session.')); return; }
+      for (const m of mine) box.appendChild(item(m, '', null));
+      return;
+    }
+    if (seg === 'fav') {
+      const list = STORE.marksOn ? await STORE.marks().catch(() => []) : [];
+      const metas = {}; for (const sid of [...new Set(list.map(m => m.sid))]) { try { metas[sid] = await STORE.getSessionMeta(sid); } catch (e) { metas[sid] = null; } }
+      const alive = list.filter(m => metas[m.sid]);
+      if (!alive.length) { empty(t('A star on a session (at the top of the Lab) keeps it here; a bookmark on a corner keeps that corner with your note.')); return; }
+      const names = await STORE.names(Object.values(metas).filter(Boolean).map(m => m.owner)).catch(() => ({})), who = (m) => m.owner === STORE.me.id || m.owner === 'local' ? '' : ((names[m.owner] || {}).name || t('Driver'));
+      for (const mk of alive.filter(m => m.corner === 0).sort((a, b) => b.at - a.at)) box.appendChild(item(metas[mk.sid], who(metas[mk.sid]), null));
+      for (const mk of alive.filter(m => m.corner > 0).sort((a, b) => b.at - a.at)) { const m = metas[mk.sid], a = item(m, who(m), `#lab~${m.id}~t${mk.corner}`, 'T' + mk.corner); if (mk.note) a.querySelector('.tx b').textContent = mk.note; box.appendChild(a); }
+      return;
+    }
+    // other drivers': this layout first, then the latest anywhere
+    const pubs = (STORE.hasDb ? await STORE.recentPublished(100).catch(() => []) : []).filter(m => m.owner !== STORE.me.id);
+    if (!pubs.length) { empty(t('Nothing published by other drivers yet.')); return; }
+    const names = await STORE.names(pubs.map(m => m.owner)).catch(() => ({})), who = (m) => (names[m.owner] || {}).name || t('Driver');
+    const here = LAB.current ? pubs.filter(m => m.track === LAB.tid && (m.layout || 'custom') === LAB.lid) : [], rest = pubs.filter(m => !here.includes(m));
+    if (here.length) { box.appendChild(el('div', 'lp-sec', t('On this layout'))); for (const m of here.slice(0, 20)) box.appendChild(item(m, who(m), null)); if (rest.length) box.appendChild(el('div', 'lp-sec', t('The latest'))); }
+    for (const m of rest.slice(0, 30)) box.appendChild(item(m, who(m), null));
+  }
+  $('labPickSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || b.dataset.v === seg) return; seg = b.dataset.v; NATIVE.haptic('light'); render(); });
+  $('labPickX').onclick = close; $('labPick').addEventListener('click', (e) => { if (e.target === $('labPick')) close(); });
+  $('labPickUp').onclick = () => { close(); UPLOAD.open(LAB.current && LAB.demo !== LAB.current.id ? { track: LAB.tid, layout: LAB.lid } : {}); };
+  return { open, close };
+})();
+$('labSessBtn').onclick = () => LABPICK.open(); $('lmPick').onclick = () => LABPICK.open();
+$('labDemoUp').onclick = () => UPLOAD.open({});
 // the bookmarks card on the Lab start page: favourite sessions, then bookmarked corners grouped by session — each a link into the Lab
 async function renderMarksCard() {
   const card = $('labMarksCard'), box = $('labMarks'); if (!STORE.marksOn) { card.hidden = true; return; }
@@ -8998,7 +9240,8 @@ async function renderMarksCard() {
 }
 function labRender() {
   const G = LAB.G, has = !!(G && LAB.sessions.length && allLaps().length && LAB.current);
-  $('labStart').hidden = has; $('labBack').hidden = !has; if (!has) { for (const id of ['btnShare', 'btnFav', 'btnPublish', 'btnEditSess', 'btnModerate', 'btnTransfer', 'voteBox', 'lowRated']) $(id).hidden = true; } for (const id of ['pickbar', 'pickSentinel', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open', 'peek'); }
+  $('labStart').hidden = has; $('labBack').hidden = true; $('labTitle').hidden = has; $('labSessBtn').hidden = !has; $('sessField').hidden = true;   // the session is chosen from its field on top
+  { const demo = has && LAB.demo === LAB.current.id; $('labDemo').hidden = !demo; if (demo) { $('labGuestNote').hidden = true; const s = LAB.current, who = whoOf(s); $('labDemoText').textContent = t('A session by {who}: every corner against the fastest. Upload yours and the Lab does the same for you.', { who: who || t('a driver') }); } $('labUpload').hidden = demo; } if (!has) { for (const id of ['btnShare', 'btnFav', 'btnPublish', 'btnEditSess', 'btnModerate', 'btnTransfer', 'voteBox', 'lowRated']) $(id).hidden = true; } for (const id of ['pickbar', 'pickSentinel', 'hero', 'digestPanel', 'askPanel', 'cornersPanel', 'discussPanel']) $(id).hidden = !has; if (!has) { $('labMob').hidden = true; $('labTabs').hidden = true; $('pickbar').classList.remove('open', 'peek'); }
   $('labEmptyText').textContent = t('Upload a session (Alfano .alf2 is the reference; AiM, RaceChrono, TrackAddict, VBOX and GPX work too), pick the track and layout, and the Lab shows where the time is: braking, apex and throttle points for every corner, a plain-language digest and, when you want it, a comparison with any other lap, the session average or another driver on the same layout.');
   $('labSub').textContent = has ? `${LAB.trackName}${G.layout ? ' · ' + G.layout.name : (LAB.lid === 'custom' ? ' · ' + t('custom layout') : '')}` : t('Session analysis');
   $('hero').classList.toggle('with-insp', has); $('pg-lab').classList.toggle('has', has); syncLand();
@@ -9012,6 +9255,8 @@ function labRender() {
   const refIsAvg = isAvgKey(LAB.ref), L = refIsAvg ? null : findLap(LAB.ref).L;
   const R = refIsAvg ? sessAvg(sess) : DATA.projectLap(L, G.track, G.rev); if (!R) { setStatus('labStatus', t('Could not project this lap onto the track line.'), 'warn'); return; }
   const refName = refIsAvg ? t('average lap') : t('lap {n}', { n: L.n });
+  // the session's field on top: who (anyone else's), its name, where, when, the best lap — and its shape
+  { const who = mySession(sess) ? '' : whoOf(sess); $('labSessName').textContent = $('lmName').textContent = [who, sess.label || sess.name || sessWhat(sess)].filter(Boolean).join(' · '); $('lmNameSub').textContent = G.layout ? G.layout.name : (LAB.trackName || ''); $('labSessSub').textContent = [LAB.trackName, G.layout ? G.layout.name : (LAB.lid === 'custom' ? t('custom layout') : ''), sess.date ? fmtDate(sess.date) : '', t('best {t}', { t: fmtMs(bestLap(sess).timeMs) })].filter(Boolean).join(' · '); labThumb(); }
   // session switch: my sessions on this layout and whatever else is loaded
   { const opts = []; const seen = new Set(); for (const sx of LAB.sessions) { seen.add(sx.id); opts.push([sx.id, `${shortSess(sx)} · ${fmtMs(bestLap(sx).timeMs)}${mySession(sx) ? '' : ' · ' + t('published')}`, mySession(sx) ? t('My sessions') : t('Published on this layout')]); } fillSelect($('sessSel'), opts, sess.id); }
   const base = findLap(pickDefaultRef()), apexes = GEOM.apexes(G, base ? DATA.projectLap(base.L, G.track, G.rev) : R);
@@ -9065,7 +9310,7 @@ function labRender() {
   { const l = lapOnMap(D); $('map1Title').textContent = l.role === 'ref' ? `1 · ${t('Reference')} · ${refName}${refIsAvg || !D.ref.mine ? ' · ' + shortSess(sess) : ''} · ${fmtLap(D.R.T)} · ${t('points of this lap')}` : `${l.n} · ${l.name} · ${fmtLap(l.P.T)} · ${t('points of this lap')}`; }
   if (LAB.scrubT > replayTmax(D)) LAB.scrubT = 0;
   $('lapLbl').textContent = refName; $('lapBig').textContent = fmtLap(D.R.T);
-  $('lmLbl').textContent = `${shortSess(sess)} · ${refName}${D.O ? ' · vs ' + nameOf(D.O) + ' ' + sg(D.total) : ''}`; $('lmBig').textContent = fmtLap(D.R.T); $('labMob').hidden = false; $('labTabs').hidden = false; applyMobTab();
+  $('lmLbl').textContent = `${refName}${D.O ? ' · vs ' + nameOf(D.O) + ' ' + sg(D.total) : ''}`; /* the session's name is the row above */ $('lmBig').textContent = fmtLap(D.R.T); $('labMob').hidden = false; $('labTabs').hidden = false; applyMobTab();
   const chips = $('lapChips'); chips.innerHTML = ''; const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
   let vmax = 0, vmin = Infinity; for (let i = 0; i < D.R.N; i++) { vmax = Math.max(vmax, D.R.v[i]); vmin = Math.min(vmin, D.R.v[i]); }
   const N = D.R.N, s1 = D.R.t[Math.floor(N / 3)], s2 = D.R.t[Math.floor(2 * N / 3)];
@@ -9854,7 +10099,7 @@ const VENUE = (() => {
   async function lookup(c) {
     try { const hit = sessionStorage.getItem(key(c)); if (hit) return JSON.parse(hit); } catch (e) {}
     let o = null, r = null; try { [o, r] = await withTimeout(Promise.all([overpass(c), reverse(c)]), 9000); } catch (e) {}
-    const out = { venue: (o && o.name) || (r && r.venue) || '', city: (r && r.city) || (o && o.city) || '', cc: (r && r.cc) || '', address: (o && o.street) || (r && r.street) || '', website: (o && o.website) || '', phone: (o && o.phone) || '', hours: (o && o.hours) || '', indoor: !!(o && o.indoor), osm: (o && o.osm) || '' };
+    const out = { venue: (o && o.name) || (r && r.venue) || '', city: (r && r.city) || (o && o.city) || '', cc: (r && r.cc) || '', address: (o && o.street) || (r && r.street) || '', website: (o && o.website) || '', phone: (o && o.phone) || '', hours: (o && o.hours) || '', indoor: !!(o && o.indoor), osm: (o && o.osm) || '', at: o && isFinite(o.lat) && isFinite(o.lon) ? { lat: o.lat, lon: o.lon } : null };   // at: where the map has the venue itself
     try { sessionStorage.setItem(key(c), JSON.stringify(out)); } catch (e) {}
     return out;
   }
@@ -11875,7 +12120,8 @@ const TRACKFIND = (() => {
       if (!best || g.inl > best.g.inl) best = { g, lp };
     }
     if (!best || best.g.inl < 0.75 || best.g.inl + best.g.cov < 1.3) return null;
-    return { xy: P.map(p => { const q = best.g.apply(p); return { x: q[0], y: q[1] }; }), lengthM: best.g.lengthM, widthM: +best.lp.widthM || 8, ref: { name: best.lp.name || 'OpenStreetMap', inl: best.g.inl, cov: best.g.cov, same: 0, start: null }, osm: true };
+    const pts = best.lp.pts, at = { lat: pts.reduce((a, p) => a + p.lat, 0) / pts.length, lon: pts.reduce((a, p) => a + p.lon, 0) / pts.length };   // where it is: the middle of the raceway
+    return { xy: P.map(p => { const q = best.g.apply(p); return { x: q[0], y: q[1] }; }), lengthM: best.g.lengthM, widthM: +best.lp.widthM || 8, ref: { name: best.lp.name || 'OpenStreetMap', inl: best.g.inl, cov: best.g.cov, same: 0, start: null }, osm: true, at };
   }
   // the layout to open for a venue: its classic one ("International", "Full", "GP"…) of those with a line, else the first of them in order
   function mainLayout(h) {
@@ -12865,6 +13111,7 @@ async function idealFromPlan(body, sub, res, ph) {
     thumb.onclick = wrong.onclick; row.append(thumb, words); head.appendChild(row);
     requestAnimationFrame(() => drawPick(thumb, ph, 72));
     const dirs = el('div', 'seg ai2-dir'), bCw = aiBtn(t('Clockwise'), '', () => draw(true)), bCcw = aiBtn(t('Anticlockwise'), '', () => draw(false)); bCw.classList.toggle('active', !!cw); bCcw.classList.toggle('active', !cw); dirs.append(bCw, bCcw); head.appendChild(dirs);
+    if (!res.lid) { const ab = addBlock({ ph, G: r.G, cw: !!cw, fit, how, tid: res.tid || null, lay: res.lay || '' }); if (ab) head.appendChild(ab); }
     if (canSave) { const sv = aiBtn(t('Save to this layout'), 'ghost', async () => { sv.disabled = true; try { const l = STORE.getLayout(res.tid, res.lid); await STORE.saveLayout(res.tid, Object.assign({}, l, { photoLine: Object.assign(BRAINS.photoLineOf(r.G, how), { dir: cw ? 'cw' : 'ccw' }, fit ? { ref: fit.ref.lid } : {}) })); sv.textContent = t('Saved — everyone sees this line now'); } catch (e) { sv.disabled = false; toast(t('Could not save: {e}', { e: e && e.message || e })); } }); head.appendChild(sv); }
     body.insertBefore(head, body.firstChild);
   };
@@ -12907,8 +13154,124 @@ async function actPlan(tid, ph, name) {
   const trk = tid ? STORE.getTrack(tid) : null, card = aiCard(t('Ideal lap'), ''), sub = card.querySelector('[data-sub]'), nm = el('div', 'ai2-cardlay');
   nm.append(el('b', '', name || t('Layout from the photo'))); card.querySelector('.hd .tt').insertBefore(nm, sub);
   const body = el('div', 'ai2-body'); card.appendChild(body); pushCard(card);
-  await idealFromPlan(body, sub, { tid, lid: null, cls: aiCls(), name: (trk ? trk.name + ' · ' : '') + (name || t('Layout from the photo')) }, ph);
+  await idealFromPlan(body, sub, { tid, lid: null, cls: aiCls(), name: (trk ? trk.name + ' · ' : '') + (name || t('Layout from the photo')), lay: name || '' }, ph);
 }
+
+// ---- a layout read from a picture, added to Hutka. A venue Hutka does not have becomes a track with this layout (anyone signed in: the
+// name the AI read, or typed; the place from the raceway the picture was laid onto, else the map's search); a layout of a venue on Hutka
+// is added by the track's editors. The picture and its line are the layout's drawing (GEOM: a trace, the picture under it): the track's
+// page shows them, the brain reads the line, and the first session uploaded there is laid onto the drawing
+function addBlock(o) {
+  const trk = o.tid ? STORE.getTrack(o.tid) : null;
+  if (!STORE.hasDb || !o.ph || !o.ph.img || (trk && !STORE.canEditTrack(trk))) return null;   // a venue's layouts are its editors' to add
+  const box = el('div', 'ai2-addtrk');
+  const paint = () => {
+    box.innerHTML = ''; const a = o.ph._added;
+    if (a) {
+      box.appendChild(el('div', 'ok', t('{name} is on Hutka now — anyone can find it.', { name: a.lay && a.tid === o.tid ? a.name + ' · ' + a.lay : a.name })));
+      const go = el('a', 'btn primary', t('Open the track page')); go.href = `#track~${a.tid}~${a.lid}`; box.appendChild(go);
+      return;
+    }
+    box.appendChild(el('div', 'tx', trk ? t('{track} has no page for this layout yet.', { track: trk.name }) : t('This track is not on Hutka yet.')));
+    box.appendChild(aiBtn(trk ? t('Add the layout to Hutka') : t('Add the track to Hutka'), 'primary', () => ADDTRK.open(o, paint)));
+  };
+  paint(); return box;
+}
+const ADDTRK = (() => {
+  let o = null, done = null, st = {};
+  const clean = (v) => String(v || '').replace(/\s+/g, ' ').trim();
+  const titled = (v) => { v = clean(v); return v && v === v.toUpperCase() && /[A-Z]/.test(v) ? v.toLowerCase().replace(/(^|[\s\-(])(\p{L})/gu, (m, a, b) => a + b.toUpperCase()) : v; };   // "SPEEDWAY CIRCUIT" → Speedway Circuit
+  function open(o2, onDone) {
+    if (!STORE.hasIdentity) { if (STORE.hasAuth) { toast(t('Sign in to add the track.')); AUTH.open(); } else toast(t('Sign in to add the track.')); return; }
+    o = o2; done = onDone;
+    const g = (o.ph && o.ph.guess) || {}, trk = o.tid ? STORE.getTrack(o.tid) : null;
+    $('addTrkH').textContent = trk ? t('New layout · {track}', { track: trk.name }) : t('Add the track to Hutka');
+    $('addTrkNameF').hidden = $('addTrkPlaceF').hidden = !!trk;
+    const lay0 = trk ? (o.lay && o.lay !== t('Layout from the photo') ? o.lay : g.layout) : g.layout;   // the title the plan prints; a new venue's only layout: "Main"
+    $('addTrkName').value = trk ? '' : titled(g.name); $('addTrkLay').value = titled(lay0) || (trk ? '' : t('Main'));
+    $('addTrkPlace').value = [clean(g.city), clean(g.country)].filter(Boolean).join(', ') || (o.ph && o.ph._place) || '';
+    st = { name0: $('addTrkName').value, place0: $('addTrkPlace').value, near: null };
+    $('addTrkGo').textContent = trk ? t('Add the layout') : t('Add the track'); $('addTrkGo').classList.add('primary'); $('addTrkNear').hidden = true; setStatus('addTrkStatus', '');
+    // a venue's layout with no line yet (no session, no drawing) may be the one the picture shows: offered first, a new one the default
+    $('addTrkWhichF').hidden = true; $('addTrkLayF').hidden = false; $('addTrkWhich').innerHTML = '';
+    if (trk) (async () => { const ls = await STORE.getLayouts(o.tid).catch(() => []); let lined = new Set(); try { lined = await TRACKFIND.linedIds(o.tid, ls); } catch (e) {} const free = ls.filter(l => !lined.has(l.id)); if (!free.length || o !== o2) return; fillSelect($('addTrkWhich'), [['', t('A new layout')]].concat(free.map(l => [l.id, l.name])), ''); $('addTrkWhichF').hidden = false; })();
+    $('addTrk').hidden = false; NATIVE.haptic('light');
+    requestAnimationFrame(() => { try { drawPick($('addTrkPv'), o.ph, 150); } catch (e) {} });
+    if (!trk && !$('addTrkName').value) setTimeout(() => $('addTrkName').focus(), 60); else if (trk && !$('addTrkLay').value) setTimeout(() => $('addTrkLay').focus(), 60);
+  }
+  const close = () => { $('addTrk').hidden = true; };
+  // the picture's line in its own pixels — the drawing the track's page shows the picture under — the way round and the start/finish as
+  // read; the picture itself, at most 1200 px (a JPEG on white: a screenshot's transparency)
+  function drawing() {
+    const ph = o.ph, img = ph && ph.img, T = ph && ph._T, G = o.G, tr = G && (G.band ? G.band.track : G.track);
+    if (!img || !T || !T.px || T.px.length < 8 || !tr) return null;
+    const W = img.naturalWidth || img.width, H = img.naturalHeight || img.height, k = Math.min(1, 1200 / Math.max(W, H)), w = Math.max(1, Math.round(W * k)), h = Math.max(1, Math.round(H * k));
+    let pts = T.px.map(p => ({ x: p.x * k, y: p.y * k }));
+    if (TRACKFIND.clockwise({ pts: pts.map(p => ({ lat: -p.y, lon: p.x })) }) !== !!o.cw) pts.reverse();   // as TRACKFIND.geometry turned it
+    const step = Math.ceil(pts.length / 400); if (step > 1) pts = pts.filter((_, i) => i % step === 0);
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+    let url = c.toDataURL('image/jpeg', 0.8); if (url.length > 900000) url = c.toDataURL('image/jpeg', 0.6);
+    const lengthM = Math.round(tr.N * tr.ds);
+    return { url, lengthM, trace: { closed: true, pts: pts.map(p => ({ x: Math.round(p.x * 10) / 10, y: Math.round(p.y * 10) / 10 })), lengthM, startU: Math.round(tr.s0 / tr.N * 10000) / 10000, reverse: false, w, h, from: 'photo' } };
+  }
+  // where the track is: the raceway the picture was laid onto; else the place the search found for the AI's name (what was read, not
+  // changed); else the map's search for what is typed — the name with the place, then the place alone
+  async function placeOf(name, place) {
+    const same = name === st.name0 && place === st.place0, fit = o.fit;
+    if (same && fit && fit.osm && fit.at) return { lat: fit.at.lat, lon: fit.at.lon, exact: true };
+    if (same && o.ph._at && !o.ph._at.broad) return o.ph._at;
+    for (const q of [...new Set([[name, place].filter(Boolean).join(', '), place])].filter(x => x && x.length >= 3)) { try { const g = await TRACKFIND.geocodeAny(q); if (g) return { lat: g.lat, lon: g.lon }; } catch (e) {} }
+    return same ? o.ph._at : null;
+  }
+  async function save() {
+    if (!o) return; const trk = o.tid ? STORE.getTrack(o.tid) : null, go = $('addTrkGo');
+    const name = clean($('addTrkName').value), lay = clean($('addTrkLay').value) || (trk ? '' : t('Main')), place = clean($('addTrkPlace').value);
+    if (!trk && name.length < 3) { setStatus('addTrkStatus', t('Type the track\'s name.'), 'warn'); $('addTrkName').focus(); return; }
+    if (trk && !lay && !(!$('addTrkWhichF').hidden && $('addTrkWhich').value)) { setStatus('addTrkStatus', t('Type the layout\'s name.'), 'warn'); $('addTrkLay').focus(); return; }   // a venue has its "Main" already
+    if (!STORE.canWrite()) { setStatus('addTrkStatus', t('Sign in to add the track.'), 'warn'); return; }
+    const D = drawing(); if (!D) { setStatus('addTrkStatus', t('Could not read the layout from this picture. A straight-on picture of the map, the track a clear band on a plain background, works best.'), 'warn'); return; }
+    go.disabled = true; go.classList.add('busy');
+    try {
+      let tid = o.tid || (o.ph._tid && STORE.getTrack(o.ph._tid) ? o.ph._tid : null); const known = o.how !== 'guess';   // a length read off the picture's band width is a guess: kept in the drawing, not shown as the track's
+      if (!trk && !tid) {   // (ph._tid: the track this picture made already, its layout not saved — a retry adds the layout only)
+        if (!STORE.isAdmin() && !(await STORE.communityAvailable())) { setStatus('addTrkStatus', t('Adding tracks is not available yet.'), 'warn'); return; }
+        setStatus('addTrkStatus', t('Finding it on the map…'));
+        const where = await placeOf(name, place);
+        if (!where) { setStatus('addTrkStatus', t('Could not find “{p}” on the map. Type the city and the country.', { p: place || name }), 'warn'); $('addTrkPlace').focus(); return; }
+        // the same track on Hutka already (a pin within 1.5 km): asked once; the button then adds a new one anyway
+        const near = STORE.getTracks().filter(x => isFinite(x.lat) && isFinite(x.lon)).map(x => ({ x, d: GEO.distKm(where, x) })).filter(x => x.d < 1.5).sort((a, b) => a.d - b.d)[0];
+        if (near && st.near !== near.x.id) {
+          st.near = near.x.id; setStatus('addTrkStatus', '');
+          $('addTrkNearT').textContent = t('{name} is already on Hutka, {d} km from there. Is it the same track?', { name: near.x.name, d: near.d < 0.1 ? '0.1' : near.d.toFixed(1) });
+          const a = $('addTrkNearGo'); a.href = '#track~' + near.x.id; a.textContent = t('Yes — open {name}', { name: near.x.name }); a.classList.add('primary'); $('addTrkNear').hidden = false;
+          go.textContent = t('No, it is another track — add it'); go.classList.remove('primary'); return;   // the likely answer is the bright one
+        }
+        // the venue's details from the map around it: its own pin (when the place was a search), the town, the country, the address
+        let v = {}; try { v = (await Promise.race([VENUE.lookup(where), new Promise(r => setTimeout(() => r(null), 8000))])) || {}; } catch (e) { v = {}; }
+        const at = !where.exact && v.at && GEO.distKm(where, v.at) < 2 ? v.at : where;
+        const city = GEO.nearestCity(at.lat, at.lon), cityName = v.city || (city && city.km < 60 ? city.name : ''), cc = v.cc || (city && city.km < 150 ? city.cc : '');
+        setStatus('addTrkStatus', t('Saving…'));
+        tid = await STORE.saveTrack(Object.assign({ name, city: cityName, country: cc, lat: +(+at.lat).toFixed(5), lon: +(+at.lon).toFixed(5), address: v.address || '', website: v.website || '', phone: v.phone || '', indoor: !!v.indoor, community: true, osm: v.osm || '', source: 'photo',
+          description: t('Added from a picture of its layout. The first session uploaded here makes the line exact. Know this track? Add the website, hours and a photo on the track page.') }, known ? { lengthM: D.lengthM } : {}, parseHours(v.hours || ''))); o.ph._tid = tid;
+      } else setStatus('addTrkStatus', t('Saving…'));
+      const ls = await STORE.getLayouts(tid).catch(() => []), order = ls.reduce((m, l) => Math.max(m, (+l.order || 0) + 1), 0), which = trk && !$('addTrkWhichF').hidden ? $('addTrkWhich').value : '', old = which ? ls.find(l => l.id === which) : null;
+      const lid = old ? await STORE.saveLayout(tid, Object.assign({}, old, { trace: D.trace, direction: o.cw ? 'cw' : 'ccw' }, known && !old.lengthM ? { lengthM: D.lengthM } : {}))   // the venue's own layout gets the drawing
+        : await STORE.saveLayout(tid, Object.assign({ name: lay, order, cornerR: 110, widthM: 8, direction: o.cw ? 'cw' : 'ccw', trace: D.trace }, known ? { lengthM: D.lengthM } : {}));
+      try { await STORE.setMedia(`tracks/${tid}/layouts/${lid}/media/trace`, D.url); } catch (e) {}   // the picture under the line; the line stands without it
+      GEOM.invalidate(); STORE.track('track_from_photo', { tid, lid, venue: !!trk });
+      o.ph._added = { tid, lid, name: trk ? trk.name : name, lay: old ? old.name : lay };
+      close(); setStatus('addTrkStatus', ''); NATIVE.haptic('success'); toast(trk ? t('Layout added to Hutka') : t('Track added to Hutka'));
+      if (done) done();
+    } catch (e) { setStatus('addTrkStatus', quotaOr(e, t('Could not save: {e}', { e: e && e.message || e })), 'warn'); }
+    finally { go.disabled = false; go.classList.remove('busy'); }
+  }
+  $('addTrkGo').onclick = save; $('addTrkX').onclick = close; $('addTrk').addEventListener('click', (e) => { if (e.target === $('addTrk')) close(); });
+  $('addTrkNearGo').onclick = close;
+  $('addTrkWhich').onchange = () => { $('addTrkLayF').hidden = !!$('addTrkWhich').value; };   // the venue's own layout: its name stays
+  for (const id of ['addTrkName', 'addTrkPlace']) $(id).addEventListener('input', () => { if (st.near) { st.near = null; $('addTrkNear').hidden = true; $('addTrkGo').textContent = t('Add the track'); $('addTrkGo').classList.add('primary'); } });   // another name or place: asked again
+  for (const id of ['addTrkName', 'addTrkLay', 'addTrkPlace']) $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); save(); } });
+  return { open, close };
+})();
 
 // ---- 2. the last session: where the time goes, then the AI on it
 async function actSession(meta, quiet) {
@@ -12984,6 +13347,7 @@ function actTrack(q0) {
     q = String(q || '').trim(); if (!q && !ph) return; out.innerHTML = ''; out.appendChild(el('div', 'hint', t('Looking…'))); go.classList.add('busy');
     let res = null; if (q) { try { res = await TRACKFIND.find(q); } catch (e) { res = { error: String(e && e.message || e) }; } } else res = { hutka: [], loops: [] };
     go.classList.remove('busy'); out.innerHTML = '';
+    if (ph) { const a = res && !res.error && res.at; ph._at = a && isFinite(a.lat) && isFinite(a.lon) ? { lat: +a.lat, lon: +a.lon, broad: !!a.broad } : null; ph._place = (res && res.place) || ''; }   // where the AI's name is on the map: the place of the track, if it is added to Hutka
     if (ph && res && !res.error && res.hutka.length) {
       // the venue: the one with a layout of the name the picture prints ("Dubai Kartdrome" may be the outdoor or the indoor one), else the
       // one with driven layouts to lay the picture onto
@@ -13254,25 +13618,45 @@ async function renderProfile() {
 $('profEditX').onclick = () => { $('profEditSheet').hidden = true; };
 $('profEditSheet').addEventListener('click', (e) => { if (e.target === $('profEditSheet')) $('profEditSheet').hidden = true; });
 // ---------- my sessions: one table for the profile and the Lab start screen ----------
+// my sessions — on the profile, in Sessions → Mine, and on the Lab's start: a list like the Lab's session sheet. The row opens the session
+// in the Lab (the one main action); ⋯ opens a sheet with the rest: edit (name, track, layout), publish or unpublish, delete
 async function renderMySessionsTable(box, opts) {
   opts = opts || {}; const list = await STORE.mySessions(); box.innerHTML = '';
   if (opts.sub) opts.sub.textContent = list.length ? String(list.length) : '';
-  if (opts.hint) opts.hint.textContent = list.length ? (opts.compact ? t('Open a session to analyse it; Edit changes its name, track and layout.') : t('Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.')) : (navigator.onLine === false ? t('No connection — your sessions show when it is back.') : t('No sessions yet. Upload a session to start.'));
+  if (opts.hint) opts.hint.textContent = list.length ? (opts.compact ? t('Tap a session to analyse it; ⋯ edits, publishes or deletes it.') : t('Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.')) : (navigator.onLine === false ? t('No connection — your sessions show when it is back.') : t('No sessions yet. Upload a session to start.'));
   if (!list.length) return;
-  const wrap = el('div', 'tblwrap'), tb = el('table', 'tbl mine'); tb.innerHTML = `<thead><tr><th>${t('Session')}</th><th>${t('Track')}</th><th>${t('Date')}</th><th>${t('Laps')}</th><th>${t('Best')}</th><th>${t('Avg clean')}</th><th>${t('Visibility')}</th><th></th></tr></thead>`; const body = el('tbody');
+  const wrap = el('div', 'ms-list'), again = () => renderMySessionsTable(box, opts);
   for (const m of list) {
-    const tr = el('tr'), trk = STORE.getTrack(m.track); const layouts = m.track ? await STORE.getLayouts(m.track) : []; const l = layouts.find(x => x.id === m.layout);
-    const vis = m.owner === 'local' ? `<span class="pill off">${t('This browser')}</span>` : (m.published ? `<span class="pill ok">${t('Published')}</span>` : `<span class="pill off">${t('Private')}</span>`);
-    tr.innerHTML = `<td style="font-weight:600;white-space:normal;min-width:160px">${esc(m.label || m.name)}${m.note ? ` <span class="hint">· ${esc(m.note)}</span>` : ''}</td><td style="white-space:normal">${esc(trk ? trk.name : (m.trackName || t('Custom')))}${l ? ' · ' + esc(l.name) : (m.layout === 'custom' || !m.layout ? ' · ' + t('custom') : '')}</td><td>${esc(fmtDate(m.date))}</td><td class="num">${m.nLaps} (${m.cleanLaps})</td><td class="num">${fmtMs(m.bestMs)}</td><td class="num">${fmtMs(m.avgMs)}</td><td>${vis}</td><td></td>`;
-    const acts = el('div', 'row sess-acts');   // the buttons wrap two by two when the table is tight (the Russian labels are long) — never cut off
-    const open = el('a', 'btn xs primary', t('Open')); open.href = '#lab~' + m.id; acts.appendChild(open);
-    const ed = el('button', 'btn xs', t('Edit')); ed.type = 'button'; ed.onclick = () => SESSEDIT.open(m, () => { LAB.invalidate(m.id); renderMySessionsTable(box, opts); }); acts.appendChild(ed);
-    if (STORE.canWrite() && m.owner !== 'local') { const pub = el('button', 'btn xs', m.published ? t('Unpublish') : t('Publish')); pub.type = 'button'; pub.disabled = !m.track; pub.title = m.track ? '' : t('Assign a track first (Edit).'); pub.onclick = async () => { pub.classList.add('busy'); try { await setPublished(m, !m.published); renderMySessionsTable(box, opts); } catch (e) { pub.classList.remove('busy'); toast(t('Could not save. Check your access to the Hutka page.')); } }; acts.appendChild(pub); }
-    const del = el('button', 'btn xs danger', '×'); del.type = 'button'; del.title = t('Delete'); del.onclick = async () => { if (!(await confirmDlg(t('Delete this session?'), t('The file data is removed from your library and from the track page.'), t('Delete')))) return; try { await STORE.deleteSession(m); LAB.invalidate(m.id); } catch (e) {} renderMySessionsTable(box, opts); }; acts.appendChild(del);
-    tr.lastElementChild.appendChild(acts); body.appendChild(tr);
+    const trk = STORE.getTrack(m.track), layouts = m.track ? await STORE.getLayouts(m.track) : [], l = layouts.find(x => x.id === m.layout), name = m.label || m.name || t('Session');
+    const a = el('a', 'lp-item ms-item'); a.href = '#lab~' + m.id;
+    const sh = el('div', 'sh'), pic = m.preview && m.preview.pts ? m.preview : (m.card && m.card.v && m.card.pts ? m.card : null);
+    if (pic) { const cv = document.createElement('canvas'); sh.appendChild(cv); requestAnimationFrame(() => trkShape(cv, pic)); } else sh.appendChild(svgUse('i-timer'));
+    const tx = el('div', 'tx'), sub = el('span', ''), pill = m.owner === 'local' ? t('This browser') : (!m.published ? t('Private') : '');   // the pill in the line under the name: the name keeps its width on a phone
+    if (pill) sub.appendChild(el('i', 'lp-pill', pill)); sub.appendChild(el('b', 'tm', fmtMs(m.bestMs)));   // the best lap leads the line: the name keeps the width ⋯ leaves
+    sub.appendChild(document.createTextNode(' · ' + [trk ? trk.name : (m.trackName || t('Custom')), l ? l.name : (m.layout === 'custom' || !m.layout ? t('custom') : ''), fmtDate(m.date), m.note || ''].filter(Boolean).join(' · ')));
+    tx.append(el('b', '', name), sub); a.append(sh, tx);
+    const more = el('button', 'more'); more.type = 'button'; more.title = t('More'); more.setAttribute('aria-label', t('More') + ': ' + name);
+    more.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
+    more.onclick = (e) => { e.preventDefault(); e.stopPropagation(); ACTSHEET.open(name, [
+      { label: t('Edit'), icon: 'i-edit', run: () => SESSEDIT.open(m, () => { LAB.invalidate(m.id); again(); }) },
+      STORE.canWrite() && m.owner !== 'local' ? { label: m.published ? t('Unpublish') : t('Publish'), icon: m.published ? 'i-eyeoff' : 'i-eye', disabled: !m.track, title: m.track ? '' : t('Assign a track first (Edit).'), run: async () => { try { await setPublished(m, !m.published); } catch (err) { toast(t('Could not save. Check your access to the Hutka page.')); } again(); } } : null,
+      { label: t('Delete'), icon: 'i-trash', danger: true, run: async () => { if (!(await confirmDlg(t('Delete this session?'), t('The file data is removed from your library and from the track page.'), t('Delete')))) return; try { await STORE.deleteSession(m); LAB.invalidate(m.id); } catch (err) {} again(); } }
+    ]); };
+    a.appendChild(more); wrap.appendChild(a);
   }
-  tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
+  box.appendChild(wrap);
 }
+// a sheet of actions for one thing (a session's ⋯): a verb a row, the destructive one last, in red. items: [{ label, icon, danger, disabled, title, run }]
+const ACTSHEET = (() => {
+  const close = () => { $('actSheet').hidden = true; };
+  function open(title, items) {
+    $('actSheetH').textContent = title || ''; const box = $('actSheetList'); box.innerHTML = '';
+    for (const it of items.filter(Boolean)) { const b = el('button', 'btn' + (it.danger ? ' danger-text' : '')); b.type = 'button'; if (it.icon) b.appendChild(svgUse(it.icon)); b.appendChild(el('span', '', it.label)); b.disabled = !!it.disabled; if (it.title) b.title = it.title; b.onclick = async () => { close(); try { await it.run(); } catch (e) {} }; box.appendChild(b); }
+    $('actSheet').hidden = false; NATIVE.haptic('light');
+  }
+  $('actSheetX').onclick = close; $('actSheet').addEventListener('click', (e) => { if (e.target === $('actSheet')) close(); });
+  return { open, close };
+})();
 // ---------- session edit: name, track, layout, note, visibility ----------
 const SESSEDIT = (() => {
   let cur = null, done = null;
