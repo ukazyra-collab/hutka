@@ -6343,10 +6343,12 @@ const STORE = (() => {
     if (adapter) await adapter.saveTrack(id, body); tracks.set(id, Object.assign({ id }, body)); notify('tracks'); return id;
   }
   async function deleteTrack(tid) { if (adapter) { const ls = await getLayouts(tid, true); await adapter.deleteTrack(tid, ls.map(l => l.id)); } tracks.delete(tid); layouts.delete(tid); notify('tracks'); }
+  // a track from the map has its one layout named "Main" in the data: shown in the reader's language
+  const localNames = (tid, list) => { const tr = tracks.get(tid); if (tr && tr.source === 'osm' && I18N.lang !== 'en') for (const l of list) if (l.name === 'Main') l.name = I18N.t('Main'); return list; };
   async function getLayouts(tid, fresh) {
     if (!fresh && layouts.has(tid)) return layouts.get(tid);
     let list = [], ok = true; if (adapter) { try { list = await adapter.listLayouts(tid); } catch (e) { list = []; ok = false; } }
-    list.sort(sortLayouts); if (ok) layouts.set(tid, list); return list;   // a failed fetch (no connection) is not kept as "no layouts"
+    list.sort(sortLayouts); localNames(tid, list); if (ok) layouts.set(tid, list); return list;   // a failed fetch (no connection) is not kept as "no layouts"
   }
   const getLayout = (tid, lid) => (layouts.get(tid) || []).find(l => l.id === lid) || null;
   async function saveLayout(tid, l) {
@@ -6522,7 +6524,7 @@ const STORE = (() => {
   let allLayoutsAt = 0;
   async function allLayouts() {
     if (Date.now() - allLayoutsAt < 120000) return;
-    if (adapter && adapter.allLayouts) { try { const rows = await adapter.allLayouts(), by = new Map(); for (const r of rows) { if (!by.has(r.track)) by.set(r.track, []); by.get(r.track).push(r.l); } for (const tid of tracks.keys()) layouts.set(tid, (by.get(tid) || []).sort(sortLayouts)); allLayoutsAt = Date.now(); return; } catch (e) {} }
+    if (adapter && adapter.allLayouts) { try { const rows = await adapter.allLayouts(), by = new Map(); for (const r of rows) { if (!by.has(r.track)) by.set(r.track, []); by.get(r.track).push(r.l); } for (const tid of tracks.keys()) layouts.set(tid, localNames(tid, (by.get(tid) || []).sort(sortLayouts))); allLayoutsAt = Date.now(); return; } catch (e) {} }
     await Promise.all([...tracks.keys()].map(tid => getLayouts(tid).catch(() => [])));
   }
   let layAct = null;

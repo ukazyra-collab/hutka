@@ -34,7 +34,7 @@ const similar = (a: string, b: string) => { const x = nameKey(a), y = nameKey(b)
 // which elements are venues: something named with karting among its sports, not a shop, an office or a closed place
 function isVenue(e: El): boolean {
   const t = e.tags || {};
-  if (!/karting/i.test(t.sport || "")) return false;
+  if (!/karting/i.test(t.sport || "") && !(t.highway === "raceway" && !t.sport && /kart/i.test(t.name || ""))) return false;   // or a raceway named for karts
   if (t.shop || t.office || t.craft) return false;
   if (Object.keys(t).some(k => /^(disused|abandoned|demolished|razed|was|removed):/.test(k))) return false;
   if (/^(no|closed)$/i.test(t.opening_hours || "") || t["end_date"]) return false;

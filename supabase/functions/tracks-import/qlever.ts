@@ -10,8 +10,10 @@ const areaOf = (area: string) => `?area osmkey:${/^US-[A-Z]{2}$/.test(area) ? "I
 const KEY = "https://www.openstreetmap.org/wiki/Key:";
 // the tags a venue is read by (lib.ts): its name, contacts, address, what kind of place it is, whether it is closed — all its tags,
 // one row a tag (a row per venue with thirty optional columns is what makes the database slow)
-export const qVenueTags = (area: string) => PRE + `SELECT ?el ?key ?val WHERE { ${areaOf(area)}?el osmkey:sport "karting" . ?el ?key ?val . FILTER(STRSTARTS(STR(?key), "${KEY}")) }`;
-export const qVenueGeom = (area: string) => PRE + `SELECT ?el ?wkt WHERE { ${areaOf(area)}?el osmkey:sport "karting" . ?el geo:hasGeometry/geo:asWKT ?wkt . }`;
+// the venues: sport=karting, karting among other sports ("karting;paintball"), and a raceway named for karts with no sport given
+const VENUE = `{ ?el osmkey:sport "karting" } UNION { ?el osmkey:sport ?sp . FILTER(?sp != "karting" && CONTAINS(LCASE(?sp), "karting")) } UNION { ?el osmkey:highway "raceway" . ?el osmkey:name ?nm . FILTER(REGEX(?nm, "kart", "i")) MINUS { ?el osmkey:sport ?sp2 } } `;
+export const qVenueTags = (area: string) => PRE + `SELECT ?el ?key ?val WHERE { ${areaOf(area)}${VENUE}?el ?key ?val . FILTER(STRSTARTS(STR(?key), "${KEY}")) }`;
+export const qVenueGeom = (area: string) => PRE + `SELECT ?el ?wkt WHERE { ${areaOf(area)}${VENUE}?el geo:hasGeometry/geo:asWKT ?wkt . }`;
 export const qRacewayGeom = (area: string) => PRE + `SELECT ?el ?wkt WHERE { ${areaOf(area)}?el osmkey:highway "raceway" . ?el geo:hasGeometry/geo:asWKT ?wkt . }`;
 export const qRacewayTags = (area: string) => PRE + `SELECT ?el ?key ?val WHERE { ${areaOf(area)}?el osmkey:highway "raceway" . ?el ?key ?val . FILTER(?key IN (osmkey:sport, osmkey:oneway, osmkey:width, osmkey:name)) }`;
 export const qTowns = (area: string) => PRE + `SELECT ?el ?wkt ?name ?place WHERE { ${areaOf(area)}?el osmkey:place ?place . FILTER(?place = "city" || ?place = "town") ?el osmkey:name ?name . ?el geo:hasGeometry/geo:asWKT ?wkt . }`;
