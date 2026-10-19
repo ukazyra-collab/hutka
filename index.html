@@ -1332,6 +1332,130 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   .ld-band .b{font-size:12px}
   .ld-steps{grid-template-columns:1fr}
 }
+/* ---------- Hutka AI: one page — who it is, four one-tap answers, one chat ---------- */
+.ai2{max-width:820px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:14px;min-width:0}
+.ai2-top{display:flex;align-items:center;gap:14px}
+.ai2-ava{width:58px;height:58px;flex:none;border-radius:50%;box-shadow:0 8px 22px rgba(59,124,255,.32)}
+.ai2-ava svg{width:100%;height:100%;display:block}
+.ai2-who{flex:1;min-width:0}
+.ai2-who h1{margin:0;font-size:24px;line-height:1.1;letter-spacing:-.01em}
+.ai2-who .sub{margin-top:4px;color:var(--muted);font-size:13px;line-height:1.4}
+.ai2-histbtn{flex:none}
+.ai2-main{display:flex;flex-direction:column;gap:10px}
+.ai2-go{height:58px;width:100%;font-size:16.5px;border-radius:14px;gap:10px}
+.ai2-go svg{width:20px;height:20px}
+.ai2-field{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font:inherit;cursor:pointer;text-align:left}
+.ai2-field:hover{border-color:var(--accent)}
+.ai2-field{min-height:56px;padding:8px 14px}
+.ai2-field .v{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.ai2-field b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;font-weight:600}
+.ai2-field .v span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--muted)}
+.ai2-field svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* the three more answers: quiet rows in one list */
+.ai2-acts{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.ai2-act{display:flex;align-items:center;gap:12px;text-align:left;padding:10px 14px;min-height:64px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;font:inherit}
+.ai2-act:first-child{border-top:0}
+.ai2-act:hover{background:var(--surface-2)}
+.ai2-act.busy{opacity:.6;pointer-events:none}
+.ai2-act .ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--surface-2);color:var(--fg);flex:none}
+.ai2-act .ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ai2-act .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ai2-act b{font-size:14.5px;line-height:1.25}
+.ai2-act .d{font-size:12.5px;color:var(--muted);line-height:1.35}
+.ai2-act .go{width:16px;height:16px;stroke:var(--faint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ai2-act.ai2-chipideal{display:none}
+/* a conversation running: the answers become one row of chips above it, the ideal lap among them */
+.ai2.talking .ai2-main{display:none}
+.ai2.talking .ai2-acts{flex-direction:row;gap:8px;overflow-x:auto;scrollbar-width:none;border:0;border-radius:0;background:none;margin:0 -2px;padding:0 2px;min-width:0;max-width:100%}
+.ai2.talking .ai2-acts::-webkit-scrollbar{display:none}
+.ai2.talking .ai2-act{flex:none;min-height:44px;padding:6px 14px 6px 6px;border:1px solid var(--line);border-radius:999px;background:var(--surface);gap:8px}
+.ai2.talking .ai2-act.ai2-chipideal{display:flex}
+.ai2.talking .ai2-act .d,.ai2.talking .ai2-act .go{display:none}
+.ai2.talking .ai2-act .ic{width:30px;height:30px;border-radius:50%}
+.ai2.talking .ai2-act .ic svg{width:15px;height:15px}
+.ai2.talking .ai2-act b{font-size:13px;white-space:nowrap}
+.ai2.talking .ai2-who .sub{display:none}
+.ai2-laylist{display:flex;flex-direction:column;gap:6px}
+.ai2-laylist h4{margin:10px 2px 2px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ai2-laylist h4:first-child{margin-top:0}
+.ai2-lay{display:flex;align-items:center;gap:10px;min-height:48px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.ai2-lay.sel{box-shadow:0 0 0 2px var(--accent);border-color:var(--accent)}
+.ai2-lay b{flex:1;min-width:0;font-size:14.5px}
+.ai2-lay span{font-size:12px;color:var(--muted);flex:none}
+.ai2-lay .mine{color:var(--ok-ink)}
+.ai2-chat{display:flex;flex-direction:column;gap:10px;padding:14px;min-width:0}
+.ai2-chathead{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:2px}
+.ai2-chathead b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.ai2-log{display:flex;flex-direction:column;gap:10px;min-width:0}
+.ai2-empty{color:var(--muted);font-size:13.5px;line-height:1.5;padding:2px 2px 4px}
+.ai2-log .msg{max-width:100%}
+.ai2-log .msg.user{max-width:85%}
+.ai2-ask{display:flex;gap:8px;align-items:flex-end;border:1px solid var(--line-2);border-radius:16px;padding:6px 6px 6px 14px;background:var(--surface)}
+.ai2-ask:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ai2-ask textarea{flex:1;border:0;outline:0;box-shadow:none;resize:none;background:transparent;font:inherit;font-size:15px;line-height:1.4;min-height:24px;max-height:160px;padding:7px 0;color:var(--fg);border-radius:0}
+.ai2-ask textarea:focus{box-shadow:none}
+.ai2-send{width:44px;height:44px;padding:0;border-radius:12px;display:grid;place-items:center;flex:none}
+.ai2-send svg{width:18px;height:18px}
+.ai2-note{font-size:11.5px;color:var(--faint);text-align:center;line-height:1.4}
+/* the answers of the four buttons: cards in the conversation */
+.ai2-card{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ai2-card .hd{display:flex;align-items:flex-start;gap:10px}
+.ai2-card .hd .tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.ai2-card .hd b{display:block;font-size:16px;line-height:1.25}
+.ai2-card .hd .hint{font-size:12.5px;line-height:1.4}
+.ai2-card .hd .hint:empty{display:none}
+.ai2-cardlay{display:flex;align-items:center;gap:8px;min-width:0}
+.ai2-cardlay b{flex:1;min-width:0;font-size:14px!important;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai2-cardlay .btn{flex:none}
+.ai2-body{display:flex;flex-direction:column;gap:10px;min-width:0}
+.ai2-map{width:100%;height:260px;border-radius:12px;background:var(--surface-2);display:block;cursor:pointer}
+@media (min-width:900px){.ai2-map{height:380px}}
+@media (max-width:640px){.ai2-map{height:230px}}
+.ai2-legend{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.ai2-legend span{display:inline-flex;align-items:center;gap:6px}
+.ai2-legend i{display:inline-block;width:16px;height:5px;border-radius:3px}
+.ai2-legend i.b{background:var(--brake)}.ai2-legend i.l{background:var(--lift)}.ai2-legend i.g{width:9px;height:9px;border-radius:50%;background:var(--throttle)}.ai2-legend i.f{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--throttle)}
+.ai2-crn{display:flex;flex-direction:column}
+.ai2-crn .row1{display:flex;gap:10px;align-items:flex-start;padding:9px 6px;border-top:1px solid var(--line);cursor:pointer;border-radius:10px}
+.ai2-crn .row1:first-child{border-top:0}
+.ai2-crn .row1.sel{background:var(--accent-soft);border-top-color:transparent}
+.ai2-crn .row1.sel+.row1{border-top-color:transparent}
+.ai2-crn .no{flex:none;min-width:34px;height:24px;padding:0 6px;border-radius:8px;display:grid;place-items:center;font:700 12px var(--mono);background:var(--fg);color:var(--surface)}
+.ai2-crn .no.flat{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 2px var(--throttle)}
+.ai2-crn .tx{flex:1;min-width:0;font-size:14px;line-height:1.45}
+.ai2-crn .tx .do{display:block}
+.ai2-crn .tx .me{display:block;color:var(--muted);font-size:12.5px;margin-top:3px}
+.ai2-crn .tx .me b{color:var(--brake);font-weight:600}
+.ai2-acts2{flex-wrap:wrap;gap:8px}
+.ai2-nums{display:flex;gap:18px;flex-wrap:wrap}
+.ai2-nums span{display:grid;gap:1px}
+.ai2-nums i{font-style:normal;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ai2-nums b{font:600 16px/1.2 var(--mono)}
+.ai2-cchips .chip{cursor:pointer;font-family:var(--mono);font-size:12px;padding:4px 9px}
+.ai2-cchips .chip b{font-weight:700;margin-right:4px}
+.ai2-cchips .chip.warm{border-color:color-mix(in srgb,var(--limit,#e9a23b) 60%,var(--line));background:color-mix(in srgb,var(--limit,#e9a23b) 12%,var(--surface))}
+.ai2-cchips .chip.hot{border-color:color-mix(in srgb,var(--brake,#e23d3d) 60%,var(--line));background:color-mix(in srgb,var(--brake,#e23d3d) 12%,var(--surface))}
+.ai2-card > a.btn{align-self:flex-start}
+.ai2-prog{display:flex;flex-direction:column;gap:8px}
+.ai2-prog .it{border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.ai2-prog .it:hover{border-color:var(--accent)}
+.ai2-prog .h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.ai2-prog .h b{font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai2-prog .pb{font:600 13px var(--mono);color:var(--ok-ink);flex:none}
+.ai2-prog .spark{width:100%;height:44px;display:block}
+.ai2-find{display:flex;gap:8px}
+.ai2-find input{flex:1;min-width:0}
+.ai2-find2{gap:8px;flex-wrap:wrap}
+.ai2-found{display:flex;flex-direction:column;gap:8px}
+.ai2-hit{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);color:var(--fg);font:inherit;cursor:pointer}
+.ai2-hit:hover{border-color:var(--accent)}
+.ai2-hit b{font-size:14px}
+.ai2-hit span{font-size:12.5px;color:var(--muted)}
+.ai2-hit:disabled{cursor:default;opacity:.85;border-style:dashed}
+.ai2-hit:disabled:hover{border-color:var(--line)}
+.ai2-dir{align-self:flex-start}
+.ai2-hist .chatlist{max-height:none}
+.ai2-hist .wallet{border-top:1px solid var(--line);padding-top:14px}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -1360,7 +1484,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></symbol>
     <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V4M8 8l4-4 4 4M5 13v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6"/></symbol>
     <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.4M12 17v.5"/></symbol>
-    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2 4 2 4H5"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></symbol><symbol id="i-trend" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol><symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2 4 2 4H5"/></symbol>
     <symbol id="i-ig" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.5"/><circle cx="17" cy="7" r=".8" fill="currentColor"/></symbol>
     <symbol id="i-yt" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/></symbol>
     <symbol id="i-fb" viewBox="0 0 24 24"><path d="M14 8h2V5h-2a3 3 0 0 0-3 3v2H9v3h2v7h3v-7h2l.5-3H14V8z"/></symbol>
@@ -1624,8 +1748,9 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       <div class="card" id="discussPanel" hidden><h2><svg><use href="#i-chat"/></svg><span data-t="Discussion">Discussion</span><span class="sub" id="discussSub"></span><button class="btn xs ghost h2act" id="discussReport" type="button" hidden data-t="Report this session">Report this session</button></h2><div class="comments" id="commentList"></div><div class="askrow" id="commentForm"><textarea id="commentInput" rows="2"></textarea><div class="askbtns"><button class="btn primary" id="commentBtn" type="button" data-t="Post">Post</button></div></div><div class="hint" id="commentNote"></div></div>
     </section>
 
-    <!-- ========== AI COACH ========== -->
+    <!-- ========== AI COACH (everyone) / HUTKA AI (admins, v35 preview) ========== -->
     <section class="page" id="pg-ai" hidden>
+      <div id="aiOld">
       <div class="ph"><div><h1 data-t="AI coach">AI coach</h1><div class="sub" id="aiSub"></div></div><div class="row"><button class="btn primary" id="aiNew" type="button"><svg><use href="#i-plus"/></svg><span data-t="New chat">New chat</span></button></div></div>
       <div class="banner info" id="aiSoon" hidden><svg><use href="#i-info"/></svg><div id="aiSoonText"></div></div>
       <div class="ai-grid" id="aiGrid">
@@ -1651,7 +1776,33 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
           <div class="hint" id="aiNote"></div>
         </div>
       </div>
-    </section>
+          </div>
+      <div class="ai2" id="hai" hidden>
+        <div class="ai2-top">
+          <div class="ai2-ava" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="aiAvG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><circle cx="32" cy="32" r="32" fill="url(#aiAvG)"/><path d="M14 34c0-11 8-19 18-19s18 8 18 19v7c0 4.4-3.6 8-8 8H22c-4.4 0-8-3.6-8-8z" fill="#fff"/><rect x="18" y="28" width="28" height="9" rx="4.5" fill="#141c38"/><path d="M22.5 32.5h13" stroke="#5ff2c4" stroke-width="2.4" stroke-linecap="round"/><circle cx="40.5" cy="32.5" r="1.8" fill="#5ff2c4"/><path d="M32 15.6v7.4" stroke="#7a4dff" stroke-width="3.2" stroke-linecap="round"/><path d="M26 44h3M35 44h3" stroke="#b9c4f5" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="ai2-who"><h1 data-t="Hutka AI">Hutka AI</h1><div class="sub" data-t="Your racing AI: it knows your sessions and the fastest laps on Hutka">Your racing AI: it knows your sessions and the fastest laps on Hutka</div></div>
+          <button class="btn sm ghost ai2-histbtn" id="haiHistBtn" type="button"><svg><use href="#i-chat"/></svg><span data-t="Chats">Chats</span></button>
+        </div>
+        <div class="banner info" id="haiSoon" hidden><svg><use href="#i-info"/></svg><div id="haiSoonText"></div></div>
+        <!-- the main answer: the ideal lap of a layout (the layout is a setting next to it); three more below; a running conversation shrinks them to chips -->
+        <div class="ai2-main" id="haiMain">
+          <button class="btn primary ai2-go" id="haiGo" type="button"><svg><use href="#i-flag"/></svg><span data-t="Show the ideal lap">Show the ideal lap</span></button>
+          <button class="ai2-field" id="haiLay" type="button" data-ta="Which layout?" aria-label="Which layout?"><span class="v"><b id="haiLayName">—</b><span id="haiLayTrack"></span></span><svg><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="ai2-acts" id="haiActs">
+          <button class="ai2-act ai2-chipideal" type="button" data-act="ideal"><span class="ic"><svg><use href="#i-flag"/></svg></span><b data-t="Ideal lap">Ideal lap</b></button>
+          <button class="ai2-act" type="button" data-act="session"><span class="ic"><svg><use href="#i-lab"/></svg></span><span class="tx"><b data-t="My last session">My last session</b><span class="d" data-t="Where the time goes and what to change">Where the time goes and what to change</span></span><svg class="go"><use href="#i-chev"/></svg></button>
+          <button class="ai2-act" type="button" data-act="progress"><span class="ic"><svg><use href="#i-trend"/></svg></span><span class="tx"><b data-t="My progress">My progress</b><span class="d" data-t="What got better and what to work on next">What got better and what to work on next</span></span><svg class="go"><use href="#i-chev"/></svg></button>
+          <button class="ai2-act" type="button" data-act="track"><span class="ic"><svg><use href="#i-pin"/></svg></span><span class="tx"><b data-t="New track">New track</b><span class="d" data-t="A photo, a link or a place: the line for a track you have never driven">A photo, a link or a place: the line for a track you have never driven</span></span><svg class="go"><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="card ai2-chat" id="haiChat">
+          <div class="ai2-chathead" id="haiChatHead" hidden><b id="haiTitle"></b><button class="btn xs ghost" id="haiNew" type="button"><svg><use href="#i-plus"/></svg><span data-t="New chat">New chat</span></button></div>
+          <div class="ai2-log" id="haiLog"></div>
+          <div class="ai2-ask"><textarea id="haiInput" rows="1"></textarea><button class="btn ai2-send" id="haiSend" type="button" data-ta="Send" aria-label="Send"><svg><use href="#i-send"/></svg></button><button class="btn ai2-send" id="haiStop" type="button" hidden data-ta="Stop" aria-label="Stop"><svg><use href="#i-x"/></svg></button></div>
+          <div class="ai2-note"><span data-t="Hutka AI can make mistakes — check it on track.">Hutka AI can make mistakes — check it on track.</span> <span id="haiNote"></span></div>
+        </div>
+      </div>
+        </section>
 
     <!-- ========== PROFILE ========== -->
     <section class="page" id="pg-profile" hidden>
@@ -1879,6 +2030,18 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div class="row" style="justify-content:flex-end"><button class="btn" id="swsCancel" type="button" data-t="Cancel">Cancel</button><button class="btn primary" id="swsSave" type="button" disabled data-t="Save to my profile">Save to my profile</button></div>
 </div></div>
 <!-- credits & plan modal -->
+<div class="modal" id="haiLaySheet" hidden><div class="box sheet ai2-laysheet">
+  <div class="sheet-head"><h3 data-t="Which layout?">Which layout?</h3><button class="sheet-x" id="haiLayX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="sheet-body"><div class="ai2-laylist" id="haiLayList"></div></div>
+</div></div>
+<div class="modal" id="haiHist" hidden><div class="box sheet ai2-hist">
+  <div class="sheet-head"><h3 data-t="Chats">Chats</h3><button class="sheet-x" id="haiHistX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="sheet-body">
+    <button class="btn primary" id="haiHistNew" type="button"><svg><use href="#i-plus"/></svg><span data-t="New chat">New chat</span></button>
+    <div class="list chatlist" id="haiChats"></div>
+    <div class="hint" id="haiWallet"></div>
+  </div>
+</div></div>
 <div class="modal" id="payModal" hidden><div class="box" style="width:min(720px,100%)"><h3 data-t="Credits and Pro">Credits and Pro</h3><p class="hint" id="payIntro"></p>
   <div class="plans" id="payPlans"></div>
   <div class="status" id="payStatus"></div>
@@ -4859,6 +5022,47 @@ Object.assign(I18N.RU, {
 Object.assign(I18N.RU, {
   'Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.': 'Отправь файл тому, кто тебя пригласил, — загрузить его за тебя займёт минуту. Или нажми кнопку с жуком (на телефоне — вверху экрана, на компьютере — в углу) и опиши, что случилось.',
   'Hutka': 'Hutka', 'Previous corner': 'Предыдущий поворот', 'Next corner': 'Следующий поворот', 'Place': 'Место', 'More': 'Ещё', 'Play': 'Воспроизвести', 'Lap position': 'Позиция на круге' });
+
+// v35 preview — Hutka AI: the four one-tap answers, the ideal lap in kart lengths, a new track off the map
+Object.assign(I18N.RU, {
+  'Flat out, no lift': 'В пол, без сброса', 'Brake {n} {k} before the turn-in': 'Тормоз за {n} {k} до входа', 'Brake {n} {k} after the turn-in': 'Тормоз через {n} {k} после входа', 'Brake at the turn-in': 'Тормоз на входе',
+  'Lift {n} {k} before the turn-in': 'Сброс газа за {n} {k} до входа', 'Lift {n} {k} after the turn-in': 'Сброс газа через {n} {k} после входа', 'Lift at the turn-in': 'Сброс газа на входе',
+  'off the brake {n} {k} before the apex': 'отпусти тормоз за {n} {k} до апекса', 'off the brake {n} {k} after the apex': 'отпусти тормоз через {n} {k} после апекса', 'off the brake at the apex': 'отпусти тормоз у апекса',
+  'gas {n} {k} before the apex': 'газ за {n} {k} до апекса', 'gas {n} {k} after the apex': 'газ через {n} {k} после апекса', 'gas at the apex': 'газ у апекса',
+  'full throttle {n} {k} before the apex': 'в пол за {n} {k} до апекса', 'full throttle {n} {k} after the apex': 'в пол через {n} {k} после апекса', 'full throttle at the apex': 'в пол у апекса',
+  'the fastest take it flat — you brake': 'быстрые едут в пол — ты тормозишь', 'the fastest take it flat — you lift': 'быстрые едут в пол — ты сбрасываешь', 'the fastest only lift here — you brake': 'быстрые тут только сбрасывают — ты тормозишь', 'the fastest brake here — you stay flat': 'быстрые тут тормозят — ты едешь в пол',
+  'you start slowing {n} {k} earlier': 'замедляешься на {n} {k} раньше', 'you start slowing {n} {k} later': 'замедляешься на {n} {k} позже', 'back on the gas {n} {k} later': 'газ на {n} {k} позже', 'back on the gas {n} {k} earlier': 'газ на {n} {k} раньше',
+  'kart length|kart lengths': 'корпус|корпуса|корпусов',
+  'The chat is being connected. The ideal lap already works.': 'Чат подключается. Идеальный круг уже работает.',
+  'No chats yet. Ask anything about karting, or tap one of the four buttons.': 'Чатов пока нет. Спроси что угодно про картинг или нажми одну из четырёх кнопок.',
+  'Tap a button above, or ask anything: how to take a corner, why you lose time, how to drive a track you have never been to.': 'Нажми кнопку выше или спроси что угодно: как проходить поворот, где теряешь время, как ехать трассу, на которой ни разу не был.',
+  'Sign in to chat — the buttons above work without it.': 'Войди, чтобы писать в чат, — кнопки выше работают и без входа.',
+  'Free beta · {u}/{d} today': 'Бесплатная бета · {u}/{d} сегодня', '{n} credits left': 'Осталось кредитов: {n}', 'Ask anything about karting…': 'Спроси что угодно про картинг…', 'The chat is being connected': 'Чат подключается',
+  'Reading the fastest laps…': 'Читаю самые быстрые круги…', 'No layouts yet.': 'Конфигураций пока нет.',
+  'This layout has no line yet — nobody has uploaded a lap on it and it has no drawing. Upload a session there, or try New track.': 'У этой конфигурации пока нет линии: на ней никто не загружал круги и нет схемы. Загрузи там сессию или попробуй «Новая трасса».',
+  'Real laps here: {n} · drivers: {d} · best {b}': 'Реальных кругов: {n} · пилотов: {d} · лучший {b}',
+  'Too few laps here yet: built from similar corners of other layouts ({n}) — a forecast, check it on track': 'Здесь пока мало кругов: собрано из похожих поворотов других конфигураций ({n}) — это прогноз, проверь на трассе',
+  'back on the gas': 'газ', 'the same points, but slower through': 'те же точки, но проезжаешь медленнее', 'Braking zone': 'тормоз', 'Lift zone': 'сброс газа', 'Your racing AI: it knows your sessions and the fastest laps on Hutka': 'Твой гоночный ИИ: знает твои сессии и самые быстрые круги на Hutka', 'Flat-out corner': 'в пол', 'Ask Hutka AI about this lap': 'Спросить Hutka AI про этот круг',
+  'Go through the ideal lap of {name}: where do the fastest drivers gain the most, and what should I focus on?': 'Разбери идеальный круг {name}: где быстрые выигрывают больше всего и на чём мне сосредоточиться?',
+  'How would you drive {name}? It has not been driven on Hutka yet.': 'Как бы ты проехал {name}? На Hutka тут ещё никто не ездил.',
+  'Ideal lap · {name}': 'Идеальный круг · {name}', 'Sign in to see your sessions.': 'Войди, чтобы увидеть свои сессии.', 'My last session': 'Моя последняя сессия', 'No sessions yet.': 'Сессий пока нет.',
+  'Your passes are close to your best in every corner.': 'В каждом повороте ты близок к своим лучшим проездам.', 'main thing to fix': 'главное, что исправить',
+  'Sign in to see your progress.': 'Войди, чтобы увидеть свой прогресс.', 'My progress': 'Мой прогресс', '{n} sessions on {l} layouts': 'Сессий: {n} · конфигураций: {l}', 'PB {t}': 'Рекорд {t}',
+  '{d} s faster than your first session here ({n} sessions)': 'На {d} с быстрее первой сессии здесь (сессий: {n})', '{d} s slower than your first session here ({n} sessions)': 'На {d} с медленнее первой сессии здесь (сессий: {n})',
+  'One session so far': 'Пока одна сессия', 'Tap a layout to see its ideal lap.': 'Нажми на конфигурацию — покажу её идеальный круг.', 'How is my progress going, and what should I work on next?': 'Как идёт мой прогресс и над чем работать дальше?',
+  'Name the track, paste a map link or coordinates, use where you are now, or send a photo of the track map.': 'Напиши название трассы, вставь ссылку на карту или координаты, возьми текущее место или пришли фото схемы трассы.',
+  'Track name, map link or coordinates': 'Название трассы, ссылка на карту или координаты', 'Find': 'Найти', 'Where I am': 'Где я сейчас',
+  'This device cannot tell where it is.': 'Это устройство не может определить место.', 'No location — allow it, or type the track name.': 'Нет геопозиции — разреши доступ или напиши название трассы.',
+  'Photo of the track map': 'Фото схемы трассы', 'Looking…': 'Ищу…', 'No connection to the map — try again online.': 'Нет связи с картой — попробуй, когда будет интернет.', 'Could not search the map just now — try again in a minute.': 'Карта сейчас не ответила — попробуй через минуту.',
+  'On Hutka · {n} layouts': 'Есть на Hutka · конфигураций: {n}', '{d} km away': '{d} км отсюда', 'Raceway on the map': 'Трасса на карте', 'OpenStreetMap · loop of {m} m': 'OpenStreetMap · круг {m} м',
+  'Found {p}, but no karting raceway is drawn there on OpenStreetMap. Upload a session there and Hutka maps it from your GPS.': 'Нашёл {p}, но трассы для картинга там на OpenStreetMap не нарисовано. Загрузи сессию оттуда — Hutka построит трассу по GPS.',
+  "Nothing found. Try the track's name with the city, or a map link.": 'Ничего не нашёл. Попробуй название трассы с городом или ссылку на карту.',
+  'Reading the photo…': 'Смотрю фото…', 'Could not tell which track this is. Type its name or the city.': 'Не понял, что это за трасса. Напиши её название или город.', 'Looks like {q}': 'Похоже на {q}',
+  'Anticlockwise': 'Против часовой', 'Show the ideal lap': 'Показать идеальный круг', 'Which layout?': 'Какая конфигурация?', 'you drove it': 'ты ездил', 'real laps': 'есть круги', 'forecast': 'прогноз', 'Change': 'Сменить', 'On Hutka, but nobody has uploaded a lap there yet': 'Есть на Hutka, но кругов там ещё никто не загружал', 'This loop cannot be read as a track.': 'Этот контур не получается прочитать как трассу.',
+  'Hutka AI': 'Hutka AI', 'Your racing AI: it knows your sessions and how the fastest drivers on Hutka take every corner': 'Твой гоночный ИИ: знает твои сессии и как самые быстрые пилоты Hutka проходят каждый поворот',
+  'Where to brake and get back on the gas, on any layout': 'Где тормозить и где газ — на любой конфигурации', 'Where the time goes and what to change': 'Где теряешь время и что поменять',
+  'What got better and what to work on next': 'Что стало лучше и над чем работать дальше', 'A photo, a link or a place: the line for a track you have never driven': 'Фото, ссылка или место — и как ехать трассу, где ты ещё не был',
+  'Hutka AI can make mistakes — check it on track.': 'Hutka AI может ошибаться — проверяй на трассе.' });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -5744,7 +5948,7 @@ const STORE = (() => {
   async function setReport(id, status) { ok(await adapter.sb.from('reports').update({ status }).eq('id', id)); }
   async function deleteReport(id) { ok(await adapter.sb.from('reports').delete().eq('id', id)); }
   async function ask(o) {
-    const r = await fnCall('ask', { chat_id: o.chatId || undefined, session_id: o.sessionId || undefined, track_id: o.trackId || undefined, layout_id: o.layoutId || undefined, title: o.title || undefined, system: o.system || '', text: o.text, lang: I18N.lang }, { signal: o.signal });
+    const r = await fnCall('ask', { chat_id: o.chatId || undefined, session_id: o.sessionId || undefined, track_id: o.trackId || undefined, layout_id: o.layoutId || undefined, title: o.title || undefined, system: o.system || '', text: o.text, lang: I18N.lang, kb: o.kb ? 1 : undefined }, { signal: o.signal });
     if (!r.ok) throw await errOf(r);
     const chatId = Number(r.headers.get('x-chat-id')) || o.chatId || null, credits = r.headers.get('x-credits'), plan = r.headers.get('x-plan'), usedDay = r.headers.get('x-used-day'), limitDay = r.headers.get('x-limit-day');
     // the whole answer in one JSON reply (default): reveal it progressively so it reads like it is being typed
@@ -5758,6 +5962,11 @@ const STORE = (() => {
     walletCache = null;
     return { text, chatId, credits: credits ? Number(credits) : null, plan, usedDay: usedDay ? Number(usedDay) : null, limitDay: limitDay ? Number(limitDay) : null };
   }
+  // the racing brain's stored atlases (brain_atlas: one compact row per layout and kart class; anyone reads them, an admin writes them)
+  async function brainRows(cls) { if (!adapter || !adapter.sb) return null; try { const r = await adapter.sb.from('brain_atlas').select('key,sig,data,updated_at').eq('cls', cls || 'rental').limit(2000); if (r.error) return null; return r.data || []; } catch (e) { return null; } }
+  async function brainSave(row) { if (!adapter || !adapter.sb || !me.canEdit) return false; try { const r = await adapter.sb.from('brain_atlas').upsert(row); return !r.error; } catch (e) { return false; } }
+  // a photo of a track map → which track it is ({ name, city, country, sure }): the ask function's vision lane — not kept as a chat message
+  async function identifyTrack(b64, mime) { const r = await fnCall('ask', { purpose: 'identify_track', image: b64, media_type: mime || 'image/jpeg', lang: I18N.lang }); if (!r.ok) throw await errOf(r); const j = await r.json(); return j && j.track ? j.track : null; }
   // admin: what the coach costs — per day and per driver (the SQL functions return nothing for non-admins)
   async function aiUsage(days) { if (!aiCfg() || !me.canEdit) return null; try { const [d, u] = await Promise.all([adapter.sb.rpc('ai_usage', { days: days || 30 }), adapter.sb.rpc('ai_usage_by_user', { days: days || 30 })]); if (d.error) return null; return { days: d.data || [], users: (u.data || []) }; } catch (e) { return null; } }
   async function checkout(kind) { const r = await fnCall('stripe-checkout', { kind, return_url: location.origin + location.pathname }); if (!r.ok) throw await errOf(r); return r.json(); }
@@ -5788,7 +5997,7 @@ const STORE = (() => {
     mySessions, mySessionsStrict, mySessionsKnown, hasData, ensureTracks, live, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, outboxAdd, outboxAll, outboxDel, outboxPut, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, marks, markOf, setMark, removeMark, get marksOn() { return marksOk !== false && !!(adapter && adapter.marksOf && me.id); }, visit, adminVisits, track, adminAnalytics,
     profile, profileStrict, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
-    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); }, deviceLog: async (o) => { if (!adapter || !adapter.deviceLog) throw new Error('not configured'); if (!me.id) throw new Error('sign in'); return adapter.deviceLog(o); } };
+    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, identifyTrack, brainRows, brainSave, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); }, deviceLog: async (o) => { if (!adapter || !adapter.deviceLog) throw new Error('not configured'); if (!me.id) throw new Error('sign in'); return adapter.deviceLog(o); } };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
 // optional model line, and (for the admin editor) the traced control points. Pan, smooth zoom, rotation, hover and click. ----------
@@ -6401,7 +6610,7 @@ async function route() {
     else if (name === 'lab') await LAB.show(r.a, r.b);
     else if (name === 'profile') await renderProfile();
     else if (name === 'driver') await renderDriverPage(r.a);
-    else if (name === 'ai') await renderAIPage(r.a, r.b);
+    else if (name === 'ai') { if (HAI.on()) await HAI.render(r.a, r.b); else { HAI.off(); await renderAIPage(r.a, r.b); } }   // admins: the new Hutka AI page (v35 preview)
     else if (name === 'admin') await ADMIN.show(r.a, r.b);
     else if (name === 'help') renderHelpPage();
     else if (name === 'activity') await renderActivity();
@@ -6679,7 +6888,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.30';
+const APP_VERSION = 'v34.31';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -7249,6 +7458,271 @@ async function renderSessionsTable(box, pubs, subEl) {
   for (const s of pubs) { const tr = STORE.getTrack(s.track); const ls = s.track ? await STORE.getLayouts(s.track) : []; const l = ls.find(x => x.id === s.layout); const r = el('tr'); r.innerHTML = `<td style="white-space:normal">${esc(tr ? tr.name : t('Custom'))}${l ? ' · ' + esc(l.name) : ''}</td><td style="white-space:normal">${esc(s.label || s.name)}</td><td>${esc(fmtDate(s.date))}</td><td class="num">${s.nLaps} (${s.cleanLaps})</td><td class="num">${fmtMs(s.bestMs)}</td><td class="num">${fmtMs(s.avgMs)}</td><td><div class="row"><a class="btn xs" href="#lab~${esc(s.id)}">${t('Open')}</a>${s.owner === STORE.me.id ? '' : `<a class="btn xs" href="#lab~${esc(s.id)}~cmp">${t('Compare with mine')}</a>`}</div></td>`; body.appendChild(r); }
   tb.appendChild(body); respTable(tb); wrap.appendChild(tb); box.appendChild(wrap);
 }
+// ---------- the racing brain: what the fastest real passes teach, carried over to layouts nobody has driven ----------
+// Not a physics model: every number comes from laps drivers uploaded. A layout's "corner atlas" keeps, for every corner, its shape (turn
+// angle, radius, the straights before and after, the neighbour it is linked with) and the fastest real passes through it (brake or lift
+// and how far before the apex, apex speed and how late, throttle point, exit speed, the speed trace around the apex). A layout nobody has
+// driven is read corner by corner against the atlases: each corner takes the behaviour of the most similar real corners, and the speed
+// between corners follows how real karts accelerate and brake (measured on the same laps). The atlas is built once per session upload
+// and stays small (a few passes per corner); a prediction reads atlases only, so it costs the same with ten sessions or ten thousand.
+const BRAIN = (() => {
+  // PLAT: the slow part of a corner — where the kart is within 6 % of its apex speed; KART: one kart length (m), the unit drivers think in
+  const VER = 2, K_TOP = 8, PROF = { from: -80, to: 80, step: 4 }, PLAT = 0.06, KART = 2;
+  const fwd = (a, b, N) => ((b - a) % N + N) % N;
+  const fin = (x) => typeof x === 'number' && isFinite(x);
+  const med = (arr) => { const s = arr.filter(fin).sort((p, q) => p - q); return s.length ? s[Math.floor(s.length / 2)] : NaN; };
+  const pct = (arr, f) => { const s = arr.filter(fin).sort((p, q) => p - q); return s.length ? s[Math.min(s.length - 1, Math.floor(s.length * f))] : NaN; };
+  const r1 = (x) => fin(x) ? Math.round(x * 10) / 10 : null, r2 = (x) => fin(x) ? Math.round(x * 100) / 100 : null;
+
+  // ---- the shape of every corner of a line: what a corner is, wherever it is
+  // theta: how far the line turns (degrees, the whole bend); Rmin: the tightest radius (m); arc: the bending length; Lin / Lout: the
+  // straight before and after (from the end of one bend to the start of the next); prev / next: the neighbour's hand and turn and how
+  // close it is — a corner linked to the next one (an S, a double apex) is driven differently from the same corner alone
+  function describe(tr, wins) {
+    const N = tr.N, ds = tr.ds, ks = DATA.trackCurv(tr), n = wins.length;
+    const ext = wins.map((w) => ({ s: (w.a + w.g0) % N, e: (w.a + w.g1) % N }));
+    const turn = wins.map((w) => { let th = 0; for (let q = w.g0; q <= w.g1; q++) th += ks[(w.a + q) % N] * ds; return Math.abs(th) * 180 / Math.PI; });
+    return wins.map((w, k) => {
+      const p = (k - 1 + n) % n, x = (k + 1) % n;
+      const Lin = fwd(ext[p].e, ext[k].s, N) * ds, Lout = fwd(ext[k].e, ext[x].s, N) * ds;
+      return { n: w.n, dir: w.dir, theta: turn[k], Rmin: Math.min(400, w.Rmin), arc: w.arc, Lin, Lout,
+        prev: { same: wins[p].dir === w.dir, theta: turn[p], gap: Lin }, next: { same: wins[x].dir === w.dir, theta: turn[x], gap: Lout } };
+    });
+  }
+
+  // ---- one lap through one corner window, read as the Lab reads it (DATA.windowMetrics), plus the points as a driver sees them: where
+  // the slowing starts against the turn-in (the start of the bend); where the brake comes off, where the throttle goes back on and where
+  // the kart is flat out again, against the apex. GPS sees speed, not pedals: "throttle on" is where the kart stops losing speed (after
+  // the hardest slowing, under 0.5 m/s² for 3 m) — the foot is on the gas by then, and with the fastest drivers that is at the apex or
+  // before it, as they say themselves; "flat out" is where it clearly gains speed (over 0.4 m/s² for 5 m, the Lab's throttle point)
+  function reading(P, w, tr) {
+    const m = DATA.windowMetrics(P, w, tr), ds = tr.ds, N = tr.N, at = (k) => ((w.a + k) % N + N) % N, n3 = Math.max(1, Math.round(3 / ds));
+    const kind = m.kind === 'ease' ? 'lift' : m.kind;
+    const inK = m.kind === 'brake' ? m.bk : m.kind === 'lift' ? m.lk : m.kind === 'ease' ? m.ek : null;
+    let gk = null;
+    if (inK !== null) { let kh = inK; for (let k = inK; k <= m.apK; k++) if (P.a[at(k)] < P.a[at(kh)]) kh = k; for (let k = kh; k <= m.apK + n3 && gk === null; k++) { let ok = true; for (let q = 0; q < n3 && ok; q++) ok = P.a[at(k + q)] >= -0.5; if (ok) gk = k; } if (gk === null) gk = m.apK; }
+    const fk = m.tk >= 0 ? m.tk : null;
+    // the slow part (within PLAT of the apex speed) and the hard slowing before it: its own deceleration, what the brake (or the lift) does
+    let kp = m.apK; const k0 = inK === null ? m.apK : inK; while (kp > k0 && P.v[at(kp - 1)] <= (1 + PLAT) * m.vApex) kp--;
+    const vIn = inK === null ? m.vApex : P.v[at(inK)], vP = P.v[at(kp)], dHard = inK === null ? 0 : (kp - inK) * ds;
+    const decel2 = inK !== null && dHard > 2 && vIn > vP + 0.3 ? (vIn * vIn - vP * vP) / (2 * dHard) : NaN;
+    const { tin, tout } = bend(w, tr);
+    const rel = { in: inK === null ? null : (inK - tin) * ds, off: m.rk >= 0 ? (m.rk - w.apK) * ds : null, min: (m.apK - w.apK) * ds, thr: gk === null ? null : (gk - w.apK) * ds, full: fk === null ? null : (fk - w.apK) * ds };
+    return { m, kind, inK, decel2, rel, tinS: at(tin) * ds, toutS: at(tout) * ds };
+  }
+  // the corner proper, as a driver sees it: from where the line bends at a third of the corner's tightest (the turn-in) to where it
+  // straightens to it again (the end of the bend); stations from the window start, and the same three points in metres from the S/F
+  function bend(w, tr) {
+    const N = tr.N, ds = tr.ds, at = (k) => ((w.a + k) % N + N) % N, ks = DATA.trackCurv(tr), kap = (k) => Math.abs(ks[at(k)]);
+    let kpk = 0; for (let k = w.g0; k <= w.g1; k++) kpk = Math.max(kpk, kap(k));
+    let tin = w.apK; while (tin > 0 && kap(tin - 1) >= kpk / 3) tin--;
+    let tout = w.apK; while (tout < w.len && kap(tout + 1) >= kpk / 3) tout++;
+    return { tin, tout, tinS: at(tin) * ds, geoS: at(w.apK) * ds, toutS: at(tout) * ds };
+  }
+  // ---- one lap through one corner, in terms that carry over to another corner: distances from the speed minimum and from the corner's
+  // own landmarks, never from the S/F
+  function passOf(P, w, tr) {
+    const r = reading(P, w, tr), m = r.m, ds = tr.ds, N = tr.N;
+    const dIn = r.inK === null ? NaN : (m.apK - r.inK) * ds;
+    const drop = m.vEntry - m.vApex, decel = fin(dIn) && dIn > 2 && drop > 0.3 ? (m.vEntry * m.vEntry - m.vApex * m.vApex) / (2 * dIn) : 0;
+    const prof = []; for (let off = PROF.from; off <= PROF.to; off += PROF.step) prof.push(r1(P.v[((w.apex + Math.round(off / ds)) % N + N) % N]));
+    return { time: m.time, kind: r.kind, vEntry: m.vEntry, vApex: m.vApex, vExit: m.vExit, dApex: (m.apK - w.apK) * ds, dIn, decel, decel2: r.decel2, dThr: m.tk >= 0 ? (m.tk - m.apK) * ds : NaN, gmax: m.gmax, prof, rel: r.rel };
+  }
+  // the kart's pull at any speed from one or more sets of accelBins (the middle of them; empty bins take the neighbour's)
+  function pullFrom(binsList) {
+    const k = new Float64Array(36);
+    for (let b = 0; b < 36; b++) { const xs = binsList.map(B => B && B[b]).filter(Boolean).map(x => x.k); k[b] = xs.length ? med(xs) : NaN; }
+    let last = NaN; for (let b = 35; b >= 0; b--) { if (fin(k[b])) last = k[b]; else k[b] = last; }
+    last = NaN; for (let b = 0; b < 36; b++) { if (fin(k[b])) last = k[b]; else k[b] = fin(last) ? last : 0.05; }
+    return (v) => k[Math.max(0, Math.min(35, Math.floor(v)))];
+  }
+
+  // ---- how real karts gain speed: dv/ds at each speed (1 m/s bins), the 80th percentile of the laps' own acceleration where they are
+  // clearly on the throttle — the kart's pull, not the driver's hesitation
+  function accelBins(projs) {
+    const bins = Array.from({ length: 36 }, () => []);
+    for (const P of projs) for (let i = 0; i < P.N; i++) { const a = P.a[i], v = P.v[i]; if (a > 0.4 && v > 3) { const b = Math.floor(v); if (b < bins.length) bins[b].push(a / v); } }
+    return bins.map(b => b.length >= 8 ? { k: pct(b, 0.8), n: b.length } : null);
+  }
+
+  // ---- the atlas of one layout from the laps driven on it: entries [{ P (the lap projected on this layout's line), sid, owner, driver, lap }]
+  function atlas(G, entries, meta) {
+    const tr = G.track, N = tr.N, ds = tr.ds;
+    const good = entries.filter(e => e.P && e.P.lost <= 0.12).sort((a, b) => a.P.T - b.P.T); if (!good.length) return null;   // (the Lab's own off-layout limit)
+    const ref = good[0].P, apx = GEOM.apexes(G, ref), wins = DATA.cornerWindows(tr, ref, apx, G.corners.R); if (wins.length < 2) return null;
+    const desc = describe(tr, wins), tops = good.slice(0, 12).map(e => e.P), accel = accelBins(tops);
+    const corners = wins.map((w, k) => {
+      const passes = good.map(e => Object.assign(passOf(e.P, w, tr), { sid: e.sid, owner: e.owner, driver: e.driver, lap: e.lap })).filter(p => fin(p.time) && p.time > 0).sort((a, b) => a.time - b.time);
+      // the top is the best of several drivers: at most three passes of one driver
+      const top = [], per = {}; for (const p of passes) { const who = p.owner || p.driver || '?'; per[who] = (per[who] || 0) + 1; if (per[who] > 3) continue; top.push(p); if (top.length >= K_TOP) break; }
+      const b = bend(w, tr);
+      return { n: w.n, apexS: w.apex * ds, lm: { tinS: b.tinS, geoS: b.geoS, toutS: b.toutS }, desc: desc[k], top, count: passes.length };
+    });
+    const A = Object.assign({ v: VER, key: `${G.tid}|${G.lid}`, tid: G.tid, lid: G.lid, lengthM: N * ds, laps: good.length, drivers: new Set(good.map(e => e.owner || e.driver)).size,
+      best: good[0].P.T, vtop: pct(tops.map(P => Math.max(...P.v)), 0.5), accel, corners, built: Date.now() }, meta || {});
+    Object.defineProperty(A, '_wins', { value: wins, enumerable: false });   // the windows, for reading other laps the same way
+    if (meta && meta.refSid) A.refSid = meta.refSid;
+    A.N = N;
+    return A;
+  }
+
+  // ---- how alike two corners are (0 = the same): the turn, the radius, the straights around it, the linked neighbours
+  const SCALE = { T: 22, R: 0.35, I: 0.45, O: 0.6, L: 0.9 };
+  function distance(a, b, sc) {
+    sc = sc || SCALE;
+    const dT = (a.theta - b.theta) / sc.T, dR = Math.log(Math.max(4, a.Rmin) / Math.max(4, b.Rmin)) / sc.R;
+    const dI = (Math.log(a.Lin + 20) - Math.log(b.Lin + 20)) / sc.I, dO = (Math.log(a.Lout + 20) - Math.log(b.Lout + 20)) / sc.O;
+    const link = (x) => x.gap < 30 ? (x.same ? 1 : -1) : 0;
+    const dL = (link(a.prev) !== link(b.prev) ? sc.L : 0) + (link(a.next) !== link(b.next) ? sc.L : 0);
+    return Math.sqrt(dT * dT + dR * dR + dI * dI + dO * dO + dL * dL);
+  }
+  // the way in and the way out of a pass, measured from its speed minimum (metres): speeds every PROF.step metres, back to where the
+  // slowing starts and on to where the kart stops gaining speed
+  function curves(p) {
+    const n = p.prof.length, at = (off) => { const f = (off - PROF.from) / PROF.step, j = Math.floor(f); if (j < 0 || j + 1 >= n) return NaN; const a = p.prof[j], b = p.prof[j + 1]; return a === null || b === null ? NaN : a + (b - a) * (f - j); };
+    const d0 = fin(p.dApex) ? p.dApex : 0, out = [], inn = [];
+    for (let k = 0; ; k++) { const v = at(d0 + k * PROF.step); if (!fin(v) || (k > 1 && v < out[k - 1] - 0.05)) break; out.push(v); }
+    for (let k = 0; ; k++) { const v = at(d0 - k * PROF.step); if (!fin(v) || (k > 1 && v < inn[k - 1] - 0.05)) break; inn.push(v); }
+    return { out, inn };
+  }
+  // what the fastest drivers do in a corner: the middle of the three fastest passes, the pedal most of them use
+  function represent(c) {
+    const top = c.top.slice(0, 3); if (!top.length) return null;
+    const votes = {}; for (const p of top) votes[p.kind] = (votes[p.kind] || 0) + 1;
+    const kind = Object.keys(votes).sort((a, b) => votes[b] - votes[a])[0], same = top.filter(p => p.kind === kind);
+    // the curves of the three, each as a share of its own apex speed, the middle at every step
+    const cs = top.map(p => { const c2 = curves(p), va = p.vApex || 1; return { out: c2.out.map(x => x / va), inn: c2.inn.map(x => x / va) }; });
+    const midCurve = (key) => { const L = Math.max(...cs.map(c2 => c2[key].length)), r = []; for (let k = 0; k < L; k++) { const xs = cs.map(c2 => c2[key][k]).filter(fin); if (xs.length < Math.min(2, cs.length)) break; r.push(med(xs)); } return r; };
+    const relMed = (f, from) => { const xs = from.map(p => p.rel && p.rel[f]).filter(fin); return xs.length ? med(xs) : null; };
+    return { kind, vApex: med(top.map(p => p.vApex)), vEntry: med(top.map(p => p.vEntry)), vExit: med(top.map(p => p.vExit)), dApex: med(top.map(p => p.dApex)),
+      dIn: med(same.map(p => p.dIn)), decel: med(same.map(p => p.decel)), decel2: med(same.map(p => p.decel2)), dThr: med(top.map(p => p.dThr)), time: med(top.map(p => p.time)), out: midCurve('out'), inn: midCurve('inn'),
+      rel: { in: kind === 'flat' ? null : relMed('in', same), off: kind === 'brake' ? relMed('off', same) : null, min: relMed('min', top), thr: kind === 'flat' ? null : relMed('thr', same), full: relMed('full', top) } };
+  }
+
+  // ---- a layout read against the atlases. G: the target line (a GEOM geometry, or any track built by KLL.buildTrack with G.corners.R);
+  // atlases: the corner atlases to learn from (the target's own is left out when opts.exclude names it). Returns, per corner, the pedal
+  // and its point, the apex speed and where, the throttle point and the exit, with the real corners it was taken from, plus the speed
+  // trace of the whole lap and its time
+  function predict(G, atlases, opts) {
+    opts = opts || {};
+    const tr = G.track, N = tr.N, ds = tr.ds, ks = DATA.trackCurv(tr);
+    const books = atlases.filter(A => A && A.key !== opts.exclude && (!opts.cls || (A.cls || 'rental') === opts.cls) && (!opts.only || opts.only(A)));
+    const pool = []; for (const A of books) for (const c of A.corners) { const rep = c.rep || (c.top && c.top.length ? represent(c) : null); if (rep) pool.push({ A, c, rep }); }
+    if (!pool.length) return null;
+    // the kart: how it pulls (dv/ds by speed, the atlases together) and its top speed
+    const pull = pullFrom(books.map(A => A.accel)), vtop = opts.vtop || med(books.map(A => A.vtop));
+    const dvds = (v) => v >= vtop ? 0 : pull(v);
+    // the apex speed against the radius over every corner learnt from (v = c·R^p): what a corner unlike any of them falls back to
+    let fit = null; { const xs = [], ys = []; for (const x of pool) if (x.rep.vApex > 3) { xs.push(Math.log(Math.max(4, x.c.desc.Rmin))); ys.push(Math.log(x.rep.vApex)); }
+      if (xs.length >= 6) { const n = xs.length, mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n; let sxy = 0, sxx = 0; for (let i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; } const p = sxx > 1e-9 ? Math.max(0.15, Math.min(0.6, sxy / sxx)) : 0.35; fit = { p, c: Math.exp(my - p * mx) }; } }
+    const vFit = (R) => fit ? fit.c * Math.pow(Math.max(4, R), fit.p) : NaN;
+    // the corners of the target: a first speed guess (the radius at a typical grip, real acceleration and braking) only to place the
+    // corner windows, as the Lab places them on a real lap
+    const apx = opts.apexes || GEOM.apexes(G, null);
+    const v0 = new Float64Array(N); for (let i = 0; i < N; i++) v0[i] = Math.min(vtop, Math.sqrt(11 / Math.max(1e-4, Math.abs(ks[i]))));
+    kinematics(v0, N, ds, dvds, () => 6, vtop);
+    const P0 = { v: v0 }, wins = DATA.cornerWindows(tr, P0, apx, G.corners.R); if (wins.length < 2) return null;
+    const desc = describe(tr, wins);
+    const K = opts.k || 5;
+    const plan = wins.map((w, k) => {
+      const d = desc[k], near = pool.map(x => ({ x, dist: distance(d, x.c.desc, opts.scale) })).sort((a, b) => a.dist - b.dist).slice(0, K);
+      const wt = near.map(s => Math.exp(-s.dist * s.dist / 2) + 1e-6), W = wt.reduce((a, b) => a + b, 0);
+      const avg = (f) => { let s = 0, ww = 0; near.forEach((s2, j) => { const v = f(s2); if (fin(v)) { s += v * wt[j]; ww += wt[j]; } }); return ww ? s / ww : NaN; };
+      // the apex speed: how much faster or slower than the radius alone says the similar corners were driven, carried over to this radius;
+      // the less alike they are, the more the radius alone decides
+      const W0 = 0.15; let rs = 0, rw = 0; near.forEach((s, j) => { const f = vFit(s.x.c.desc.Rmin); if (fin(f) && f > 0) { rs += wt[j] * s.x.rep.vApex / f; rw += wt[j]; } });
+      const vApex = fit ? vFit(d.Rmin) * (rs + W0) / (rw + W0) : avg(s => s.x.rep.vApex * Math.max(0.85, Math.min(1.18, Math.sqrt(Math.max(4, d.Rmin) / Math.max(4, s.x.c.desc.Rmin)))));
+      const votes = {}; near.forEach((s, j) => { votes[s.x.rep.kind] = (votes[s.x.rep.kind] || 0) + wt[j]; });
+      const kind = Object.keys(votes).sort((a, b) => votes[b] - votes[a])[0];
+      const decel = avg(s => s.x.rep.kind === kind ? (fin(s.x.rep.decel2) ? s.x.rep.decel2 : s.x.rep.decel) : NaN);
+      // the way in and out: the similar corners' curves (shares of their apex speed), weighted, step by step while most of them still reach
+      const mixCurve = (key) => { const r = []; for (let k = 0; ; k++) { let s2 = 0, ww = 0, have = 0; near.forEach((s3, j) => { const x = s3.x.rep[key][k]; if (fin(x)) { s2 += x * wt[j]; ww += wt[j]; have++; } }); if (have < Math.max(1, Math.ceil(near.length / 2))) break; r.push(s2 / ww); } return r; };
+      // the points straight from the similar corners (each against its own turn-in, apex, end of bend): the weighted middle
+      const wmed = (xs) => { const a = xs.filter(q => fin(q.x)).sort((p, q) => p.x - q.x); if (!a.length) return null; const tot = a.reduce((u, q) => u + q.w, 0); let acc = 0; for (const q of a) { acc += q.w; if (acc >= tot / 2) return q.x; } return a[a.length - 1].x; };
+      const relT = {}; for (const f of ['in', 'off', 'min', 'thr', 'full']) relT[f] = wmed(near.map((s, j) => ({ x: s.x.rep.rel && (f === 'in' || f === 'off' ? (s.x.rep.kind === kind ? s.x.rep.rel[f] : null) : s.x.rep.rel[f]), w: wt[j] })));
+      if (kind === 'flat') { relT.in = null; relT.off = null; relT.thr = null; } if (kind !== 'brake') relT.off = null;
+      return { n: w.n, w, desc: d, kind, relT, vApex: Math.min(vtop, vApex), decel: fin(decel) && decel > 0.2 ? decel : (kind === 'brake' ? 6 : 1.5), dApex: avg(s => s.x.rep.dApex), dThr: avg(s => s.x.rep.dThr), out: mixCurve('out'), inn: mixCurve('inn'),
+        conf: W / near.length, from: near.slice(0, 3).map(s => ({ key: s.x.A.key, name: s.x.A.name || s.x.A.key, n: s.x.c.n, dist: r2(s.dist), kind: s.x.rep.kind, vApex: r1(s.x.rep.vApex * 3.6) })) };
+    });
+    // the lap: every apex at its carried-over speed (where the similar corners had their speed minimum), real acceleration out of it, the
+    // carried-over braking into the next one
+    const v = new Float64Array(N).fill(vtop), cap = new Float64Array(N).fill(Infinity), dec = new Float64Array(N);
+    for (const c of plan) {
+      const i = ((c.w.apex + Math.round((fin(c.dApex) ? c.dApex : 0) / ds)) % N + N) % N; c.at = i; cap[i] = Math.min(cap[i], c.vApex);
+      if (opts.points) continue;   // (the plain version: the apex speed only, real acceleration and braking around it)
+      const put = (curve, sgn) => { for (let k = 1; k < curve.length; k++) for (let q = 0; q < Math.round(PROF.step / ds); q++) { const dk = k - 1 + (q + 1) / Math.round(PROF.step / ds), j = ((i + sgn * Math.round(dk * PROF.step / ds)) % N + N) % N, f = dk - Math.floor(dk), a = curve[Math.floor(dk)], b = curve[Math.min(curve.length - 1, Math.floor(dk) + 1)]; const vv = c.vApex * (a + (b - a) * f); if (vv < cap[j]) cap[j] = vv; } };
+      // the way out as the similar corners have it; of the way in only the slow part — before it the kart slows at the carried-over rate
+      const plat = []; for (const x of c.inn) { if (x > 1 + PLAT) break; plat.push(x); }
+      put(c.out, 1); put(plat, -1);
+    }
+    // the braking that applies at a station is the one of the next corner ahead
+    { const order = plan.slice().sort((a, b) => a.at - b.at); for (let i = 0; i < N; i++) { let nx = order.find(c => c.at >= i); if (!nx) nx = order[0]; dec[i] = nx.decel; } }
+    for (let i = 0; i < N; i++) v[i] = Math.min(v[i], cap[i]);
+    kinematics(v, N, ds, dvds, (i) => dec[i], vtop);
+    // the predicted lap as the Lab reads a real one (the same corner reading: where the slowing starts and how hard — brake, lift or a
+    // breath —, the apex, where the speed picks up, the exit), so its points mean what the points of a real lap mean
+    const t = new Float64Array(N + 1); for (let i = 0; i < N; i++) t[i + 1] = t[i] + ds / Math.max(1, v[i]);
+    const T = t[N], P = { key: 'brain', N, ds, T, v, t, o: new Float64Array(N), x: tr.cx, y: tr.cy, a: DATA.accelFrom(v, N, ds), g: Float64Array.from(v, (x, i) => x * x * Math.abs(ks[i]) / 9.81), lost: 0, lap: null, brain: true };
+    const L = N * ds;
+    for (const c of plan) {
+      const rd = reading(P, c.w, tr), m = rd.m; c.m = m; c.rel = rd.rel; c.tinS = rd.tinS; c.toutS = rd.toutS; c.geoS = c.w.apex * ds;
+      c.pedal = rd.kind;
+      // the points to tell: where the slowing starts and where the brake comes off — the middle of what the lap's own trace says and what
+      // the similar corners did (each alone is off by about 4 kart lengths, the middle by about 3); throttle and full pull as the similar
+      // corners have them
+      const mid = (a, b) => fin(a) && fin(b) ? (a + b) / 2 : (fin(a) ? a : (fin(b) ? b : null)), T2 = c.relT || {};
+      c.pts = { kind: c.pedal, in: c.pedal === 'flat' ? null : mid(c.rel.in, T2.in), off: c.pedal === 'brake' ? mid(c.rel.off, T2.off) : null, min: fin(T2.min) ? T2.min : c.rel.min, thr: c.pedal === 'flat' ? null : mid(c.rel.thr, T2.thr), full: fin(T2.full) ? T2.full : c.rel.full };
+      c.apexS = m.sApex; c.inS = m.sIn >= 0 ? m.sIn : m.sApex; c.dIn = ((m.sApex - c.inS) % L + L) % L;
+      c.vEntry = m.vEntry; c.vApex = m.vApex; c.vExit = m.vExit; c.thrS = m.sThr >= 0 ? m.sThr : m.sApex; c.time = m.time;
+    }
+    return { T, v, P, plan, vtop, pool: pool.length, books: books.map(A => A.key) };
+  }
+  // the speed trace kept within what a kart can do: forward, no more speed gain than the acceleration measured on real laps; backward,
+  // no later slowing than the braking of the corner ahead. Twice round the loop so the S/F joins up
+  function kinematics(v, N, ds, dvds, decAt, vtop) {
+    for (let r = 0; r < 2; r++) for (let q = 0; q < N; q++) { const i = q, j = (q + 1) % N; const lim = v[i] + dvds(v[i]) * ds; if (v[j] > lim) v[j] = lim; }
+    for (let r = 0; r < 2; r++) for (let q = N - 1; q >= 0; q--) { const j = q, i = (q - 1 + N) % N; const lim = Math.sqrt(v[j] * v[j] + 2 * decAt(i) * ds); if (v[i] > lim) v[i] = lim; }
+    for (let i = 0; i < N; i++) if (v[i] > vtop) v[i] = vtop;
+  }
+
+  // ---- the stored form of an atlas: per corner its shape, landmarks and what the fastest drivers do (the representative of the top
+  // passes, not the passes) plus the corner windows to read a driver's own laps the same way; about 1 kB a corner, whatever the number of
+  // sessions behind it
+  function compact(A) {
+    const r1v = (x) => (fin(x) ? Math.round(x * 100) / 100 : x), rr = (o) => { const out = {}; for (const [k, v] of Object.entries(o || {})) out[k] = Array.isArray(v) ? v.map(r1v) : (v && typeof v === 'object' ? rr(v) : r1v(v)); return out; };
+    const wins = (A._wins || []).map(w => ({ n: w.n, a: w.a, b: w.b, len: w.len, apex: w.apex, apK: w.apK, g0: w.g0, g1: w.g1, dir: w.dir, Rmin: r1v(w.Rmin), exK: w.exK, arc: r1v(w.arc), back: w.back }));
+    return { v: VER, key: A.key, tid: A.tid, lid: A.lid, cls: A.cls || 'rental', name: A.name || '', refSid: A.refSid || null, N: A.N, lengthM: r1v(A.lengthM), laps: A.laps, drivers: A.drivers, best: r1v(A.best), vtop: r1v(A.vtop), accel: A.accel, built: A.built, wins,
+      corners: A.corners.map(c => { const r = represent(c); return { n: c.n, apexS: r1v(c.apexS), lm: rr(c.lm), desc: rr(c.desc), count: c.count, rep: r ? rr(r) : null, drivers: [...new Set(c.top.slice(0, 3).map(p => p.driver || p.owner))] }; }) };
+  }
+  // ---- the ideal of a layout that has been driven: corner by corner, the middle of its fastest real passes (several drivers, at most
+  // three passes each), the points against the corner's landmarks — the reference a prediction is checked against, and what a driver
+  // on that layout is shown
+  function ideal(A) {
+    return A.corners.map(c => { const r = c.rep || represent(c); if (!r) return null; const lm = c.lm || {}; return { n: c.n, desc: c.desc, apexS: c.apexS, tinS: lm.tinS, geoS: fin(lm.geoS) ? lm.geoS : c.apexS, toutS: lm.toutS, vApex: r.vApex, time: r.time, pts: Object.assign({ kind: r.kind }, r.rel), drivers: c.drivers || [...new Set((c.top || []).slice(0, 3).map(p => p.driver || p.owner))] }; }).filter(Boolean);
+  }
+  // where the points of a corner sit on the lap (metres from the S/F): landmarks { tinS, geoS, toutS } plus the relative points
+  function place(c, L) {
+    const md = (x) => ((x % L) + L) % L, p = c.pts || {}, at = (base, d) => fin(base) && fin(d) ? md(base + d) : null;
+    return { in: at(c.tinS, p.in), off: at(c.geoS, p.off), min: at(c.geoS, p.min), thr: at(c.geoS, p.thr), full: at(c.geoS, p.full), tin: fin(c.tinS) ? c.tinS : null, tout: fin(c.toutS) ? c.toutS : null, geo: fin(c.geoS) ? c.geoS : null };
+  }
+  // ---- a corner as a driver is told it: the pedal and where, in kart lengths from what can be seen — the start of the bend, the apex,
+  // the end of the bend. rel: { in, off, min, thr, full } (metres; negative = before the landmark); kind: brake | lift | flat
+  function steps(rel, kind) {
+    const kl = (m) => Math.max(1, Math.round(Math.abs(m) / KART)), side = (m, tol) => (Math.abs(m) <= (tol || 1.5) ? 0 : (m < 0 ? -1 : 1));   // whole kart lengths
+    const out = [];
+    // the points in the order a lap meets them: the brake comes off no later than the gas goes on; flat out right where the gas goes on
+    // (within a kart length or so) is one point, said once
+    if (rel) { rel = Object.assign({}, rel); if (fin(rel.off) && fin(rel.thr) && rel.off > rel.thr) rel.off = rel.thr; if (fin(rel.full) && fin(rel.thr) && rel.full < rel.thr + 2) rel.full = null; }
+    if (kind === 'flat' || !rel || !fin(rel.in)) out.push({ k: 'flat' });
+    else out.push({ k: kind, at: 'turnin', side: side(rel.in), n: kl(rel.in), m: Math.round(rel.in) });
+    if (rel && kind === 'brake' && fin(rel.off)) out.push({ k: 'off', at: 'apex', side: side(rel.off), n: kl(rel.off), m: Math.round(rel.off) });
+    if (rel && fin(rel.min) && Math.abs(rel.min) >= 3) out.push({ k: 'apex', at: 'apex', side: side(rel.min, 3), n: kl(rel.min), m: Math.round(rel.min) });
+    if (rel && kind !== 'flat' && fin(rel.thr)) out.push({ k: 'thr', at: 'apex', side: side(rel.thr), n: kl(rel.thr), m: Math.round(rel.thr) });
+    if (rel && kind !== 'flat' && fin(rel.full)) out.push({ k: 'full', at: 'apex', side: side(rel.full, 2), n: kl(rel.full), m: Math.round(rel.full) });
+    return out;
+  }
+  return { VER, KART, describe, bend, reading, passOf, pullFrom, atlas, compact, distance, represent, curves, predict, kinematics, accelBins, steps, ideal, place };
+})();
 // ---------- the Lab ----------
 // One session is the reference; a comparison (another lap, the session average, or another session on the same layout) is optional.
 const LAB = {
@@ -9581,6 +10055,320 @@ const DEVICE = (() => {
 // OSM opening_hours → the track's open / close fields, only when the tag is one plain daily range ("10:00-22:00", "Mo-Su 10:00-23:00"); anything else stays empty
 function parseHours(h) { const m = /^(?:Mo-Su\s+)?(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/.exec(String(h || '').trim()); return m ? { open: m[1].padStart(5, '0'), close: m[2].padStart(5, '0') } : {}; }
 const fileDate = (f) => { try { const d = new Date(f.lastModified || Date.now()); const p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; } catch (e) { return ''; } };   // local time, like the loggers write it
+// ---------- the racing brain in the app: the ideal lap of any layout, and the driver against it ----------
+// Where a layout has been driven, its ideal is what its fastest real passes do, corner by corner (several drivers, at most three passes
+// each). Where it has not, every corner takes what the fastest drivers did in the most similar corners driven elsewhere (BRAIN.predict).
+// Points are told against what a driver sees — the turn-in, the apex — in kart lengths. The atlases are built here from the published
+// sessions (one per layout and kart class, rebuilt only when its sessions change); a stored copy on the server comes later.
+const BRAINS = (() => {
+  const OFF = 0.12, MIN_LAPS = 5, mem = new Map(), inflight = new Map(), rows = {};
+  const clsOf = (m) => kartClassOf(m) === 'sport' ? 'sport' : 'rental';
+  const fin = (x) => typeof x === 'number' && isFinite(x);
+  const layoutName = (tid, lid) => { const tr = STORE.getTrack(tid), l = STORE.getLayout(tid, lid); return [tr ? tr.name : tid, l ? l.name : (lid === 'custom' ? '' : lid)].filter(Boolean).join(' · '); };
+  // the published sessions of one layout in one kart class, and what they are (the stored atlas is rebuilt when this changes)
+  async function metasOf(tid, lid, cls) { try { return (await STORE.sessionsFor(tid, lid)).filter(m => (m.layout || 'custom') === lid && clsOf(m) === cls); } catch (e) { return []; } }
+  const sigOf = (metas) => metas.map(m => m.id + ':' + (m.bestMs || 0)).sort().join(',');
+  // the stored atlases of a class, read once a page load (and kept up to date by the rebuilds below)
+  async function stored(cls) { if (!rows[cls]) { const rs = await STORE.brainRows(cls); rows[cls] = new Map((rs || []).map(r => [r.key, r])); } return rows[cls]; }
+  // a layout's atlas built from its sessions (every session loaded: heavy), its line from the fastest one; an admin stores the result
+  async function build(tid, lid, cls, metas, sig) {
+    const ss = [];
+    for (const m of metas.slice().sort((a, b) => (a.bestMs || 1e12) - (b.bestMs || 1e12))) { try { ss.push({ meta: m, sess: await STORE.loadSession(m) }); } catch (e) {} }
+    if (!ss.length) return null;
+    let G = null; try { G = await GEOM.build(tid, lid, ss[0].sess, { noMedia: true, selfRef: true }); } catch (e) { G = null; }
+    if (!G) return null;
+    const entries = [];
+    for (const x of ss) { const at = GEOM.attach(x.sess, G); if (at.error) continue; for (const L of x.sess.laps) { if (!L.clean) continue; const P = DATA.projectLap(L, G.track, G.rev); if (P && P.lost <= OFF) entries.push({ P, sid: x.meta.id, owner: x.meta.owner, driver: x.meta.driver || '', lap: L.n }); } }
+    const A = BRAIN.atlas(G, entries, { cls, name: layoutName(tid, lid), refSid: ss[0].meta.id }); if (!A) return null;
+    const C = BRAIN.compact(A), key = `${tid}|${lid}|${cls}`;
+    if (STORE.me.canEdit && await STORE.brainSave({ key, track_id: tid, layout_id: lid, cls, ver: BRAIN.VER, sig, laps: A.laps, drivers: A.drivers, best: A.best, data: C, updated_at: new Date().toISOString() })) (await stored(cls)).set(key, { key, sig, data: C });
+    return { C, G };
+  }
+  // one layout's atlas: the stored one while its sessions are the same; rebuilt when they changed (by an admin), or here when none is
+  // stored yet. { C: the compact atlas, G: its line once loaded }
+  async function layoutAtlas(tid, lid, cls) {
+    if (!tid || !lid || lid === 'custom') return null;
+    cls = cls || 'rental'; const key = `${tid}|${lid}|${cls}`;
+    const metas = await metasOf(tid, lid, cls); if (!metas.length) return null;
+    const sig = sigOf(metas), m0 = mem.get(key); if (m0 && m0.sig === sig) return m0.v;
+    if (inflight.has(key)) return inflight.get(key);
+    const p = (async () => {
+      const st = (await stored(cls)).get(key), ok = st && st.data && st.data.v === BRAIN.VER;
+      let v = ok ? { C: st.data, G: null } : null;
+      if (!ok || (st.sig !== sig && STORE.me.canEdit)) { const b = await build(tid, lid, cls, metas, sig).catch(() => null); if (b) v = b; }
+      if (v) mem.set(key, { sig, v }); return v;
+    })();
+    inflight.set(key, p); try { return await p; } finally { inflight.delete(key); }
+  }
+  // the line an atlas was read on (its fastest session's GPS), for the map and for reading the driver's own laps in the same windows
+  async function geomOf(tid, lid, v) {
+    if (v.G) return v.G;
+    let sess = null; try { const m = v.C.refSid ? await STORE.getSessionMeta(v.C.refSid) : null; if (m) sess = await STORE.loadSession(m); } catch (e) { sess = null; }
+    try { v.G = sess ? await GEOM.build(tid, lid, sess, { noMedia: true, selfRef: true }) : await GEOM.build(tid, lid, null, { noMedia: true }); } catch (e) { v.G = null; }
+    return v.G;
+  }
+  // every driven layout of this class: what a prediction learns from (an admin brings stale and missing ones up to date as he goes)
+  async function allAtlases(cls) {
+    cls = cls || 'rental'; const out = [], seen = new Set();
+    if (STORE.me.canEdit) for (const tr of STORE.getTracks()) { let ls = []; try { ls = await STORE.getLayouts(tr.id); } catch (e) { ls = []; } for (const l of ls) { const v = await layoutAtlas(tr.id, l.id, cls); if (v) { out.push(v); seen.add(v.C.key); } } }
+    for (const r of (await stored(cls)).values()) if (r.data && r.data.v === BRAIN.VER && !seen.has(r.data.key)) { out.push({ C: r.data, G: null }); seen.add(r.data.key); }
+    return out;
+  }
+  // the driver's own passes on a driven layout, read in the atlas's own corner windows: the middle of his three fastest per corner
+  async function mineOn(tid, lid, cls, v, G) {
+    if (!v || !G || !v.C.wins || !v.C.wins.length || G.track.N !== v.C.N || !STORE.hasIdentity) return null;
+    let metas = []; try { metas = (await STORE.mySessions()).filter(m => m.track === tid && (m.layout || 'custom') === lid && clsOf(m) === cls); } catch (e) { metas = []; }
+    if (!metas.length) return null;
+    const tr = G.track, laps = [];
+    for (const m of metas.slice(0, 12)) { let s = null; try { s = await STORE.loadSession(m); } catch (e) { s = null; } if (!s || GEOM.attach(s, G).error) continue; for (const L of s.laps) { if (!L.clean) continue; const P = DATA.projectLap(L, tr, G.rev); if (P && P.lost <= OFF) laps.push(P); } }
+    if (!laps.length) return null;
+    laps.sort((a, b) => a.T - b.T);
+    const best = laps.slice(0, 6), out = {};
+    for (const w of v.C.wins) { const ps = best.map(P => BRAIN.passOf(P, w, tr)).filter(p => fin(p.time)).sort((a, b) => a.time - b.time).slice(0, 3); if (!ps.length) continue; const r = BRAIN.represent({ top: ps }); if (r) out[w.n] = { pts: Object.assign({ kind: r.kind }, r.rel), time: r.time, vApex: r.vApex }; }
+    return { laps: laps.length, best: laps[0].T, corners: out };
+  }
+  // the ideal of a layout. mode 'real': driven (MIN_LAPS clean laps or more) — its fastest real passes; 'predicted': not (or too little)
+  // — carried over from the other layouts' similar corners; 'none': no line to read (no session, no drawing)
+  async function ideal(tid, lid, cls) {
+    cls = cls || 'rental';
+    const name = layoutName(tid, lid);
+    const v = await layoutAtlas(tid, lid, cls);
+    if (v && v.C.laps >= MIN_LAPS) {
+      const G = await geomOf(tid, lid, v); if (!G) return { mode: 'none', tid, lid, cls, name };
+      const L = G.track.N * G.track.ds, plan = BRAIN.ideal(v.C);
+      const mine = await mineOn(tid, lid, cls, v, G).catch(() => null);
+      const corners = plan.map(c => Object.assign({ n: c.n, dir: c.desc.dir, pts: c.pts, drivers: c.drivers, time: c.time, place: BRAIN.place(c, L) }, mine && mine.corners[c.n] ? { mine: mine.corners[c.n] } : {}));
+      return { mode: 'real', tid, lid, cls, name, G, L, corners, info: { laps: v.C.laps, drivers: v.C.drivers, best: v.C.best, mine: mine ? { laps: mine.laps, best: mine.best } : null } };
+    }
+    // nobody (or too few) here: the layout's line from its sessions or its drawing, the corners from everywhere else
+    let G = v ? await geomOf(tid, lid, v) : null;
+    if (!G) { try { G = await GEOM.build(tid, lid, null, { noMedia: true }); } catch (e) { G = null; } }
+    if (!G) return { mode: 'none', tid, lid, cls, name };
+    return predictOn(G, { tid, lid, cls, name });
+  }
+  // a line from anywhere (a layout, a track found on the map): every corner from the similar corners of the driven layouts
+  async function predictOn(G, o) {
+    const cls = o.cls || 'rental', key = o.tid && o.lid ? `${o.tid}|${o.lid}` : '';
+    const books = (await allAtlases(cls)).map(x => x.C).filter(A => A.key !== key);
+    if (!books.length) return Object.assign({ mode: 'none' }, o, { G });
+    const pred = BRAIN.predict(G, books, { cls });
+    if (!pred) return Object.assign({ mode: 'none' }, o, { G });
+    const L = G.track.N * G.track.ds;
+    const corners = pred.plan.map(c => ({ n: c.n, dir: c.desc.dir, pts: c.pts, from: c.from, place: BRAIN.place(c, L) }));
+    return Object.assign({ mode: 'predicted' }, o, { G, L, corners, info: { pool: pred.pool, books: books.length, T: pred.T, names: [...new Set(books.map(A => A.name || A.key))] } });
+  }
+
+  // ---- words: one corner as a driver is told it, in kart lengths from the turn-in and the apex
+  const KL = (n) => tn(n, 'kart length', 'kart lengths');
+  function lines(pts) {
+    const out = [];
+    for (const s of BRAIN.steps(pts, pts && pts.kind)) {
+      const v = { n: s.n, k: KL(s.n) };
+      if (s.k === 'flat') out.push(t('Flat out, no lift'));
+      else if (s.k === 'brake') out.push(s.side < 0 ? t('Brake {n} {k} before the turn-in', v) : s.side > 0 ? t('Brake {n} {k} after the turn-in', v) : t('Brake at the turn-in'));
+      else if (s.k === 'lift') out.push(s.side < 0 ? t('Lift {n} {k} before the turn-in', v) : s.side > 0 ? t('Lift {n} {k} after the turn-in', v) : t('Lift at the turn-in'));
+      else if (s.k === 'off') out.push(s.side < 0 ? t('off the brake {n} {k} before the apex', v) : s.side > 0 ? t('off the brake {n} {k} after the apex', v) : t('off the brake at the apex'));
+      else if (s.k === 'thr') out.push(s.side < 0 ? t('gas {n} {k} before the apex', v) : s.side > 0 ? t('gas {n} {k} after the apex', v) : t('gas at the apex'));
+      else if (s.k === 'full') out.push(s.side < 0 ? t('full throttle {n} {k} before the apex', v) : s.side > 0 ? t('full throttle {n} {k} after the apex', v) : t('full throttle at the apex'));
+    }
+    return out;
+  }
+  // the driver against the ideal in one corner: what he does differently, in the same words (nothing when it is the same within a kart)
+  function diffLines(ideal, mine) {
+    if (!ideal || !mine) return [];
+    const out = [], a = ideal, b = mine, v = (m) => { const n = Math.max(1, Math.round(Math.abs(m) / BRAIN.KART)); return { n, k: KL(n) }; };
+    if (a.kind === 'flat' && b.kind !== 'flat') out.push(b.kind === 'brake' ? t('the fastest take it flat — you brake') : t('the fastest take it flat — you lift'));
+    else if (a.kind === 'lift' && b.kind === 'brake') out.push(t('the fastest only lift here — you brake'));
+    else if (a.kind === 'brake' && b.kind === 'flat') out.push(t('the fastest brake here — you stay flat'));
+    if (a.kind !== 'flat' && b.kind !== 'flat' && fin(a.in) && fin(b.in) && Math.abs(b.in - a.in) >= 2.5) out.push(b.in < a.in ? t('you start slowing {n} {k} earlier', v(b.in - a.in)) : t('you start slowing {n} {k} later', v(b.in - a.in)));
+    if (fin(a.thr) && fin(b.thr) && Math.abs(b.thr - a.thr) >= 2.5) out.push(b.thr > a.thr ? t('back on the gas {n} {k} later', v(b.thr - a.thr)) : t('back on the gas {n} {k} earlier', v(b.thr - a.thr)));
+    return out;
+  }
+  const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+  const text = (pts) => cap(lines(pts).join(' · '));
+  // the whole ideal as plain text (for the AI's context and for sharing)
+  function asText(res) {
+    if (!res || !res.corners) return '';
+    const head = res.mode === 'real' ? `IDEAL LAP of ${res.name} (${res.cls} karts) from its fastest real passes: ${res.info.laps} clean laps, ${res.info.drivers} drivers, best ${res.info.best.toFixed(2)} s.` : `IDEAL LAP of ${res.name} (${res.cls} karts) PREDICTED from similar corners of ${res.info.books} driven layouts (nobody has enough laps here): about ${res.info.T.toFixed(1)} s.`;
+    const ls = res.corners.map(c => { return `T${c.n} (${c.dir === 'L' ? 'left' : 'right'}): ${describeEN(c.pts)}` + (c.mine ? ` | the driver: ${describeEN(c.mine.pts)}${fin(c.mine.time) && fin(c.time) ? `, ${(c.mine.time - c.time >= 0 ? '+' : '') + (c.mine.time - c.time).toFixed(2)} s vs the fastest` : ''}` : ''); });
+    return head + '\nPoints in kart lengths (1 kart length = 2 m) from the turn-in (start of the bend) and from the apex; "gas" = where the kart stops slowing (the throttle is on), "full throttle" = where it clearly accelerates.\n' + ls.join('\n');
+  }
+  function describeEN(pts) {
+    const p = [], kl = (m) => Math.max(1, Math.round(Math.abs(m) / BRAIN.KART));
+    for (const s of BRAIN.steps(pts, pts && pts.kind)) {
+      if (s.k === 'flat') p.push('flat out'); else if (s.k === 'brake' || s.k === 'lift') p.push(`${s.k} ${s.side === 0 ? 'at the turn-in' : kl(s.m) + ' kart lengths ' + (s.side < 0 ? 'before' : 'after') + ' the turn-in'}`);
+      else if (s.k === 'off' || s.k === 'thr' || s.k === 'full') p.push(`${s.k === 'off' ? 'off the brake' : s.k === 'thr' ? 'gas' : 'full throttle'} ${s.side === 0 ? 'at the apex' : kl(s.m) + ' kart lengths ' + (s.side < 0 ? 'before' : 'after') + ' the apex'}`);
+    }
+    return p.join(', ');
+  }
+
+  // ---- the map: the line, every corner numbered, where the slowing starts (red: brake, yellow: lift) and where the gas goes back on
+  function draw(cv, res, sel) {
+    const G = res && res.G; if (!cv || !G || !G.track) return [];
+    const tr = G.track, N = tr.N, ds = tr.ds, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), W = cv.clientWidth || 320, H = cv.clientHeight || 220; if (W < 40) return [];
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (let i = 0; i < N; i++) { x0 = Math.min(x0, tr.cx[i]); x1 = Math.max(x1, tr.cx[i]); y0 = Math.min(y0, tr.cy[i]); y1 = Math.max(y1, tr.cy[i]); }
+    const pad = 22, s = Math.min((W - 2 * pad) / Math.max(1, x1 - x0), (H - 2 * pad) / Math.max(1, y1 - y0)), ox = (W - s * (x1 - x0)) / 2, oy = (H - s * (y1 - y0)) / 2;
+    const P = (i) => [ox + s * (tr.cx[i] - x0), oy + s * (tr.cy[i] - y0)], I = (S) => ((Math.round(S / ds) % N) + N) % N;
+    const cs = getComputedStyle(document.documentElement), col = (n, d) => cs.getPropertyValue(n).trim() || d;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.strokeStyle = col('--line-2', '#cdd3dd'); ctx.lineWidth = 7; ctx.beginPath(); for (let i = 0; i < N; i++) { const [x, y] = P(i); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); ctx.stroke();
+    // the slowing stretches (from the point to the apex) and the selected corner's part of the line
+    const span = (a, b, color, w) => { if (!fin(a) || !fin(b)) return; let i = I(a); const j = I(b); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath(); let k = 0; const [sx, sy] = P(i); ctx.moveTo(sx, sy); while (i !== j && k++ < N) { i = (i + 1) % N; const [x, y] = P(i); ctx.lineTo(x, y); } ctx.stroke(); };
+    for (const c of res.corners) { const pl = c.place; if (c.pts.kind === 'flat' || !fin(pl.in)) continue; span(pl.in, fin(pl.thr) ? pl.thr : pl.geo, c.pts.kind === 'brake' ? col('--brake', '#e5484d') : col('--lift', '#d9a300'), sel === c.n ? 6 : 4); }
+    // S/F
+    { const [x, y] = P(0), [x2, y2] = P(Math.min(N - 1, 3)); const ang = Math.atan2(y2 - y, x2 - x) + Math.PI / 2; ctx.strokeStyle = col('--fg', '#1a2237'); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x - Math.cos(ang) * 7, y - Math.sin(ang) * 7); ctx.lineTo(x + Math.cos(ang) * 7, y + Math.sin(ang) * 7); ctx.stroke(); }
+    // gas points
+    for (const c of res.corners) { const pl = c.place; if (!fin(pl.thr) || c.pts.kind === 'flat') continue; const [x, y] = P(I(pl.thr)); ctx.beginPath(); ctx.arc(x, y, sel === c.n ? 5 : 4, 0, Math.PI * 2); ctx.fillStyle = col('--throttle', '#2fb563'); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke(); }
+    // corner numbers, pushed off the line toward the outside of the bend
+    const hits = []; ctx.font = `700 10.5px ${col('--mono', 'monospace')}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const c of res.corners) {
+      const i = I(c.place.geo), [x, y] = P(i), [xa, ya] = P((i - 2 + N) % N), [xb, yb] = P((i + 2) % N); let nx = -(yb - ya), ny = xb - xa; const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+      const sgn = c.dir === 'R' ? -1 : 1, bx = x + nx * 15 * sgn, by = y + ny * 15 * sgn, on = sel === c.n, flat = c.pts.kind === 'flat';
+      ctx.beginPath(); ctx.arc(bx, by, on ? 10.5 : 9, 0, Math.PI * 2); ctx.fillStyle = on ? col('--accent', '#2f6bf0') : (flat ? col('--surface', '#fff') : col('--fg', '#1a2237')); ctx.fill();
+      if (flat && !on) { ctx.strokeStyle = col('--throttle', '#2fb563'); ctx.lineWidth = 2; ctx.stroke(); }
+      ctx.fillStyle = flat && !on ? col('--fg', '#1a2237') : '#fff'; ctx.fillText(String(c.n), bx, by + 0.5); hits.push({ x: bx, y: by, n: c.n });
+    }
+    return hits;
+  }
+  return { layoutAtlas, allAtlases, ideal, predictOn, mineOn, lines, diffLines, text, asText, draw, clsOf, layoutName, geomOf };
+})();
+// ---------- a track nobody has driven on Hutka: found by its name, a map link, coordinates or a photo of its map ----------
+// Hutka's own tracks first (by name, or within 3 km of the place). Otherwise the karting raceways drawn on OpenStreetMap around the place
+// (Overpass, straight from the browser like the admin's import): the ways are joined at their shared nodes and every closed loop of a
+// track's size (300 m – 3.5 km) is a candidate layout. A loop becomes a line the racing brain can read (KLL.buildTrack, metres).
+const TRACKFIND = (() => {
+  const RE = 6371000, rad = Math.PI / 180;
+  const kmBetween = (a, b) => { const x = (b.lon - a.lon) * rad * Math.cos((a.lat + b.lat) / 2 * rad), y = (b.lat - a.lat) * rad; return Math.hypot(x, y) * RE / 1000; };
+  // coordinates in what was typed: "25.04, 55.24", or a Google / Apple / OpenStreetMap link
+  function coords(q) {
+    const s = decodeURIComponent(String(q || '')).trim();
+    const pats = [/@(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/, /!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/, /[?&](?:ll|q|query|center|destination|daddr|sll)=(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/i, /mlat=(-?\d{1,2}\.\d+).*?mlon=(-?\d{1,3}\.\d+)/i, /#map=\d+\/(-?\d{1,2}\.\d+)\/(-?\d{1,3}\.\d+)/, /^(-?\d{1,2}\.\d+)\s*[,; ]\s*(-?\d{1,3}\.\d+)$/];
+    for (const p of pats) { const m = s.match(p); if (m) { const lat = +m[1], lon = +m[2]; if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180 && (lat || lon)) return { lat, lon }; } }
+    return null;
+  }
+  const words = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').split(/[^a-zа-яё0-9]+/i).filter(w => w.length >= 3 && !/^(the|kart|karting|track|circuit|club|park|and|international|картинг|трасса|клуб)$/.test(w));
+  // Hutka's tracks that match the words typed, or lie near the place
+  function onHutka(q, at) {
+    const qw = words(q), out = [];
+    for (const tr of STORE.getTracks()) {
+      const tw = words(tr.name + ' ' + (tr.city || '')), hit = qw.length && qw.every(w => tw.some(x => x.startsWith(w) || w.startsWith(x)));
+      const km = at && isFinite(tr.lat) && isFinite(tr.lon) ? kmBetween(at, { lat: tr.lat, lon: tr.lon }) : null;
+      if (hit || (km !== null && km <= 3)) out.push({ tr, km });
+    }
+    return out.sort((a, b) => (a.km === null ? 1e9 : a.km) - (b.km === null ? 1e9 : b.km));
+  }
+  const mirrors = () => [(window.HUTKA_CONFIG || {}).overpassUrl, 'https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'].filter(Boolean);
+  async function overpass(q) {
+    let last = null;
+    for (const u of mirrors()) { const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 30000);
+      try { const r = await fetch(u, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, signal: ctl.signal }); clearTimeout(to); if (r.ok) { const j = await r.json(); if (j && Array.isArray(j.elements)) return j; } last = new Error('http ' + r.status); } catch (e) { clearTimeout(to); last = e; } }
+    throw last || new Error('overpass');
+  }
+  // a name → a place (OpenStreetMap's own search; the first answer)
+  async function geocode(q) {
+    const u = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=3&accept-language=' + (I18N.lang === 'ru' ? 'ru,en' : 'en') + '&q=' + encodeURIComponent(q);
+    const r = await fetch(u, { headers: { 'Accept': 'application/json' } }); if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json(); return (Array.isArray(j) ? j : []).map(x => ({ lat: +x.lat, lon: +x.lon, name: x.display_name ? String(x.display_name).split(',').slice(0, 3).join(',') : q })).filter(x => isFinite(x.lat) && isFinite(x.lon));
+  }
+  // the raceways around a place, joined into loops
+  async function raceways(at, radius) {
+    const R = radius || 2500, q = `[out:json][timeout:25];(way["highway"="raceway"](around:${R},${at.lat},${at.lon});way["leisure"="track"]["sport"~"karting|motor"](around:${R},${at.lat},${at.lon}););out body geom;`;
+    return loopsOf((await overpass(q)).elements || []);
+  }
+  // ways → loops: closed ways as they are; open ways cut at the nodes they share and searched for cycles (at most 14 pieces, each piece
+  // once), 300 m – 3.5 km long; the same loop found twice is kept once
+  function loopsOf(elements) {
+    const ways = elements.filter(e => e.type === 'way' && Array.isArray(e.nodes) && Array.isArray(e.geometry) && e.nodes.length === e.geometry.length && e.nodes.length >= 2);
+    const lenOf = (g) => { let s = 0; for (let i = 1; i < g.length; i++) s += kmBetween(g[i - 1], g[i]) * 1000; return s; };
+    const loops = [], seen = new Set(), nameOf = (ws) => { const c = {}; for (const w of ws) { const n = w.tags && (w.tags['name:en'] || w.tags.name); if (n) c[n] = (c[n] || 0) + 1; } return Object.keys(c).sort((a, b) => c[b] - c[a])[0] || ''; };
+    const widthOf = (ws) => { const xs = ws.map(w => parseFloat(w.tags && w.tags.width)).filter(x => isFinite(x) && x >= 4 && x <= 20).sort((a, b) => a - b); return xs.length ? xs[Math.floor(xs.length / 2)] : 8; };
+    const push = (g, ws, key) => { const L = lenOf(g); if (L < 300 || L > 3500 || seen.has(key)) return; seen.add(key); loops.push({ pts: g.map(p => ({ lat: p.lat, lon: p.lon })), lengthM: L, name: nameOf(ws), ways: ws.map(w => w.id), widthM: widthOf(ws) }); };
+    // the pieces: every way cut at the nodes it shares with another way
+    const use = new Map(); for (const w of ways) w.nodes.forEach((id) => use.set(id, (use.get(id) || 0) + 1));
+    const pieces = [];
+    for (const w of ways) {
+      const closed = w.nodes[0] === w.nodes[w.nodes.length - 1] && w.nodes.length >= 4;
+      const cuts = [0]; for (let i = 1; i < w.nodes.length - 1; i++) if (use.get(w.nodes[i]) > 1) cuts.push(i); cuts.push(w.nodes.length - 1);
+      if (closed && cuts.length === 2) { push(w.geometry, [w], 'w' + w.id); continue; }
+      for (let k = 1; k < cuts.length; k++) { const a = cuts[k - 1], b = cuts[k]; if (b <= a) continue; pieces.push({ id: pieces.length, a: w.nodes[a], b: w.nodes[b], g: w.geometry.slice(a, b + 1), way: w }); }
+    }
+    // cycles over the pieces (depth-first from every piece, smallest piece id first so each cycle is found from one start)
+    const at = new Map(); for (const p of pieces) { for (const v of [p.a, p.b]) { if (!at.has(v)) at.set(v, []); at.get(v).push(p); } }
+    let budget = 20000;
+    for (const p0 of pieces) {
+      const stack = [{ v: p0.b, path: [{ p: p0, fwd: true }], used: new Set([p0.id]) }];
+      while (stack.length && budget-- > 0) {
+        const s = stack.pop();
+        if (s.v === p0.a && s.path.length > 1) { const ids = s.path.map(x => x.p.id); if (Math.min(...ids) !== p0.id) continue; const key = ids.slice().sort((x, y) => x - y).join(','); const g = []; for (const x of s.path) { const seg = x.fwd ? x.p.g : x.p.g.slice().reverse(); g.push(...(g.length ? seg.slice(1) : seg)); } push(g, [...new Set(s.path.map(x => x.p.way))], 'c' + key); continue; }
+        if (s.path.length >= 14) continue;
+        for (const q of at.get(s.v) || []) { if (s.used.has(q.id)) continue; const fwd = q.a === s.v; const u = new Set(s.used); u.add(q.id); stack.push({ v: fwd ? q.b : q.a, path: s.path.concat([{ p: q, fwd }]), used: u }); }
+      }
+    }
+    return loops.sort((a, b) => b.lengthM - a.lengthM).slice(0, 6);
+  }
+  // a map's line is the middle of the asphalt; karts drive a smoother, shorter line through every corner (wider radii), and the atlases
+  // were learnt on driven lines. So the middle is pulled toward a driven line first: a rubber band, points every 3 m, each moved toward
+  // the middle of its neighbours but never further than half the track's width less a kart's half-width from the middle
+  function drivenLine(tr, widthM) {
+    const step = Math.max(1, Math.round(3 / tr.ds)), M = Math.floor(tr.N / step), h = Math.max(1, (widthM || 8) / 2 - 1.5);
+    const cx = new Float64Array(M), cy = new Float64Array(M), nx = new Float64Array(M), ny = new Float64Array(M), o = new Float64Array(M);
+    for (let k = 0; k < M; k++) { const i = k * step; cx[k] = tr.cx[i]; cy[k] = tr.cy[i]; nx[k] = tr.nx[i]; ny[k] = tr.ny[i]; }
+    const X = (k) => cx[k] + o[k] * nx[k], Y = (k) => cy[k] + o[k] * ny[k];
+    for (let it = 0; it < 3000; it++) for (let k = 0; k < M; k++) { const a = (k - 1 + M) % M, b = (k + 1) % M, mx = (X(a) + X(b)) / 2, my = (Y(a) + Y(b)) / 2; o[k] = Math.max(-h, Math.min(h, (mx - cx[k]) * nx[k] + (my - cy[k]) * ny[k])); }
+    return Array.from({ length: M }, (_, k) => ({ x: X(k), y: Y(k) }));
+  }
+  // which way round a loop is drawn (true: clockwise on the map)
+  function clockwise(lp) { let s = 0; const p = lp.pts; for (let i = 0; i < p.length; i++) { const a = p[i], b = p[(i + 1) % p.length]; s += (b.lon - a.lon) * (b.lat + a.lat); } return s > 0; }
+  // a loop as a line the brain reads: metres around its middle, the way round asked for, the start/finish in the middle of the longest
+  // straight (the map does not say where it is; it only numbers the corners)
+  function geometry(lp, cw) {
+    let pts = lp.pts.slice(); if (pts.length > 2 && pts[0].lat === pts[pts.length - 1].lat && pts[0].lon === pts[pts.length - 1].lon) pts.pop(); if (pts.length < 8) return null;
+    if (clockwise({ pts }) !== !!cw) pts.reverse();
+    const lat0 = pts.reduce((a, p) => a + p.lat, 0) / pts.length, lon0 = pts.reduce((a, p) => a + p.lon, 0) / pts.length, kx = Math.cos(lat0 * rad) * rad * RE, ky = rad * RE;
+    const xy = pts.map(p => ({ x: (p.lon - lon0) * kx, y: -(p.lat - lat0) * ky }));   // y down, north up on the map
+    let L = 0; for (let i = 0; i < xy.length; i++) { const a = xy[i], b = xy[(i + 1) % xy.length]; L += Math.hypot(b.x - a.x, b.y - a.y); }
+    let tr = null; try { tr = KLL.buildTrack(xy, L, 0, false); } catch (e) { tr = null; } if (!tr || !(tr.mpp > 0) || !isFinite(tr.mpp)) return null;
+    // the driven line, unless asked for the map's own middle (o.raw)
+    let line = xy, LL = L;
+    if (!(lp.raw)) { const d = drivenLine(tr, lp.widthM); let L2 = 0; for (let i = 0; i < d.length; i++) { const a = d[i], b = d[(i + 1) % d.length]; L2 += Math.hypot(b.x - a.x, b.y - a.y); } try { const t2 = KLL.buildTrack(d, L2, 0, false); if (t2 && t2.mpp > 0 && isFinite(t2.mpp)) { tr = t2; line = d; LL = L2; } } catch (e) {} }
+    // the start/finish: the middle of the longest stretch straighter than a 150 m radius
+    const ks = DATA.trackCurv(tr), N = tr.N; let best = { len: 0, mid: 0 }, run = 0, start = 0;
+    for (let q = 0; q < 2 * N; q++) { const i = q % N; if (Math.abs(ks[i]) < 1 / 150) { if (!run) start = q; run++; if (run > best.len && run <= N) best = { len: run, mid: (start + Math.floor(run / 2)) % N }; } else run = 0; }
+    try { const tr2 = KLL.buildTrack(line, LL, best.mid / N, false); if (tr2 && tr2.mpp > 0) tr = tr2; } catch (e) {}
+    return { rev: 'osm' + (lp.ways || []).join('-') + (cw ? 'cw' : 'ccw'), tid: null, lid: null, track: tr, corners: { R: 110, add: [], del: [] }, source: 'osm', widthM: 8 };
+  }
+  // Hutka's matches (each with how many of its layouts have a line: a session on it or a drawing) and, when none of them has a line, the
+  // raceways on the map around the place (6 km: a catalogue point is often the venue's gate, not the track)
+  async function find(q) {
+    if (navigator.onLine === false) return { error: 'offline' };
+    let at = coords(q), place = null;
+    const hit0 = onHutka(at ? '' : q, at);
+    if (!at && !hit0.length) { try { const g = await geocode(q); if (g.length) { at = g[0]; place = g[0].name; } } catch (e) { return { error: 'map' }; } }
+    const near = at ? onHutka('', at) : [];
+    const seen = new Set(), hutka = [];
+    for (const h of hit0.concat(near)) {
+      if (seen.has(h.tr.id)) continue; seen.add(h.tr.id);
+      let ls = []; try { ls = await STORE.getLayouts(h.tr.id); } catch (e) { ls = []; }
+      let lined = 0; for (const l of ls) { const tr0 = l.trace && l.trace.closed; let n = 0; if (!tr0) { try { n = (await STORE.sessionsFor(h.tr.id, l.id)).length; } catch (e) { n = 0; } } if (tr0 || n) lined++; }
+      hutka.push({ tr: h.tr, ls, lined, km: at && isFinite(h.tr.lat) ? kmBetween(at, { lat: h.tr.lat, lon: h.tr.lon }) : h.km });
+    }
+    let loops = [];
+    if (!hutka.some(h => h.lined)) {
+      const c = at || (hutka[0] && isFinite(hutka[0].tr.lat) ? { lat: hutka[0].tr.lat, lon: hutka[0].tr.lon } : null);
+      if (c) { try { loops = await raceways(c, 6000); } catch (e) { if (!hutka.length) return { error: 'map' }; } }
+    }
+    return { hutka, loops, place, at };
+  }
+  // a photo of the track map → its name and place, read by the AI; then searched like a typed name
+  async function fromPhoto(file) {
+    const b64 = await new Promise((res, rej) => { const img = new Image(), u = URL.createObjectURL(file); img.onload = () => { const s = Math.min(1, 1400 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg', 0.85).split(',')[1]); }; img.onerror = () => { URL.revokeObjectURL(u); rej(new Error('image')); }; img.src = u; });
+    const g = await STORE.identifyTrack(b64, 'image/jpeg');
+    if (!g || !g.name) return null;
+    return { query: [g.name, g.city, g.country].filter(Boolean).join(', '), guess: g };
+  }
+  return { coords, onHutka, geocode, raceways, loopsOf, clockwise, geometry, find, fromPhoto };
+})();
 // ---------- home: the feed of published sessions, where people drive, who is fastest ----------
 // the analysis card from the session meta (LAB.cardOf): the lap line, the Lab's points, the corner numbers — y grows downwards
 function drawCard(cv, c) {
@@ -10088,6 +10876,410 @@ $('aiSend').onclick = aiSend; $('aiStop').onclick = () => { if (AI.ctl) AI.ctl.a
 $('aiInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); aiSend(); } });
 $('aiRename').onclick = async () => { if (!AI.cur) return; const v = prompt(t('Chat title'), AI.cur.title || ''); if (v === null) return; await STORE.renameChat(AI.cur.id, v.trim()); AI.cur.title = v.trim(); $('aiTitle').textContent = AI.cur.title; renderChatList(); };
 $('aiDelete').onclick = async () => { if (!AI.cur) return; if (!(await confirmDlg(t('Delete this chat?'), t('The messages are removed; credits are not returned.'), t('Delete')))) return; await STORE.deleteChat(AI.cur.id); AI.chats = AI.chats.filter(c => c.id !== AI.cur.id); AI.cur = null; renderChatList(); startNew(null, true); };
+// ---------- Hutka AI (v35 preview, admins only): the driver's racing AI — the ideal lap of any layout at one tap, three more answers, one chat ----------
+// The tiles answer at once from the data (no AI needed for the ideal lap); the chat talks about anything in karting with the driver's
+// sessions, the ideal points of the layouts in play and Uladzislau's course behind it (the ask function adds the course: kb). One
+// conversation on screen; the earlier ones are in the Chats sheet. Cards live on screen only; the questions and answers are kept in the
+// chat. Everyone else keeps the AI coach page (app_ai.js) until this one goes to all.
+const HAI = (() => {
+const AI = { chats: [], cur: null, log: [], wallet: null, busy: false, ctl: null, ctx: {}, seq: 0, lay: null };
+const AI_RULES_V3 = () => `You are Hutka AI, the driver's racing AI on Hutka, a karting telemetry platform. You talk about anything in karting: driving technique, lines, braking, tracks and layouts, karts and conditions, racecraft, the driver's sessions and progress. Rental karts are the default world (Sodi RT8/RT10-class, about 9–13 hp, no differential, built-in understeer); a session may name a sport kart (Rotax, X30, KZ…) — a different world: never compare times across kart classes and fit the advice to the class.
+How you know things. (1) THE COACH'S METHOD below, when present, is your philosophy of driving: explain technique in its terms and never contradict it. (2) The data below — the driver's sessions and progress, the ideal points of layouts computed from the fastest real passes on Hutka (or predicted from similar corners when a layout has not been driven), the corner breakdown of a session: every number and corner you give comes from it, never invented. If a question needs data that is not here, say what to upload or which layout to open in the Ideal lap. (3) General karting knowledge for the rest, plainly, saying when it depends on the track, the kart or the conditions.
+Telemetry is GPS: speak of where the slowing starts, where the kart stops slowing (the gas is on) and where it accelerates hard (full throttle) — never of pedal pressure you cannot see. Points are in kart lengths (one kart length ≈ 2 m) from the turn-in and the apex. Name corners as T<number> (T7) — the app turns them into markers.
+Be compact: lead with the one thing that matters, then at most three corners or points, one or two lines each; about 150 words, never more than 250, unless the driver asks for a full breakdown. Finish every sentence. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, plain language, no headings or tables; short lists are fine. Address the driver as "you". You can be wrong: when something is a guess (a predicted layout, little data), say so in a few words.`;
+// the coach's method: Uladzislau's course (served with the preview only; on the server it comes from a private table)
+let aiKnow = null;
+async function aiKnowledge() {
+  if (aiKnow !== null) return aiKnow;
+  if (!window.__sbmock) { aiKnow = ''; return aiKnow; }   // on the site the ask function adds it itself (a private table), never the page
+  try { const r = await fetch('knowledge/course_en.md', { cache: 'no-store' }); aiKnow = r.ok ? (await r.text()).slice(0, 40000) : ''; } catch (e) { aiKnow = ''; }
+  return aiKnow;
+}
+// the layouts a question is about: the ones on screen, the ones it names (a track's or a layout's own words), else the driver's last one
+async function aiLayoutsFor(text) {
+  const out = new Set(AI.ctx.layouts || []), low = String(text || '').toLowerCase(), words = (s) => String(s || '').toLowerCase().split(/[^a-zа-яё0-9]+/i).filter(w => w.length >= 4 && !/^(kart|karting|track|circuit|international|картинг|трасса)$/.test(w));
+  for (const tr of STORE.getTracks()) {
+    if (!words(tr.name).some(w => low.includes(w)) && !(tr.city && low.includes(String(tr.city).toLowerCase()) && words(tr.name).length)) continue;
+    let ls = []; try { ls = await STORE.getLayouts(tr.id); } catch (e) { ls = []; } if (!ls.length) continue;
+    const named = ls.filter(l => words(l.name).some(w => low.includes(w)));
+    for (const l of (named.length ? named : [ls[0]]).slice(0, 2)) out.add(tr.id + '|' + l.id);
+  }
+  if (!out.size && STORE.hasIdentity) { const last = (await STORE.mySessions()).find(m => m.track && m.layout && m.layout !== 'custom'); if (last) out.add(last.track + '|' + last.layout); }
+  return [...out].slice(0, 3);
+}
+// what the AI knows for this question: the rules, the method, the driver, the layouts in play, the session in play
+async function aiSystem(text) {
+  const parts = [AI_RULES_V3()];
+  const know = await aiKnowledge(); if (know) parts.push("THE COACH'S METHOD (the course of Uladzislau Kazyra, Hutka's founder — your philosophy of driving):\n" + know);
+  const me = STORE.me, prof = STORE.hasIdentity ? (await STORE.profile(me.id) || {}) : {};
+  const home = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null;
+  parts.push(`DRIVER: ${prof.racingName || me.name || 'driver'}${prof.country ? ', ' + countryName(prof.country) : ''}${home ? ', home track ' + home.name : ''}.`);
+  const mine = STORE.hasIdentity ? (await STORE.mySessions()).slice(0, 40) : [];
+  if (mine.length) {
+    const lines = []; for (const m of mine) { const tr = STORE.getTrack(m.track); const ls = m.track ? await STORE.getLayouts(m.track) : []; const l = ls.find(x => x.id === m.layout); lines.push(`- [${m.id}] ${m.label || m.name} — ${tr ? tr.name : (m.trackName || 'custom track')}${l ? ' · ' + l.name : ''} · ${fmtDate(m.date)} · best ${fmtMs(m.bestMs)} · avg clean ${fmtMs(m.avgMs)} · ${m.nLaps} laps (${m.cleanLaps} clean)${m.kart || m.kartClass === 'sport' ? ' · kart: ' + kartLabel(m) : ''}${resultText(m) ? ' · ' + resultText(m) : ''}${m.published ? ' · published' : ''}${m.note ? ' · ' + m.note : ''}`); }
+    parts.push("THE DRIVER'S SESSIONS (newest first):\n" + lines.join('\n'));
+    const prog = aiProgressRows(mine); if (prog.length) parts.push('PROGRESS BY LAYOUT (best lap per session, oldest → newest):\n' + prog.map(r => `- ${r.name}: ${r.bests.map(b => fmtMs(b.ms) + ' (' + fmtDate(b.date) + ')').join(' → ')}${r.bests.length > 1 ? ` · PB ${fmtMs(r.pb)} · ${r.delta <= 0 ? 'faster' : 'slower'} by ${(Math.abs(r.delta) / 1000).toFixed(2)} s since the first` : ''}`).join('\n'));
+  } else parts.push(STORE.hasIdentity ? "THE DRIVER'S SESSIONS: none uploaded yet." : 'THE DRIVER is not signed in: no sessions known.');
+  // the ideal of the layouts in play
+  for (const k of await aiLayoutsFor(text)) { const [tid, lid] = k.split('|'); try { const res = await BRAINS.ideal(tid, lid, aiCls()); if (res && res.corners) parts.push(BRAINS.asText(res)); } catch (e) {} }
+  if (AI.ctx.found && AI.ctx.found.corners) parts.push(BRAINS.asText(AI.ctx.found));
+  // the session in play, corner by corner (loaded into the Lab)
+  if (AI.ctx.sid) { try { const meta = await STORE.getSessionMeta(AI.ctx.sid); if (meta) { if (!(LAB.current && LAB.current.id === meta.id && LAB.dcmp)) await LAB.open(meta, false); if (LAB.dcmp && LAB.current && LAB.current.id === meta.id) parts.push('THIS CHAT IS ABOUT SESSION [' + meta.id + ']. Corner-by-corner breakdown (JSON):\n' + aiContext()); } } catch (e) {} }
+  return parts.join('\n\n').slice(0, 90000);
+}
+const aiCls = () => AI.ctx.cls || 'rental';
+// best lap per session, per layout, oldest first (layouts with a name only)
+function aiProgressRows(mine) {
+  const by = new Map();
+  for (const m of mine) { if (!m.track || !m.layout || m.layout === 'custom' || !(m.bestMs > 0)) continue; const k = m.track + '|' + m.layout + '|' + kartClassOf(m); if (!by.has(k)) by.set(k, []); by.get(k).push(m); }
+  const rows = [];
+  for (const [k, ms] of by) { const [tid, lid] = k.split('|'); ms.sort((a, b) => String(a.date || '').localeCompare(String(b.date || ''))); const bests = ms.map(m => ({ ms: m.bestMs, date: m.date, id: m.id })); const pb = Math.min(...bests.map(b => b.ms)); rows.push({ key: k, tid, lid, name: BRAINS.layoutName(tid, lid), bests, pb, delta: bests[bests.length - 1].ms - bests[0].ms, last: ms[ms.length - 1].date }); }
+  return rows.sort((a, b) => String(b.last || '').localeCompare(String(a.last || '')));
+}
+
+async function renderAIPage(a, b) {
+  const on = STORE.aiOn;
+  $('haiSoon').hidden = on; if (!on) $('haiSoonText').innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('The chat is being connected. The ideal lap already works.'))}`;
+  if (a === 'paid') { toast(t('Payment received — credits appear within a few seconds.')); setTimeout(() => renderWallet(true), 2500); history.replaceState(null, '', '#ai'); a = null; }
+  if (on && STORE.hasIdentity) { renderWallet(false).then(renderAiNote).catch(() => {}); STORE.chats().then(cs => { AI.chats = cs || []; renderChatList(); }).catch(() => {}); }
+  aiLayField().catch(() => {});
+  if (a === 'new') { newChat(); if (b) { const m = await STORE.getSessionMeta(b).catch(() => null); if (m) await actSession(m, true); } }
+  else if (a === 'ideal' && b) { newChat(); const [tid, lid] = String(b).split('.'); await actIdeal(tid, lid); }
+  else if (a && /^\d+$/.test(a)) { const cs = AI.chats.length ? AI.chats : (STORE.hasIdentity ? await STORE.chats().catch(() => []) : []); AI.chats = cs || []; const c = AI.chats.find(x => String(x.id) === a); if (c) await openChat(c); }
+  renderLog(); renderAiNote();
+}
+// fair-use replies from the ask function, in words
+function aiLimitText2(e) {
+  const code = e && e.code, d = (e && e.data) || {};
+  if (code === 'rate_limited') return d.scope === 'day' ? t('Daily limit reached ({n} questions) — the coach is back tomorrow.', { n: d.limit || '' }) : (d.scope === 'ip' ? t('Too many questions from this network today — try again tomorrow.') : t('Limit: {n} questions an hour — take a short break and try again.', { n: d.limit || '' }));
+  if (code === 'busy') return t('The coach is resting: the community used today\'s questions. Back tomorrow.');
+  if (code === 'paused') return t('The coach is paused for a moment.');
+  return '';
+}
+// the beta's counter (questions today) for the note and the chats sheet
+async function renderWallet(fresh) { const w = await STORE.wallet(fresh); AI.wallet = w; const box = $('haiWallet'); if (box) box.textContent = w && !w.off && w.free ? t('Free beta · {u}/{d} today', { u: w.used_day || 0, d: w.limit_day }) : ''; return w; }
+// ---- the conversation on screen
+function newChat() { if (AI.ctl) AI.ctl.abort(); AI.cur = null; AI.log = []; AI.ctx = {}; AI.busy = false; if (/^#ai~/.test(location.hash)) history.replaceState(null, '', '#ai'); renderLog(); renderAiNote(); }
+async function openChat(c) {
+  newChat(); AI.cur = c; AI.ctx = { sid: c.session_id || '', layouts: c.track_id && c.layout_id && c.layout_id !== 'custom' ? [c.track_id + '|' + c.layout_id] : [] };
+  renderLog(true);
+  const ms = await STORE.chatMessages(c.id).catch(() => []); if (AI.cur !== c) return;
+  AI.log = ms.map(m => ({ t: m.role === 'user' ? 'user' : 'ai', content: m.content, at: m.created_at }));
+  renderLog(); renderAiNote(); $('haiHist').hidden = true;
+}
+function renderChatList() {
+  const box = $('haiChats'); box.innerHTML = '';
+  if (!AI.chats.length) { box.appendChild(el('div', 'hint', t('No chats yet. Ask anything about karting, or tap one of the four buttons.'))); return; }
+  for (const c of AI.chats) {
+    const a = el('a', 'item' + (AI.cur && AI.cur.id === c.id ? ' sel' : '')); a.href = '#ai~' + c.id; const tr = c.track_id ? STORE.getTrack(c.track_id) : null; const ly = tr && c.layout_id ? STORE.getLayout(c.track_id, c.layout_id) : null;
+    a.append(el('span', 'name', c.title || t('Chat')), el('span', 'meta', [tr ? tr.name + (ly ? ' · ' + ly.name : '') : (c.session_id ? t('session') : t('general')), fmtDate(c.updated_at)].join(' · ')));
+    a.onclick = (e) => { e.preventDefault(); $('haiHist').hidden = true; location.hash = '#ai~' + c.id; };
+    box.appendChild(a);
+  }
+}
+function mdLite(text) {
+  const esc1 = esc(text); const blocks = esc1.split(/\n{2,}/); const out = [];
+  for (const b of blocks) { const lines = b.split('\n'); if (lines.every(l => /^\s*([-•*]|\d+[.)])\s+/.test(l))) out.push('<ul>' + lines.map(l => '<li>' + l.replace(/^\s*([-•*]|\d+[.)])\s+/, '') + '</li>').join('') + '</ul>'); else out.push('<p>' + lines.join('<br>') + '</p>'); }
+  return out.join('').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\bT(\d{1,2})\b/g, '<span class="tref" style="border:0;cursor:default">T$1</span>');
+}
+const cutWords = (s, n) => { s = String(s || '').trim(); if (s.length <= n) return s; const c = s.slice(0, n); const k = c.lastIndexOf(' '); return (k > n * 0.5 ? c.slice(0, k) : c) + '…'; };
+// the session the conversation is about, once the Lab has it loaded
+const aiLabSid = () => { const sid = AI.ctx.sid; return sid && LAB.current && LAB.current.id === sid && LAB.G && LAB.dcmp ? sid : ''; };
+// a small lap map next to an answer about a session: the track line, every corner as a dot, the corners the answer names as badges
+function aiMiniMap(text) {
+  const sid = aiLabSid(); if (!sid) return null;
+  const want = new Set(); for (const m of String(text).matchAll(/\bT(\d{1,2})\b/g)) want.add(+m[1]); if (!want.size) return null;
+  const tr = LAB.G.track, D = LAB.dcmp, coach = LAB.coach, rows = D.rows.filter(r => want.has(r.w.n)); if (!rows.length) return null;
+  const cv = document.createElement('canvas'); cv.className = 'ai-map'; cv.title = t('Tap a corner to open it in the Lab');
+  const paint = () => {
+    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), W = cv.clientWidth || 220, H = cv.clientHeight || 150; if (W < 40) return;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (let i = 0; i < tr.N; i++) { x0 = Math.min(x0, tr.cx[i]); x1 = Math.max(x1, tr.cx[i]); y0 = Math.min(y0, tr.cy[i]); y1 = Math.max(y1, tr.cy[i]); }
+    const pad = 14, s = Math.min((W - 2 * pad) / Math.max(1, x1 - x0), (H - 2 * pad) / Math.max(1, y1 - y0)), ox = (W - s * (x1 - x0)) / 2, oy = (H - s * (y1 - y0)) / 2, P = (i) => [ox + s * (tr.cx[i] - x0), oy + s * (tr.cy[i] - y0)];
+    const cs = getComputedStyle(document.documentElement), col = (n, d) => cs.getPropertyValue(n).trim() || d;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = col('--line-2', '#cdd3dd'); ctx.lineWidth = 3; ctx.beginPath(); for (let i = 0; i < tr.N; i++) { const [x, y] = P(i); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); ctx.stroke();
+    ctx.fillStyle = col('--faint', '#98a1b3'); for (const r of D.rows) if (!want.has(r.w.n)) { const [x, y] = P(r.w.apex); ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2); ctx.fill(); }
+    { const [x, y] = P(0); ctx.fillStyle = col('--fg', '#1a2237'); ctx.fillRect(x - 1.5, y - 5, 3, 10); }
+    cv._hits = []; ctx.font = `700 10px ${col('--mono', 'monospace')}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const r of rows) { const c = coach && coach.corners.find(x => x.n === r.w.n), res = c ? Math.max(0, r.R.time - c.tTop) : 0; const [x, y] = P(r.w.apex); const bg = res > 0.25 ? col('--brake', '#e23d3d') : res > 0.1 ? col('--limit', '#e9a23b') : col('--accent', '#2f6bf0'); ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.fillStyle = '#fff'; ctx.fillText(String(r.w.n), x, y + 0.5); cv._hits.push({ x, y, n: r.w.n }); }
+  };
+  cv.onclick = (e) => { const b = cv.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top; const h = (cv._hits || []).find(p => Math.hypot(p.x - x, p.y - y) < 12); if (h) location.hash = '#lab~' + sid + '~t' + h.n; };
+  requestAnimationFrame(paint); if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (cv.isConnected) paint(); }); ro.observe(cv); }
+  return cv;
+}
+function renderLog(loading) {
+  const log = $('haiLog'); log.innerHTML = ''; $('hai').classList.toggle('talking', AI.log.length > 0 || !!loading);
+  $('haiChatHead').hidden = !(AI.cur || AI.log.length); $('haiTitle').textContent = AI.cur ? (AI.cur.title || t('Chat')) : '';
+  if (loading) { log.appendChild(el('div', 'msg ai thinking', t('Loading…'))); return null; }
+  if (!AI.log.length) { const e = el('div', 'ai2-empty'); e.textContent = t('Tap a button above, or ask anything: how to take a corner, why you lose time, how to drive a track you have never been to.'); log.appendChild(e); return null; }
+  let last = null; const sid = aiLabSid();
+  for (const m of AI.log) {
+    if (m.t === 'card') { log.appendChild(m.node); last = m.node; continue; }
+    const d = el('div', 'msg ' + (m.t === 'user' ? 'user' : 'ai'));
+    if (m.t === 'user') d.textContent = m.content;
+    else {
+      d.innerHTML = mdLite(m.content); const mm = aiMiniMap(m.content); if (mm) d.prepend(mm);
+      if (sid) for (const sp of d.querySelectorAll('.tref')) { const n = +sp.textContent.slice(1); if (LAB.dcmp.rows.some(r => r.w.n === n)) { sp.classList.add('go'); sp.style.cursor = 'pointer'; sp.title = t('Open T{n} in the Lab', { n }); sp.onclick = () => { location.hash = '#lab~' + sid + '~t' + n; }; } }
+      if (m.cut) { const c = el('button', 'btn xs ghost ai-cut'); c.type = 'button'; c.textContent = t('The answer was cut short — continue'); c.onclick = () => aiSend(t('Continue exactly where you stopped, briefly.')); d.appendChild(c); }
+      if (AI.cur && STORE.hasIdentity) { const tgt = AI.cur.id + ':' + AI.log.filter(x => x.t !== 'card').indexOf(m); const f = el('button', 'ai-flag', STORE.hasFlagged('ai', tgt) ? t('Reported ✓') : t('Report this answer')); f.type = 'button'; f.onclick = () => FLAG.open('ai', tgt, '', () => { f.textContent = t('Reported ✓'); }); d.appendChild(f); }
+    }
+    log.appendChild(d); last = d;
+  }
+  if (AI.busy) { const d = el('div', 'msg ai thinking', t('Thinking…')); log.appendChild(d); last = d; }
+  if (last) requestAnimationFrame(() => { try { last.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {} });
+  return last;
+}
+function renderAiNote() {
+  const w = AI.wallet, n = $('haiNote'), on = STORE.aiOn, signed = STORE.hasIdentity;
+  let out = false;   // out of questions for now (only once the wallet has answered)
+  if (!on) n.textContent = '';
+  else if (!signed) n.textContent = t('Sign in to chat — the buttons above work without it.');
+  else if (!w || w.off) n.textContent = '';
+  else if (w.free) { out = !!w.paused || w.used_day >= w.limit_day; n.textContent = w.paused ? t('The coach is paused for a moment.') : t('Free beta · {u}/{d} today', { u: w.used_day || 0, d: w.limit_day }); }
+  else if (w.plan === 'pro') n.textContent = 'Pro';
+  else { out = !(w.credits > 0); n.textContent = w.credits > 0 ? t('{n} credits left', { n: w.credits }) : t('No credits left.'); }
+  $('haiSend').disabled = !on || AI.busy || out;
+  $('haiInput').placeholder = on ? t('Ask anything about karting…') : t('The chat is being connected');
+  $('haiInput').disabled = !on;
+}
+// a question to the AI: kept in the chat (the first one opens it), the answer streamed in
+async function aiSend(text, o) {
+  o = o || {}; text = String(text || $('haiInput').value || '').trim(); if (!text || AI.busy) return;
+  if (!STORE.aiOn) { toast(t('The AI coach is not connected yet.')); return; }
+  if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to talk to the AI coach — it remembers your sessions.')); return; }
+  const w = AI.wallet; if (w && !w.off && !w.free && w.plan !== 'pro' && !(w.credits > 0)) { openPay(); return; }
+  if (o.ctx) AI.ctx = Object.assign({}, AI.ctx, o.ctx);
+  AI.log.push({ t: 'user', content: text }); if (!o.keep) $('haiInput').value = ''; $('haiSend').classList.toggle('primary', !!$('haiInput').value.trim()); aiGrow(); AI.busy = true;
+  const bubble = renderLog(); renderAiNote(); $('haiStop').hidden = false; $('haiSend').hidden = true; AI.ctl = new AbortController(); const ctl = AI.ctl;
+  try {
+    const system = await aiSystem(text), lay = (AI.ctx.layouts || [])[0] || '', [tid, lid] = lay ? lay.split('|') : [null, null];
+    const sm = AI.ctx.sid ? await STORE.getSessionMeta(AI.ctx.sid).catch(() => null) : null;
+    STORE.track('ask', { page: 'ai', act: o.act || '' });
+    const r = await STORE.ask({ kb: true, chatId: AI.cur ? AI.cur.id : null, sessionId: sm ? sm.id : null, trackId: sm ? sm.track : tid, layoutId: sm ? sm.layout : lid, title: AI.cur ? null : (o.title || cutWords(text, 60)), system, text, signal: ctl.signal, onText: (tx) => { if (bubble && AI.ctl === ctl) { bubble.classList.remove('thinking'); bubble.innerHTML = mdLite(tx); } } });
+    if (AI.ctl !== ctl) return;
+    AI.log.push({ t: 'ai', content: r.text, cut: r.stop === 'max_tokens' });
+    if (!AI.cur) { AI.chats = await STORE.chats().catch(() => AI.chats); AI.cur = AI.chats.find(c => c.id === r.chatId) || null; if (AI.cur) history.replaceState(null, '', '#ai~' + AI.cur.id); renderChatList(); }
+    if (AI.wallet && !AI.wallet.off) { if (AI.wallet.free) { if (r.usedDay !== null && r.usedDay !== undefined) { AI.wallet.used_day = r.usedDay;  } } else if (r.credits !== null && r.credits !== undefined) { AI.wallet.credits = r.credits; AI.wallet.plan = r.plan || AI.wallet.plan;  } }
+  } catch (e) {
+    if (AI.ctl !== ctl) return;
+    const code = e && e.code; if (e && e.text) AI.log.push({ t: 'ai', content: e.text }); else AI.log.pop();
+    if (code === 'no_credits') { toast(t('No credits left — get a pack or Pro.')); await renderWallet(true); openPay(); }
+    else if (code === 'sign_in') AUTH.open();
+    else if (aiLimitText2(e)) toast(aiLimitText2(e));
+    else if (code === 'not_configured') toast(t('The AI coach is not connected yet.'));
+    else if (code !== 'cancelled' && !(e && e.name === 'AbortError')) toast(t('No answer ({code}). Try again.', { code: code || (e && e.message) || 'error' }));
+  }
+  AI.busy = false; AI.ctl = null; $('haiStop').hidden = true; $('haiSend').hidden = false; renderLog(); renderAiNote(); renderWallet(false).then(renderAiNote).catch(() => {});
+}
+function aiGrow() { const ta = $('haiInput'); ta.style.height = 'auto'; ta.style.height = Math.min(160, ta.scrollHeight) + 'px'; }
+function pushCard(node) { AI.log.push({ t: 'card', node }); renderLog(); }
+const aiCard = (title, sub) => { const c = el('div', 'ai2-card'), hd = el('div', 'hd'), tt = el('div', 'tt'); tt.append(el('b', 'ai2-cardt', title)); if (sub !== undefined) { const s = el('div', 'hint', sub || ''); s.dataset.sub = '1'; tt.append(s); } hd.append(tt); c.append(hd); return c; };
+const aiBtn = (label, cls, fn) => { const b = el('button', 'btn sm ' + (cls || ''), label); b.type = 'button'; b.onclick = fn; return b; };
+
+// ---- 1. the ideal lap: any layout, at once, from the data
+async function aiLayoutOptions() {
+  const mineK = new Set(); if (STORE.hasIdentity) for (const m of await STORE.mySessions().catch(() => [])) if (m.track && m.layout && m.layout !== 'custom') mineK.add(m.track + '|' + m.layout);
+  const groups = [];
+  for (const tr of STORE.getTracks()) { let ls = []; try { ls = await STORE.getLayouts(tr.id); } catch (e) { ls = []; } if (!ls.length) continue; groups.push({ tr, ls }); }
+  return { groups, mineK };
+}
+async function aiDefaultLayout() {
+  if (STORE.hasIdentity) { const last = (await STORE.mySessions().catch(() => [])).find(m => m.track && m.layout && m.layout !== 'custom'); if (last) return [last.track, last.layout, kartClassOf(last) === 'sport' ? 'sport' : 'rental']; }
+  const prof = STORE.hasIdentity ? (await STORE.profile(STORE.me.id).catch(() => null) || {}) : {};
+  const tids = [prof.homeTrack, 'dubai-kartdrome'].concat(STORE.getTracks().map(x => x.id)).filter(Boolean);
+  for (const tid of tids) { let ls = []; try { ls = await STORE.getLayouts(tid); } catch (e) { ls = []; } if (ls.length) return [tid, ls[0].id, 'rental']; }
+  return [null, null, 'rental'];
+}
+// the layout the ideal lap is for: a setting next to the main button (the driver's last layout until he picks another; kept on this device)
+async function aiLayField() {
+  if (!AI.lay) { let saved = null; try { saved = JSON.parse(localStorage.getItem('hutka.ai.lay') || 'null'); } catch (e) { saved = null; } if (saved && saved.tid && STORE.getTrack(saved.tid)) AI.lay = saved; else { const d = await aiDefaultLayout(); if (d[0]) AI.lay = { tid: d[0], lid: d[1], cls: d[2] }; } }
+  if (AI.lay) { try { await STORE.getLayouts(AI.lay.tid); } catch (e) {} }   // the layout's own name, not its id
+  aiLayShow();
+}
+function aiLayShow() { const L = AI.lay, tr = L ? STORE.getTrack(L.tid) : null, l = L ? STORE.getLayout(L.tid, L.lid) : null; $('haiLayName').textContent = L ? (l ? l.name : L.lid) : t('No layouts yet.'); $('haiLayTrack').textContent = tr ? tr.name : ''; }
+function aiSetLay(tid, lid) { AI.lay = { tid, lid, cls: (AI.lay && AI.lay.cls) || 'rental' }; try { localStorage.setItem('hutka.ai.lay', JSON.stringify(AI.lay)); } catch (e) {} aiLayShow(); }
+// the layouts to choose from, by track: the driver's own first (★), each saying whether real laps or a forecast stand behind its ideal
+async function aiLaySheet(onPick) {
+  const box = $('haiLayList'); box.innerHTML = ''; box.appendChild(el('div', 'hint', t('Loading…'))); $('haiLaySheet').hidden = false;
+  const { groups, mineK } = await aiLayoutOptions(); box.innerHTML = '';
+  groups.sort((a, b) => (b.ls.some(l => mineK.has(b.tr.id + '|' + l.id)) - a.ls.some(l => mineK.has(a.tr.id + '|' + l.id))));
+  for (const g of groups) {
+    box.appendChild(el('h4', '', g.tr.name));
+    for (const l of g.ls) {
+      const k = g.tr.id + '|' + l.id, b = el('button', 'ai2-lay' + (AI.lay && AI.lay.tid === g.tr.id && AI.lay.lid === l.id ? ' sel' : '')); b.type = 'button';
+      const hint = el('span', mineK.has(k) ? 'mine' : '', mineK.has(k) ? t('you drove it') : '');
+      b.append(el('b', '', l.name), hint);
+      if (!mineK.has(k)) STORE.sessionsFor(g.tr.id, l.id).then(ms => { hint.textContent = ms.length ? t('real laps') : t('forecast'); }).catch(() => {});
+      b.onclick = () => { $('haiLaySheet').hidden = true; aiSetLay(g.tr.id, l.id); if (onPick) onPick(g.tr.id, l.id); };
+      box.appendChild(b);
+    }
+  }
+}
+async function actIdeal(tid, lid, cls) {
+  if (!tid) { await aiLayField(); if (AI.lay) { tid = AI.lay.tid; lid = AI.lay.lid; cls = cls || AI.lay.cls; } }
+  else aiSetLay(tid, lid);
+  cls = cls || 'rental';
+  const card = aiCard(t('Ideal lap'), ''), sub = card.querySelector('[data-sub]'), name = el('div', 'ai2-cardlay');
+  const nm = el('b', '', tid ? ((STORE.getLayout(tid, lid) || {}).name || BRAINS.layoutName(tid, lid)) : t('No layouts yet.')), ch = el('button', 'btn xs ghost', t('Change')); ch.type = 'button';
+  name.append(nm, ch); card.querySelector('.hd .tt').insertBefore(name, sub);
+  const body = el('div', 'ai2-body'); card.appendChild(body);
+  pushCard(card);
+  let cur = 0;
+  const show = async (t1, l1) => {
+    const my = ++cur; const lo = STORE.getLayout(t1, l1), trk = STORE.getTrack(t1); nm.textContent = lo ? lo.name : BRAINS.layoutName(t1, l1); nm.title = trk ? trk.name : ''; body.innerHTML = ''; body.appendChild(el('div', 'hint', t('Reading the fastest laps…'))); sub.textContent = '';
+    let res = null; try { res = await BRAINS.ideal(t1, l1, cls); } catch (e) { res = null; }
+    if (my !== cur) return;
+    AI.ctx = Object.assign({}, AI.ctx, { layouts: [t1 + '|' + l1], cls });
+    renderIdeal(body, sub, res);
+  };
+  ch.onclick = () => aiLaySheet((t1, l1) => show(t1, l1));
+  if (tid && lid) await show(tid, lid); else body.innerHTML = '<div class="hint">' + esc(t('No layouts yet.')) + '</div>';
+}
+// the ideal of one layout drawn in a card: the map, the legend, every corner in words (and the driver's own way where it differs)
+function renderIdeal(body, sub, res) {
+  body.innerHTML = '';
+  if (!res || res.mode === 'none' || !res.corners) { body.appendChild(el('div', 'hint', t('This layout has no line yet — nobody has uploaded a lap on it and it has no drawing. Upload a session there, or try New track.'))); return; }
+  const trName = res.tid && STORE.getTrack(res.tid) ? STORE.getTrack(res.tid).name + ' · ' : '';
+  sub.textContent = res.mode === 'real' ? trName + t('Real laps here: {n} · drivers: {d} · best {b}', { n: res.info.laps, d: res.info.drivers, b: fmtMs(res.info.best * 1000) }) : trName + t('Too few laps here yet: built from similar corners of other layouts ({n}) — a forecast, check it on track', { n: res.info.books });
+  const cv = el('canvas', 'ai2-map'); body.appendChild(cv);
+  const lg = el('div', 'ai2-legend'); lg.innerHTML = `<span><i class="b"></i>${esc(t('Braking zone'))}</span><span><i class="l"></i>${esc(t('Lift zone'))}</span><span><i class="g"></i>${esc(t('back on the gas'))}</span><span><i class="f"></i>${esc(t('Flat-out corner'))}</span>`; body.appendChild(lg);
+  const list = el('div', 'ai2-crn'); body.appendChild(list);
+  let sel = 0, hits = [];
+  const paint = () => { hits = BRAINS.draw(cv, res, sel); };
+  const rows = [];
+  for (const c of res.corners) {
+    const r = el('div', 'row1'), no = el('span', 'no' + (c.pts.kind === 'flat' ? ' flat' : ''), 'T' + c.n), tx = el('div', 'tx');
+    tx.append(el('span', 'do', BRAINS.text(c.pts)));
+    if (c.mine) { const dl = BRAINS.diffLines(c.pts, c.mine.pts), dt = typeof c.mine.time === 'number' && typeof c.time === 'number' ? c.mine.time - c.time : null, slow = dt !== null && dt >= 0.05; if (dl.length || slow) { const me = el('span', 'me'); me.innerHTML = `${esc(t('You'))}: ${esc(dl.length ? dl.join(' · ') : t('the same points, but slower through'))}${slow ? ` · <b>+${dt.toFixed(2)} ${esc(t('s'))}</b>` : ''}`; tx.append(me); } }
+    r.append(no, tx); r.onclick = () => { sel = sel === c.n ? 0 : c.n; for (const x of rows) x.el.classList.toggle('sel', x.n === sel); paint(); };
+    rows.push({ n: c.n, el: r }); list.appendChild(r);
+  }
+  cv.onclick = (e) => { const b = cv.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top; const h = hits.find(p => Math.hypot(p.x - x, p.y - y) < 14); if (!h) return; sel = sel === h.n ? 0 : h.n; for (const r of rows) r.el.classList.toggle('sel', r.n === sel); paint(); const row = rows.find(r => r.n === h.n); if (row && sel) row.el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
+  requestAnimationFrame(paint); if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (cv.isConnected) paint(); }); ro.observe(cv); }
+  const acts = el('div', 'row ai2-acts2');
+  acts.append(aiBtn(t('Ask Hutka AI about this lap'), 'primary', () => aiSend(res.mode === 'real' ? t('Go through the ideal lap of {name}: where do the fastest drivers gain the most, and what should I focus on?', { name: res.name }) : t('How would you drive {name}? It has not been driven on Hutka yet.', { name: res.name }), { act: 'ideal', title: t('Ideal lap · {name}', { name: res.name }) })));
+  body.appendChild(acts);
+}
+
+// ---- 2. the last session: where the time goes, then the AI on it
+async function actSession(meta, quiet) {
+  if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to see your sessions.')); return; }
+  if (!meta) meta = (await STORE.mySessions().catch(() => []))[0] || null;
+  if (!meta) { const c = aiCard(t('My last session'), t('No sessions yet.')); c.appendChild(aiBtn(t('Upload a session'), 'primary', () => { location.hash = '#lab'; setTimeout(() => { const b = $('labUpload'); if (b) b.click(); }, 300); })); pushCard(c); return; }
+  const tr = STORE.getTrack(meta.track), ls = meta.track ? await STORE.getLayouts(meta.track).catch(() => []) : [], l = ls.find(x => x.id === meta.layout);
+  const card = aiCard(meta.label || meta.name || t('Session'), [tr ? tr.name : (meta.trackName || t('Custom')), l ? l.name : '', fmtDate(meta.date)].filter(Boolean).join(' · '));
+  const nums = el('div', 'ai2-nums'); nums.innerHTML = `<span><i>${esc(t('best lap'))}</i><b>${esc(fmtMs(meta.bestMs))}</b></span><span><i>${esc(t('avg clean'))}</i><b>${esc(fmtMs(meta.avgMs))}</b></span><span><i>${esc(t('laps'))}</i><b>${meta.nLaps || 0}</b></span><span><i>${esc(t('reserve'))}</i><b class="res">…</b></span>`;
+  const chips = el('div', 'chips ai2-cchips'); chips.appendChild(el('span', 'hint', t('Reading the corners…')));
+  const open = el('a', 'btn sm', t('Open in the Lab')); open.href = '#lab~' + meta.id;
+  card.append(nums, chips, open); pushCard(card);
+  AI.ctx = Object.assign({}, AI.ctx, { sid: meta.id, layouts: meta.track && meta.layout && meta.layout !== 'custom' ? [meta.track + '|' + meta.layout] : [], cls: kartClassOf(meta) === 'sport' ? 'sport' : 'rental' });
+  try { if (!(LAB.current && LAB.current.id === meta.id && LAB.dcmp)) await LAB.open(meta, false); } catch (e) {}
+  chips.innerHTML = '';
+  if (LAB.dcmp && LAB.current && LAB.current.id === meta.id) {
+    const D = LAB.dcmp, coach = LAB.coach; let total = 0; const per = [];
+    for (const r of D.rows) { const c = coach && coach.corners.find(x => x.n === r.w.n); const res = c ? Math.max(0, r.R.time - c.tTop) : 0; total += res; per.push({ n: r.w.n, res }); }
+    per.sort((a, b) => b.res - a.res);
+    for (const p of per.slice(0, 5)) { if (p.res < 0.03) break; const ch = el('button', 'chip' + (p.res > 0.25 ? ' hot' : p.res > 0.1 ? ' warm' : '')); ch.type = 'button'; ch.innerHTML = `<b>T${p.n}</b>−${p.res.toFixed(2)} ${esc(t('s'))}`; ch.title = t('Ask the coach about T{n}', { n: p.n }); ch.onclick = () => aiSend(t('T{n}: what exactly am I losing here and what should I change?', { n: p.n }), { act: 'corner' }); chips.appendChild(ch); }
+    if (!chips.children.length) chips.appendChild(el('span', 'hint', t('Your passes are close to your best in every corner.')));
+    nums.querySelector('.res').textContent = total.toFixed(2) + ' ' + t('s');
+  } else { chips.appendChild(el('span', 'hint', t('The corner breakdown appears once the session opens in the Lab.'))); nums.querySelector('.res').textContent = '—'; }
+  if (!quiet && STORE.aiOn) aiSend(t('What is the main thing to fix in this session?'), { act: 'session', keep: true, title: `${meta.label || meta.name || t('Session')} · ${t('main thing to fix')}` });
+}
+
+// ---- 3. progress: every layout the driver has more than one session on, best lap by session, then the AI on it
+async function actProgress() {
+  if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to see your progress.')); return; }
+  const mine = await STORE.mySessions().catch(() => []); const rows = aiProgressRows(mine);
+  const card = aiCard(t('My progress'), mine.length ? t('{n} sessions on {l} layouts', { n: mine.length, l: rows.length }) : t('No sessions yet.'));
+  const list = el('div', 'ai2-prog');
+  for (const r of rows.slice(0, 6)) {
+    const it = el('div', 'it'), hd = el('div', 'h'); hd.append(el('b', '', r.name), el('span', 'pb', t('PB {t}', { t: fmtMs(r.pb) })));
+    const sp = el('canvas', 'spark'); const sub = el('div', 'hint', r.bests.length > 1 ? (r.delta < 0 ? t('{d} s faster than your first session here ({n} sessions)', { d: (-r.delta / 1000).toFixed(2), n: r.bests.length }) : t('{d} s slower than your first session here ({n} sessions)', { d: (r.delta / 1000).toFixed(2), n: r.bests.length })) : t('One session so far'));
+    it.append(hd, sp, sub); list.appendChild(it);
+    requestAnimationFrame(() => aiSpark(sp, r.bests.map(b => b.ms)));
+    it.onclick = () => actIdeal(r.tid, r.lid);
+  }
+  card.appendChild(list);
+  if (rows.length) card.appendChild(el('div', 'hint', t('Tap a layout to see its ideal lap.')));
+  pushCard(card);
+  if (rows.length && STORE.aiOn) aiSend(t('How is my progress going, and what should I work on next?'), { act: 'progress', keep: true, title: t('My progress') });
+}
+function aiSpark(cv, xs) {
+  const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), W = cv.clientWidth || 260, H = cv.clientHeight || 44; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (xs.length < 2) return; const lo = Math.min(...xs), hi = Math.max(...xs), span = Math.max(1, hi - lo), cs = getComputedStyle(document.documentElement), col = (n, d) => cs.getPropertyValue(n).trim() || d;
+  const P = (i) => [6 + (W - 12) * i / (xs.length - 1), 6 + (H - 12) * (xs[i] - lo) / span];   // lower = faster: the line goes up as the driver gets faster
+  ctx.strokeStyle = col('--accent', '#2f6bf0'); ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.beginPath(); xs.forEach((x, i) => { const [a, b] = P(i); const y = H - b; i ? ctx.lineTo(a, y) : ctx.moveTo(a, y); }); ctx.stroke();
+  xs.forEach((x, i) => { const [a, b] = P(i); ctx.beginPath(); ctx.arc(a, H - b, x === lo ? 3.5 : 2.2, 0, Math.PI * 2); ctx.fillStyle = x === lo ? col('--throttle', '#2fb563') : col('--accent', '#2f6bf0'); ctx.fill(); });
+}
+
+// ---- 4. a new track: a name, a map link, a place or a photo → its layouts (Hutka's, or the raceway on OpenStreetMap) → the ideal
+function actTrack() {
+  const card = aiCard(t('New track'), t('Name the track, paste a map link or coordinates, use where you are now, or send a photo of the track map.'));
+  const row = el('div', 'ai2-find'), inp = el('input', ''); inp.type = 'text'; inp.placeholder = t('Track name, map link or coordinates'); inp.autocomplete = 'off';
+  const go = aiBtn(t('Find'), 'primary', () => run(inp.value)); row.append(inp, go);
+  const row2 = el('div', 'row ai2-find2');
+  const here = aiBtn(t('Where I am'), '', () => { if (!navigator.geolocation) { toast(t('This device cannot tell where it is.')); return; } here.classList.add('busy'); navigator.geolocation.getCurrentPosition((p) => { here.classList.remove('busy'); run(`${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`); }, () => { here.classList.remove('busy'); toast(t('No location — allow it, or type the track name.')); }, { enableHighAccuracy: false, timeout: 12000, maximumAge: 600000 }); });
+  const file = el('input', ''); file.type = 'file'; file.accept = 'image/*'; file.hidden = true;
+  const photo = aiBtn(t('Photo of the track map'), '', () => file.click());
+  file.onchange = async () => { const f = file.files && file.files[0]; if (!f) return; file.value = ''; await fromPhoto(f); };
+  row2.append(here, photo, file);
+  const out = el('div', 'ai2-found');
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); run(inp.value); } });
+  card.append(row, row2, out); pushCard(card); setTimeout(() => inp.focus(), 50);
+  async function run(q) {
+    q = String(q || '').trim(); if (!q) return; out.innerHTML = ''; out.appendChild(el('div', 'hint', t('Looking…'))); go.classList.add('busy');
+    let res = null; try { res = await TRACKFIND.find(q); } catch (e) { res = { error: String(e && e.message || e) }; }
+    go.classList.remove('busy'); out.innerHTML = '';
+    if (!res || res.error) { out.appendChild(el('div', 'hint warn', res && res.error === 'offline' ? t('No connection to the map — try again online.') : t('Could not search the map just now — try again in a minute.'))); return; }
+    // tracks already on Hutka: their layouts straight to the ideal
+    for (const h of res.hutka) { const b = el('button', 'ai2-hit'); b.type = 'button'; const far = h.km !== null && h.km !== undefined ? ' · ' + esc(t('{d} km away', { d: h.km.toFixed(h.km < 10 ? 1 : 0) })) : ''; b.innerHTML = `<b>${esc(h.tr.name)}</b><span>${esc(h.lined ? t('On Hutka · {n} layouts', { n: h.ls.length }) : t('On Hutka, but nobody has uploaded a lap there yet'))}${far}</span>`; if (h.lined) b.onclick = () => actIdeal(h.tr.id, (h.ls[0] || {}).id); else b.disabled = true; out.appendChild(b); }
+    // raceways on the map: every closed loop found, longest first
+    for (const lp of res.loops) { const b = el('button', 'ai2-hit'); b.type = 'button'; b.innerHTML = `<b>${esc(lp.name || t('Raceway on the map'))}</b><span>${esc(t('OpenStreetMap · loop of {m} m', { m: Math.round(lp.lengthM) }))}</span>`; b.onclick = () => idealFromLoop(lp); out.appendChild(b); }
+    if (!res.hutka.length && !res.loops.length) out.appendChild(el('div', 'hint', res.place ? t('Found {p}, but no karting raceway is drawn there on OpenStreetMap. Upload a session there and Hutka maps it from your GPS.', { p: res.place }) : t('Nothing found. Try the track\'s name with the city, or a map link.')));
+  }
+  async function fromPhoto(f) {
+    out.innerHTML = ''; out.appendChild(el('div', 'hint', t('Reading the photo…')));
+    let guess = null; try { guess = await TRACKFIND.fromPhoto(f); } catch (e) { guess = null; }
+    out.innerHTML = '';
+    if (!guess || !guess.query) { out.appendChild(el('div', 'hint warn', t('Could not tell which track this is. Type its name or the city.'))); return; }
+    inp.value = guess.query; out.appendChild(el('div', 'hint', t('Looks like {q}', { q: guess.query }))); await run(guess.query);
+  }
+}
+// a loop off the map read like a layout: the ideal from similar corners, both ways round (the map does not say which way it is driven)
+async function idealFromLoop(lp, cw) {
+  const card = aiCard(lp.name || t('Raceway on the map'), ''), sub = card.querySelector('[data-sub]'), body = el('div', 'ai2-body');
+  const dirs = el('div', 'seg ai2-dir'); const bCw = aiBtn(t('Clockwise'), '', () => draw(true)), bCcw = aiBtn(t('Anticlockwise'), '', () => draw(false)); dirs.append(bCw, bCcw);
+  card.querySelector('.hd .tt').appendChild(dirs); card.appendChild(body); pushCard(card);
+  async function draw(cw) {
+    bCw.classList.toggle('active', !!cw); bCcw.classList.toggle('active', !cw); body.innerHTML = ''; body.appendChild(el('div', 'hint', t('Reading the corners…')));
+    const G = TRACKFIND.geometry(lp, cw); if (!G) { body.innerHTML = ''; body.appendChild(el('div', 'hint warn', t('This loop cannot be read as a track.'))); return; }
+    let res = null; try { res = await BRAINS.predictOn(G, { name: lp.name || t('Raceway on the map'), cls: aiCls() }); } catch (e) { res = null; }
+    AI.ctx = Object.assign({}, AI.ctx, { found: res, layouts: [] });
+    renderIdeal(body, sub, res);
+  }
+  await draw(cw === undefined ? true : !!cw);   // the map does not say which way it is driven: clockwise first, one tap for the other
+}
+
+// ---- wiring
+for (const b of document.querySelectorAll('#haiActs .ai2-act')) b.onclick = async () => { const a = b.dataset.act; b.classList.add('busy'); try { if (a === 'ideal') await actIdeal(); else if (a === 'session') await actSession(); else if (a === 'progress') await actProgress(); else if (a === 'track') actTrack(); } finally { b.classList.remove('busy'); } };
+$('haiNew').onclick = () => newChat();
+$('haiGo').onclick = async () => { const b = $('haiGo'); b.classList.add('busy'); try { await actIdeal(); } finally { b.classList.remove('busy'); } };
+$('haiLay').onclick = () => aiLaySheet();
+$('haiLayX').onclick = () => { $('haiLaySheet').hidden = true; }; $('haiLaySheet').addEventListener('click', (e) => { if (e.target === $('haiLaySheet')) $('haiLaySheet').hidden = true; });
+$('haiInput').addEventListener('input', () => { $('haiSend').classList.toggle('primary', !!$('haiInput').value.trim()); });
+$('haiHistBtn').onclick = () => { renderChatList(); $('haiHist').hidden = false; if (STORE.hasIdentity && STORE.aiOn) { renderWallet(false).catch(() => {}); STORE.chats().then(cs => { AI.chats = cs || []; renderChatList(); }).catch(() => {}); } };
+$('haiHistX').onclick = () => { $('haiHist').hidden = true; }; $('haiHist').addEventListener('click', (e) => { if (e.target === $('haiHist')) $('haiHist').hidden = true; });
+$('haiHistNew').onclick = () => { $('haiHist').hidden = true; newChat(); };
+$('haiSend').onclick = () => aiSend(); $('haiStop').onclick = () => { if (AI.ctl) AI.ctl.abort(); };
+$('haiInput').addEventListener('input', aiGrow);
+$('haiInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && !isPhone()) { e.preventDefault(); aiSend(); } });
+
+  // the page: an admin gets this one, everyone else the AI coach
+  const on = () => { let pg = ''; try { pg = localStorage.getItem('hutka.ai.page') || ''; } catch (e) {} return pg === 'new' || (!!(STORE.me && STORE.me.canEdit) && pg !== 'old'); };   // (hutka.ai.page: 'old' — the AI coach for an admin too; 'new' — this page for anyone, for checks)
+  async function render(a, b) { $('aiOld').hidden = true; $('hai').hidden = false; await renderAIPage(a, b); }
+  function off() { $('hai').hidden = true; $('aiOld').hidden = false; }
+  return { on, render, off };
+})();
 // ---------- SWS (Sodi World Series): the driver's own results, brought over from their SWS page ----------
 // SWS pages sit behind a captcha for servers, so the data comes from the driver's own browser: a bookmarklet on the SWS
 // profile page (or the table pasted by hand) → Hutka parses the rows → they live in the profile and can be tied to sessions.
@@ -10609,7 +11801,7 @@ const ADMIN = (() => {
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
   try { AUTH.gate(); } catch (e) {}   // the app: sign in first
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, sameTrackName, lineOf, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, sameTrackName, lineOf, BRAIN, DATA, KLL, readAnyLogger, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { if (typeof INTRO !== 'undefined') INTRO.ready(); } catch (e) {}   // the opening may finish: the app is up
