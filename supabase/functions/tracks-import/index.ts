@@ -32,9 +32,18 @@ Deno.serve(async (req) => {
   let body: { area?: string; dry?: boolean } = {};
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
   const area = String(body.area || "").toUpperCase(), dry = !!body.dry;
-  if (area === "PING") {   // does the map database answer from here, how fast (a run from the queue: area "PING")
-    const out: Record<string, unknown> = {}, t1 = Date.now();
-    try { const rows = await sparql('PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:> PREFIX ogc: <http://www.opengis.net/rdf#> SELECT (COUNT(DISTINCT ?el) AS ?n) WHERE { ?area osmkey:ISO3166-1 "BE" ; osmkey:admin_level "2" . ?area ogc:sfContains ?el . ?el osmkey:sport "karting" . }', 25000); out[QLEVER] = { ms: Date.now() - t1, n: rows[0] && rows[0].n ? rows[0].n.value : null }; } catch (e) { out[QLEVER] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; }
+  if (area === "PING") {   // how fast the map database answers the import's questions from here (a run from the queue: area "PING")
+    const P = 'PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:> PREFIX ogc: <http://www.opengis.net/rdf#> PREFIX geo: <http://www.opengis.net/ont/geosparql#> ';
+    const A = '?area osmkey:ISO3166-1 "BE" ; osmkey:admin_level "2" . ?area ogc:sfContains ?el . ?el osmkey:sport "karting" . ';
+    const tests: [string, string][] = [
+      ["tags", P + 'SELECT ?el ?key ?val WHERE { ' + A + '?el ?key ?val . FILTER(STRSTARTS(STR(?key), "https://www.openstreetmap.org/wiki/Key:")) }'],
+      ["cent", P + 'SELECT ?el ?cent WHERE { ' + A + '?el geo:hasCentroid/geo:asWKT ?cent . }'],
+      ["geom", P + 'SELECT ?el ?wkt WHERE { ' + A + '?el geo:hasGeometry/geo:asWKT ?wkt . }'],
+      ["race", P + 'SELECT ?el ?wkt WHERE { ?area osmkey:ISO3166-1 "BE" ; osmkey:admin_level "2" . ?area ogc:sfContains ?el . ?el osmkey:highway "raceway" . ?el geo:hasGeometry/geo:asWKT ?wkt . }'],
+      ["name1", P + 'SELECT ?el ?name WHERE { ' + A + 'OPTIONAL { ?el osmkey:name ?name } }'],
+    ];
+    const out: Record<string, unknown> = {};
+    for (const [k, q] of tests) { const t1 = Date.now(); try { const rows = await sparql(q, 30000); out[k] = { ms: Date.now() - t1, rows: rows.length, kb: Math.round(JSON.stringify(rows).length / 1024) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }
     await db.from("import_queue").update({ status: "done", result: out, finished_at: new Date().toISOString() }).eq("area", area); return json(out);
   }
   if (!/^([A-Z]{2}|US-[A-Z]{2})$/.test(area)) return json({ error: "bad_area" }, 400);
