@@ -35,6 +35,10 @@ const similar = (a: string, b: string) => { const x = nameKey(a), y = nameKey(b)
 // center, kartódromo, kartodrom, gokart, картинг, картодром, motokáry, mikroautorata — not Kartause, Kartoffel, kartano, Kartverket
 export const KART_NAME = /(^|[^\p{L}])(go[- ]?)?karts?(?![\p{L}])|karting|kartbahn|kartbaan|kartsport|kart[- ]?(center|centre|centrum|club|klub|arena|hall|halle|park|ring|land|world|zone|racing|track|circuit|bane|bana)|kart[oó]drom|kartdrom|gokart|go-kart|картинг|картодром|motok[aá]r|mikroauto/iu;
 export const kartName = (s: string) => KART_NAME.test(String(s || "")) && !/orient|kompass/i.test(String(s || ""));
+// children's karts, pedal cars and traffic parks (Mini-Karts, Kinderkartbahn, Kids Karts, Kart pour enfants, Pédale-Kart, verkeerspark)
+export const KIDS = /mini[- ]?auto|mini[- ]?kart|verkeerspark|kinder[- ]?(kart|auto|verkehr|bahn)|(^|[^\p{L}])kids?(?![\p{L}])|pour enfants|per bambini|para niños|p[ée]dal|trapauto|tretauto/iu;
+// a name saying the place is gone: "Ex Kartdromo", "Kartodromo (Abbandonato)", "ehemalige Kartbahn", "former karting"
+export const CLOSED = /(^|[^\p{L}])(ex|former|ehemalige?[rns]?|stillgelegte?[rns]?|abbandonat[oaie]|abandonn?ed|abandonn[ée]e?s?|disused|closed|chiuso|ferm[ée]e?|cerrad[oa]|desaparecid[oa]|zamknięty)(?![\p{L}])/iu;
 // which elements are venues: something with karting among its sports, or named for karts (a raceway, a track or a hall with no sport
 // given, a motor-sport venue), not a shop, an office or a closed place
 function isVenue(e: El): boolean {
@@ -43,7 +47,7 @@ function isVenue(e: El): boolean {
   if (t.shop || t.office || t.craft) return false;
   if (Object.keys(t).some(k => /^(disused|abandoned|demolished|razed|was|removed):/.test(k))) return false;
   if (/^(no|closed)$/i.test(t.opening_hours || "") || t["end_date"]) return false;
-  if (/mini[- ]?auto|verkeerspark|kinderauto|trapauto|pedal ?kart|tretauto|kinderverkehr/i.test(tag(t, "name"))) return false;   // children's pedal-car and traffic parks
+  if (KIDS.test(tag(t, "name")) || CLOSED.test(tag(t, "name"))) return false;
   return true;
 }
 // a venue's pieces ranked: the venue itself (sports centre), its track, a raceway drawn with a name, a pin
