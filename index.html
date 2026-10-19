@@ -1515,7 +1515,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <nav class="nav">
       <a href="#home" data-route="home"><svg><use href="#i-home"/></svg><span data-t="Home">Home</span></a>
       <a href="#lab" data-route="lab"><svg><use href="#i-lab"/></svg><span data-t="Lab">Lab</span></a>
-      <a href="#ai" data-route="ai" id="navAI"><svg><use href="#i-spark"/></svg><span data-t="AI coach">AI coach</span></a>
+      <a href="#ai" data-route="ai" id="navAI"><svg><use href="#i-spark"/></svg><span data-t="Hutka AI">Hutka AI</span></a>
       <a href="#tracks" data-route="tracks"><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></a>
       <a href="#profile" data-route="profile"><svg><use href="#i-user"/></svg><span data-t="Profile">Profile</span></a>
       <a href="#help" data-route="help"><svg><use href="#i-help"/></svg><span data-t="Help">Help</span></a>
@@ -1950,7 +1950,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <a href="#home" data-route="home"><svg><use href="#i-home"/></svg><span data-t="Home">Home</span></a>
   <a href="#lab" data-route="lab"><svg><use href="#i-lab"/></svg><span data-t="Lab">Lab</span></a>
   <button type="button" id="tabUpload" class="up" aria-label="Upload" data-ta="Upload"><span class="circ"><svg><use href="#i-upload"/></svg></span><span data-t="Upload">Upload</span></button>
-  <a href="#ai" data-route="ai" id="tabAI"><svg><use href="#i-spark"/></svg><span data-t="AI coach">AI coach</span></a>
+  <a href="#ai" data-route="ai" id="tabAI"><svg><use href="#i-spark"/></svg><span data-t="Hutka AI">Hutka AI</span></a>
   <a href="#profile" data-route="profile"><svg><use href="#i-user"/></svg><span data-t="Profile">Profile</span></a>
 </nav>
 <!-- upload modal -->
@@ -5187,6 +5187,8 @@ Object.assign(I18N.RU, {
   "Read from the photo · about {m} m: the length is a guess, so the corners are right and the distances only roughly": "С фото · примерно {m} м: длина — догадка, поэтому повороты верные, а расстояния примерные"
 });
 Object.assign(I18N.RU, {"A forecast from similar corners of {n} layouts on Hutka — check it on track": "Прогноз по похожим поворотам {n} конфигураций на Hutka — проверь на трассе"});
+// v34.33 — Hutka AI for everyone
+Object.assign(I18N.RU, {"Hutka AI is not connected yet.": "Hutka AI ещё не подключён.", "Sign in to talk to Hutka AI — it knows your sessions.": "Войди, чтобы говорить с Hutka AI — он знает твои сессии."});
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -7012,7 +7014,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.32';
+const APP_VERSION = 'v34.33';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -10200,7 +10202,10 @@ const fileDate = (f) => { try { const d = new Date(f.lastModified || Date.now())
 // Points are told against what a driver sees — the turn-in, the apex — in metres. The atlases are built here from the published
 // sessions (one per layout and kart class, rebuilt only when its sessions change); a stored copy on the server comes later.
 const BRAINS = (() => {
-  const MIN_LAPS = 5, mem = new Map(), inflight = new Map(), rows = {};
+  // COMPAT: the oldest stored atlas a page may read (the compact form has not changed since version 2; a newer VER only builds better).
+  // LOCAL_MAX: a driver's page builds a layout's atlas itself only when the layout has few sessions — a big one would load every one of
+  // them (time, and the daily telemetry limit); it reads the stored atlas instead, which an admin's page brings up to date
+  const MIN_LAPS = 5, COMPAT = 2, LOCAL_MAX = 12, mem = new Map(), inflight = new Map(), rows = {};
   const clsOf = (m) => kartClassOf(m) === 'sport' ? 'sport' : 'rental';
   const fin = (x) => typeof x === 'number' && isFinite(x);
   const layoutName = (tid, lid) => { const tr = STORE.getTrack(tid), l = STORE.getLayout(tid, lid); return [tr ? tr.name : tid, l ? l.name : (lid === 'custom' ? '' : lid)].filter(Boolean).join(' · '); };
@@ -10246,9 +10251,12 @@ const BRAINS = (() => {
     const sig = sigOf(metas), m0 = mem.get(key); if (m0 && m0.sig === sig) return m0.v;
     if (inflight.has(key)) return inflight.get(key);
     const p = (async () => {
-      const st = (await stored(cls)).get(key), ok = st && st.data && st.data.v === BRAIN.VER;
-      let v = ok ? { C: st.data, G: null } : null;
-      if (!ok || (st.sig !== sig && STORE.me.canEdit)) { const b = await build(tid, lid, cls, metas, sig).catch(() => null); if (b) v = b; }
+      const st = (await stored(cls)).get(key), fresh = !!(st && st.data && st.data.v === BRAIN.VER), usable = !!(st && st.data && st.data.v >= COMPAT);
+      let v = usable ? { C: st.data, G: null } : null;
+      // an admin brings it up to date (a newer version, or its sessions changed) and stores it; a driver builds only a small layout
+      // that has none stored yet — a big one without an atlas is read from the similar corners until the admin's page has built it
+      const build1 = STORE.me.canEdit ? (!fresh || st.sig !== sig) : (!usable && metas.length <= LOCAL_MAX);
+      if (build1) { const b = await build(tid, lid, cls, metas, sig).catch(() => null); if (b) v = b; }
       if (v) mem.set(key, { sig, v }); return v;
     })();
     inflight.set(key, p); try { return await p; } finally { inflight.delete(key); }
@@ -10264,7 +10272,7 @@ const BRAINS = (() => {
   async function allAtlases(cls) {
     cls = cls || 'rental'; const out = [], seen = new Set();
     if (STORE.me.canEdit) for (const tr of STORE.getTracks()) { let ls = []; try { ls = await STORE.getLayouts(tr.id); } catch (e) { ls = []; } for (const l of ls) { const v = await layoutAtlas(tr.id, l.id, cls); if (v) { out.push(v); seen.add(v.C.key); } } }
-    for (const r of (await stored(cls)).values()) if (r.data && r.data.v === BRAIN.VER && !seen.has(r.data.key)) { out.push({ C: r.data, G: null }); seen.add(r.data.key); }
+    for (const r of (await stored(cls)).values()) if (r.data && r.data.v >= COMPAT && !seen.has(r.data.key)) { out.push({ C: r.data, G: null }); seen.add(r.data.key); }
     return out;
   }
   // the driver's own passes on a driven layout, read in the atlas's own corner windows: the middle of his three fastest per corner
@@ -11431,8 +11439,8 @@ function renderAiNote() {
 // a question to the AI: kept in the chat (the first one opens it), the answer streamed in
 async function aiSend(text, o) {
   o = o || {}; text = String(text || $('haiInput').value || '').trim(); if (!text || AI.busy) return;
-  if (!STORE.aiOn) { toast(t('The AI coach is not connected yet.')); return; }
-  if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to talk to the AI coach — it remembers your sessions.')); return; }
+  if (!STORE.aiOn) { toast(t('Hutka AI is not connected yet.')); return; }
+  if (!STORE.hasIdentity) { if (STORE.hasAuth) AUTH.open(); else toast(t('Sign in to talk to Hutka AI — it knows your sessions.')); return; }
   const w = AI.wallet; if (w && !w.off && !w.free && w.plan !== 'pro' && !(w.credits > 0)) { openPay(); return; }
   if (o.ctx) AI.ctx = Object.assign({}, AI.ctx, o.ctx);
   AI.log.push({ t: 'user', content: text }); if (!o.keep) $('haiInput').value = ''; $('haiSend').classList.toggle('primary', !!$('haiInput').value.trim()); aiGrow(); AI.busy = true;
@@ -11452,7 +11460,7 @@ async function aiSend(text, o) {
     if (code === 'no_credits') { toast(t('No credits left — get a pack or Pro.')); await renderWallet(true); openPay(); }
     else if (code === 'sign_in') AUTH.open();
     else if (aiLimitText2(e)) toast(aiLimitText2(e));
-    else if (code === 'not_configured') toast(t('The AI coach is not connected yet.'));
+    else if (code === 'not_configured') toast(t('Hutka AI is not connected yet.'));
     else if (code !== 'cancelled' && !(e && e.name === 'AbortError')) toast(t('No answer ({code}). Try again.', { code: code || (e && e.message) || 'error' }));
   }
   AI.busy = false; AI.ctl = null; $('haiStop').hidden = true; $('haiSend').hidden = false; renderLog(); renderAiNote(); renderWallet(false).then(renderAiNote).catch(() => {});
@@ -11676,9 +11684,15 @@ $('haiSend').onclick = () => aiSend(); $('haiStop').onclick = () => { if (AI.ctl
 $('haiInput').addEventListener('input', aiGrow);
 $('haiInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && !isPhone()) { e.preventDefault(); aiSend(); } });
 
-  // the page: an admin gets this one, everyone else the AI coach
-  const on = () => { let pg = ''; try { pg = localStorage.getItem('hutka.ai.page') || ''; } catch (e) {} return pg === 'new' || (!!(STORE.me && STORE.me.canEdit) && pg !== 'old'); };   // (hutka.ai.page: 'old' — the AI coach for an admin too; 'new' — this page for anyone, for checks)
-  async function render(a, b) { $('aiOld').hidden = true; $('hai').hidden = false; await renderAIPage(a, b); }
+  // the page: everyone's since v34.33 (hutka.ai.page = 'old' in localStorage still opens the former AI coach, for checks)
+  const on = () => { let pg = ''; try { pg = localStorage.getItem('hutka.ai.page') || ''; } catch (e) {} return pg !== 'old'; };
+  // an admin's visit is when the stored atlases are brought up to date — every layout whose sessions changed (or that a newer brain reads
+  // better) is rebuilt in the background, once a page load, so drivers' pages read fresh ones without loading whole layouts themselves
+  let refreshed = false;
+  async function render(a, b) {
+    $('aiOld').hidden = true; $('hai').hidden = false; await renderAIPage(a, b);
+    if (!refreshed && STORE.me && STORE.me.canEdit && STORE.hasDb) { refreshed = true; setTimeout(() => { BRAINS.allAtlases('rental').catch(() => {}).then(() => BRAINS.allAtlases('sport')).catch(() => {}); }, 2000); }
+  }
   function off() { $('hai').hidden = true; $('aiOld').hidden = false; }
   return { on, render, off };
 })();
