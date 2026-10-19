@@ -1457,6 +1457,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 .ai2-hist .chatlist{max-height:none}
 .ai2-hist .wallet{border-top:1px solid var(--line);padding-top:14px}
 .site-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 18px;margin:28px 2px 6px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.site-foot nav{display:flex;flex-wrap:wrap;gap:6px 16px}.site-foot a{color:inherit;text-decoration:none}.site-foot a:hover{color:var(--fg);text-decoration:underline}
+.ai2-legend i.r{background:var(--accent);height:3px}.ai2-photohd{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}.ai2-photohd .btn.ghost{align-self:flex-start}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -5193,6 +5194,17 @@ Object.assign(I18N.RU, {"A forecast from similar corners of {n} layouts on Hutka
 Object.assign(I18N.RU, {"Hutka AI is not connected yet.": "Hutka AI ещё не подключён.", "Sign in to talk to Hutka AI — it knows your sessions.": "Войди, чтобы говорить с Hutka AI — он знает твои сессии."});
 // v34.33 — the site footer: who runs Hutka, support, privacy
 Object.assign(I18N.RU, {"Dubai, UAE": "Дубай, ОАЭ", "Support": "Поддержка", "Privacy": "Конфиденциальность"});
+// v34.35 — the racing line from a layout map
+Object.assign(I18N.RU, {
+  "Racing line": "Траектория",
+  "From the layout map · {m} m": "По схеме конфигурации · {m} м",
+  "Nobody has driven this layout on Hutka yet. Upload a picture of its map — Hutka traces it and shows the racing line, where to brake and where to get back on the gas.": "Эту конфигурацию на Hutka ещё никто не ездил. Загрузи картинку её схемы — Hutka обведёт её и покажет траекторию, где тормозить и где открывать газ.",
+  "Upload the layout map": "Загрузить схему",
+  "Reading the picture…": "Читаю картинку…",
+  "Could not read the corners of this picture.": "Не получилось прочитать повороты на этой картинке.",
+  "Save to this layout": "Сохранить в конфигурацию",
+  "Saved — everyone sees this line now": "Сохранено — теперь эту линию видят все"
+});
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -7018,7 +7030,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.34';
+const APP_VERSION = 'v34.35';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -10292,8 +10304,58 @@ const BRAINS = (() => {
     for (const w of v.C.wins) { const ps = best.map(P => BRAIN.passOf(P, w, tr)).filter(p => fin(p.time)).sort((a, b) => a.time - b.time).slice(0, 3); if (!ps.length) continue; const r = BRAIN.represent({ top: ps }); if (r) out[w.n] = { pts: Object.assign({ kind: r.kind }, r.rel), time: r.time, vApex: r.vApex }; }
     return { laps: laps.length, best: laps[0].T, corners: out };
   }
+  // ---- the line a kart drives inside a drawn track (an admin's trace, a picture of the layout, the map): not the middle of the asphalt
+  // but the line of least curvature within the width — in wide, clip the apex, out wide — a kart's half-width and a margin off each edge.
+  // Solved on a coarse grid (a point every 8 m, then every 4 m from that answer): each point moved along its own normal to where the bends
+  // it takes part in are straightest (the second differences of the points around it), kept inside the corridor, until nothing moves; the
+  // points then make the line again (a spline). The corners are read on that line, as the atlases were learnt on driven lines; G.band
+  // keeps the middle and the half-width for the map
+  function lineOf(G) {
+    if (!G || !G.track || G.band) return G;
+    const tr = G.track, N = tr.N, half = (+G.widthM || 8) / 2, amax = Math.max(0.5, half - 0.7 - 0.3);
+    let prev = null, pts = null;
+    for (const grid of [8, 4]) {
+      const step = Math.max(1, Math.round(grid / tr.ds)), M = Math.floor(N / step); if (M < 12) continue;
+      const cx = new Float64Array(M), cy = new Float64Array(M), nx = new Float64Array(M), ny = new Float64Array(M), a = new Float64Array(M);
+      for (let k = 0; k < M; k++) { const i = k * step; cx[k] = tr.cx[i]; cy[k] = tr.cy[i]; nx[k] = tr.nx[i]; ny[k] = tr.ny[i]; if (prev) a[k] = prev(i); }
+      const m = (k) => (k % M + M) % M, X = (k) => cx[k] + a[k] * nx[k], Y = (k) => cy[k] + a[k] * ny[k];
+      for (let it = 0; it < 8000; it++) {
+        let moved = 0;
+        for (let k = 0; k < M; k++) {
+          const k1 = m(k - 1), k2 = m(k + 1), k0 = m(k - 2), k3 = m(k + 2);
+          const tx = (4 * (X(k1) + X(k2)) - (X(k0) + X(k3))) / 6, ty = (4 * (Y(k1) + Y(k2)) - (Y(k0) + Y(k3))) / 6;
+          const na = Math.max(-amax, Math.min(amax, (tx - cx[k]) * nx[k] + (ty - cy[k]) * ny[k]));
+          const d = Math.abs(na - a[k]); if (d > moved) moved = d; a[k] = na;
+        }
+        if (moved < 2e-4) break;
+      }
+      prev = (i) => { const f = i / step, k = Math.floor(f) % M, w = f - Math.floor(f); return a[k] + (a[(k + 1) % M] - a[k]) * w; };
+      pts = []; for (let k = 0; k < M; k++) pts.push({ x: X(k), y: Y(k) });
+    }
+    if (!pts) return G;
+    let L = 0; for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; L += Math.hypot(q.x - p.x, q.y - p.y); }
+    let t2 = null; try { t2 = KLL.buildTrack(pts, L, 0, false); } catch (e) { t2 = null; }
+    if (!t2 || !(t2.mpp > 0) || !isFinite(t2.mpp)) return G;
+    return Object.assign({}, G, { rev: G.rev + '~line', track: t2, band: { track: tr, half } });
+  }
+  // a picture of a layout saved to it (an admin's "Save to this layout"): the middle of the track in metres, the way round it is driven,
+  // the start/finish first — the layout's line for the brain while nobody has driven it (the Lab keeps reading sessions and drawings)
+  function photoGeom(tid, lid) {
+    const l = STORE.getLayout(tid, lid), p = l && l.photoLine;
+    if (!p || !Array.isArray(p.pts) || p.pts.length < 8 || !(+p.lengthM > 0)) return null;
+    let tr = null; try { tr = KLL.buildTrack(p.pts.map(q => ({ x: +q[0], y: +q[1] })), +p.lengthM, 0, false); } catch (e) { tr = null; }
+    if (!tr || !(tr.mpp > 0) || !isFinite(tr.mpp)) return null;
+    return { rev: 'ph:' + tid + '|' + lid + '|' + (p.at || ''), tid, lid, track: tr, corners: { R: 110, add: [], del: [] }, source: 'photo', widthM: +p.widthM || 8, photo: { lengthM: Math.round(+p.lengthM), how: p.how || '' } };
+  }
+  // what is saved for a picture's line: the middle as the brain read it (every ~2 m), in the way round chosen
+  function photoLineOf(G, how) {
+    const tr = G && (G.band ? G.band.track : G.track); if (!tr) return null;
+    const step = Math.max(1, Math.round(2 / tr.ds)), pts = []; for (let i = 0; i < tr.N; i += step) pts.push([Math.round(tr.cx[i] * 10) / 10, Math.round(tr.cy[i] * 10) / 10]);
+    return { v: 1, pts, lengthM: Math.round(tr.N * tr.ds), widthM: +G.widthM || 8, how: how || '', at: new Date().toISOString() };
+  }
   // the ideal of a layout. mode 'real': driven (MIN_LAPS clean laps or more) — its fastest real passes; 'predicted': not (or too little)
-  // — carried over from the other layouts' similar corners; 'none': no line to read (no session, no drawing)
+  // — carried over from the other layouts' similar corners, on the line a kart drives in its drawing or its saved picture; 'none': no line
+  // to read (no session, no drawing, no picture)
   async function ideal(tid, lid, cls) {
     cls = cls || 'rental';
     const name = layoutName(tid, lid);
@@ -10308,11 +10370,13 @@ const BRAINS = (() => {
     // nobody (or too few) here: the layout's line from its sessions or its drawing, the corners from everywhere else
     let G = v ? await geomOf(tid, lid, v) : null;
     if (!G) { try { G = await GEOM.build(tid, lid, null, { noMedia: true }); } catch (e) { G = null; } }
+    if (!G) G = photoGeom(tid, lid);
     if (!G) return { mode: 'none', tid, lid, cls, name };
     return predictOn(G, { tid, lid, cls, name });
   }
   // a line from anywhere (a layout, a track found on the map): every corner from the similar corners of the driven layouts
   async function predictOn(G, o) {
+    if (G && (G.source === 'trace' || G.source === 'osm' || G.source === 'photo')) G = lineOf(G);   // a drawn middle: the line a kart drives in it
     const cls = o.cls || 'rental', key = o.tid && o.lid ? `${o.tid}|${o.lid}` : '';
     const books = (await allAtlases(cls)).map(x => x.C).filter(A => A.key !== key);
     if (!books.length) return Object.assign({ mode: 'none' }, o, { G });
@@ -10375,12 +10439,15 @@ const BRAINS = (() => {
     const G = res && res.G; if (!cv || !G || !G.track) return [];
     const tr = G.track, N = tr.N, ds = tr.ds, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), W = cv.clientWidth || 320, H = cv.clientHeight || 220; if (W < 40) return [];
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (let i = 0; i < N; i++) { x0 = Math.min(x0, tr.cx[i]); x1 = Math.max(x1, tr.cx[i]); y0 = Math.min(y0, tr.cy[i]); y1 = Math.max(y1, tr.cy[i]); }
+    const band = G.band, bt = band ? band.track : tr, mg = band ? band.half : 0;   // a line drawn inside a track: the asphalt around it
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (let i = 0; i < bt.N; i++) { x0 = Math.min(x0, bt.cx[i] - mg); x1 = Math.max(x1, bt.cx[i] + mg); y0 = Math.min(y0, bt.cy[i] - mg); y1 = Math.max(y1, bt.cy[i] + mg); }
     const pad = 22, s = Math.min((W - 2 * pad) / Math.max(1, x1 - x0), (H - 2 * pad) / Math.max(1, y1 - y0)), ox = (W - s * (x1 - x0)) / 2, oy = (H - s * (y1 - y0)) / 2;
     const P = (i) => [ox + s * (tr.cx[i] - x0), oy + s * (tr.cy[i] - y0)], I = (S) => ((Math.round(S / ds) % N) + N) % N;
     const cs = getComputedStyle(document.documentElement), col = (n, d) => cs.getPropertyValue(n).trim() || d;
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-    ctx.strokeStyle = col('--line-2', '#cdd3dd'); ctx.lineWidth = 7; ctx.beginPath(); for (let i = 0; i < N; i++) { const [x, y] = P(i); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); ctx.stroke();
+    const loop = (t, color, w) => { ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath(); for (let i = 0; i < t.N; i++) { const x = ox + s * (t.cx[i] - x0), y = oy + s * (t.cy[i] - y0); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); ctx.stroke(); };
+    if (band) { loop(bt, col('--line-2', '#cdd3dd'), Math.max(6, 2 * mg * s)); loop(tr, col('--accent', '#2f6bf0'), 2.2); }
+    else loop(tr, col('--line-2', '#cdd3dd'), 7);
     // the slowing stretches (from the point to the apex) and the selected corner's part of the line
     const span = (a, b, color, w) => { if (!fin(a) || !fin(b)) return; let i = I(a); const j = I(b); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath(); let k = 0; const [sx, sy] = P(i); ctx.moveTo(sx, sy); while (i !== j && k++ < N) { i = (i + 1) % N; const [x, y] = P(i); ctx.lineTo(x, y); } ctx.stroke(); };
     for (const c of res.corners) { const pl = c.place; if (c.pts.kind === 'flat' || !fin(pl.in)) continue; span(pl.in, fin(pl.thr) ? pl.thr : pl.geo, c.pts.kind === 'brake' ? col('--brake', '#e5484d') : col('--lift', '#d9a300'), sel === c.n ? 6 : 4); }
@@ -10399,7 +10466,7 @@ const BRAINS = (() => {
     }
     return hits;
   }
-  return { layoutAtlas, allAtlases, ideal, predictOn, mineOn, lines, diffLines, text, asText, draw, clsOf, layoutName, geomOf };
+  return { layoutAtlas, allAtlases, ideal, predictOn, mineOn, lines, diffLines, text, asText, draw, clsOf, layoutName, geomOf, lineOf, photoGeom, photoLineOf };
 })();
 // Auto-trace: layout image -> track mask -> skeleton -> closed centreline loop + band width (all in image pixels).
 const AT = (() => {
@@ -10683,21 +10750,11 @@ const TRACKFIND = (() => {
     }
     return loops.sort((a, b) => b.lengthM - a.lengthM).slice(0, 6);
   }
-  // a map's line is the middle of the asphalt; karts drive a smoother, shorter line through every corner (wider radii), and the atlases
-  // were learnt on driven lines. So the middle is pulled toward a driven line first: a rubber band, points every 3 m, each moved toward
-  // the middle of its neighbours but never further than half the track's width less a kart's half-width from the middle
-  function drivenLine(tr, widthM) {
-    const step = Math.max(1, Math.round(3 / tr.ds)), M = Math.floor(tr.N / step), h = Math.max(1, (widthM || 8) / 2 - 1.5);
-    const cx = new Float64Array(M), cy = new Float64Array(M), nx = new Float64Array(M), ny = new Float64Array(M), o = new Float64Array(M);
-    for (let k = 0; k < M; k++) { const i = k * step; cx[k] = tr.cx[i]; cy[k] = tr.cy[i]; nx[k] = tr.nx[i]; ny[k] = tr.ny[i]; }
-    const X = (k) => cx[k] + o[k] * nx[k], Y = (k) => cy[k] + o[k] * ny[k];
-    for (let it = 0; it < 3000; it++) for (let k = 0; k < M; k++) { const a = (k - 1 + M) % M, b = (k + 1) % M, mx = (X(a) + X(b)) / 2, my = (Y(a) + Y(b)) / 2; o[k] = Math.max(-h, Math.min(h, (mx - cx[k]) * nx[k] + (my - cy[k]) * ny[k])); }
-    return Array.from({ length: M }, (_, k) => ({ x: X(k), y: Y(k) }));
-  }
   // which way round a loop is drawn (true: clockwise on the map)
   function clockwise(lp) { let s = 0; const p = lp.pts; for (let i = 0; i < p.length; i++) { const a = p[i], b = p[(i + 1) % p.length]; s += (b.lon - a.lon) * (b.lat + a.lat); } return s > 0; }
-  // a loop as a line the brain reads: metres around its middle, the way round asked for, the start/finish in the middle of the longest
-  // straight (the map does not say where it is; it only numbers the corners)
+  // a loop as a line the brain reads: the middle of the asphalt in metres, the way round asked for, the start/finish in the middle of the
+  // longest straight (the map does not say where it is; it only numbers the corners). The line a kart drives inside it is the brain's
+  // to draw (BRAINS.lineOf): the least curvature within the width, as the atlases were learnt on driven lines
   function geometry(lp, cw) {
     let xy;
     if (lp.xy) {   // a traced picture: metres, y down as drawn — clockwise on the picture is the same sum with y turned up
@@ -10711,14 +10768,12 @@ const TRACKFIND = (() => {
     }
     let L = 0; for (let i = 0; i < xy.length; i++) { const a = xy[i], b = xy[(i + 1) % xy.length]; L += Math.hypot(b.x - a.x, b.y - a.y); }
     let tr = null; try { tr = KLL.buildTrack(xy, L, 0, false); } catch (e) { tr = null; } if (!tr || !(tr.mpp > 0) || !isFinite(tr.mpp)) return null;
-    // the driven line, unless asked for the map's own middle (o.raw)
-    let line = xy, LL = L;
-    if (!(lp.raw)) { const d = drivenLine(tr, lp.widthM); let L2 = 0; for (let i = 0; i < d.length; i++) { const a = d[i], b = d[(i + 1) % d.length]; L2 += Math.hypot(b.x - a.x, b.y - a.y); } try { const t2 = KLL.buildTrack(d, L2, 0, false); if (t2 && t2.mpp > 0 && isFinite(t2.mpp)) { tr = t2; line = d; LL = L2; } } catch (e) {} }
+    const line = xy, LL = L;
     // the start/finish: the middle of the longest stretch straighter than a 150 m radius
     const ks = DATA.trackCurv(tr), N = tr.N; let best = { len: 0, mid: 0 }, run = 0, start = 0;
     for (let q = 0; q < 2 * N; q++) { const i = q % N; if (Math.abs(ks[i]) < 1 / 150) { if (!run) start = q; run++; if (run > best.len && run <= N) best = { len: run, mid: (start + Math.floor(run / 2)) % N }; } else run = 0; }
     try { const tr2 = KLL.buildTrack(line, LL, best.mid / N, false); if (tr2 && tr2.mpp > 0) tr = tr2; } catch (e) {}
-    return { rev: 'osm' + (lp.ways || []).join('-') + (cw ? 'cw' : 'ccw'), tid: null, lid: null, track: tr, corners: { R: 110, add: [], del: [] }, source: 'osm', widthM: 8 };
+    return { rev: 'osm' + (lp.ways || []).join('-') + (cw ? 'cw' : 'ccw'), tid: null, lid: null, track: tr, corners: { R: 110, add: [], del: [] }, source: lp.xy ? 'photo' : 'osm', widthM: +lp.widthM || 8 };
   }
   // Hutka's matches (each with how many of its layouts have a line: a session on it or a drawing) and, when none of them has a line, the
   // raceways on the map around the place (6 km: a catalogue point is often the venue's gate, not the track)
@@ -11536,11 +11591,15 @@ async function actIdeal(tid, lid, cls) {
 // the ideal of one layout drawn in a card: the map, the legend, every corner in words (and the driver's own way where it differs)
 function renderIdeal(body, sub, res) {
   body.innerHTML = '';
-  if (!res || res.mode === 'none' || !res.corners) { body.appendChild(el('div', 'hint', t('This layout has no line yet — nobody has uploaded a lap on it and it has no drawing. Upload a session there, or try New track.'))); return; }
+  if (!res || res.mode === 'none' || !res.corners) {
+    if (res && res.tid && res.lid) { idealNoLine(body, sub, res); return; }   // a layout of Hutka's nobody has driven or drawn: its map, uploaded
+    body.appendChild(el('div', 'hint', t('This layout has no line yet — nobody has uploaded a lap on it and it has no drawing. Upload a session there, or try New track.'))); return;
+  }
   const trName = res.tid && STORE.getTrack(res.tid) ? STORE.getTrack(res.tid).name + ' · ' : '';
   sub.textContent = res.mode === 'real' ? trName + t('Real laps here: {n} · drivers: {d} · best {b}', { n: res.info.laps, d: res.info.drivers, b: fmtMs(res.info.best * 1000) }) : res.tid ? trName + t('Too few laps here yet: built from similar corners of other layouts ({n}) — a forecast, check it on track', { n: res.info.books }) : t('A forecast from similar corners of {n} layouts on Hutka — check it on track', { n: res.info.books });   // a track off the map or a photo: nobody drove it here
+  if (res.G && res.G.photo) body.appendChild(el('div', 'hint', t('From the layout map · {m} m', { m: res.G.photo.lengthM })));   // a picture saved to the layout
   const cv = el('canvas', 'ai2-map'); body.appendChild(cv);
-  const lg = el('div', 'ai2-legend'); lg.innerHTML = `<span><i class="b"></i>${esc(t('Braking zone'))}</span><span><i class="l"></i>${esc(t('Lift zone'))}</span><span><i class="g"></i>${esc(t('back on the gas'))}</span><span><i class="f"></i>${esc(t('Flat-out corner'))}</span>`; body.appendChild(lg);
+  const lg = el('div', 'ai2-legend'); lg.innerHTML = (res.G && res.G.band ? `<span><i class="r"></i>${esc(t('Racing line'))}</span>` : '') + `<span><i class="b"></i>${esc(t('Braking zone'))}</span><span><i class="l"></i>${esc(t('Lift zone'))}</span><span><i class="g"></i>${esc(t('back on the gas'))}</span><span><i class="f"></i>${esc(t('Flat-out corner'))}</span>`; body.appendChild(lg);
   const list = el('div', 'ai2-crn'); body.appendChild(list);
   let sel = 0, hits = [];
   const paint = () => { hits = BRAINS.draw(cv, res, sel); };
@@ -11557,6 +11616,38 @@ function renderIdeal(body, sub, res) {
   const acts = el('div', 'row ai2-acts2');
   acts.append(aiBtn(t('Ask Hutka AI about this lap'), 'primary', () => aiSend(res.mode === 'real' ? t('Go through the ideal lap of {name}: where do the fastest drivers gain the most, and what should I focus on?', { name: res.name }) : t('How would you drive {name}? It has not been driven on Hutka yet.', { name: res.name }), { act: 'ideal', title: t('Ideal lap · {name}', { name: res.name }) })));
   body.appendChild(acts);
+}
+
+// a layout nobody has driven and nobody has drawn: its map, uploaded here, is read like a new track's photo — traced, the racing line in
+// it, the points from similar corners on Hutka; which way round from the layout's own setting or the picture's arrows, clockwise
+// otherwise, one tap for the other. The track's editor (an admin) keeps it on the layout for everyone
+function idealNoLine(body, sub, res) {
+  body.appendChild(el('div', 'hint', t('Nobody has driven this layout on Hutka yet. Upload a picture of its map — Hutka traces it and shows the racing line, where to brake and where to get back on the gas.')));
+  const f = el('input', ''); f.type = 'file'; f.accept = 'image/*'; f.hidden = true;
+  f.onchange = async () => { const file = f.files && f.files[0]; f.value = ''; if (file) await idealFromPicture(body, sub, res, file); };
+  const row = el('div', 'row ai2-acts2'); row.append(aiBtn(t('Upload the layout map'), 'primary', () => f.click()), f); body.appendChild(row);
+}
+async function idealFromPicture(body, sub, res, file) {
+  body.innerHTML = ''; body.appendChild(el('div', 'hint', t('Reading the picture…')));
+  let ph = null; try { ph = await TRACKFIND.fromPhoto(file); } catch (e) { ph = null; }
+  const T = ph ? TRACKFIND.fromImage(ph.img, ph.guess) : null;
+  if (!T) { body.innerHTML = ''; body.appendChild(el('div', 'hint warn', t('Could not read the layout from this picture. A straight-on picture of the map, the track a clear band on a plain background, works best.'))); idealNoLine(body, sub, res); return; }
+  const lay = STORE.getLayout(res.tid, res.lid) || {}, trk = STORE.getTrack(res.tid), canSave = !!(trk && STORE.canEditTrack(trk));
+  const dir0 = lay.direction === 'cw' || lay.direction === 'ccw' ? lay.direction : ((ph.guess && ph.guess.direction) || 'cw');
+  const draw = async (cw) => {
+    body.innerHTML = ''; body.appendChild(el('div', 'hint', t('Reading the corners…')));
+    const G = TRACKFIND.geometry(Object.assign({ name: res.name }, T.lp), cw);
+    let r = null; if (G) { try { r = await BRAINS.predictOn(G, { tid: res.tid, lid: res.lid, cls: res.cls, name: res.name }); } catch (e) { r = null; } }
+    if (!r || !r.corners) { body.innerHTML = ''; body.appendChild(el('div', 'hint warn', t('Could not read the corners of this picture.'))); idealNoLine(body, sub, res); return; }
+    AI.ctx = Object.assign({}, AI.ctx, { found: r });
+    renderIdeal(body, sub, r);
+    const head = el('div', 'ai2-photohd');
+    head.appendChild(el('div', 'hint', T.how === 'given' ? t('Read from the photo · {m} m, the length the picture gives', { m: T.lengthM }) : t('Read from the photo · about {m} m: the length is a guess, so the corners are right and the distances only roughly', { m: T.lengthM })));
+    const dirs = el('div', 'seg ai2-dir'), bCw = aiBtn(t('Clockwise'), '', () => draw(true)), bCcw = aiBtn(t('Anticlockwise'), '', () => draw(false)); bCw.classList.toggle('active', !!cw); bCcw.classList.toggle('active', !cw); dirs.append(bCw, bCcw); head.appendChild(dirs);
+    if (canSave) { const sv = aiBtn(t('Save to this layout'), 'ghost', async () => { sv.disabled = true; try { const l = STORE.getLayout(res.tid, res.lid); await STORE.saveLayout(res.tid, Object.assign({}, l, { photoLine: Object.assign(BRAINS.photoLineOf(r.G, T.how), { dir: cw ? 'cw' : 'ccw' }) })); sv.textContent = t('Saved — everyone sees this line now'); } catch (e) { sv.disabled = false; toast(t('Could not save: {e}', { e: e && e.message || e })); } }); head.appendChild(sv); }
+    body.insertBefore(head, body.firstChild);
+  };
+  await draw(dir0 !== 'ccw');
 }
 
 // ---- 2. the last session: where the time goes, then the AI on it
