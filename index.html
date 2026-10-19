@@ -1554,6 +1554,87 @@ input.sw:checked::after{transform:translateX(18px)}
   .last-card .lc-b{grid-template-columns:100px minmax(0,1fr);gap:12px}
   .last-card .lc-pv{height:92px}
 }
+/* ---------- v34.40: the tracks library and the Sessions page ---------- */
+/* country chips: one row that scrolls sideways */
+.cc-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -2px;padding:2px}
+.cc-chips::-webkit-scrollbar{display:none}
+.cc-chips button{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border:1px solid var(--line-2);border-radius:999px;background:var(--surface);color:var(--fg);font:500 13.5px/1 var(--body);cursor:pointer;white-space:nowrap}
+.cc-chips button .n{color:var(--muted);font-weight:600;font-size:12.5px}
+.cc-chips button.on{background:var(--btn);border-color:var(--btn);color:var(--btn-ink)}
+.cc-chips button.on .n{color:inherit;opacity:.75}
+.trk-lib{display:flex;flex-direction:column;gap:12px}
+.trk-sec{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:8px 2px -2px}
+.trk-sec b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.trk-sec .hint{font-size:12.5px}
+.trk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:12px;align-items:start}
+.trk-card{padding:6px 6px 8px;display:flex;flex-direction:column}
+.trk-head,.trk-lay,.trk-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;text-decoration:none;color:var(--fg);min-width:0}
+.trk-head:hover,.trk-lay:hover,.trk-row:hover{background:var(--surface-2)}
+.trk-head .logo{width:44px;height:44px;border-radius:12px}
+.trk-head .tx,.trk-lay .tx,.trk-row .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.trk-head .tx b{font-size:16.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trk-row .tx b{font-size:15px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trk-lay .tx b{font-size:15px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.trk-head .tx span,.trk-lay .tx span,.trk-row .tx span{font-size:12.5px;color:var(--muted);line-height:1.35}
+.trk-lay .tx span.first{color:var(--accent);font-weight:500}
+.trk-head .go,.trk-lay .go,.trk-row .go{width:16px;height:16px;stroke:var(--faint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.trk-lay{border-top:1px solid var(--line);border-radius:0 0 0 0;margin:0 4px;padding:10px 6px}
+.trk-head + .trk-lay{border-top:1px solid var(--line)}
+.trk-lay .sh{width:60px;height:46px;flex:none;border-radius:9px;background:var(--surface-2);position:relative;overflow:hidden;display:grid;place-items:center}
+.trk-lay .sh canvas{position:absolute;inset:0;width:100%;height:100%}
+.trk-lay .sh svg{width:18px;height:18px;stroke:var(--faint);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.trk-lay .me{flex:none;font-size:11.5px;font-weight:600;color:var(--ok-ink);background:var(--ok-soft);border-radius:999px;padding:3px 8px}
+.trk-more{margin:2px 4px 0;border:0;border-top:1px solid var(--line);background:none;color:var(--accent);font:600 13.5px/1.3 var(--body);text-align:left;padding:12px 6px 6px;cursor:pointer;min-height:44px}
+.trk-rows{padding:4px 6px}
+.trk-row{border-top:1px solid var(--line);border-radius:0;margin:0 4px;padding:10px 6px}
+.trk-row:first-child{border-top:0}
+.trk-row .logo{width:38px;height:38px;border-radius:10px;font-size:12px}
+.trk-row .nl{flex:none;font-size:12px;color:var(--muted);background:var(--surface-2);border-radius:999px;padding:3px 9px;white-space:nowrap}
+.trk-empty{color:var(--muted);font-size:14px;padding:6px 2px}
+.trk-add{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 14px;align-items:center}
+.trk-add .ic{width:44px;height:44px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+.trk-add .ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.trk-add .tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.trk-add .tx b{font-size:16px;line-height:1.3}
+.trk-add .tx span{font-size:13.5px;color:var(--muted);line-height:1.45}
+.trk-add .btn{grid-column:1/-1;height:52px;font-size:15.5px;border-radius:14px}
+.trk-add .btn.primary{height:56px}
+.trk-add .btn svg{width:18px;height:18px}
+/* a two-way switch: All · My sessions */
+.seg2{display:flex;gap:4px;padding:4px;background:var(--surface-3);border-radius:14px;max-width:420px}
+.seg2 button{flex:1;min-height:40px;border:0;border-radius:10px;background:none;color:var(--muted);font:600 14px/1 var(--body);cursor:pointer}
+.seg2 button.on{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(20,30,60,.12)}
+.feed-all,.feed-mine{display:flex;flex-direction:column;gap:18px}
+/* the fastest laps: a strip of cards, one per layout */
+.lead{display:flex;flex-direction:column;gap:10px;min-width:0}
+.lead-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:0 2px}
+.lead-h b{font-size:17px}
+.lead-strip{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 6px;margin:0 -2px;scroll-snap-type:x proximity}
+.lead-strip::-webkit-scrollbar{display:none}
+.lead-card{flex:none;width:236px;scroll-snap-align:start;display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);text-decoration:none;color:var(--fg);min-width:0}
+.lead-card:hover{border-color:var(--accent)}
+.lead-card .k{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lead-card .lay{font-size:15px;font-weight:700;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lead-card .tm{font:600 26px/1.05 var(--mono);letter-spacing:-.02em}
+.lead-card .who{display:flex;align-items:center;gap:8px;min-width:0;font-size:13px;color:var(--muted)}
+.lead-card .who img{width:24px;height:24px;border-radius:50%;object-fit:cover;background:var(--surface-3);flex:none}
+.lead-card .who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lead-card .you{font-size:12.5px;font-weight:600;border-radius:8px;padding:4px 8px;align-self:flex-start}
+.lead-card .you.behind{color:var(--danger);background:var(--danger-soft)}
+.lead-card .you.top{color:var(--ok-ink);background:var(--ok-soft)}
+.lead-card .you.none{color:var(--muted);background:var(--surface-2);font-weight:500}
+/* a post: how it stands against the viewer's own best there */
+.post .vs{display:inline-block;margin:2px 0 8px;font-size:12.5px;font-weight:600;border-radius:8px;padding:3px 8px}
+.post .vs.faster{color:var(--danger);background:var(--danger-soft)}
+.post .vs.slower{color:var(--ok-ink);background:var(--ok-soft)}
+.post .ph .flag.ico{flex:none;width:36px;height:36px;padding:0;color:var(--faint);border-radius:50%}
+.post .ph .flag.ico svg{width:17px;height:17px}
+.post .ph .flag.ico:hover{color:var(--danger);background:var(--danger-soft)}
+@media (max-width:700px){
+  .trk-grid{grid-template-columns:1fr}
+  .seg2{max-width:none}
+  .lead-card{width:212px}
+}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -1658,9 +1739,11 @@ input.sw:checked::after{transform:translateX(18px)}
       <footer class="site-foot"><span>© 2026 KOZYRA MEDIA GROUP - FZCO · <span data-t="Dubai, UAE">Dubai, UAE</span></span><nav><a href="support.html" data-t="Support">Support</a><a href="privacy.html" data-t="Privacy">Privacy</a><a href="delete-account.html" data-t="Delete account">Delete account</a></nav></footer>
     </section>
 
-    <!-- ========== FEED (was Home): what drivers publish ========== -->
+    <!-- ========== SESSIONS (was Home, then Feed): what drivers publish — the fastest laps on top, then the latest; "Mine" for his own ========== -->
     <section class="page" id="pg-home" hidden>
-      <div class="ph feed-ph" id="feedHead"><div><h1 data-t="Feed">Feed</h1><div class="sub" data-t="Sessions drivers publish on Hutka">Sessions drivers publish on Hutka</div></div></div>
+      <div class="ph feed-ph" id="feedHead"><div><h1 data-t="Sessions">Sessions</h1><div class="sub" data-t="Laps of Hutka drivers — open any and compare it with yours">Laps of Hutka drivers — open any and compare it with yours</div></div></div>
+      <div class="seg2" id="feedSeg" role="tablist" aria-label="Sessions" data-ta="Sessions"><button type="button" role="tab" data-v="all" class="on"><span data-t="All">All</span></button><button type="button" role="tab" data-v="mine"><span data-t="My sessions">My sessions</span></button></div>
+      <div class="feed-all" id="feedAll">
       <!-- the landing for a guest: the product first — a real session with the seconds left in every corner -->
       <div class="landing" id="landing" hidden>
         <div class="ld-hero">
@@ -1697,6 +1780,8 @@ input.sw:checked::after{transform:translateX(18px)}
         <div class="stats" id="homeStats"></div>
       </div>
       <div class="card pushask" id="pushAsk" hidden><div class="ic"><svg><use href="#i-bell"/></svg></div><div class="tx"><b data-t="Know when someone likes or comments">Know when someone likes or comments</b><span data-t="A push when a driver likes your session or comments on it — nothing else.">A push when a driver likes your session or comments on it — nothing else.</span></div><div class="row"><button class="btn primary sm" id="pushYes" type="button" data-t="Turn on">Turn on</button><button class="btn sm" id="pushLater" type="button" data-t="Not now">Not now</button></div></div>
+      <!-- the fastest lap of every layout people drive — the driver's own layouts first, his gap to it; a tap compares -->
+      <div class="lead" id="feedLead" hidden><div class="lead-h"><b data-t="Fastest laps">Fastest laps</b><span class="hint" id="feedLeadSub"></span></div><div class="lead-strip" id="feedLeadStrip"></div></div>
       <div class="home-grid">
         <div style="min-width:0"><h2 class="hh"><svg><use href="#i-timer"/></svg><span data-t="Latest sessions">Latest sessions</span><span class="sub" id="feedSub"></span></h2><div class="feed" id="homeFeed"></div><div class="hint" id="feedHint" style="margin-top:10px"></div></div>
         <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
@@ -1705,24 +1790,25 @@ input.sw:checked::after{transform:translateX(18px)}
           <div class="card" id="homeFollowCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="Drivers you follow">Drivers you follow</span></h2><div class="list" id="homeFollowing" style="gap:4px"></div></div>
         </div>
       </div>
+      </div>
+      <div class="feed-mine" id="feedMine" hidden>
+        <div class="card" id="feedMineCard"><div id="feedMineProg" hidden></div><div id="feedMineList"></div><div class="hint" id="feedMineHint"></div></div>
+        <div class="card ai2-up" id="feedMineGuest" hidden><div class="ic"><svg><use href="#i-timer"/></svg></div><div class="tx"><b data-t="Your sessions live here">Your sessions live here</b><span data-t="Sign in — every session you upload is kept on all your devices, and you can publish it to compare with others.">Sign in — every session you upload is kept on all your devices, and you can publish it to compare with others.</span></div><button class="btn primary" id="feedMineSignIn" type="button"><span data-t="Sign in">Sign in</span></button></div>
+      </div>
       <footer class="site-foot"><span>© 2026 KOZYRA MEDIA GROUP - FZCO · <span data-t="Dubai, UAE">Dubai, UAE</span></span><nav><a href="support.html" data-t="Support">Support</a><a href="privacy.html" data-t="Privacy">Privacy</a><a href="delete-account.html" data-t="Delete account">Delete account</a></nav></footer>
     </section>
 
-    <!-- ========== TRACKS ========== -->
+    <!-- ========== TRACKS: a library of layouts — where people drive first, each layout with its sessions; the search is the bar on top ========== -->
     <section class="page" id="pg-tracks" hidden>
-      <div class="ph"><div><h1 data-t="Tracks">Tracks</h1><div class="sub" id="tracksSub"></div></div><div class="row"><button class="btn primary" id="btnAddTrack" type="button" hidden><svg><use href="#i-plus"/></svg><span data-t="Add track">Add track</span></button></div></div>
-      <div class="tracks-grid">
-        <div class="geo-wrap">
-          <canvas id="geo"></canvas>
-          <div class="geo-search"><svg class="h-ico" style="width:16px;height:16px"><use href="#i-search"/></svg><span data-t="Click a pin to open the track">Click a pin to open the track</span></div>
-          <div class="geo-tools"><button class="btn" id="geoIn" type="button" title="Zoom in">+</button><button class="btn" id="geoOut" type="button" title="Zoom out">−</button><button class="btn" id="geoFit" type="button" title="Fit all tracks">⌂</button></div>
-          <div class="geo-tip" id="geoTip" hidden></div>
-          <div class="geo-attr">Map: Natural Earth</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
-          <div class="card"><h2><svg><use href="#i-pin"/></svg><span id="nearTitle" data-t="Tracks near you">Tracks near you</span></h2><div id="nearList" class="list" style="gap:2px"></div><div class="hint" id="nearHint"></div></div>
-          <div class="card"><h2><svg><use href="#i-track"/></svg><span data-t="All tracks">All tracks</span><span class="sub" id="allCount"></span></h2><div class="row" style="margin-bottom:8px;gap:8px"><select id="allCountry" style="max-width:220px"></select><input type="text" id="allSearch" placeholder="Search" style="flex:1;min-width:120px"></div><div id="allList" class="list" style="gap:2px"></div></div>
-        </div>
+      <div class="ph"><div><h1 data-t="Tracks">Tracks</h1><div class="sub" id="tracksSub"></div></div><div class="row"><button class="btn" id="btnAddTrack" type="button" hidden><svg><use href="#i-plus"/></svg><span data-t="Add track">Add track</span></button></div></div>
+      <div class="cc-chips" id="trCountries" role="group" aria-label="Country" data-ta="Country"></div>
+      <div class="trk-lib" id="trList"></div>
+      <!-- nothing found / a track not on Hutka yet: upload from it (its page is made from the session), or find it on the map -->
+      <div class="card trk-add" id="trAdd">
+        <div class="ic"><svg><use href="#i-pin"/></svg></div>
+        <div class="tx"><b id="trAddT" data-t="Your track is not here?">Your track is not here?</b><span data-t="Upload a session from it — Hutka recognises the track by GPS and makes it a page with its layout.">Upload a session from it — Hutka recognises the track by GPS and makes it a page with its layout.</span></div>
+        <button class="btn primary" id="trAddUp" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload a session">Upload a session</span></button>
+        <button class="btn" id="trAddFind" type="button"><svg><use href="#i-spark"/></svg><span id="trAddFindT" data-t="Find it on the map">Find it on the map</span></button>
       </div>
     </section>
 
@@ -5394,6 +5480,38 @@ Object.assign(I18N.RU, {
   "Saved ✓": "Сохранено ✓"
 });
 Object.assign(I18N.RU, { "Published sessions": "Опубликовано" });
+// v34.40 — the tracks library and the Sessions page
+Object.assign(I18N.RU, {
+  "Find a track…": "Найти трассу…",
+  "Your track is not here?": "Нет твоей трассы?",
+  "Upload a session from it — Hutka recognises the track by GPS and makes it a page with its layout.": "Загрузи сессию оттуда — Hutka узнает трассу по GPS и сделает ей страницу с конфигурацией.",
+  "Find it on the map": "Найти на карте",
+  "Nobody has uploaded here yet": "Ещё никто не загружал",
+  "be the first — upload a session": "будь первым — загрузи сессию",
+  "Nothing on Hutka matches “{q}”.": "На Hutka нет ничего по запросу «{q}».",
+  "No tracks here yet.": "Здесь пока нет трасс.",
+  "“{q}” is not on Hutka yet": "«{q}» ещё нет на Hutka",
+  "Find “{q}” on the map": "Найти «{q}» на карте",
+  "{n} layout|{n} layouts": "{n} конфигурация|{n} конфигурации|{n} конфигураций",
+  "{n} driver|{n} drivers": "{n} гонщик|{n} гонщика|{n} гонщиков",
+  "{n} more layout nobody has driven — be the first|{n} more layouts nobody has driven — be the first": "Ещё {n} конфигурация без сессий — будь первым|Ещё {n} конфигурации без сессий — будь первым|Ещё {n} конфигураций без сессий — будь первым",
+  "All": "Все",
+  "best {t}": "лучший {t}",
+  "No sessions yet — be the first": "Сессий ещё нет — будь первым",
+  "no layouts yet": "конфигураций пока нет",
+  "Laps of Hutka drivers — open any and compare it with yours": "Круги гонщиков Hutka — открой любой и сравни со своим",
+  "Fastest laps": "Быстрее всех",
+  "Your sessions live here": "Здесь будут твои сессии",
+  "Sign in — every session you upload is kept on all your devices, and you can publish it to compare with others.": "Войди — каждая загруженная сессия сохранится на всех твоих устройствах, и её можно опубликовать и сравнить с другими.",
+  "{s} s faster than your best": "на {s} с быстрее твоего лучшего",
+  "you are {s} s faster": "ты быстрее на {s} с",
+  "the same as your best": "как твой лучший",
+  "Analysis": "Разбор",
+  "Yours — the fastest here": "Твой — самый быстрый",
+  "you +{s} s": "ты +{s} с",
+  "a tap — compare with yours": "тап — сравнить со своим",
+  "a tap opens the lap": "тап — открыть круг"
+});
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -5989,6 +6107,9 @@ const STORE = (() => {
       unfollow: async (a, b) => must(await sb.from('follows').delete().eq('follower', a).eq('followee', b)),
       async sessionsByOwners(ids) { if (!ids.length) return []; return must(await sb.from('sessions').select('id,meta').in('owner', ids.slice(0, 100)).eq('published', true).order('updated_at', { ascending: false }).limit(60)).map(r => Object.assign({ id: r.id }, r.meta)); },
       async recentPublished(n) { return must(await sb.from('sessions').select('id,meta').eq('published', true).order('created_at', { ascending: false }).limit(n)).map(r => Object.assign({ id: r.id }, r.meta)); },
+      // the tracks library: every layout in one request; the published sessions without their bodies (who, where, when, how fast, which kart class)
+      async allLayouts() { return must(await sb.from('layouts').select('track_id,id,data')).map(r => ({ track: r.track_id, l: row2doc(r) })); },
+      async layoutActivity() { return must(await sb.from('sessions').select('track_id,layout_id,owner,created_at,best_ms,cls:meta->>kartClass').eq('published', true).limit(5000)); },
       async socialCounts(ids, me) { const out = {}; for (const id of ids) out[id] = { likes: 0, down: 0, comments: 0, liked: false, mine: 0 }; if (!ids.length) return out; try { let r = await sb.from('likes').select('session_id,user_id,vote').in('session_id', ids).limit(5000); if (r.error && noCol(r.error)) { A.votes = false; r = await sb.from('likes').select('session_id,user_id').in('session_id', ids).limit(5000); } for (const x of must(r)) { const o = out[x.session_id]; if (o) { const v = x.vote === -1 ? -1 : 1; if (v === -1) o.down++; else o.likes++; if (me && x.user_id === me) { o.mine = v; o.liked = v === 1; } } } } catch (e) {} try { for (const r of must(await sb.from('comments').select('session_id').in('session_id', ids).limit(5000))) { const o = out[r.session_id]; if (o) o.comments++; } } catch (e) {} return out; },
       // auth
       // inside the native app the browser comes back to hutka://auth (a deep link); on the web, to this page
@@ -6090,7 +6211,7 @@ const STORE = (() => {
     sessCache.set(meta.id, sess); return sess;
   }
   async function saveSession(sess) {
-    if (!sess.id) sess.id = 's' + uid();
+    freshPubs(); if (!sess.id) sess.id = 's' + uid();
     const meta = sessionMeta(sess), packed = await packSession(sess); meta.chunks = packed.chunks.length; meta.enc = packed.enc; meta.bytes = packed.bytes;
     if (adapter && me.id && me.canWrite !== false) { meta.owner = me.id; await adapter.saveSession(sess.id, meta, packed.chunks); }
     else { meta.owner = 'local'; meta.published = false; await LDB.put('sessions', { id: sess.id, meta, chunks: packed.chunks }); }
@@ -6104,6 +6225,7 @@ const STORE = (() => {
     writing.set(sid, tail); tail.then(() => { if (writing.get(sid) === tail) writing.delete(sid); }); return p;
   }
   async function updateSession1(sid, patch) {
+    freshPubs();
     const cached = sessCache.get(sid);
     if (adapter && !(cached && cached.owner === 'local')) await adapter.updateSession(sid, Object.assign({ updatedAt: Date.now() }, patch));
     else { const rec = await LDB.get('sessions', sid); if (rec) { Object.assign(rec.meta, patch, { updatedAt: Date.now() }); await LDB.put('sessions', rec); } }
@@ -6124,6 +6246,7 @@ const STORE = (() => {
   }
   // an admin hides (or shows again) someone else's published session — moderate.sql
   async function setPublishedAdmin(sid, pub) {
+    freshPubs();
     if (!adapter || !adapter.setPublished || !me.canEdit) { const e = new Error('admins only'); e.code = 'not_admin'; throw e; }
     const ok = await adapter.setPublished(sid, pub); if (ok) { const c = sessCache.get(sid); if (c) { c.published = pub; if (pub) delete c.moderated; else c.moderated = true; } notify('sessions'); } return ok;
   }
@@ -6146,7 +6269,7 @@ const STORE = (() => {
   async function outboxAll() { if (!me.id) return []; try { return (await LDB.range('kv', OUT, OUT + '\uffff')).filter(r => !r.owner || r.owner === me.id).sort((a, b) => a.at - b.at); } catch (e) { return []; } }
   async function outboxDel(id) { try { await LDB.del('kv', id); } catch (e) {} notify('outbox'); }
   async function outboxPut(rec) { try { await LDB.put('kv', rec); } catch (e) {} notify('outbox'); }   // a record kept back (one this version cannot read stays for the next)
-  async function deleteSession(meta) { if (adapter && meta.owner !== 'local') await adapter.deleteSession(meta.id, meta.chunks); else await LDB.del('sessions', meta.id); sessCache.delete(meta.id); notify('sessions'); }
+  async function deleteSession(meta) { freshPubs(); if (adapter && meta.owner !== 'local') await adapter.deleteSession(meta.id, meta.chunks); else await LDB.del('sessions', meta.id); sessCache.delete(meta.id); notify('sessions'); }
 
   // ----- people -----
   async function profile(id) { if (profiles.has(id)) return profiles.get(id); let p = null; if (adapter && id && id !== 'local') { try { p = await adapter.getProfile(id); } catch (e) { return null; } } profiles.set(id, p); return p; }   // a failed fetch (no connection) is not kept as "no profile"
@@ -6211,7 +6334,27 @@ const STORE = (() => {
     if (countsV && Date.now() - countsAt < 60000) return countsV;
     try { const c = await adapter.counts(); if (!c || typeof c.sessions !== 'number') return null; countsV = c; countsAt = Date.now(); return c; } catch (e) { return null; }
   }
-  async function recentPublished(n) { if (!adapter) return []; try { await blocked(); return notBlocked((await adapter.recentPublished(n || 30)).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))); } catch (e) { return []; } }
+  // the latest published sessions (the Sessions page and the tracks library ask for the same list: kept for a minute)
+  const recentCache = new Map();
+  async function recentPublished(n) { if (!adapter) return []; n = n || 30; const c = recentCache.get(n); if (c && Date.now() - c.t < 60000) return c.list.slice(); try { await blocked(); const list = notBlocked((await adapter.recentPublished(n)).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))); recentCache.set(n, { t: Date.now(), list }); return list.slice(); } catch (e) { return []; } }
+  // the tracks library: every track's layouts at once (kept per track like getLayouts), and per layout what was published there —
+  // sessions, drivers, the latest, the best lap of each kart class — from one light request
+  let allLayoutsAt = 0;
+  async function allLayouts() {
+    if (Date.now() - allLayoutsAt < 120000) return;
+    if (adapter && adapter.allLayouts) { try { const rows = await adapter.allLayouts(), by = new Map(); for (const r of rows) { if (!by.has(r.track)) by.set(r.track, []); by.get(r.track).push(r.l); } for (const tid of tracks.keys()) layouts.set(tid, (by.get(tid) || []).sort(sortLayouts)); allLayoutsAt = Date.now(); return; } catch (e) {} }
+    await Promise.all([...tracks.keys()].map(tid => getLayouts(tid).catch(() => [])));
+  }
+  let layAct = null;
+  function freshPubs() { recentCache.clear(); layAct = null; }   // a session saved, published or deleted: the lists ask again
+  async function layoutActivity() {
+    if (layAct && Date.now() - layAct.t < 60000) return layAct.m;
+    let rows = null; if (adapter && adapter.layoutActivity) { try { rows = await adapter.layoutActivity(); } catch (e) { rows = null; } }
+    if (!rows) rows = (await recentPublished(100)).map(s => ({ track_id: s.track, layout_id: s.layout, owner: s.owner, created_at: s.createdAt, best_ms: s.bestMs, cls: s.kartClass }));
+    const m = new Map();
+    for (const r of rows) { if (!r.track_id) continue; const k = r.track_id + '|' + (r.layout_id || 'custom'), cls = r.cls || (r.meta && r.meta.kartClass) || 'rental'; const o = m.get(k) || { n: 0, owners: new Set(), last: 0, best: {} }; o.n++; o.owners.add(r.owner); const at = typeof r.created_at === 'number' ? r.created_at : (Date.parse(r.created_at) || 0); if (at > o.last) o.last = at; const b = +r.best_ms || (r.meta && +r.meta.bestMs) || 0; if (b > 0 && (!o.best[cls] || b < o.best[cls])) o.best[cls] = b; m.set(k, o); }
+    layAct = { t: Date.now(), m }; return m;
+  }
   async function socialCounts(ids) { const empty = () => { const o = {}; for (const id of ids) o[id] = { likes: 0, down: 0, comments: 0, liked: false, mine: 0 }; return o; }; if (!adapter || !ids.length) return empty(); try { return await adapter.socialCounts(ids, me.id); } catch (e) { return empty(); } }
   async function refreshProfile() { if (adapter && me.id) { try { const p = await adapter.getProfile(me.id); profiles.set(me.id, p); return p; } catch (e) {} } return profiles.get(me.id) || null; }
 
@@ -6332,7 +6475,7 @@ const STORE = (() => {
     getTracks, getTrack, saveTrack, deleteTrack, getLayouts, getLayout, saveLayout, deleteLayout, getMedia, setMedia,
     mySessions, mySessionsStrict, mySessionsKnown, hasData, ensureTracks, live, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, outboxAdd, outboxAll, outboxDel, outboxPut, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, marks, markOf, setMark, removeMark, get marksOn() { return marksOk !== false && !!(adapter && adapter.marksOf && me.id); }, visit, adminVisits, track, adminAnalytics,
     profile, profileStrict, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
-    sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
+    sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, allLayouts, layoutActivity, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
     get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, identifyTrack, brainRows, brainSave, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); }, deviceLog: async (o) => { if (!adapter || !adapter.deviceLog) throw new Error('not configured'); if (!me.id) throw new Error('sign in'); return adapter.deviceLog(o); } };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
@@ -6929,7 +7072,7 @@ const NAV = (() => {
   const KEY = 'hutka.nav', DEF = 'b', OK = /^[abc]$/;
   let v = DEF;
   try { const q = new URLSearchParams(location.search).get('nav'); if (q && OK.test(q)) localStorage.setItem(KEY, q); const s = localStorage.getItem(KEY); if (s && OK.test(s)) v = s; } catch (e) {}
-  const ITEM = { start: ['i-how', 'How it works'], home: ['i-home', 'Home'], ai: ['i-spark', 'Hutka AI'], lab: ['i-lab', 'Lab'], feed: ['i-feed', 'Feed'], tracks: ['i-track', 'Tracks'] };
+  const ITEM = { start: ['i-how', 'How it works'], home: ['i-home', 'Home'], ai: ['i-spark', 'Hutka AI'], lab: ['i-lab', 'Lab'], feed: ['i-timer', 'Sessions'], tracks: ['i-track', 'Tracks'] };
   const TABS = { a: ['start', 'ai', 'lab', 'feed'], b: ['ai', 'lab', 'feed', 'tracks'], c: ['home', 'ai', 'lab', 'feed'] }[v];
   const SIDE = { a: ['start', 'ai', 'lab', 'feed', 'tracks'], b: ['ai', 'lab', 'feed', 'tracks'], c: ['home', 'ai', 'lab', 'feed', 'tracks'] }[v];
   const first = TABS[0];
@@ -6964,6 +7107,7 @@ async function route() {
     if (name === 'admin' && !STORE.isAdmin() && !(r.a && STORE.canEditTrack(STORE.getTrack(r.a)))) name = STORE.getTracks().some(tr => STORE.canEditTrack(tr)) ? 'admin' : 'home';
     // '#home' and an empty address: the first tab of the navigation (without the AI here — the claude.ai preview — the feed)
     { const to = NAV.resolve(name), ok = to !== 'ai' || STORE.hasAuth, dest = ok ? to : 'feed'; if (dest !== name) { name = dest; if (location.hash && location.hash !== '#' + name) { history.replaceState(null, '', '#' + name); routeHash = location.hash; } } }
+    if (APP.route === 'tracks' && name !== 'tracks') { $('q').value = ''; $('q').placeholder = t('Search tracks, drivers...'); }   // the library's filter stays on its page
     APP.route = name; APP.a = r.a; APP.b = r.b; APP.c = r.c;
     if (typeof STORE !== 'undefined' && STORE.track) { const pp = { route: name }; if (r.a && name !== 'lab') pp.a = String(r.a).slice(0, 60); STORE.track('page', pp); }
     { const show = NAV.pageOf(name); for (const p of PAGES) { const pg = $('pg-' + p); if (pg) pg.hidden = p !== show; } } if (name === 'layout') $('pg-track').hidden = false;
@@ -6972,7 +7116,7 @@ async function route() {
     for (const a of document.querySelectorAll('.nav a[data-route], .tabbar a[data-route]')) a.classList.toggle('active', a.dataset.route === name || (name === 'track' || name === 'layout') && a.dataset.route === 'tracks' || name === 'help' && a.dataset.route === 'lab' && a.closest('.tabbar') || name === 'driver' && a.dataset.route === 'feed');
     window.scrollTo({ top: 0 });
     if (name === 'home' || name === 'start') await renderStartPage();
-    else if (name === 'feed') await renderHomePage();
+    else if (name === 'feed') await renderHomePage(r.a);
     else if (name === 'tracks') await renderTracksPage();
     else if (name === 'track') await renderTrackPage(r.a, r.b);
     else if (name === 'layout') { history.replaceState(null, '', `#track~${r.a}~${r.b || ''}`.replace(/~$/, '')); $('pg-layout') && ($('pg-layout').hidden = true); $('pg-track').hidden = false; APP.route = 'track'; await renderTrackPage(r.a, r.b); }
@@ -7258,7 +7402,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.39';
+const APP_VERSION = 'v34.40';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -7319,6 +7463,7 @@ document.addEventListener('click', (e) => { if (!e.target.closest('.search')) $(
 let qSeq = 0;
 async function renderSearch() {
   const q = $('q').value.trim().toLowerCase(), drop = $('qDrop'), seq = ++qSeq;
+  if (APP.route === 'tracks') { drop.hidden = true; if (typeof trkRender === 'function') trkRender(); return; }   // on Tracks the bar filters the library
   if (!q) { drop.hidden = true; drop.innerHTML = ''; return; }
   const trs = STORE.getTracks().filter(tr => [tr.name, tr.city, countryName(tr.country)].join(' ').toLowerCase().includes(q)).slice(0, 6);
   const drivers = await STORE.searchDrivers(q); if (seq !== qSeq) return;
@@ -7548,37 +7693,111 @@ const GEOM = (() => {
   return { build, attach, apexes, aerialImage, invalidate, traceTrack, forwardOf, reverseTrack };
 })();
 
-// ---------- tracks page ----------
-let geoBound = false;
+// ---------- tracks: a library of layouts ----------
+// Where people drive comes first: each track with its layouts — the published sessions, the drivers, the best lap of the kart class most
+// of them drive, the shape of the latest lap; the driver's own layouts marked; layouts nobody has driven fold under "be the first". Then the
+// tracks nobody has uploaded to yet, the nearest first. Countries as chips; the search is the bar on top (on this page it filters the
+// library). Nothing found, or a track that is not here: upload a session from it (its page is made from the session's GPS) or find it
+// on the map (Hutka AI → New track).
+const TRK = { cc: null, data: null, open: new Set() };
+// a country's name in the reader's language ("ОАЭ", "Великобритания"); the stored English name where the browser cannot say it
+const countryLocal = (cc) => { try { if (cc && I18N.lang === 'ru' && window.Intl && Intl.DisplayNames) return new Intl.DisplayNames(['ru'], { type: 'region' }).of(cc) || countryName(cc); } catch (e) {} return countryName(cc); };
 async function renderTracksPage() {
-  const trs = STORE.getTracks();
   $('btnAddTrack').hidden = !STORE.isAdmin();
-  $('tracksSub').textContent = STORE.hasDb ? (trs.length ? t('{n} tracks · pick one to see layouts, hot laps and the corner guide', { n: trs.length }) : (STORE.isAdmin() ? t('No tracks yet — add the first one.') : t('No tracks yet.'))) : t('Sign in to claude.ai and open the shared Hutka link to see the track catalogue.');
-  if (!APP.geo) {
-    APP.geo = new GEO.GeoMap($('geo'), { getTracks: () => STORE.getTracks(), height: () => Math.round(clamp(($('geo').clientWidth || 700) * 0.85, 380, 720)),
-      tokens: () => { const cs = getComputedStyle(document.documentElement), g = (n) => cs.getPropertyValue(n).trim(); return { water: g('--map-water'), land: g('--map-land'), coast: g('--map-coast'), border: g('--map-border'), label: g('--map-label'), fg: g('--fg'), surface: g('--surface'), line2: g('--line-2'), accent: g('--accent'), body: g('--body') }; },
-      onPick: (tr) => go('track~' + tr.id),
-      onHover: (tr, at) => { const tip = $('geoTip'); if (!tr) { tip.hidden = true; return; } tip.textContent = tr.name; tip.style.left = at[0] + 'px'; tip.style.top = (at[1] - 14) + 'px'; tip.hidden = false; for (const r of $('allList').children) r.classList.toggle('sel', r.dataset.id === tr.id); } });
-    GEO.load('geo.txt').then(() => APP.geo.draw());
-    $('geoIn').onclick = () => { const { w, h } = APP.geo.size(); APP.geo.zoomAt(1.6, w / 2, h / 2); };
-    $('geoOut').onclick = () => { const { w, h } = APP.geo.size(); APP.geo.zoomAt(1 / 1.6, w / 2, h / 2); };
-    $('geoFit').onclick = () => APP.geo.fitTo(STORE.getTracks());
-    window.addEventListener('resize', () => { if (APP.route === 'tracks' && APP.geo) APP.geo.draw(); });
-  }
-  if (!geoBound || APP.geoN !== trs.length) { APP.geo.fitTo(trs); geoBound = true; APP.geoN = trs.length; } else APP.geo.draw();
-  // "near you": from the home track in the profile
-  const prof = STORE.hasIdentity ? await STORE.profile(STORE.me.id) : STORE.localProfile();
+  $('q').placeholder = t('Find a track…');
+  if (TRK.cc === null) { try { TRK.cc = localStorage.getItem('hutka.trk.cc') || ''; } catch (e) { TRK.cc = ''; } }
+  const box = $('trList');
+  if (!TRK.data) { box.innerHTML = ''; for (let i = 0; i < 3; i++) { const sk = el('div', 'card skel'); sk.style.height = '132px'; box.appendChild(sk); } }
+  await STORE.allLayouts();
+  const trs = STORE.getTracks();
+  const [act, pubs, mine, prof, lists] = await Promise.all([
+    STORE.hasDb ? STORE.layoutActivity().catch(() => new Map()) : Promise.resolve(new Map()),
+    STORE.hasDb ? STORE.recentPublished(100).catch(() => []) : Promise.resolve([]),
+    STORE.hasIdentity ? STORE.mySessions().catch(() => []) : Promise.resolve([]),
+    (STORE.hasIdentity ? STORE.profile(STORE.me.id) : Promise.resolve(STORE.localProfile())).catch(() => null),
+    Promise.all(trs.map(tr => STORE.getLayouts(tr.id).catch(() => [])))]);
+  const pics = new Map(); for (const s of pubs) { const k = s.track + '|' + (s.layout || 'custom'), pic = s.preview && s.preview.pts ? s.preview : (s.card && s.card.v && s.card.pts ? s.card : null); if (pic && !pics.has(k)) pics.set(k, pic); }
   const home = prof && prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null;
-  const withD = trs.map(tr => ({ tr, d: home && isFinite(tr.lat) && isFinite(home.lat) ? GEO.distKm(home, tr) : null }));
-  const near = $('nearList'); near.innerHTML = '';
-  if (home) { $('nearTitle').textContent = t('Tracks near {name}', { name: home.name }); $('nearHint').textContent = ''; for (const x of withD.filter(x => x.d !== null).sort((a, b) => a.d - b.d).slice(0, 4)) near.appendChild(trackRow(x.tr, x.d)); }
-  else { $('nearTitle').textContent = t('Tracks near you'); $('nearHint').textContent = t('Set your home track in the profile to see distances.'); }
-  // the catalogue: by country, with a search box (the list can hold hundreds of tracks once countries are imported)
-  { const ccs = [...new Set(trs.map(tr => tr.country).filter(Boolean))].sort((a, b) => countryName(a).localeCompare(countryName(b))); const cur = $('allCountry').value; fillSelect($('allCountry'), [['', t('All countries') + (trs.length ? ` · ${trs.length}` : '')]].concat(ccs.map(cc => [cc, `${flag(cc)} ${countryName(cc)} · ${trs.filter(tr => tr.country === cc).length}`])), cur || (home && home.country && ccs.includes(home.country) ? home.country : '')); }
-  const sorted = home ? withD.sort((a, b) => (a.d === null) - (b.d === null) || (a.d || 0) - (b.d || 0)) : withD.sort((a, b) => (a.tr.country || '').localeCompare(b.tr.country || '') || a.tr.name.localeCompare(b.tr.name));
-  const renderAll = () => { const all = $('allList'); all.innerHTML = ''; const cc = $('allCountry').value, q = $('allSearch').value.trim().toLowerCase(); const list = sorted.filter(x => (!cc || x.tr.country === cc) && (!q || [x.tr.name, x.tr.city].join(' ').toLowerCase().includes(q))); $('allCount').textContent = list.length ? `· ${list.length}` : ''; for (const x of list.slice(0, 400)) all.appendChild(trackRow(x.tr, x.d)); if (!trs.length) all.appendChild(el('div', 'hint', STORE.hasDb ? t('No tracks yet.') : t('Tracks appear here once you are signed in.'))); else if (!list.length) all.appendChild(el('div', 'hint', t('Nothing found'))); };
-  $('allCountry').onchange = renderAll; $('allSearch').oninput = renderAll; $('allSearch').placeholder = t('Search'); renderAll();
+  TRK.data = { act, pics, home, ls: new Map(trs.map((tr, i) => [tr.id, lists[i] || []])), mineK: new Set(mine.map(m => m.track + '|' + (m.layout || 'custom'))) };
+  if (APP.route === 'tracks') trkRender();
 }
+function trkRender() {
+  const D = TRK.data; if (!D) return;
+  const raw = $('q').value.trim(), words = raw.toLowerCase().split(/\s+/).filter(Boolean), hit = (text) => words.every(w => text.includes(w));
+  const all = STORE.getTracks(), rows = [];
+  for (const tr of all) {
+    const lays = (D.ls.get(tr.id) || []).map(l => ({ l, a: D.act.get(tr.id + '|' + l.id) || null, mine: D.mineK.has(tr.id + '|' + l.id) }));
+    const custom = D.act.get(tr.id + '|custom'), owners = new Set(); let n = custom ? custom.n : 0; if (custom) for (const o of custom.owners) owners.add(o);
+    for (const x of lays) if (x.a) { n += x.a.n; for (const o of x.a.owners) owners.add(o); }
+    const d = D.home && isFinite(tr.lat) && isFinite(D.home.lat) ? GEO.distKm(D.home, tr) : null;
+    rows.push({ tr, all: lays, lays, n, drivers: owners.size, d, home: !!(D.home && D.home.id === tr.id) });
+  }
+  // the country chips count what the search leaves
+  const found = rows.filter(r => { if (!words.length || hit([r.tr.name, r.tr.city, countryName(r.tr.country), countryLocal(r.tr.country)].join(' ').toLowerCase())) return true; r.lays = r.all.filter(x => hit((r.tr.name + ' ' + x.l.name).toLowerCase())); return r.lays.length > 0; });
+  trkCountries(found);
+  const shown = found.filter(r => !TRK.cc || r.tr.country === TRK.cc);
+  const near = (a, b) => (a.d === null) - (b.d === null) || (a.d || 0) - (b.d || 0);
+  const driven = shown.filter(r => r.n > 0).sort((a, b) => (b.home - a.home) || (b.n - a.n));
+  const fresh = shown.filter(r => !r.n).sort((a, b) => D.home ? (near(a, b) || (b.all.length > 0) - (a.all.length > 0) || a.tr.name.localeCompare(b.tr.name)) : ((b.all.length > 0) - (a.all.length > 0) || countryName(a.tr.country).localeCompare(countryName(b.tr.country)) || a.tr.name.localeCompare(b.tr.name)));
+  const box = $('trList'); box.innerHTML = '';
+  const sec = (title, hint) => { const h = el('div', 'trk-sec'); h.appendChild(el('b', '', title)); if (hint) h.appendChild(el('span', 'hint', hint)); return h; };
+  if (driven.length) { box.appendChild(sec(t('Where people drive'))); const g = el('div', 'trk-grid'); for (const r of driven) g.appendChild(trkCard(r, words.length > 0)); box.appendChild(g); }
+  if (fresh.length) { box.appendChild(sec(t('Nobody has uploaded here yet'), t('be the first — upload a session'))); const c = el('div', 'card trk-rows'); for (const r of fresh) c.appendChild(trkRow(r)); box.appendChild(c); }
+  const none = !driven.length && !fresh.length;
+  if (none && !words.length) box.appendChild(el('div', 'trk-empty', t('No tracks here yet.')));   // a search that finds nothing: the card under says so
+  $('trAddT').textContent = none && words.length ? t('“{q}” is not on Hutka yet', { q: raw }) : t('Your track is not here?');
+  $('trAddFindT').textContent = none && words.length ? t('Find “{q}” on the map', { q: raw }) : t('Find it on the map');
+  const nl = all.reduce((s, tr) => s + (D.ls.get(tr.id) || []).length, 0), ns = rows.reduce((s, r) => s + r.n, 0);
+  $('tracksSub').textContent = STORE.hasDb || all.length ? [tn(all.length, '{n} track', '{n} tracks').replace('{n}', all.length), tn(nl, '{n} layout', '{n} layouts').replace('{n}', nl), ns ? tn(ns, '{n} session', '{n} sessions').replace('{n}', ns) : ''].filter(Boolean).join(' · ') : t('Sign in to claude.ai and open the shared Hutka link to see the track catalogue.');
+}
+// the countries with tracks (what the search leaves), the busiest first; "All" first; a pick is kept on this device
+function trkCountries(rows) {
+  const box = $('trCountries'), by = new Map(); for (const r of rows) if (r.tr.country) by.set(r.tr.country, (by.get(r.tr.country) || 0) + 1);
+  if (TRK.cc && !by.has(TRK.cc) && !rows.length) by.set(TRK.cc, 0);
+  const ccs = [...by.entries()].sort((a, b) => b[1] - a[1] || countryLocal(a[0]).localeCompare(countryLocal(b[0])));
+  box.innerHTML = ''; box.hidden = ccs.length < 2 && !TRK.cc;
+  const chip = (cc, label, n) => { const b = el('button', cc === TRK.cc ? 'on' : ''); b.type = 'button'; b.append(document.createTextNode(label + ' '), el('span', 'n', String(n))); b.onclick = () => { TRK.cc = cc; try { localStorage.setItem('hutka.trk.cc', cc); } catch (e) {} trkRender(); }; box.appendChild(b); };
+  chip('', t('All'), rows.length);
+  for (const [cc, n] of ccs) chip(cc, flag(cc) + ' ' + countryLocal(cc), n);
+}
+function trkCard(r, searching) {
+  const c = el('div', 'card trk-card'), hd = el('a', 'trk-head'); hd.href = '#track~' + r.tr.id;
+  const lg = el('div', 'logo'); logoInto(lg, r.tr);
+  const tx = el('div', 'tx'); tx.append(el('b', '', r.tr.name), el('span', '', [[r.tr.city, flag(r.tr.country)].filter(Boolean).join(' '), tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n), tn(r.drivers, '{n} driver', '{n} drivers').replace('{n}', r.drivers)].filter(Boolean).join(' · ')));
+  hd.append(lg, tx, svgUse('i-chev', 'go')); c.appendChild(hd);
+  const withS = r.lays.filter(x => x.a).sort((a, b) => b.a.n - a.a.n), without = r.lays.filter(x => !x.a);
+  for (const x of withS) c.appendChild(trkLay(r.tr, x));
+  if (without.length) {
+    if (searching || !withS.length || TRK.open.has(r.tr.id)) for (const x of without) c.appendChild(trkLay(r.tr, x));
+    else { const b = el('button', 'trk-more', t(tn(without.length, '{n} more layout nobody has driven — be the first', '{n} more layouts nobody has driven — be the first'), { n: without.length })); b.type = 'button'; b.onclick = () => { TRK.open.add(r.tr.id); trkRender(); }; c.appendChild(b); }
+  }
+  return c;
+}
+function trkLay(tr, x) {
+  const a = el('a', 'trk-lay'); a.href = `#track~${tr.id}~${x.l.id}`;
+  const sh = el('div', 'sh'), pic = TRK.data.pics.get(tr.id + '|' + x.l.id);
+  if (pic) { const cv = document.createElement('canvas'); sh.appendChild(cv); requestAnimationFrame(() => trkShape(cv, pic)); } else sh.appendChild(svgUse(x.a ? 'i-track' : 'i-upload'));
+  const tx = el('div', 'tx'); tx.appendChild(el('b', '', x.l.name));
+  if (x.a) { const cls = x.a.best.rental ? 'rental' : 'sport', best = x.a.best[cls]; tx.appendChild(el('span', '', [tn(x.a.n, '{n} session', '{n} sessions').replace('{n}', x.a.n), tn(x.a.owners.size, '{n} driver', '{n} drivers').replace('{n}', x.a.owners.size), best ? t('best {t}', { t: fmtMs(best) }) + (cls === 'sport' ? ' · ' + t('sport') : '') : ''].filter(Boolean).join(' · '))); }
+  else tx.appendChild(el('span', 'first', t('No sessions yet — be the first')));
+  a.append(sh, tx); if (x.mine) a.appendChild(el('span', 'me', t('you drove it'))); a.appendChild(svgUse('i-chev', 'go'));
+  return a;
+}
+function trkRow(r) {
+  const a = el('a', 'trk-row'); a.href = '#track~' + r.tr.id; const lg = el('div', 'logo'); logoInto(lg, r.tr);
+  const tx = el('div', 'tx'); tx.append(el('b', '', r.tr.name), el('span', '', [[r.tr.city, flag(r.tr.country)].filter(Boolean).join(' '), r.all.length ? tn(r.all.length, '{n} layout', '{n} layouts').replace('{n}', r.all.length) : t('no layouts yet'), r.d !== null ? `${r.d < 10 ? r.d.toFixed(1) : Math.round(r.d)} ${t('km')}` : ''].filter(Boolean).join(' · ')));
+  a.append(lg, tx, svgUse('i-chev', 'go')); return a;
+}
+// a layout's shape from a published lap: a card (y down) or a preview (y up)
+function trkShape(cv, pic) {
+  const box = cv.parentElement, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1)), w = (box && box.clientWidth) || 56, h = (box && box.clientHeight) || 42; if (!pic.pts || pic.pts.length < 3) return;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const down = !!pic.v, pad = 6, s = Math.min((w - 2 * pad) / Math.max(pic.w || 1, 0.05), (h - 2 * pad) / Math.max(pic.h || 1, 0.05)), ox = (w - (pic.w || 1) * s) / 2, oy = (h - (pic.h || 1) * s) / 2;
+  ctx.beginPath(); pic.pts.forEach((p, i) => { const x = ox + p[0] * s, y = down ? oy + p[1] * s : h - (oy + p[1] * s); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath();
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--actual').trim() || '#1f6fe0'; ctx.lineWidth = 1.8; ctx.stroke();
+}
+$('trAddUp').onclick = () => UPLOAD.open({});
+$('trAddFind').onclick = () => { const q = $('q').value.trim(); HAI.queue({ act: 'track', q }); $('q').value = ''; location.hash = '#ai'; };
 // a generated cover: the layout's shape from a published session on a brand gradient (until the track has a real photo)
 function drawCoverShape(cv, pv, name) {
   const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1)), w = cv.clientWidth || 900, h = cv.clientHeight || 300; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -7587,16 +7806,6 @@ function drawCoverShape(cv, pv, name) {
   const path = () => { ctx.beginPath(); pv.pts.forEach((p, i) => { const x = ox + p[0] * s, y = h - (oy + p[1] * s); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath(); };
   ctx.lineJoin = 'round'; ctx.lineCap = 'round'; path(); ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 22; ctx.stroke(); path(); ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 4; ctx.stroke();
   ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `600 12px ${getComputedStyle(document.documentElement).getPropertyValue('--mono') || 'monospace'}`; ctx.fillText('GPS · ' + (name || ''), pad, pad + 10);   // top left: the bottom of the cover fades into the page
-}
-function trackRow(tr, d) {
-  const a = el('a', 'track-row'); a.href = '#track~' + tr.id; a.dataset.id = tr.id;
-  const lg = el('div', 'logo'); logoInto(lg, tr);
-  const tx = el('div', ''); tx.style.minWidth = '0'; const nm = el('span', 'nm', tr.name); const ct = el('span', 'ct'); ct.append(svgUse('i-pin', 'h-ico'), document.createTextNode([tr.city, flag(tr.country)].filter(Boolean).join(' ') + (d !== null && d !== undefined ? ` · ${d < 10 ? d.toFixed(1) : Math.round(d)} ${t('km')}` : ''))); ct.querySelector('svg').style.cssText = 'width:14px;height:14px'; tx.append(nm, ct);
-  a.append(lg, tx);
-  if (d !== null && d !== undefined) a.appendChild(el('span', 'dist', `${d < 10 ? d.toFixed(1) : Math.round(d)} ${t('km')}`));
-  a.appendChild(el('span', 'chev', '›'));
-  a.onmouseenter = () => { if (APP.geo) { APP.geo.hover = tr; APP.geo.draw(); } }; a.onmouseleave = () => { if (APP.geo && APP.geo.hover === tr) { APP.geo.hover = null; APP.geo.draw(); } };
-  return a;
 }
 $('btnAddTrack').onclick = () => ADMIN.addTrack();
 
@@ -11893,11 +12102,16 @@ const LANDING = {
     else if (ex) LANDING.remember(ex, ex.who, trk ? trk.name : ex.trackName);
   }
 };
-async function renderHomePage() {
+// ---------- Sessions: All — the fastest lap of every layout on top, then the latest sessions; My sessions — his own ----------
+async function renderHomePage(mode) {
+  const mineView = mode === 'mine';
+  for (const b of $('feedSeg').querySelectorAll('button')) { const on = (b.dataset.v === 'mine') === mineView; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); }
+  $('feedAll').hidden = mineView; $('feedMine').hidden = !mineView;
+  if (mineView) { await renderMySessionsView(); return; }
   $('homeSub').textContent = t('Upload a session — every corner, compared with the fastest on the same layout.');
   $('homeUpload').onclick = () => UPLOAD.open({});
   $('homeSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity); $('homeSignIn').onclick = () => AUTH.open();
-  pushAskAt($('pg-home'), document.querySelector('#pg-home .home-grid'));
+  pushAskAt($('feedAll'), $('feedLead'));
   const feed = $('homeFeed'); feed.innerHTML = '';
   for (let i = 0; i < 3; i++) { const sk = el('div', 'post skel'); sk.style.height = '220px'; feed.appendChild(sk); }
   document.querySelector('#pg-home .home-hero').hidden = !!STORE.hasDb;   // the old hero only for the preview with no database
@@ -11907,6 +12121,9 @@ async function renderHomePage() {
   await STORE.socialAvailable();
   const names = await STORE.names(pubs.map(s => s.owner)), counts = await STORE.socialCounts(pubs.map(s => s.id));
   for (const tid of new Set(pubs.map(s => s.track).filter(Boolean))) await STORE.getLayouts(tid);
+  // the driver's own best on every layout (per kart class): his gap on the fastest-laps cards and on each post
+  { const mine = STORE.hasIdentity ? await STORE.mySessions().catch(() => []) : []; HOME.myBest = new Map(); HOME.mineN = mine.length; for (const m of mine) { if (!m.track || !m.layout || m.layout === 'custom' || !(m.bestMs > 0)) continue; const k = m.track + '|' + m.layout + '|' + kartClassOf(m); if (!HOME.myBest.has(k) || m.bestMs < HOME.myBest.get(k)) HOME.myBest.set(k, m.bestMs); } }
+  renderLeaders(pubs, names);
   // hero stats
   // site-wide totals from hutka_counts; without the function (older database) — what the feed slice shows
   { const st = $('homeStats'); st.innerHTML = ''; const drivers = C ? C.drivers : new Set(pubs.map(s => s.owner)).size, laps = C ? C.laps : pubs.reduce((a, s) => a + (s.nLaps || 0), 0), nSess = C ? C.sessions : pubs.length; for (const [k, v] of [[t('Tracks'), C ? C.tracks : STORE.getTracks().length], [t('Sessions'), nSess], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="v">${v}</div><div class="k">${esc(k)}</div>`; st.appendChild(d); } }
@@ -11947,7 +12164,9 @@ function postCard(s, names, cnt, opts) {
   const info = el('div'); info.innerHTML = `<div class="lbl">${t('best lap')}</div><div class="big">${fmtMs(s.bestMs)}</div><div class="nm">${esc(s.label || s.name)}${resultText(s) ? ` <span class="res">${esc(resultText(s))}</span>` : ''}${s.note ? ` <span class="hint">· ${esc(s.note)}</span>` : ''}</div>`;
   const chips = el('div', 'chips'); const chip = (k, v) => { const c = el('span', 'chip'); c.innerHTML = `${esc(k)} <b></b>`; c.querySelector('b').textContent = v; chips.appendChild(c); };
   chip(t('avg clean'), fmtMs(s.avgMs)); chip(t('laps'), `${s.nLaps} (${s.cleanLaps})`);
-  if (rich) { if (s.card.vmax) chip(t('max'), `${s.card.vmax} ${t('km/h')}`); if (s.card.total) chip(t('reserve'), `${s.card.total.toFixed(2)} s`); } if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.ch && s.ch.rpm) { chip(t('rpm max'), String(Math.round(s.ch.rpmMax || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009')); if (s.ch.kind && s.ch.kind !== 'single' && s.ch.shifts) chip(t('shifts'), `${s.ch.shifts} / ${t('lap')}`); if (s.ch.t1Max) chip(t('water'), `${Math.round(s.ch.t1Max)} °C`); } if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
+  if (rich) { if (s.card.vmax) chip(t('max'), `${s.card.vmax} ${t('km/h')}`); if (s.card.total && s.card.total < 10) chip(t('reserve'), `${s.card.total.toFixed(2)} s`); } if (s.kart || kartClassOf(s) === 'sport') chip(t('kart'), kartLabel(s)); if (s.ch && s.ch.rpm) { chip(t('rpm max'), String(Math.round(s.ch.rpmMax || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009')); if (s.ch.kind && s.ch.kind !== 'single' && s.ch.shifts) chip(t('shifts'), `${s.ch.shifts} / ${t('lap')}`); if (s.ch.t1Max) chip(t('water'), `${Math.round(s.ch.t1Max)} °C`); } if (s.source && s.source.app !== 'alfano') chip(t('source'), `${s.source.appName || s.source.app} ${s.source.hz} Hz`); if (s.sws) chip('SWS', [s.sws.race, s.sws.pos ? 'P' + String(s.sws.pos).replace(/^P/i, '') : ''].filter(Boolean).join(' · ')); if (s.lat && s.lon && !tr) chip('GPS', `${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}`);
+  const mb = !mine && s.layout && s.layout !== 'custom' && s.bestMs > 0 && HOME.myBest ? HOME.myBest.get(s.track + '|' + s.layout + '|' + kartClassOf(s)) : null;
+  if (mb) { const gap = (mb - s.bestMs) / 1000; info.appendChild(el('span', 'vs ' + (gap > 0 ? 'faster' : 'slower'), gap > 0 ? t('{s} s faster than your best', { s: gap.toFixed(2) }) : (gap < 0 ? t('you are {s} s faster', { s: (-gap).toFixed(2) }) : t('the same as your best')))); }
   info.appendChild(chips);
   pb.append(pv, info);
   // the rest of a driver's batch: one compact row each, three shown, the others behind "show all"
@@ -11957,16 +12176,47 @@ function postCard(s, names, cnt, opts) {
   const like = voteButtons(s.id, cnt, (r) => { d.classList.toggle('low', STORE.lowRated(r)); lowTag.hidden = !STORE.lowRated(r); });
   const lowTag = el('span', 'soon', t('rated not helpful')); lowTag.hidden = !STORE.lowRated(cnt); if (STORE.socialOn) ph.appendChild(lowTag);
   const cm = el('a', 'act'); cm.href = '#lab~' + esc(s.id) + '~discuss'; cm.title = t('Comments'); cm.innerHTML = `<svg><use href="#i-chat"/></svg><b>${cnt ? cnt.comments : 0}</b>`;
-  const open = el('a', 'btn sm primary', t('Open analysis')); open.href = '#lab~' + esc(s.id);
+  // one main button: compare with mine where he has driven this layout, the analysis elsewhere (the map itself opens the analysis too)
+  const open = el('a', 'btn sm primary', mb ? t('Compare with mine') : t('Open analysis')); open.href = '#lab~' + esc(s.id) + (mb ? '~cmp' : '');
   if (STORE.socialOn) pf.append(like, cm); else { const soon = el('span', 'soon', t('votes & comments soon')); pf.appendChild(soon); } pf.appendChild(el('span', 'sp'));
-  if (!mine && s.track) { const c = el('a', 'btn sm', t('Compare')); c.href = `#lab~${esc(s.id)}~cmp`; c.title = t('Compare with mine'); pf.appendChild(c); }
   pf.appendChild(open);
-  if (!mine && STORE.hasDb) pf.appendChild(FLAG.button('session', s.id, s.label || s.name || '', 'sm'));   // a report on someone's session goes to the admins
+  if (!mine && STORE.hasDb) { const fb = FLAG.button('session', s.id, s.label || s.name || '', 'ico'); if (!STORE.hasFlagged('session', s.id)) { fb.innerHTML = '<svg><use href="#i-warn"/></svg>'; fb.setAttribute('aria-label', t('Report')); } ph.appendChild(fb); }   // a report on someone's session goes to the admins: a small mark in the corner
   // admins: hide a broken or wrongly placed session from the public (moderate.sql); its owner keeps it
   if (!mine && STORE.isAdmin() && STORE.hasDb) { const hb = el('button', 'btn sm ghost mod', t('Hide')); hb.type = 'button'; hb.title = t('Hide from the public (admins): the session stays in its owner\'s library, unpublished.'); hb.onclick = async () => { if (!(await confirmDlg(t('Hide this session from the public?'), t('It disappears from the feed and the track page. The owner keeps it, unpublished, and cannot republish it; you can show it again from the Lab.'), t('Hide')))) return; hb.classList.add('busy'); try { await STORE.setPublishedAdmin(s.id, false); s.published = false; s.moderated = true; d.remove(); toast(t('Hidden from the public.')); sharePageSync(s).catch(() => {}); } catch (e) { hb.classList.remove('busy'); toast(/hutka_set_published|PGRST202|42883/.test(String(e && e.message || e)) ? t('Run supabase/moderate.sql in the SQL editor once — then admins can hide sessions.') : t('Could not hide: {e}', { e: e && e.message || e })); } }; pf.insertBefore(hb, open); }
   d.append(ph, pb); if (more) d.appendChild(more); d.appendChild(pf); return d;
 }
 function layoutName(tid, lid) { const l = STORE.getLayout(tid, lid); return l ? l.name : lid; }
+// the fastest lap of every layout people drive (each kart class apart): the driver's own layouts first with his gap; a tap opens it —
+// compared with his own where he has driven
+function renderLeaders(pubs, names) {
+  const box = $('feedLeadStrip'), wrap = $('feedLead'), my = HOME.myBest || new Map(); box.innerHTML = '';
+  const by = new Map();
+  for (const s of pubs) { if (!s.track || !s.layout || s.layout === 'custom' || !(s.bestMs > 0)) continue; const k = s.track + '|' + s.layout + '|' + kartClassOf(s); const o = by.get(k) || { k, n: 0, all: [], owners: new Set() }; o.n++; o.owners.add(s.owner); o.all.push(s); by.set(k, o); }
+  // the leader: the fastest lap that is not far quicker than the layout's usual best laps (a cut lap or a GPS jump is not a record)
+  for (const o of by.values()) { const xs = o.all.map(s => s.bestMs).sort((a, b) => a - b), med = xs[Math.floor(xs.length / 2)]; o.best = o.all.filter(s => xs.length < 3 || s.bestMs >= 0.85 * med).sort((a, b) => a.bestMs - b.bestMs)[0] || null; }
+  const list = [...by.values()].filter(o => o.best).sort((a, b) => (my.has(b.k) - my.has(a.k)) || b.n - a.n).slice(0, 12);
+  wrap.hidden = !list.length; if (!list.length) return;
+  for (const o of list) {
+    const s = o.best, tr = STORE.getTrack(s.track), lay = STORE.getLayout(s.track, s.layout), nm = names[s.owner] || {}, mb = my.get(o.k), me = s.owner === STORE.me.id;
+    const a = el('a', 'lead-card'); a.href = '#lab~' + s.id + (mb && !me ? '~cmp' : '');
+    a.append(el('div', 'k', (tr ? tr.name : (s.trackName || '')) + (kartClassOf(s) === 'sport' ? ' · ' + t('sport') : '')), el('div', 'lay', lay ? lay.name : s.layout), el('div', 'tm', fmtMs(s.bestMs)));
+    const who = el('div', 'who'), im = new Image(); im.src = nm.avatar || GENERIC_AVATAR; im.alt = ''; who.append(im, el('span', '', nm.name || t('Driver'))); a.appendChild(who);
+    if (me) a.appendChild(el('span', 'you top', t('Yours — the fastest here')));
+    else if (mb) a.appendChild(el('span', 'you behind', t('you +{s} s', { s: ((mb - s.bestMs) / 1000).toFixed(2) })));
+    else a.appendChild(el('span', 'you none', tn(o.owners.size, '{n} driver', '{n} drivers').replace('{n}', o.owners.size) + ' · ' + tn(o.n, '{n} session', '{n} sessions').replace('{n}', o.n)));
+    box.appendChild(a);
+  }
+  $('feedLeadSub').textContent = my.size ? t('a tap — compare with yours') : t('a tap opens the lap');
+}
+// My sessions: the table every session of his lives in (publish, edit, delete) and his progress; a guest is asked to sign in
+async function renderMySessionsView() {
+  const ok = STORE.hasIdentity || !STORE.hasAuth;   // without sign-in at all (the claude.ai preview) the library is this browser's
+  $('feedMineCard').hidden = !ok; $('feedMineGuest').hidden = ok; $('feedMineSignIn').onclick = () => AUTH.open();
+  if (!ok) return;
+  await renderMySessionsTable($('feedMineList'), { hint: $('feedMineHint') });
+  try { renderProgress($('feedMineProg'), await STORE.mySessions(), { max: 2 }); } catch (e) { $('feedMineProg').hidden = true; }
+}
+$('feedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; NATIVE.haptic('light'); location.hash = b.dataset.v === 'mine' ? '#feed~mine' : '#feed'; });
 $('homeUpload').onclick = () => UPLOAD.open({});
 
 // the app: one soft question about pushes for a signed-in driver (the system dialog follows "Turn on"; "Not now" asks again in a week) —
@@ -12328,7 +12578,7 @@ async function runJob(j) {
   if (j.act === 'ideal') await actIdeal(j.tid, j.lid);
   else if (j.act === 'session') { const m = j.sid ? await STORE.getSessionMeta(j.sid).catch(() => null) : null; await actSession(m || undefined); }
   else if (j.act === 'progress') await actProgress();
-  else if (j.act === 'track') actTrack();
+  else if (j.act === 'track') actTrack(j.q || '');
   else if (j.text) aiSend(j.text);
 }
 // fair-use replies from the ask function, in words
@@ -12712,7 +12962,7 @@ function aiSpark(cv, xs) {
 }
 
 // ---- 4. a new track: a name, a map link, a place or a photo → its layouts (Hutka's, or the raceway on OpenStreetMap) → the ideal
-function actTrack() {
+function actTrack(q0) {
   const card = aiCard(t('New track'), t('Name the track, paste a map link or coordinates, use where you are now, or send a photo of the track map.'));
   const row = el('div', 'ai2-find'), inp = el('input', ''); inp.type = 'text'; inp.placeholder = t('Track name, map link or coordinates'); inp.autocomplete = 'off';
   const go = aiBtn(t('Find'), 'primary', () => run(inp.value)); row.append(inp, go);
@@ -12724,7 +12974,7 @@ function actTrack() {
   row2.append(here, photo, file);
   const out = el('div', 'ai2-found');
   inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); run(inp.value); } });
-  card.append(row, row2, out); pushCard(card); setTimeout(() => inp.focus(), 50);
+  card.append(row, row2, out); pushCard(card); if (q0) { inp.value = q0; setTimeout(() => run(q0), 0); } else setTimeout(() => inp.focus(), 50);   // a name from the tracks library: looked up at once
   // ph: the photo this search came from. A venue's plan of a venue on Hutka opens the layout it shows at once: by the name printed on it
   // (the AI reads it: "SPEEDWAY CIRCUIT"), else by its shape laid onto the venue's driven layouts; a layout nobody has driven is read from
   // the picture itself at the venue's real size. Off Hutka the photo's own layout is always one of the answers, and the answer by itself
