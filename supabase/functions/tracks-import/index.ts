@@ -11,13 +11,13 @@ import { venuesOf, distM, nameKey, type El, type Venue } from "./lib.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-import-token", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
-const MIRRORS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
+const MIRRORS = ["https://overpass.kumi.systems/api/interpreter", "https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
 
 // three light questions (an "around" over the venues' outlines is slow on the public servers): the area's karting
 // venues; the raceways in small boxes around them; the towns (for a venue whose address has none). The whole run stays inside the
 // function's time (a server that hangs is left for the next one, and the area for the queue's next try)
 const areaOf = (area: string) => /^US-[A-Z]{2}$/.test(area) ? `area["ISO3166-2"="${area}"]->.a;` : `area["ISO3166-1"="${area}"]["admin_level"="2"]->.a;`;
-const qVenues = (area: string) => `[out:json][timeout:90];${areaOf(area)}nwr["sport"~"karting"](area.a);out tags center bb;`;
+const qVenues = (area: string) => `[out:json][timeout:90];${areaOf(area)}nwr["sport"="karting"](area.a);out tags center bb;`;   // the exact value: the tag index answers it
 const qTowns = (area: string) => `[out:json][timeout:90];${areaOf(area)}node["place"~"^(city|town)$"](area.a);out body;`;
 function qRaceways(venues: El[]): string | null {
   const boxes: number[][] = [];   // [south, west, north, east], 800 m round each venue, overlapping ones merged
@@ -33,7 +33,7 @@ function qRaceways(venues: El[]): string | null {
   return `[out:json][timeout:90];(${boxes.map(b => `way["highway"="raceway"](${b.map(x => x.toFixed(5)).join(",")});`).join("")});out tags geom;`;
 }
 let deadline = 0;   // when the run has to stop asking (set per request)
-async function overpass(q: string, ms = 75000): Promise<{ elements: El[]; mirror: string }> {
+async function overpass(q: string, ms = 55000): Promise<{ elements: El[]; mirror: string }> {
   let last = "";
   for (const m of MIRRORS) {
     const left = deadline - Date.now(); if (left < 8000) { last = last || "out of time"; break; }
@@ -65,6 +65,11 @@ Deno.serve(async (req) => {
   let body: { area?: string; dry?: boolean } = {};
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
   const area = String(body.area || "").toUpperCase(), dry = !!body.dry;
+  if (area === "PING") {   // which map servers answer from here, and how fast (a run from the queue: area "PING")
+    const out: Record<string, unknown> = {};
+    for (const m of MIRRORS) { const t1 = Date.now(), ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000); try { const r = await fetch(m, { method: "POST", body: "data=" + encodeURIComponent("[out:json][timeout:10];node(1);out;"), headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": "Hutka track import (https://hutka.ai)" }, signal: ctl.signal }); out[m] = { status: r.status, ms: Date.now() - t1, body: (await r.text()).slice(0, 120) }; } catch (e) { out[m] = { error: String((e as Error).message || e), ms: Date.now() - t1 }; } finally { clearTimeout(timer); } }
+    await db.from("import_queue").update({ status: "done", result: out, finished_at: new Date().toISOString() }).eq("area", area); return json(out);
+  }
   if (!/^([A-Z]{2}|US-[A-Z]{2})$/.test(area)) return json({ error: "bad_area" }, 400);
   const t0 = Date.now(), cc = area.slice(0, 2); deadline = t0 + 125000;   // the writes need the rest of the function's 150 s
   const done = async (result: Record<string, unknown>, status = "done") => { await db.from("import_queue").update({ status, result, finished_at: new Date().toISOString() }).eq("area", area); return json(result, status === "done" ? 200 : 502); };
