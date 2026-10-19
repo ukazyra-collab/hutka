@@ -9,7 +9,8 @@
 // v34.31 (Hutka AI): kb=1 puts the coach's course (table ai_knowledge, id 'course' — never sent to a page) in front of the page's prompt,
 // cached; purpose='identify_track' with a photo (image: base64, media_type) asks which karting track it shows and answers {track} without
 // keeping a chat (LIMIT_VISION_DAY=10 photos a day per driver, table ai_vision). v34.37: {track} also says which layout a venue's plan
-// is about (its printed title).
+// is about (its printed title). v34.38: signed-out visitors too — LIMIT_VISION_IP_DAY=5 per network address, LIMIT_VISION_ANON_DAY=200
+// for all of them together.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const cors = {
@@ -24,7 +25,7 @@ const FREE = num("FREE_CREDITS", 10);
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") || "claude-sonnet-5-5";
 const FREE_MODE = (Deno.env.get("FREE_MODE") ?? "1") !== "0";
 const PAUSED = (Deno.env.get("AI_PAUSED") || "0") === "1";
-const LIM = { hour: num("LIMIT_HOUR", 15), day: num("LIMIT_DAY", 50), ip: num("LIMIT_IP_DAY", 120), global: num("LIMIT_GLOBAL_DAY", 800), text: num("MAX_TEXT_CHARS", 1500), system: num("MAX_SYSTEM_CHARS", 48000), out: num("MAX_OUT_TOKENS", 2500), vision: num("LIMIT_VISION_DAY", 10) };
+const LIM = { hour: num("LIMIT_HOUR", 15), day: num("LIMIT_DAY", 50), ip: num("LIMIT_IP_DAY", 120), global: num("LIMIT_GLOBAL_DAY", 800), text: num("MAX_TEXT_CHARS", 1500), system: num("MAX_SYSTEM_CHARS", 48000), out: num("MAX_OUT_TOKENS", 2500), vision: num("LIMIT_VISION_DAY", 10), visionIp: num("LIMIT_VISION_IP_DAY", 5), visionAnon: num("LIMIT_VISION_ANON_DAY", 200) };
 const STREAM = (Deno.env.get("ASK_STREAM") || "0") === "1";
 
 // the network address is kept only as a short hash — enough to notice one address opening many accounts, useless for anything else
@@ -49,12 +50,22 @@ async function knowledge(db: any) {
 // a photo of a track → which venue it is: {name, city, country, sure, layout, length_m, direction} or null. Not a chat message; counted
 // per driver per day
 // deno-lint-ignore no-explicit-any
-async function identifyTrack(db: any, uid: string, body: any, key: string) {
+// v34.38: a signed-out visitor's photo too — counted by the network address (a short hash), a few a day, and all of them together capped
+async function identifyTrack(db: any, uid: string | null, body: any, key: string, ip: string) {
   const img = String(body.image || ""), mt = String(body.media_type || "image/jpeg");
   if (!img || img.length > 5_000_000 || !/^image\/(jpeg|png|webp|gif)$/.test(mt)) return json({ error: "bad_image" }, 400);
   const dayAgo = new Date(Date.now() - 86400_000).toISOString();
-  let used = 0; try { const r = await db.from("ai_vision").select("id", { count: "exact", head: true }).eq("user_id", uid).gte("created_at", dayAgo); used = r.count || 0; } catch (_) { used = 0; }
-  if (used >= LIM.vision) return json({ error: "rate_limited", scope: "day", used, limit: LIM.vision }, 429);
+  if (uid) {
+    let used = 0; try { const r = await db.from("ai_vision").select("id", { count: "exact", head: true }).eq("user_id", uid).gte("created_at", dayAgo); used = r.count || 0; } catch (_) { used = 0; }
+    if (used >= LIM.vision) return json({ error: "rate_limited", scope: "day", used, limit: LIM.vision }, 429);
+  } else {
+    if (!ip) return json({ error: "sign_in" }, 401);
+    let used = 0, all = 0;
+    try { const r = await db.from("ai_vision").select("id", { count: "exact", head: true }).eq("ip", ip).gte("created_at", dayAgo); used = r.count || 0; } catch (_) { used = 0; }
+    try { const r = await db.from("ai_vision").select("id", { count: "exact", head: true }).is("user_id", null).gte("created_at", dayAgo); all = r.count || 0; } catch (_) { all = 0; }
+    if (used >= LIM.visionIp) return json({ error: "rate_limited", scope: "ip", used, limit: LIM.visionIp }, 429);
+    if (all >= LIM.visionAnon) return json({ error: "busy", used: all, limit: LIM.visionAnon }, 503);
+  }
   // besides the venue: the layout the picture is about when it names one (a venue's plan prints its title: "SPEEDWAY CIRCUIT" — the app
   // opens that layout), the lap length when the picture prints it (the app traces the drawing itself and needs its size) and which way
   // round it is driven when arrows or the corner numbers show it
@@ -67,7 +78,7 @@ async function identifyTrack(db: any, uid: string, body: any, key: string) {
   if (!up.ok) { const t = await up.text(); return json({ error: "upstream", status: up.status, detail: t.slice(0, 300) }, 502); }
   const j = await up.json();
   const out = Array.isArray(j.content) ? j.content.filter((c: { type: string }) => c.type === "text").map((c: { text: string }) => c.text).join("") : "";
-  try { await db.from("ai_vision").insert({ user_id: uid }); } catch (_) { /* best effort */ }
+  try { await db.from("ai_vision").insert(uid ? { user_id: uid } : { user_id: null, ip }); } catch (_) { /* best effort */ }
   let track = null;
   try {
     const m = out.match(/\{[\s\S]*\}/); const p = m ? JSON.parse(m[0]) : null;
@@ -91,15 +102,17 @@ Deno.serve(async (req) => {
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || req.headers.get("apikey") || "";
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SUPABASE_SECRET_KEY") || "";
   const asUser = createClient(url, anonKey, { global: { headers: { Authorization: auth } } });
-  const { data: { user } } = await asUser.auth.getUser();
-  if (!user) return json({ error: "sign_in" }, 401);
+  let user: { id: string } | null = null;
+  try { const r = await asUser.auth.getUser(); user = r.data && r.data.user ? r.data.user : null; } catch (_) { user = null; }
   const db = serviceKey ? createClient(url, serviceKey) : asUser;
 
   let body: { chat_id?: number; session_id?: string; track_id?: string; layout_id?: string; title?: string; system?: string; text?: string; lang?: string; kb?: number | boolean; purpose?: string; image?: string; media_type?: string };
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
   const key = Deno.env.get("ANTHROPIC_API_KEY");
   if (!key) return json({ error: "not_configured" }, 503);
-  if (body.purpose === "identify_track") return await identifyTrack(db, user.id, body, key);
+  // the photo lane is open to signed-out visitors (a few a day per network); everything else needs a driver
+  if (body.purpose === "identify_track") return await identifyTrack(db, user ? user.id : null, body, key, user ? "" : await ipHash(req));
+  if (!user) return json({ error: "sign_in" }, 401);
   const text = String(body.text || "").trim().slice(0, LIM.text);
   if (!text) return json({ error: "empty" }, 400);
 
