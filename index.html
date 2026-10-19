@@ -5207,6 +5207,14 @@ Object.assign(I18N.RU, {
 });
 // v34.36 — a reverse layout: the layout it reverses, driven the other way
 Object.assign(I18N.RU, {"Nobody has driven this layout on Hutka yet: it is {name} driven the other way — the line from there, the points from similar corners.": "Эту конфигурацию на Hutka ещё не ездили: это {name} в обратную сторону — линия оттуда, точки из похожих поворотов."});
+// v34.37 — a venue's plan: the layout it names opened, read at the venue's real size; a typed track opened at once
+Object.assign(I18N.RU, {
+  "Laying the picture onto the layouts driven here…": "Накладываю схему на конфигурации, которые здесь ездили…",
+  "Read from the picture and laid onto {name} as driven here: {m} m": "По схеме, наложенной на {name}, как её здесь ездят: {m} м",
+  "Read from the picture": "Прочитано по схеме",
+  "Read from the picture: its shape is this layout": "Прочитано по схеме: по форме это эта конфигурация",
+  "Not a layout of the venue on Hutka yet: read from the picture at the venue's size": "Такой конфигурации этой трассы на Hutka ещё нет: прочитано по схеме в настоящем масштабе трассы"
+});
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -7032,7 +7040,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.36';
+const APP_VERSION = 'v34.37';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -10522,23 +10530,35 @@ const AT = (() => {
     const med = (a) => { if (!a.length) return 255; a.sort((p, q) => p - q); return a[a.length >> 1]; };
     return [med(rs), med(gs), med(bs)];
   }
+  // a colour's tint: what is left of it once its grey (the mean of r, g, b) is taken away, and how strong that is
+  const chroma = (r, g, b) => { const m = (r + g + b) / 3, q = [r - m, g - m, b - m]; return { q, C: Math.hypot(q[0], q[1], q[2]) }; };
+  const HUE_MIN = 14;   // a tint weaker than this is a grey: matched by its colour, not its tint
   function maskFrom(img, mode, seed, tol) {
     const { data, w, h } = img, m = new Uint8Array(w * h);
-    let ref = null;
+    let ref = null, hue = null;
     if (mode === 'auto') ref = borderColor(img);
+    if (mode === 'color') { ref = [seed.r, seed.g, seed.b]; const c = chroma(seed.r, seed.g, seed.b); if (c.C >= HUE_MIN) hue = { u: c.q.map(x => x / c.C), C: c.C }; }
     if (mode === 'seed') { let r = 0, g = 0, b = 0, n = 0; for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) { const x = seed.x + dx, y = seed.y + dy; if (x < 0 || y < 0 || x >= w || y >= h) continue; const i = (y * w + x) * 4; r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; } ref = [r / n, g / n, b / n]; }
     for (let i = 0, p = 0; i < w * h; i++, p += 4) {
       if (data[p + 3] < 128) { m[i] = 0; continue; }
       const r = data[p], g = data[p + 1], b = data[p + 2];
       if (mode === 'dark') m[i] = (0.299 * r + 0.587 * g + 0.114 * b) < tol ? 1 : 0;
-      else { const d = Math.sqrt((r - ref[0]) ** 2 + (g - ref[1]) ** 2 + (b - ref[2]) ** 2); m[i] = mode === 'auto' ? (d > tol ? 1 : 0) : (d < tol ? 1 : 0); }
+      else if (hue) {   // a tinted band (a venue plan's highlighted layout): the same tint, lighter (its shine) or darker (its shadow, a bridge) alike
+        const mm = (r + g + b) / 3, q0 = r - mm, q1 = g - mm, q2 = b - mm, pr = q0 * hue.u[0] + q1 * hue.u[1] + q2 * hue.u[2];
+        if (pr < 0.45 * hue.C) { m[i] = 0; continue; }
+        const e0 = q0 - pr * hue.u[0], e1 = q1 - pr * hue.u[1], e2 = q2 - pr * hue.u[2];
+        m[i] = Math.hypot(e0, e1, e2) <= 0.5 * Math.max(pr, hue.C) ? 1 : 0;
+      }
+      else { const d = Math.sqrt((r - ref[0]) ** 2 + (g - ref[1]) ** 2 + (b - ref[2]) ** 2); m[i] = mode === 'auto' ? (d > tol ? 1 : 0) : (d < tol ? 1 : 0); }   // 'seed', a grey 'color': near the colour
     }
     return m;
   }
-  function morph(m, w, h, r, isDilate) {
-    const out = new Uint8Array(w * h), tmp = new Uint8Array(w * h);
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = isDilate ? 0 : 1; for (let d = -r; d <= r; d++) { const xx = x + d; if (xx < 0 || xx >= w) { if (!isDilate) v = 0; continue; } const q = m[y * w + xx]; if (isDilate ? q : !q) { v = isDilate ? 1 : 0; break; } } tmp[y * w + x] = v; }
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = isDilate ? 0 : 1; for (let d = -r; d <= r; d++) { const yy = y + d; if (yy < 0 || yy >= h) { if (!isDilate) v = 0; continue; } const q = tmp[yy * w + x]; if (isDilate ? q : !q) { v = isDilate ? 1 : 0; break; } } out[y * w + x] = v; }
+  function morph(m, w, h, r, isDilate) { // a square r: the same as the plain loops, by running counts along the rows then the columns
+    const out = new Uint8Array(w * h), tmp = new Uint8Array(w * h), full = 2 * r + 1;
+    for (let y = 0; y < h; y++) { const o = y * w; let c = 0; for (let x = 0; x < Math.min(r, w); x++) c += m[o + x];
+      for (let x = 0; x < w; x++) { if (x + r < w) c += m[o + x + r]; if (x - r - 1 >= 0) c -= m[o + x - r - 1]; tmp[o + x] = isDilate ? (c > 0 ? 1 : 0) : (c === full ? 1 : 0); } }
+    for (let x = 0; x < w; x++) { let c = 0; for (let y = 0; y < Math.min(r, h); y++) c += tmp[y * w + x];
+      for (let y = 0; y < h; y++) { if (y + r < h) c += tmp[(y + r) * w + x]; if (y - r - 1 >= 0) c -= tmp[(y - r - 1) * w + x]; out[y * w + x] = isDilate ? (c > 0 ? 1 : 0) : (c === full ? 1 : 0); } }
     return out;
   }
   function components(m, w, h, val) { // 4-connected labelling of pixels == val; returns {label(Int32), sizes[], touchesBorder[]}
@@ -10546,10 +10566,11 @@ const AT = (() => {
     for (let i = 0; i < w * h; i++) {
       if (m[i] !== val || label[i] >= 0) continue;
       const id = sizes.length; let sp = 0, size = 0, tb = false; stack[sp++] = i; label[i] = id;
-      while (sp) { const c = stack[--sp]; size++; const x = c % w, y = (c / w) | 0; if (x === 0 || y === 0 || x === w - 1 || y === h - 1) tb = true;
-        const nb = [c - 1, c + 1, c - w, c + w];
-        if (x === 0) nb[0] = -1; if (x === w - 1) nb[1] = -1; if (y === 0) nb[2] = -1; if (y === h - 1) nb[3] = -1;
-        for (const q of nb) if (q >= 0 && m[q] === val && label[q] < 0) { label[q] = id; stack[sp++] = q; } }
+      while (sp) { const c = stack[--sp]; size++; const x = c % w, y = (c - x) / w; if (x === 0 || y === 0 || x === w - 1 || y === h - 1) tb = true;
+        if (x > 0) { const q = c - 1; if (m[q] === val && label[q] < 0) { label[q] = id; stack[sp++] = q; } }
+        if (x < w - 1) { const q = c + 1; if (m[q] === val && label[q] < 0) { label[q] = id; stack[sp++] = q; } }
+        if (y > 0) { const q = c - w; if (m[q] === val && label[q] < 0) { label[q] = id; stack[sp++] = q; } }
+        if (y < h - 1) { const q = c + w; if (m[q] === val && label[q] < 0) { label[q] = id; stack[sp++] = q; } } }
       sizes.push(size); border.push(tb);
     }
     return { label, sizes, border };
@@ -10564,24 +10585,27 @@ const AT = (() => {
     for (let i = 0; i < w * h; i++) d[i] /= 3;
     return d;
   }
-  function thin(m, w, h) { // Zhang–Suen
+  function thin(m, w, h) { // Zhang–Suen (only the band's own pixels looked at: the same result, many times faster on a big picture)
     const s = Uint8Array.from(m); const del = [];
     for (let y = 0; y < h; y++) { s[y * w] = 0; s[y * w + w - 1] = 0; } for (let x = 0; x < w; x++) { s[x] = 0; s[(h - 1) * w + x] = 0; }
+    let n = 0; for (let i = 0; i < w * h; i++) if (s[i]) n++;
+    let list = new Int32Array(n); n = 0; for (let i = 0; i < w * h; i++) if (s[i]) list[n++] = i;
     let changed = true, iter = 0;
     while (changed && iter < 200) {
       changed = false; iter++;
       for (let pass = 0; pass < 2; pass++) {
         del.length = 0;
-        for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
-          const i = y * w + x; if (!s[i]) continue;
+        for (let t = 0; t < list.length; t++) {
+          const i = list[t]; if (!s[i]) continue;
           const p2 = s[i - w], p3 = s[i - w + 1], p4 = s[i + 1], p5 = s[i + w + 1], p6 = s[i + w], p7 = s[i + w - 1], p8 = s[i - 1], p9 = s[i - w - 1];
           const B = p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9; if (B < 2 || B > 6) continue;
-          let A = 0; const seq = [p2, p3, p4, p5, p6, p7, p8, p9, p2]; for (let q = 0; q < 8; q++) if (seq[q] === 0 && seq[q + 1] === 1) A++; if (A !== 1) continue;
+          const A = (!p2 && p3) + (!p3 && p4) + (!p4 && p5) + (!p5 && p6) + (!p6 && p7) + (!p7 && p8) + (!p8 && p9) + (!p9 && p2); if (A !== 1) continue;
           if (pass === 0) { if (p2 * p4 * p6 !== 0 || p4 * p6 * p8 !== 0) continue; } else { if (p2 * p4 * p8 !== 0 || p2 * p6 * p8 !== 0) continue; }
           del.push(i);
         }
         if (del.length) { changed = true; for (const i of del) s[i] = 0; }
       }
+      if (changed) { let k = 0; for (let t = 0; t < list.length; t++) if (s[list[t]]) list[k++] = list[t]; list = list.subarray(0, k); }
     }
     return s;
   }
@@ -10613,6 +10637,149 @@ const AT = (() => {
     const ex = path[path.length - 1] % w, ey = (path[path.length - 1] / w) | 0, sx = start % w, sy = (start / w) | 0;
     const closed = Math.hypot(ex - sx, ey - sy) <= 2.5;
     return { path, closed, count };
+  }
+  // The skeleton as a graph: junctions (clusters of pixels with three or more neighbours) and the pixel chains between them. The loop is
+  // walked chain by chain, and at every junction it takes the way that turns least: a crossing (a bridge: the track passing over itself) is
+  // gone straight through, a split of the band around an arrow or a label takes the straighter side and leaves the other. Junctions a
+  // band's width or two apart are one (the two forks a crossing thins into). { path (pixel indices), closed, count, cover } or null
+  function walkGraph(s, w, h, halfW) {
+    const offs = N8(w), n = w * h, deg = new Uint8Array(n); let count = 0;
+    for (let i = w; i < n - w; i++) if (s[i]) { count++; let d = 0; for (const o of offs) if (s[i + o]) d++; deg[i] = d; }
+    if (!count) return null;
+    const jl = new Int32Array(n).fill(-1), J = [];
+    for (let i = w; i < n - w; i++) if (s[i] && deg[i] >= 3 && jl[i] < 0) {
+      const id = J.length, st = [i], px = []; jl[i] = id;
+      while (st.length) { const c = st.pop(); px.push(c); for (const o of offs) { const j = c + o; if (s[j] && deg[j] >= 3 && jl[j] < 0) { jl[j] = id; st.push(j); } } }
+      let cx = 0, cy = 0; for (const p of px) { cx += p % w; cy += (p / w) | 0; } J.push({ x: cx / px.length, y: cy / px.length });
+    }
+    const used = new Uint8Array(n), E = [];
+    // a chain from junction a through its pixel `first`: to the junction it reaches (b), or to a dead end (b = -1)
+    const follow = (a, first) => {
+      const px = [first]; used[first] = 1; let cur = first, b = -1;
+      for (;;) {
+        let nxt = -1, hit = -1;
+        for (const o of offs) { const j = cur + o; if (!s[j]) continue; if (jl[j] >= 0) { if (jl[j] !== a || px.length > 1) hit = jl[j]; } else if (!used[j]) nxt = j; }
+        if (nxt >= 0) { cur = nxt; used[cur] = 1; px.push(cur); continue; }
+        if (hit >= 0) b = hit; break;
+      }
+      return { a, b, px };
+    };
+    for (let i = w; i < n - w; i++) if (jl[i] >= 0) for (const o of offs) { const j = i + o; if (s[j] && jl[j] < 0 && !used[j]) E.push(follow(jl[i], j)); }
+    // a loop with no junction at all: the whole skeleton is one ring
+    if (!J.length) {
+      let start = -1; for (let i = w; i < n - w; i++) if (s[i]) { start = i; break; }
+      const px = [start]; used[start] = 1; let cur = start;
+      for (;;) { let nxt = -1; for (const o of offs) { const j = cur + o; if (s[j] && !used[j]) { nxt = j; break; } } if (nxt < 0) break; cur = nxt; used[cur] = 1; px.push(cur); }
+      const e = px[px.length - 1], closed = Math.hypot(e % w - start % w, ((e / w) | 0) - ((start / w) | 0)) <= 2.5;
+      return { path: px, closed, count, cover: px.length / count };
+    }
+    const len = (e) => e.px.length;
+    const joinLen = Math.max(6, 4 * halfW);
+    // the graph made plain: no dead ends, no tiny rings (a staircase step of the thinning), no junction that only passes a chain on (two
+    // chains spliced into one there) — again and again until nothing changes
+    const plain = (es) => {
+      for (let guard = 0; guard < 20000; guard++) {
+        es = es.filter(e => e.b >= 0 && !(e.a === e.b && len(e) <= 6));
+        const ends = new Map(); for (const e of es) { for (const [nd, isA] of [[e.a, true], [e.b, false]]) { if (!ends.has(nd)) ends.set(nd, []); ends.get(nd).push([e, isA]); } }
+        let changed = false;
+        for (const [nd, list] of ends) {
+          if (list.length === 1) { const e = list[0][0]; es = es.filter(x => x !== e); changed = true; break; }   // a dead end
+          if (list.length !== 2 || list[0][0] === list[1][0]) continue;
+          const [[e1, a1], [e2, a2]] = list;   // spliced: e1 into the junction, e2 out of it
+          const p1 = a1 ? e1.px.slice().reverse() : e1.px, from = a1 ? e1.b : e1.a, p2 = a2 ? e2.px : e2.px.slice().reverse(), to = a2 ? e2.b : e2.a;
+          es = es.filter(x => x !== e1 && x !== e2); es.push({ a: from, b: to, px: p1.concat(p2) }); changed = true; break;
+        }
+        if (!changed) break;
+      }
+      return es;
+    };
+    let es = plain(E.slice());
+    // junctions a chain of at most two band widths apart are one (a crossing thins into two forks): joined, the chain between them dropped
+    const par = J.map((_, i) => i), root = (i) => { while (par[i] !== i) { par[i] = par[par[i]]; i = par[i]; } return i; };
+    for (const e of es) if (e.a !== e.b && len(e) <= joinLen && Math.hypot(J[e.a].x - J[e.b].x, J[e.a].y - J[e.b].y) <= joinLen) par[root(e.a)] = root(e.b);
+    es = es.map(e => ({ a: root(e.a), b: root(e.b), px: e.px })).filter(e => !(e.a === e.b && len(e) <= 3 * joinLen));   // a small ring at one junction: a speck in the band, not the track
+    es = plain(es);
+    if (!es.length) return { path: [], closed: false, count, cover: 0 };
+    const total = es.reduce((a, e) => a + len(e), 0);
+    // the direction a chain leaves its junction (from its end at `at`), over about two band widths
+    const K = Math.max(3, Math.round(2.5 * halfW));
+    const dirOut = (e, fromA) => { const p = e.px, L = p.length, k = Math.min(L - 1, K); const i0 = fromA ? p[0] : p[L - 1], i1 = fromA ? p[k] : p[L - 1 - k]; const dx = i1 % w - i0 % w, dy = ((i1 / w) | 0) - ((i0 / w) | 0), l = Math.hypot(dx, dy) || 1; return [dx / l, dy / l]; };
+    // walk: the longest chain first, then at each junction the least turn
+    let e0 = 0; for (let i = 1; i < es.length; i++) if (len(es[i]) > len(es[e0])) e0 = i;
+    const usedE = new Uint8Array(es.length), path = []; let cur = e0, fwd = true, closed = false;
+    for (let guard = 0; guard <= es.length + 1; guard++) {
+      const e = es[cur]; usedE[cur] = 1;
+      const seq = fwd ? e.px : e.px.slice().reverse();
+      if (path.length) { const p0 = path[path.length - 1], p1 = seq[0], x0 = p0 % w, y0 = (p0 / w) | 0, x1 = p1 % w, y1 = (p1 / w) | 0, g = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)); for (let t = 1; t < g; t++) path.push(Math.round(y0 + (y1 - y0) * t / g) * w + Math.round(x0 + (x1 - x0) * t / g)); }
+      for (const p of seq) path.push(p);
+      const node = fwd ? e.b : e.a, din = dirOut(e, !fwd); const inx = -din[0], iny = -din[1];   // arriving: the reverse of how the chain leaves this end
+      let best = -1, bestFwd = true, bestTurn = Infinity;
+      for (let i = 0; i < es.length; i++) for (const f of [true, false]) {
+        const x = es[i]; if ((f ? x.a : x.b) !== node) continue; if (i === cur && f !== fwd) continue;   // not back the way it came
+        if (x.a === x.b && i === cur && !(i === e0 && f)) continue;   // a ring at one junction: closed, not walked twice
+        const d = dirOut(x, f), turn = Math.acos(Math.max(-1, Math.min(1, d[0] * inx + d[1] * iny)));
+        if (turn < bestTurn) { bestTurn = turn; best = i; bestFwd = f; }
+      }
+      if (best < 0) break;
+      if (best === e0 && bestFwd) { closed = true; break; }
+      if (usedE[best]) break;
+      cur = best; fwd = bestFwd;
+    }
+    let walked = 0; for (let i = 0; i < es.length; i++) if (usedE[i]) walked += len(es[i]);
+    return { path, closed, count, cover: walked / total };
+  }
+  // A band cut short and going on further ahead: the road that passes under a bridge (the plan draws the bridge over it, the road's two
+  // ends on either side), or a band a big label cuts. The ends of the band's skeleton that point at each other across a gap of a few band
+  // widths are joined by a band as wide (drawn into the mask): the road goes on under the bridge, and the walk crosses straight over.
+  // The mask with its bridges, or the same mask when there is nothing to join
+  function bridgeGaps(m, w, h) {
+    const cc = components(m, w, h, 1); if (!cc.sizes.length) return m;
+    const top = Math.max(...cc.sizes), keepId = new Uint8Array(cc.sizes.length); cc.sizes.forEach((s, i) => { keepId[i] = s >= 0.1 * top ? 1 : 0; });
+    let b = new Uint8Array(w * h); for (let i = 0; i < w * h; i++) b[i] = cc.label[i] >= 0 && keepId[cc.label[i]] ? 1 : 0;
+    const fillSmall = (x) => { const bg = components(x, w, h, 0); for (let i = 0; i < w * h; i++) if (!x[i] && !bg.border[bg.label[i]] && bg.sizes[bg.label[i]] < 0.002 * w * h) x[i] = 1; return x; };   // lettering in the band
+    b = fillSmall(b);
+    // the band's half width: its area over its outline (a band is about twice as long round its outline as it is long)
+    let area = 0, edge = 0; for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) { const i = y * w + x; if (!b[i]) continue; area++; if (!b[i - 1] || !b[i + 1] || !b[i - w] || !b[i + w]) edge++; }
+    if (!edge) return m;
+    const halfW = Math.max(2, area / edge), N = Math.round(1.5 * halfW), rc = Math.max(1, Math.round(halfW * 0.5));
+    b = fillSmall(morph(morph(b, w, h, rc, true), w, h, rc, false));   // an arrow or a label notched into the band's edge closed: no spur of its own
+    const s = thin(b, w, h), offs = N8(w);
+    // an end of the skeleton: its neighbours all on one side (one run round the pixel: one, or two touching)
+    const ring8 = [-w, -w + 1, 1, w + 1, w, w - 1, -1, -w - 1];
+    const isEnd = (i) => { let n = 0, runs = 0; for (let k = 0; k < 8; k++) { const a = s[i + ring8[k]], c = s[i + ring8[(k + 1) % 8]]; if (a) n++; if (!a && c) runs++; } return n === 0 || (runs === 1 && n <= 3); };
+    // the short spurs a band's end thins into, eaten back
+    let sk = []; for (let i = w; i < w * (h - 1); i++) { const x = i % w; if (x && x < w - 1 && s[i]) sk.push(i); }
+    for (let it = 0; it < N; it++) { const tips = sk.filter(i => s[i] && isEnd(i)); if (!tips.length) break; for (const i of tips) s[i] = 0; sk = sk.filter(i => s[i]); }
+    const inB = (x, y) => { const xi = Math.round(x), yi = Math.round(y); return xi >= 0 && yi >= 0 && xi < w && yi < h && b[yi * w + xi]; };
+    const tips = [];
+    for (const i of sk) {
+      if (!s[i] || !isEnd(i) || degree(s, w, i, offs) === 0) continue;
+      // back along the skeleton about two band widths (breadth-first: a staircase step of the thinning is no fork)
+      const L = Math.max(6, Math.round(2 * halfW)), seen = new Map([[i, 0]]); let ring = [i], cur = i;
+      for (let k = 1; k <= L && ring.length; k++) { const nx = []; for (const c of ring) for (const o of offs) { const j = c + o; if (s[j] && !seen.has(j)) { seen.set(j, k); nx.push(j); } } if (nx.length) cur = nx[0]; ring = nx; }
+      const dx = i % w - cur % w, dy = ((i / w) | 0) - ((cur / w) | 0), l = Math.hypot(dx, dy); if (l < 4) continue;
+      const ux = dx / l, uy = dy / l, px = i % w, py = (i / w) | 0;
+      // the end of a band: behind it the band runs the way the end points, as wide as a band (a spur across a wider stretch is not one)
+      const across = []; for (const k of [0.5 * N, N, 1.5 * N]) { const cx = px - ux * k, cy = py - uy * k; let a = 0, c = 0; while (a < 4 * halfW && inB(cx - uy * (a + 1), cy + ux * (a + 1))) a++; while (c < 4 * halfW && inB(cx + uy * (c + 1), cy - ux * (c + 1))) c++; across.push(a + c + 1); }
+      across.sort((p, q) => p - q); if (across[1] > 3 * halfW) continue;
+      tips.push({ i, x: px, y: py, dx: ux, dy: uy });
+    }
+    if (tips.length < 2) return m;
+    const pairs = [], maxGap = 10 * halfW + 2 * N, cosMax = Math.cos(30 * Math.PI / 180);
+    for (let a = 0; a < tips.length; a++) for (let c = a + 1; c < tips.length; c++) {
+      const p = tips[a], q = tips[c], vx = q.x - p.x, vy = q.y - p.y, d = Math.hypot(vx, vy); if (d < 2 || d > maxGap) continue;
+      if ((p.dx * vx + p.dy * vy) / d < cosMax || -(q.dx * vx + q.dy * vy) / d < cosMax) continue;
+      pairs.push({ a, c, d });
+    }
+    if (!pairs.length) return m;
+    pairs.sort((p, q) => p.d - q.d); const used = new Set(), out = Uint8Array.from(m), r = Math.max(1, Math.round(halfW)), r2 = r * r;
+    for (const pr of pairs) {
+      if (used.has(pr.a) || used.has(pr.c)) continue; used.add(pr.a); used.add(pr.c);
+      const p = tips[pr.a], q = tips[pr.c], steps = Math.ceil(pr.d);
+      for (let t = 0; t <= steps; t++) { const cx = Math.round(p.x + (q.x - p.x) * t / steps), cy = Math.round(p.y + (q.y - p.y) * t / steps);
+        for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { if (dx * dx + dy * dy > r2) continue; const x = cx + dx, y = cy + dy; if (x >= 0 && y >= 0 && x < w && y < h) out[y * w + x] = 1; } }
+    }
+    return out;
   }
   // Constant-width assumption: push each centreline pixel to the middle between the two band edges along the local normal,
   // ignoring an edge that is further than ~1.15 half-widths away (a pit-lane stub or a label glued to the band).
@@ -10650,9 +10817,9 @@ const AT = (() => {
     for (const closeR of [1, 2, 0]) { const r = runOnce(src, w0, h0, mode, seed, tol, closeR); if (!r.error) return r; last = r; }
     return last;
   }
-  function runOnce(src, w0, h0, mode, seed, tol, closeR) {
-    const img = prepare(src, w0, h0, 900), { w, h, k } = img;
-    const sd = seed ? { x: Math.round(seed.x * k), y: Math.round(seed.y * k) } : null;
+  function runOnce(src, w0, h0, mode, seed, tol, closeR, img0) {
+    const img = img0 || prepare(src, w0, h0, 900), { w, h, k } = img;
+    const sd = seed && mode === 'seed' ? { x: Math.round(seed.x * k), y: Math.round(seed.y * k) } : seed;
     let m = maskFrom(img, mode, sd, tol);
     if (closeR > 0) m = morph(morph(m, w, h, closeR, true), w, h, closeR, false);   // close small gaps (dashes, text crossing the band)
     m = morph(morph(m, w, h, 1, false), w, h, 1, true);   // open: drop specks
@@ -10663,26 +10830,30 @@ const AT = (() => {
       const bg = components(out, w, h, 0); let holes = 0;
       for (let i = 0; i < w * h; i++) if (!out[i]) { const id = bg.label[i]; if (!bg.border[id] && bg.sizes[id] < holeMax) out[i] = 1; }
       for (let id = 0; id < bg.sizes.length; id++) if (!bg.border[id] && bg.sizes[id] >= holeMax) holes++;
-      return holes ? out : null;
+      return holes ? Object.assign(out, { holes }) : null;
     };
+    { let n = 0; for (let i = 0; i < w * h; i++) n += m[i]; if (n > 0.4 * w * h) return { error: 'Не нашёл кольцо трассы: нет замкнутого полотна с внутренней областью.' }; }
+    m = bridgeGaps(m, w, h);
     const ring = cleanRing(m, 0.002 * w * h); if (!ring) return { error: 'Не нашёл кольцо трассы: нет замкнутого полотна с внутренней областью.' };
     m = ring;
-    // typical half-width of the band from the raw skeleton, then an opening that removes anything narrower (pit lane, link roads, text)
+    // typical half-width of the band from the raw skeleton, then an opening that removes anything narrower (pit lane, link roads, text) —
+    // kept only when the band stays whole: as many rings inside it, most of its area
     let dist = distTransform(m, w, h); const skel0 = thin(m, w, h);
     const dv = []; for (let i = 0; i < w * h; i++) if (skel0[i]) dv.push(dist[i]); dv.sort((a, b) => a - b);
     const halfW0 = dv.length ? dv[(dv.length * 0.6) | 0] : 0;
     const rOpen = Math.min(14, Math.round(halfW0 * 0.6));
+    let area = 0; for (let i = 0; i < w * h; i++) area += m[i];
     if (rOpen >= 2 && halfW0 >= 4) {
-      let area = 0; for (let i = 0; i < w * h; i++) area += m[i];
       const m2 = cleanRing(morph(morph(m, w, h, rOpen, false), w, h, rOpen, true), Math.max(0.002 * w * h, 9 * halfW0 * halfW0));
-      if (m2) { let a2 = 0; for (let i = 0; i < w * h; i++) a2 += m2[i]; if (a2 >= 0.6 * area) { m = m2; dist = distTransform(m, w, h); } }
+      if (m2 && m2.holes >= ring.holes) { let a2 = 0; for (let i = 0; i < w * h; i++) a2 += m2[i]; if (a2 >= 0.6 * area) { m = m2; dist = distTransform(m, w, h); } }
     }
     const skel = prune(thin(m, w, h), w, h);
-    const loop = walkLoop(skel, w, h, dist);
+    let loop = walkGraph(skel, w, h, Math.max(2, halfW0));
+    if (!loop || !loop.closed || loop.cover < 0.6) { const l2 = walkLoop(skel, w, h, dist); if (l2 && l2.closed && l2.path.length >= 0.5 * l2.count) loop = Object.assign(l2, { cover: l2.path.length / l2.count }); }
     if (!loop || loop.path.length < 60) return { error: 'Не удалось выделить замкнутый контур.' };
-    if (!loop.closed || loop.path.length < 0.5 * loop.count) return { error: `Контур не замыкается (несколько конфигураций или разрыв полотна).`, debug: { closed: loop.closed, len: loop.path.length, count: loop.count } };
+    if (!loop.closed || loop.cover < 0.5) return { error: `Контур не замыкается (несколько конфигураций или разрыв полотна).`, debug: { closed: loop.closed, len: loop.path.length, count: loop.count, cover: loop.cover } };
     const ds = []; for (const i of loop.path) ds.push(dist[i]); ds.sort((a, b) => a - b);
-    const halfW = ds[ds.length >> 1];
+    const halfW = ds[ds.length >> 1], wq = [ds[(ds.length * 0.2) | 0], ds[(ds.length * 0.8) | 0]];
     let pts = loop.path.map(i => [i % w, (i / w) | 0]);
     pts = recenter(pts, m, w, h, halfW);
     pts = smoothLoop(pts, Math.max(2, Math.round(halfW * 0.6)));
@@ -10693,9 +10864,64 @@ const AT = (() => {
     for (const q of simp) { if (!out.length || Math.hypot(q[0] - out[out.length - 1][0], q[1] - out[out.length - 1][1]) >= minGap) out.push(q); }
     if (out.length > 3 && Math.hypot(out[0][0] - out[out.length - 1][0], out[0][1] - out[out.length - 1][1]) < minGap) out.pop();
     if (out.length < 4) return { error: 'Контур слишком мал.' };
-    return { pts: out.map(q => ({ x: q[0] / k, y: q[1] / k })), widthPx: 2 * halfW / k, lengthPx: loop.path.length / k, mode };
+    let fin = 0; for (let i = 0; i < w * h; i++) fin += m[i];
+    let plen = 0; for (let t = 1; t < loop.path.length; t++) { const a = loop.path[t - 1], c = loop.path[t]; plen += Math.hypot(c % w - a % w, ((c / w) | 0) - ((a / w) | 0)); }
+    // how much this looks like a track drawn as a band: as wide all the way round (wcv), the band about its length times its width (fill),
+    // the skeleton walked whole (cover)
+    const shape = { cover: +loop.cover.toFixed(3), wcv: +((wq[1] - wq[0]) / Math.max(1e-6, halfW)).toFixed(3), fill: +(fin / Math.max(1, plen * 2 * halfW)).toFixed(3), rel: +(2 * halfW / Math.max(1, plen)).toFixed(4) };
+    return { pts: out.map(q => ({ x: q[0] / k, y: q[1] / k })), widthPx: 2 * halfW / k, lengthPx: plen / k, mode, shape };
   }
-  return { run };
+  // how much a traced loop looks like the track of the picture (1 best): a band as wide all the way round, about as much band as its
+  // length times its width, the whole skeleton on the loop, a band thin against its length
+  function trackness(r) {
+    if (!r || r.error || !r.shape) return 0; const s = r.shape;
+    if (s.cover < 0.6 || s.fill < 0.55 || s.fill > 1.8 || s.rel > 0.12) return 0;
+    return Math.max(0, 1 - s.wcv) * Math.min(1, s.cover) * Math.min(1, 1 / Math.max(s.fill, 1 / s.fill)) * (s.rel < 0.06 ? 1 : 0.5);
+  }
+  // a venue's plan: every layout of the venue drawn, the one this picture is about in its own colour (Dubai Kartdrome: a dark blue-grey band
+  // over the light grey of the others). The picture's main colours, each a way to read the band — tinted ones by their tint (the band's
+  // shine and its shadow under a bridge are the same tint), greys by their colour
+  function colours(img) {
+    const { data, w, h } = img, bins = new Map(); let tot = 0;
+    for (let i = 0; i < w * h; i++) { const p = i * 4; if (data[p + 3] < 128) continue; const r = data[p], g = data[p + 1], b = data[p + 2], key = ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4); const o = bins.get(key) || { n: 0, r: 0, g: 0, b: 0 }; o.n++; o.r += r; o.g += g; o.b += b; bins.set(key, o); tot++; }
+    const border = borderColor(img);
+    const cs = [...bins.values()].filter(o => o.n >= tot * 0.003).map(o => ({ r: o.r / o.n, g: o.g / o.n, b: o.b / o.n, n: o.n })).sort((a, b) => b.n - a.n);
+    const hueOf = (c) => { const q = chroma(c.r, c.g, c.b); return q.C >= HUE_MIN ? Math.atan2(Math.sqrt(3) * (q.q[1] - q.q[2]) / 2, q.q[0] - (q.q[1] + q.q[2]) / 2) : null; };
+    const merged = [];
+    for (const c of cs) {
+      const hc = hueOf(c);
+      const m = merged.find(x => { const hx = hueOf(x); if (hc === null || hx === null) return hc === null && hx === null && Math.hypot(x.r - c.r, x.g - c.g, x.b - c.b) < 45; let d = Math.abs(hc - hx); if (d > Math.PI) d = 2 * Math.PI - d; return d < 0.35; });
+      if (m) m.n += c.n; else merged.push(Object.assign({}, c));   // the most common shade speaks for its tint
+    }
+    return merged.filter(c => Math.hypot(c.r - border[0], c.g - border[1], c.b - border[2]) > 30 && !(c.r > 228 && c.g > 228 && c.b > 228)).slice(0, 12).map(c => ({ r: c.r, g: c.g, b: c.b, share: c.n / tot }));
+  }
+  // every way to read the band, cheapest first: whatever differs from the border, whatever is dark, then each main colour. A way whose
+  // biggest blob is no band at a small size (too small, filling the picture, not spanning it) is not traced at all; the rest are traced
+  // whole, the most track-like first. stopAt: a trace this track-like ends the search
+  function search(src, w0, h0, stopAt) {
+    const small = prepare(src, w0, h0, 320), { w, h } = small;
+    const ways = [{ mode: 'auto', tol: 60, closeRs: [1, 2, 0] }, { mode: 'dark', tol: 110, closeRs: [1, 2, 0] }].concat(colours(small).map(c => ({ mode: 'color', seed: c, tol: 46, closeRs: [1, 2], color: { r: Math.round(c.r), g: Math.round(c.g), b: Math.round(c.b) }, share: +c.share.toFixed(3) })));
+    const bandAt = (wy) => { const m = morph(morph(maskFrom(small, wy.mode, wy.seed, wy.tol), w, h, 1, true), w, h, 1, false); const cc = components(m, w, h, 1); if (!cc.sizes.length) return false; let big = 0; for (let i = 1; i < cc.sizes.length; i++) if (cc.sizes[i] > cc.sizes[big]) big = i; const n = cc.sizes[big]; if (n < 0.004 * w * h || n > 0.4 * w * h) return false; let x0 = w, x1 = 0, y0 = h, y1 = 0; for (let i = 0; i < w * h; i++) if (cc.label[i] === big) { const x = i % w, y = (i - x) / w; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } return x1 - x0 >= 0.2 * w && y1 - y0 >= 0.2 * h && n <= 0.45 * (x1 - x0 + 1) * (y1 - y0 + 1); };
+    const big = prepare(src, w0, h0, 900), out = [], t0 = Date.now();
+    for (const wy of ways) {
+      const spent = Date.now() - t0; if (stopAt && (spent > 12000 || (spent > 5000 && out.some(r => r.score > 0.3)))) break;   // a phone is slower: enough tried
+      const tag = { mode: wy.mode, color: wy.color, share: wy.share };
+      if (!bandAt(wy)) { out.push(Object.assign(tag, { error: 'no band' })); continue; }
+      let r = null; for (const closeR of wy.closeRs) { try { r = runOnce(src, w0, h0, wy.mode, wy.seed, wy.tol, closeR, big); } catch (e) { r = { error: 'failed' }; } if (!r.error) break; }
+      const res = Object.assign(tag, r && !r.error ? r : { error: r ? r.error : 'failed' }); res.score = r && !r.error ? +trackness(r).toFixed(3) : 0; out.push(res);
+      if (stopAt && res.score >= stopAt) break;
+    }
+    return out.sort((a, b) => (b.score || 0) - (a.score || 0));
+  }
+  const candidates = (src, w0, h0) => search(src, w0, h0, 0);
+  // the track of any picture: a band on a plain background, or a venue's plan with the layout in its own colour — whichever traces most
+  // like a track. { pts, widthPx, lengthPx, mode, shape, score, color? } or { error }
+  function best(src, w0, h0) {
+    const all = search(src, w0, h0, 0.75), top = all.find(r => r.score > 0);
+    if (top) return top;
+    return all.find(r => r.pts) || { error: (all.find(r => r.error && r.error !== 'no band') || {}).error || 'Не нашёл кольцо трассы: нет замкнутого полотна с внутренней областью.' };
+  }
+  return { run, candidates, best, trackness };
 })();
 
 // Alfano 7 import: .alf2 is a zip of per-lap CSVs (10 Hz: GPS speed, lat/lon, heading, accelerometer) plus a session summary.
@@ -10793,7 +11019,7 @@ const TRACKFIND = (() => {
   // a loop as a line the brain reads: the middle of the asphalt in metres, the way round asked for, the start/finish in the middle of the
   // longest straight (the map does not say where it is; it only numbers the corners). The line a kart drives inside it is the brain's
   // to draw (BRAINS.lineOf): the least curvature within the width, as the atlases were learnt on driven lines
-  function geometry(lp, cw) {
+  function geometry(lp, cw, startAt) {
     let xy;
     if (lp.xy) {   // a traced picture: metres, y down as drawn — clockwise on the picture is the same sum with y turned up
       xy = lp.xy.slice(); if (xy.length < 8) return null;
@@ -10807,18 +11033,24 @@ const TRACKFIND = (() => {
     let L = 0; for (let i = 0; i < xy.length; i++) { const a = xy[i], b = xy[(i + 1) % xy.length]; L += Math.hypot(b.x - a.x, b.y - a.y); }
     let tr = null; try { tr = KLL.buildTrack(xy, L, 0, false); } catch (e) { tr = null; } if (!tr || !(tr.mpp > 0) || !isFinite(tr.mpp)) return null;
     const line = xy, LL = L;
-    // the start/finish: the middle of the longest stretch straighter than a 150 m radius
+    // the start/finish: where the venue's own is (a plan laid onto its driven layouts), else the middle of the longest stretch straighter
+    // than a 150 m radius
     const ks = DATA.trackCurv(tr), N = tr.N; let best = { len: 0, mid: 0 }, run = 0, start = 0;
     for (let q = 0; q < 2 * N; q++) { const i = q % N; if (Math.abs(ks[i]) < 1 / 150) { if (!run) start = q; run++; if (run > best.len && run <= N) best = { len: run, mid: (start + Math.floor(run / 2)) % N }; } else run = 0; }
+    if (startAt && lp.xy) { let bd = Infinity, bi = -1; for (let i = 0; i < N; i++) { const d = Math.hypot(tr.cx[i] / tr.mpp - startAt.x, tr.cy[i] / tr.mpp - startAt.y); if (d < bd) { bd = d; bi = i; } } if (bi >= 0 && bd <= 10) best.mid = bi; }
     try { const tr2 = KLL.buildTrack(line, LL, best.mid / N, false); if (tr2 && tr2.mpp > 0) tr = tr2; } catch (e) {}
     return { rev: 'osm' + (lp.ways || []).join('-') + (cw ? 'cw' : 'ccw'), tid: null, lid: null, track: tr, corners: { R: 110, add: [], del: [] }, source: lp.xy ? 'photo' : 'osm', widthM: +lp.widthM || 8 };
   }
-  // Hutka's matches (each with how many of its layouts have a line: a session on it or a drawing) and, when none of them has a line, the
-  // raceways on the map around the place (6 km: a catalogue point is often the venue's gate, not the track)
+  // Hutka's matches (each with its layouts that have a line: a session on it, a drawing, a saved picture, or the layout it reverses has
+  // one) and, when none of them has a line, the raceways on the map around the place (6 km: a catalogue point is often the venue's gate,
+  // not the track)
   async function find(q) {
     if (navigator.onLine === false) return { error: 'offline' };
     let at = coords(q), place = null;
-    const hit0 = onHutka(at ? '' : q, at);
+    // Hutka's own tracks by the whole of what was typed, else by its shorter forms ("Dubai Kartdrome, Dubai, United Arab Emirates" → Dubai
+    // Kartdrome): a venue on Hutka is found without the map
+    let hit0 = onHutka(at ? '' : q, at);
+    if (!at && !hit0.length) { const name = String(q).replace(/\([^)]*\)/g, ' ').split(',')[0].trim(); for (const v of variants(q).slice(1).filter(v => name.length >= 3 && v.startsWith(name))) { hit0 = onHutka(v, null); if (hit0.length) break; } }   // never the town alone
     let broad = false;
     if (!at && !hit0.length) { try { const g = await geocodeAny(q); if (g) { at = g; place = g.name; broad = !!g.broad; } } catch (e) { return { error: 'map' }; } }
     const near = at ? onHutka('', at) : [];
@@ -10826,8 +11058,8 @@ const TRACKFIND = (() => {
     for (const h of hit0.concat(near)) {
       if (seen.has(h.tr.id)) continue; seen.add(h.tr.id);
       let ls = []; try { ls = await STORE.getLayouts(h.tr.id); } catch (e) { ls = []; }
-      let lined = 0; for (const l of ls) { const tr0 = l.trace && l.trace.closed; let n = 0; if (!tr0) { try { n = (await STORE.sessionsFor(h.tr.id, l.id)).length; } catch (e) { n = 0; } } if (tr0 || n) lined++; }
-      hutka.push({ tr: h.tr, ls, lined, km: at && isFinite(h.tr.lat) ? kmBetween(at, { lat: h.tr.lat, lon: h.tr.lon }) : h.km });
+      let ids = new Set(); try { ids = await linedIds(h.tr.id, ls); } catch (e) { ids = new Set(); }
+      hutka.push({ tr: h.tr, ls, lined: ids.size, linedIds: ids, km: at && isFinite(h.tr.lat) ? kmBetween(at, { lat: h.tr.lat, lon: h.tr.lon }) : h.km });
     }
     let loops = [];
     if (!hutka.some(h => h.lined)) {
@@ -10844,21 +11076,164 @@ const TRACKFIND = (() => {
     let g = null; try { g = await STORE.identifyTrack(c.toDataURL('image/jpeg', 0.85).split(',')[1], 'image/jpeg'); } catch (e) { g = null; }
     return { query: g && g.name ? [g.name, g.city, g.country].filter(Boolean).join(', ') : '', guess: g || {}, img };
   }
-  // the picture traced: the band of the track (whatever differs from the picture's border, else whatever is dark) → its centreline, in
-  // pixels. Its size in metres: the lap length the picture or the AI gives; else a guess between the band's width (a kart track is about
-  // 8 m wide, but a drawing paints it one and a half to two times as wide) and a usual kart track's kilometre; else 1 km. { lp, lengthM, how } or null
+  // the picture traced (AT.best): the band of the track — a band on a plain background, or a venue's plan with the layout in its own colour
+  // among the venue's other layouts in grey, bridges and labels and arrows in it — → its centreline, in pixels. Its size in metres: the lap
+  // length the picture or the AI gives; else a guess between the band's width (a kart track is about 8 m wide, but a drawing paints it one
+  // and a half to two times as wide) and a usual kart track's kilometre; else 1 km. { lp, lengthM, how, px, widthPx } or null — px: the
+  // traced points in the picture's pixels, for laying the picture onto a venue's driven layouts (venueFit), which gives the real metres
   function fromImage(img, hint) {
     if (typeof AT === 'undefined' || !img) return null;
     const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height; let r = null;
-    try { r = AT.run(img, w, h, 'auto', null, 60); if (r.error) { const r2 = AT.run(img, w, h, 'dark', null, 110); if (!r2.error) r = r2; } } catch (e) { r = null; }
-    if (!r || r.error || !r.pts || r.pts.length < 8) return null;
+    try { r = AT.best ? AT.best(img, w, h) : AT.run(img, w, h, 'auto', null, 60); } catch (e) { r = null; }
+    if (!r || r.error || !r.pts || r.pts.length < 8 || (AT.trackness && !AT.trackness(r))) return null;
     let per = 0; for (let i = 0; i < r.pts.length; i++) { const a = r.pts[i], b = r.pts[(i + 1) % r.pts.length]; per += Math.hypot(b.x - a.x, b.y - a.y); }
     const given = hint && +hint.length_m, byWidth = r.widthPx > 0 ? per * 8 * 1.6 / r.widthPx : 0, ok = given >= 300 && given <= 3500;
     const lengthM = ok ? given : (byWidth ? Math.max(600, Math.min(1500, Math.sqrt(byWidth * 1000))) : 1000), how = ok ? 'given' : 'guess';
     const sc = lengthM / per, xy = r.pts.map(p => ({ x: p.x * sc, y: p.y * sc }));
-    return { lp: { xy, lengthM, widthM: 8, ways: ['img' + Math.round(per)] }, lengthM: Math.round(lengthM), how };
+    return { lp: { xy, lengthM, widthM: 8, ways: ['img' + Math.round(per)] }, lengthM: Math.round(lengthM), how, px: r.pts, widthPx: r.widthPx };
   }
-  return { coords, onHutka, geocode, geocodeAny, variants, raceways, loopsOf, clockwise, geometry, find, fromPhoto, fromImage };
+  // ---- a venue's plan: which of the venue's layouts it shows, and its real size ----
+  // a layout's name in the words that tell it apart: "SPEEDWAY CIRCUIT" → speedway, "International with Bus Stop" → international w bus stop
+  const LAY_STOP = new Set(['circuit', 'layout', 'track', 'configuration', 'config', 'course', 'the', 'трасса', 'конфигурация', 'схема']);
+  const layWords = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, ' and ').split(/[^a-zа-яё0-9]+/i).filter(Boolean).map(x => x === 'with' || x === 'с' ? 'w' : x).filter(x => !LAY_STOP.has(x));
+  // the layout of `ls` the name read from a picture means: the most words in common (all of them best), and clearly more than any other.
+  // The venue's own name is no part of it ("Dubai Kartdrome Speedway" → Speedway)
+  function layoutByName(ls, name, venue) {
+    const vw = new Set(layWords(venue)), q = new Set(layWords(name).filter(x => !vw.has(x))); if (!q.size) return null;
+    let best = null, bs = 0, second = 0;
+    for (const l of ls || []) { const w = new Set(layWords(l.name)); if (!w.size) continue; let n = 0; for (const x of q) if (w.has(x)) n++; const j = n / (q.size + w.size - n); if (j > bs) { second = bs; bs = j; best = l; } else if (j > second) second = j; }
+    return bs >= 0.6 && bs > second ? best : null;
+  }
+  // which layouts of a track have a line to read: driven (a session on it), drawn (a trace), a picture saved to it, or the reverse of one
+  // that has. A Set of layout ids
+  async function linedIds(tid, ls) {
+    const out = new Set(); ls = ls || await STORE.getLayouts(tid).catch(() => []);
+    for (const l of ls) { let n = 0; if (!(l.trace && l.trace.closed) && !l.photoLine) { try { n = (await STORE.sessionsFor(tid, l.id)).length; } catch (e) { n = 0; } } if ((l.trace && l.trace.closed) || l.photoLine || n) out.add(l.id); }
+    for (const l of ls) if (!out.has(l.id)) { let f = null; try { f = await GEOM.forwardOf(tid, l); } catch (e) { f = null; } if (f && out.has(f.id)) out.add(l.id); }
+    return out;
+  }
+  // A traced loop (picture pixels, y down) laid onto a known line (metres, y down): the similarity — scale, turn, shift, never a mirror image
+  // — that puts the most of the trace on the line. Only part of it may be (another layout of the venue shares straights and corners with
+  // this one): the shift is voted for by every pair of trace and line points that run the same way (or the opposite way), for every turn
+  // and scale tried; the best few are refined on their closest points, the far ones left out.
+  // { T, inl (share of the trace on the line), cov (share of the line under the trace), rms (m), lengthM, apply(p) → [x, y] m } or null
+  function registerLoop(Pin, Qin, opts) {
+    opts = opts || {};
+    const resample = (pts, n) => {
+      const c = pts.concat([pts[0]]), L = [0]; for (let i = 1; i < c.length; i++) L.push(L[i - 1] + Math.hypot(c[i][0] - c[i - 1][0], c[i][1] - c[i - 1][1]));
+      const tot = L[L.length - 1], out = [], tan = []; let j = 1;
+      for (let k = 0; k < n; k++) { const u = tot * k / n; while (j < L.length - 1 && L[j] < u) j++; const f = (u - L[j - 1]) / Math.max(1e-9, L[j] - L[j - 1]); out.push([c[j - 1][0] + (c[j][0] - c[j - 1][0]) * f, c[j - 1][1] + (c[j][1] - c[j - 1][1]) * f]); }
+      for (let k = 0; k < n; k++) { const a = out[(k - 2 + n) % n], b = out[(k + 2) % n], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1; tan.push([dx / l, dy / l]); }
+      return { pts: out, tan, len: tot };
+    };
+    const P0 = Pin.map(p => Array.isArray(p) ? p : [p.x, p.y]), Q0 = Qin.map(p => Array.isArray(p) ? p : [p.x, p.y]);
+    if (P0.length < 8 || Q0.length < 8) return null;
+    const perP = resample(P0, 64).len, perQ = resample(Q0, 64).len, P = resample(P0, 240), Q = resample(Q0, Math.max(200, Math.round(perQ / 2)));
+    // the line's nearest point anywhere around it: a 1 m grid, each cell the index of the line point nearest to it (two sweeps)
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (const [x, y] of Q.pts) { if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y; }
+    const MG = 40, gx0 = Math.floor(x0 - MG), gy0 = Math.floor(y0 - MG), GW = Math.ceil(x1 + MG) - gx0 + 1, GH = Math.ceil(y1 + MG) - gy0 + 1;
+    const near = new Int32Array(GW * GH).fill(-1), nd = new Float32Array(GW * GH).fill(1e9);
+    Q.pts.forEach(([x, y], k) => { const gx = Math.round(x - gx0), gy = Math.round(y - gy0); for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) { const X = gx + dx, Y = gy + dy; if (X < 0 || Y < 0 || X >= GW || Y >= GH) continue; const d = Math.hypot(X + gx0 - x, Y + gy0 - y), c = Y * GW + X; if (d < nd[c]) { nd[c] = d; near[c] = k; } } });
+    for (let pass = 0; pass < 2; pass++) {
+      const ys = pass ? [GH - 1, -1, -1] : [0, GH, 1], xs = pass ? [GW - 1, -1, -1] : [0, GW, 1], nb = pass ? [[1, 0], [0, 1], [1, 1], [-1, 1]] : [[-1, 0], [0, -1], [-1, -1], [1, -1]];
+      for (let Y = ys[0]; Y !== ys[1]; Y += ys[2]) for (let X = xs[0]; X !== xs[1]; X += xs[2]) { const c = Y * GW + X;
+        for (const [dx, dy] of nb) { const X2 = X + dx, Y2 = Y + dy; if (X2 < 0 || Y2 < 0 || X2 >= GW || Y2 >= GH) continue; const k = near[Y2 * GW + X2]; if (k < 0) continue; const d = Math.hypot(X + gx0 - Q.pts[k][0], Y + gy0 - Q.pts[k][1]); if (d < nd[c]) { nd[c] = d; near[c] = k; } } }
+    }
+    const nearest = (x, y) => { const X = Math.round(x - gx0), Y = Math.round(y - gy0); if (X < 0 || Y < 0 || X >= GW || Y >= GH) return null; const k = near[Y * GW + X]; return k < 0 ? null : { k, d: Math.hypot(x - Q.pts[k][0], y - Q.pts[k][1]) }; };
+    const apply = (T, p) => [T.s * (T.c * p[0] - T.si * p[1]) + T.tx, T.s * (T.si * p[0] + T.c * p[1]) + T.ty];
+    const tol = opts.tol || 5;
+    const score = (T) => { let n = 0; for (const p of P.pts) { const q = apply(T, p), r = nearest(q[0], q[1]); if (r && r.d <= tol) n++; } return n / P.pts.length; };
+    // 1. the votes, the trace about its middle (the shift is where its middle lands, over the line's own extent)
+    let mx = 0, my = 0; for (const [x, y] of P.pts) { mx += x; my += y; } mx /= P.pts.length; my /= P.pts.length;
+    const s0 = perQ / perP, sMin = (opts.sMin || 0.5) * s0, sMax = (opts.sMax || 2) * s0, cand = [];
+    const sub = [], subT = []; for (let i = 0; i < P.pts.length; i += 4) { sub.push([P.pts[i][0] - mx, P.pts[i][1] - my]); subT.push(P.tan[i]); }
+    const qs = [], qt = []; for (let k = 0; k < Q.pts.length; k += 3) { qs.push(Q.pts[k]); qt.push(Q.tan[k]); }
+    const CELL = 6, par = Math.sin(15 * Math.PI / 180), AX0 = x0 - (x1 - x0) * 0.5 - 20, AY0 = y0 - (y1 - y0) * 0.5 - 20, AW = Math.ceil((x1 - x0) * 2 / CELL) + 8, AH = Math.ceil((y1 - y0) * 2 / CELL) + 8;
+    const acc = new Uint16Array(AW * AH), touched = new Int32Array(sub.length * qs.length);
+    for (let s = sMin; s <= sMax * 1.0001; s *= 1.06) for (let a = 0; a < 360; a += 6) {
+      const th = a * Math.PI / 180, c = Math.cos(th), si = Math.sin(th); let nt = 0;
+      for (let i = 0; i < sub.length; i++) {
+        const p = sub[i], px = s * (c * p[0] - si * p[1]), py = s * (si * p[0] + c * p[1]), tx = c * subT[i][0] - si * subT[i][1], ty = si * subT[i][0] + c * subT[i][1];
+        for (let k = 0; k < qs.length; k++) { const t = qt[k]; if (Math.abs(tx * t[1] - ty * t[0]) > par) continue; const X = Math.round((qs[k][0] - px - AX0) / CELL), Y = Math.round((qs[k][1] - py - AY0) / CELL); if (X < 1 || Y < 1 || X >= AW - 1 || Y >= AH - 1) continue; const cI = Y * AW + X; if (!acc[cI]) touched[nt++] = cI; acc[cI]++; }
+      }
+      let bv = 0, bc = -1;
+      for (let j = 0; j < nt; j++) { const cI = touched[j], v = acc[cI] + 0.5 * (acc[cI - 1] + acc[cI + 1] + acc[cI - AW] + acc[cI + AW]); if (v > bv) { bv = v; bc = cI; } }
+      for (let j = 0; j < nt; j++) acc[touched[j]] = 0;
+      if (bc < 0) continue;
+      const X = bc % AW, Y = (bc - X) / AW, cx = AX0 + X * CELL, cy = AY0 + Y * CELL;
+      cand.push({ T: { s, c, si, tx: cx - s * (c * mx - si * my), ty: cy - s * (si * mx + c * my) }, v: bv });
+    }
+    cand.sort((p, q) => q.v - p.v);
+    // 2. the best by votes scored by the share of the trace on the line; the best few refined (closest points, the far ones left out)
+    const top = cand.slice(0, 40).map(x => Object.assign(x, { sc: score(x.T) })).sort((p, q) => q.sc - p.sc).slice(0, 5);
+    const umeyama = (pairs) => {
+      let mpx = 0, mpy = 0, mqx = 0, mqy = 0; for (const [p, q] of pairs) { mpx += p[0]; mpy += p[1]; mqx += q[0]; mqy += q[1]; } const n = pairs.length; mpx /= n; mpy /= n; mqx /= n; mqy /= n;
+      let sxx = 0, sxy = 0, syx = 0, syy = 0, varp = 0;
+      for (const [p, q] of pairs) { const px = p[0] - mpx, py = p[1] - mpy, qx = q[0] - mqx, qy = q[1] - mqy; sxx += qx * px; sxy += qx * py; syx += qy * px; syy += qy * py; varp += px * px + py * py; }
+      const ang = Math.atan2(syx - sxy, sxx + syy), c = Math.cos(ang), si = Math.sin(ang), s = (c * (sxx + syy) + si * (syx - sxy)) / varp;
+      return { s, c, si, tx: mqx - s * (c * mpx - si * mpy), ty: mqy - s * (si * mpx + c * mpy) };
+    };
+    let best = null;
+    for (const x of top) {
+      let T = x.T;
+      for (let it = 0; it < 25; it++) {
+        const lim = it < 8 ? 3 * tol : it < 16 ? 2 * tol : tol, pairs = [];
+        for (const p of P.pts) { const q = apply(T, p), r = nearest(q[0], q[1]); if (r && r.d <= lim) pairs.push([p, Q.pts[r.k]]); }
+        if (pairs.length < 12) break;
+        const T2 = umeyama(pairs); if (!(T2.s > 0) || T2.s < sMin * 0.8 || T2.s > sMax * 1.2) break; T = T2;
+      }
+      const inl = score(T); if (!best || inl > best.inl) best = { T, inl };
+    }
+    if (!best) return null;
+    // how much of the line the trace covers; how close it runs where it is on it; which way round it goes against the line
+    const Pt = P.pts.map(p => apply(best.T, p)); let e2 = 0, ne = 0, along = 0;
+    Pt.forEach((q, i) => { const r = nearest(q[0], q[1]); if (r && r.d <= tol) { e2 += r.d * r.d; ne++; const t = P.tan[i], tx = best.T.c * t[0] - best.T.si * t[1], ty = best.T.si * t[0] + best.T.c * t[1]; along += tx * Q.tan[r.k][0] + ty * Q.tan[r.k][1]; } });
+    let covN = 0; for (const q of Q.pts) { let bd = Infinity; for (const p of Pt) { const d = (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2; if (d < bd) bd = d; } if (Math.sqrt(bd) <= tol) covN++; }
+    const T = best.T;
+    return { T, inl: +best.inl.toFixed(3), cov: +(covN / Q.pts.length).toFixed(3), rms: ne ? +Math.sqrt(e2 / ne).toFixed(2) : null, same: ne ? along / ne : 0, lengthM: Math.round(perP * T.s), apply: (p) => apply(T, Array.isArray(p) ? p : [p.x, p.y]) };
+  }
+  // a traced plan laid onto the driven layouts of its venue, one after another (the main one first, then the most driven; a reverse is the
+  // same line as the layout it reverses): the layout that takes the most of the trace gives the real metres and the frame (its start/finish too); a layout the
+  // trace covers all of and is all on is the layout the plan shows. { xy (metres), lengthM, ref {lid, name, inl, cov, same, start},
+  // same: lid|null, fits: [{lid, name, inl, cov}] } or null (no driven layout, or the trace is not on any). opts.scaleOnly: the layout is
+  // known, only its size is wanted — the first layout that takes most of the trace is enough
+  async function venueFit(tid, px, opts) {
+    let ls = []; try { ls = await STORE.getLayouts(tid); } catch (e) { ls = []; }
+    const refs = [];
+    for (const l of ls) {
+      if (/reverse|реверс|обратн/i.test(l.name || '')) continue;
+      let n = 0; try { n = (await STORE.sessionsFor(tid, l.id)).length; } catch (e) { n = 0; }
+      if (!n && !(l.trace && l.trace.closed)) continue;
+      refs.push({ l, n });
+    }
+    // the venue's main layout first (the classic one: it shares the most with the others), then the most driven
+    const main = (l) => /international|classic|full|main|standard|grand prix|\bgp\b|классик|основн/i.test(l.name || '') ? 1 : 0;
+    refs.sort((a, b) => (main(b.l) - main(a.l)) || (b.n - a.n) || ((+a.l.order || 0) - (+b.l.order || 0)));
+    const fits = [], P = px.map(p => [p.x, p.y]);
+    for (const { l } of refs.slice(0, 6)) {
+      let G = null; try { G = await GEOM.build(tid, l.id, null, { noMedia: true, noReverse: true }); } catch (e) { G = null; }
+      if (!G || !G.track) continue;
+      const tr = G.track, Q = []; for (let i = 0; i < tr.N; i += Math.max(1, Math.round(2 / tr.ds))) Q.push([tr.cx[i], tr.cy[i]]);
+      const g = registerLoop(P, Q); if (!g) continue;
+      fits.push({ lid: l.id, name: l.name, inl: g.inl, cov: g.cov, rms: g.rms, same: g.same, g, start: { x: tr.cx[0], y: tr.cy[0] } });
+      if (g.inl >= 0.95 && g.cov >= 0.95) break;   // this is that layout: no need to look further
+      if (opts && opts.scaleOnly && g.inl >= 0.85 && g.inl + g.cov >= 1.3) break;   // the layout is known (its name read): the size is all that is wanted
+    }
+    if (!fits.length) return null;
+    fits.sort((a, b) => (b.inl - a.inl) || (b.cov - a.cov));
+    // a plan of this venue runs along a driven layout for most of its length (Speedway: 92 % on International, which it covers two thirds
+    // of); any other drawing shrunk onto a busy venue finds a line near half its points, and covers little of it
+    const ref = fits[0]; if (ref.inl < 0.75 || ref.inl + ref.cov < 1.3) return null;
+    const xy = P.map(p => { const q = ref.g.apply(p); return { x: q[0], y: q[1] }; });
+    const full = fits.filter(f => f.inl >= 0.9 && f.cov >= 0.9).sort((a, b) => (b.inl + b.cov) - (a.inl + a.cov));
+    return { xy, lengthM: ref.g.lengthM, widthM: 8, ref: { lid: ref.lid, name: ref.name, inl: ref.inl, cov: ref.cov, same: ref.same, start: ref.start }, same: full.length ? full[0].lid : null, fits: fits.map(f => ({ lid: f.lid, name: f.name, inl: f.inl, cov: f.cov })) };
+  }
+  // the layout to open for a venue: its classic one ("International", "Full", "GP"…) of those with a line, else the first of them in order
+  function mainLayout(h) {
+    const ls = (h.ls || []).filter(l => !h.linedIds || h.linedIds.has(l.id)).sort((a, b) => (+a.order || 0) - (+b.order || 0));
+    return ls.find(l => /international|classic|full|main|standard|grand prix|\bgp\b|классик|основн/i.test(l.name || '') && !/reverse|реверс|обратн/i.test(l.name || '')) || ls[0] || null;
+  }
+  return { coords, onHutka, geocode, geocodeAny, variants, raceways, loopsOf, clockwise, geometry, find, fromPhoto, fromImage, layoutByName, linedIds, registerLoop, venueFit, mainLayout };
 })();
 // ---------- home: the feed of published sessions, where people drive, who is fastest ----------
 // the analysis card from the session meta (LAB.cardOf): the lap line, the Lab's points, the corner numbers — y grows downwards
@@ -11606,7 +11981,8 @@ async function aiLaySheet(onPick) {
     }
   }
 }
-async function actIdeal(tid, lid, cls) {
+// ph: a picture of this layout (a venue's plan sent in New track) — read when the layout has no line yet, instead of asking for one
+async function actIdeal(tid, lid, cls, ph) {
   if (!tid) { await aiLayField(); if (AI.lay) { tid = AI.lay.tid; lid = AI.lay.lid; cls = cls || AI.lay.cls; } }
   else aiSetLay(tid, lid);
   cls = cls || 'rental';
@@ -11621,6 +11997,7 @@ async function actIdeal(tid, lid, cls) {
     let res = null; try { res = await BRAINS.ideal(t1, l1, cls); } catch (e) { res = null; }
     if (my !== cur) return;
     AI.ctx = Object.assign({}, AI.ctx, { layouts: [t1 + '|' + l1], cls });
+    if (ph && t1 === tid && l1 === lid && res && res.mode === 'none' && res.tid && res.lid) { await idealFromPlan(body, sub, res, ph); return; }
     renderIdeal(body, sub, res);
   };
   ch.onclick = () => aiLaySheet((t1, l1) => show(t1, l1));
@@ -11669,24 +12046,59 @@ function idealNoLine(body, sub, res) {
 async function idealFromPicture(body, sub, res, file) {
   body.innerHTML = ''; body.appendChild(el('div', 'hint', t('Reading the picture…')));
   let ph = null; try { ph = await TRACKFIND.fromPhoto(file); } catch (e) { ph = null; }
-  const T = ph ? TRACKFIND.fromImage(ph.img, ph.guess) : null;
-  if (!T) { body.innerHTML = ''; body.appendChild(el('div', 'hint warn', t('Could not read the layout from this picture. A straight-on picture of the map, the track a clear band on a plain background, works best.'))); idealNoLine(body, sub, res); return; }
-  const lay = STORE.getLayout(res.tid, res.lid) || {}, trk = STORE.getTrack(res.tid), canSave = !!(trk && STORE.canEditTrack(trk));
-  const dir0 = lay.direction === 'cw' || lay.direction === 'ccw' ? lay.direction : ((ph.guess && ph.guess.direction) || 'cw');
+  await idealFromPlan(body, sub, res, ph);
+}
+// a picture of a layout read for a layout of Hutka's (res: tid, lid, cls, name), or for a venue of Hutka's alone (lid null: a layout the
+// venue has no page for): traced, then laid onto the venue's driven layouts — the real metres, the venue's start/finish, the way round its
+// layouts are driven; the racing line, every corner's points from similar corners; the way round to switch; the track's editor keeps it
+// on the layout for everyone. Off the venue (or nothing driven there) the picture's own size: the length it prints, else a guess
+const planTrace = (ph) => { if (!ph) return null; if (ph._T === undefined) { try { ph._T = TRACKFIND.fromImage(ph.img, ph.guess); } catch (e) { ph._T = null; } } return ph._T; };
+// the plan laid onto the venue's driven layouts (once per picture and venue); not when the length the picture prints says otherwise.
+// scaleOnly: the layout is known by its name, only the size is wanted (the first driven layout the plan mostly lies on)
+async function planFit(ph, tid, scaleOnly) {
+  if (ph && ph._T === undefined) await new Promise(r => setTimeout(r, 30));   // the words on screen show before the tracing holds the page
+  const T = planTrace(ph); if (!T || !tid) return null; ph._fit = ph._fit || {};
+  if (ph._fit[tid] !== undefined) return ph._fit[tid];
+  const k = scaleOnly ? tid + '~s' : tid;
+  if (ph._fit[k] === undefined) { let f = null; try { f = await TRACKFIND.venueFit(tid, T.px, { scaleOnly: !!scaleOnly }); } catch (e) { f = null; } if (f && T.how === 'given' && Math.abs(f.lengthM - T.lengthM) > 0.2 * T.lengthM) f = null; ph._fit[k] = f; }
+  return ph._fit[k];
+}
+async function idealFromPlan(body, sub, res, ph) {
+  body.innerHTML = ''; body.appendChild(el('div', 'hint', t('Reading the picture…')));
+  await new Promise(r => setTimeout(r, 30));   // the words show before the tracing holds the page
+  const T = planTrace(ph);
+  if (!T) { body.innerHTML = ''; body.appendChild(el('div', 'hint warn', t('Could not read the layout from this picture. A straight-on picture of the map, the track a clear band on a plain background, works best.'))); if (res.lid) idealNoLine(body, sub, res); return; }
+  if (res.tid) { body.innerHTML = ''; body.appendChild(el('div', 'hint', t('Laying the picture onto the layouts driven here…'))); }
+  const fit = await planFit(ph, res.tid, !!res.lid);
+  const lay = (res.lid && STORE.getLayout(res.tid, res.lid)) || {}, trk = res.tid ? STORE.getTrack(res.tid) : null, canSave = !!(res.lid && trk && STORE.canEditTrack(trk));
+  const lp = fit ? { name: res.name, xy: fit.xy, lengthM: fit.lengthM, widthM: 8, ways: ['venue' + fit.lengthM] } : Object.assign({ name: res.name }, T.lp);
+  const how = fit ? 'venue' : T.how, lengthM = fit ? fit.lengthM : T.lengthM, g = (ph && ph.guess) || {};
+  // which way round: the picture's arrows, the layout's own setting, the way the venue's layouts are driven where this one runs on them
+  // (the other way for a reverse), else clockwise
+  const cwOf = (xy) => TRACKFIND.clockwise({ pts: xy.map(p => ({ lat: -p.y, lon: p.x })) });
+  let dir0 = g.direction === 'cw' || g.direction === 'ccw' ? g.direction : (lay.direction === 'cw' || lay.direction === 'ccw' ? lay.direction : null);
+  if (!dir0 && fit && Math.abs(fit.ref.same) > 0.5) { const along = (fit.ref.same > 0) !== /reverse|реверс|обратн/i.test(lay.name || res.name || ''); dir0 = (along ? cwOf(fit.xy) : !cwOf(fit.xy)) ? 'cw' : 'ccw'; }
   const draw = async (cw) => {
     body.innerHTML = ''; body.appendChild(el('div', 'hint', t('Reading the corners…')));
-    const G = TRACKFIND.geometry(Object.assign({ name: res.name }, T.lp), cw);
-    let r = null; if (G) { try { r = await BRAINS.predictOn(G, { tid: res.tid, lid: res.lid, cls: res.cls, name: res.name }); } catch (e) { r = null; } }
-    if (!r || !r.corners) { body.innerHTML = ''; body.appendChild(el('div', 'hint warn', t('Could not read the corners of this picture.'))); idealNoLine(body, sub, res); return; }
+    const G = TRACKFIND.geometry(lp, cw, fit ? fit.ref.start : null);
+    let r = null; if (G) { try { r = await BRAINS.predictOn(G, { tid: res.tid, lid: res.lid, cls: res.cls || aiCls(), name: res.name }); } catch (e) { r = null; } }
+    if (!r || !r.corners) { body.innerHTML = ''; body.appendChild(el('div', 'hint warn', t('Could not read the corners of this picture.'))); if (res.lid) idealNoLine(body, sub, res); return; }
     AI.ctx = Object.assign({}, AI.ctx, { found: r });
     renderIdeal(body, sub, r);
     const head = el('div', 'ai2-photohd');
-    head.appendChild(el('div', 'hint', T.how === 'given' ? t('Read from the photo · {m} m, the length the picture gives', { m: T.lengthM }) : t('Read from the photo · about {m} m: the length is a guess, so the corners are right and the distances only roughly', { m: T.lengthM })));
+    head.appendChild(el('div', 'hint', fit ? t('Read from the picture and laid onto {name} as driven here: {m} m', { name: fit.ref.name, m: lengthM }) : T.how === 'given' ? t('Read from the photo · {m} m, the length the picture gives', { m: T.lengthM }) : t('Read from the photo · about {m} m: the length is a guess, so the corners are right and the distances only roughly', { m: T.lengthM })));
     const dirs = el('div', 'seg ai2-dir'), bCw = aiBtn(t('Clockwise'), '', () => draw(true)), bCcw = aiBtn(t('Anticlockwise'), '', () => draw(false)); bCw.classList.toggle('active', !!cw); bCcw.classList.toggle('active', !cw); dirs.append(bCw, bCcw); head.appendChild(dirs);
-    if (canSave) { const sv = aiBtn(t('Save to this layout'), 'ghost', async () => { sv.disabled = true; try { const l = STORE.getLayout(res.tid, res.lid); await STORE.saveLayout(res.tid, Object.assign({}, l, { photoLine: Object.assign(BRAINS.photoLineOf(r.G, T.how), { dir: cw ? 'cw' : 'ccw' }) })); sv.textContent = t('Saved — everyone sees this line now'); } catch (e) { sv.disabled = false; toast(t('Could not save: {e}', { e: e && e.message || e })); } }); head.appendChild(sv); }
+    if (canSave) { const sv = aiBtn(t('Save to this layout'), 'ghost', async () => { sv.disabled = true; try { const l = STORE.getLayout(res.tid, res.lid); await STORE.saveLayout(res.tid, Object.assign({}, l, { photoLine: Object.assign(BRAINS.photoLineOf(r.G, how), { dir: cw ? 'cw' : 'ccw' }, fit ? { ref: fit.ref.lid } : {}) })); sv.textContent = t('Saved — everyone sees this line now'); } catch (e) { sv.disabled = false; toast(t('Could not save: {e}', { e: e && e.message || e })); } }); head.appendChild(sv); }
     body.insertBefore(head, body.firstChild);
   };
   await draw(dir0 !== 'ccw');
+}
+// a venue's plan of a layout the venue has no page for: the card of its ideal, the picture read at the venue's size
+async function actPlan(tid, ph, name) {
+  const trk = STORE.getTrack(tid), card = aiCard(t('Ideal lap'), ''), sub = card.querySelector('[data-sub]'), nm = el('div', 'ai2-cardlay');
+  nm.append(el('b', '', name || t('Layout from the photo'))); card.querySelector('.hd .tt').insertBefore(nm, sub);
+  const body = el('div', 'ai2-body'); card.appendChild(body); pushCard(card);
+  await idealFromPlan(body, sub, { tid, lid: null, cls: aiCls(), name: (trk ? trk.name + ' · ' : '') + (name || t('Layout from the photo')) }, ph);
 }
 
 // ---- 2. the last session: where the time goes, then the AI on it
@@ -11754,22 +12166,46 @@ function actTrack() {
   const out = el('div', 'ai2-found');
   inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); run(inp.value); } });
   card.append(row, row2, out); pushCard(card); setTimeout(() => inp.focus(), 50);
-  // ph: the photo this search came from — its own layout is always one of the answers (it may be a configuration no map has), and the
-  // answer by itself when the search finds nothing: a new track never ends in "nothing found" while there is a picture to read
+  // ph: the photo this search came from. A venue's plan of a venue on Hutka opens the layout it shows at once: by the name printed on it
+  // (the AI reads it: "SPEEDWAY CIRCUIT"), else by its shape laid onto the venue's driven layouts; a layout nobody has driven is read from
+  // the picture itself at the venue's real size. Off Hutka the photo's own layout is always one of the answers, and the answer by itself
+  // when the search finds nothing: a new track never ends in "nothing found" while there is a picture to read. A name typed opens the best
+  // answer at once (the venue's main layout, or the longest raceway on the map, clockwise); the list stays to pick another
   async function run(q, ph) {
     q = String(q || '').trim(); if (!q && !ph) return; out.innerHTML = ''; out.appendChild(el('div', 'hint', t('Looking…'))); go.classList.add('busy');
     let res = null; if (q) { try { res = await TRACKFIND.find(q); } catch (e) { res = { error: String(e && e.message || e) }; } } else res = { hutka: [], loops: [] };
     go.classList.remove('busy'); out.innerHTML = '';
+    if (ph && res && !res.error && res.hutka.length) {
+      // the venue: the one with a layout of the name the picture prints ("Dubai Kartdrome" may be the outdoor or the indoor one), else the
+      // one with driven layouts to lay the picture onto
+      const g = ph.guess || {}; let h = null, lay = null;
+      for (const x of res.hutka) { const l = TRACKFIND.layoutByName(x.ls, g.layout, x.tr.name); if (l) { h = x; lay = l; break; } }
+      if (!h) h = res.hutka.find(x => x.lined) || res.hutka[0];
+      const hit = (title, line, fn) => { const b = el('button', 'ai2-hit'); b.type = 'button'; b.innerHTML = `<b>${esc(title)}</b><span>${esc(line)}</span>`; b.onclick = fn; out.appendChild(b); };
+      if (lay) { hit(lay.name + ' · ' + h.tr.name, t('Read from the picture'), () => actIdeal(h.tr.id, lay.id, aiCls(), ph)); listHutka(res); await actIdeal(h.tr.id, lay.id, aiCls(), ph); return; }
+      out.appendChild(el('div', 'hint', t('Laying the picture onto the layouts driven here…')));
+      const fit = await planFit(ph, h.tr.id); out.innerHTML = '';
+      const same = fit && fit.same ? h.ls.find(l => l.id === fit.same) : null;
+      if (same) { hit(same.name + ' · ' + h.tr.name, t('Read from the picture: its shape is this layout'), () => actIdeal(h.tr.id, same.id, aiCls(), ph)); listHutka(res); await actIdeal(h.tr.id, same.id, aiCls(), ph); return; }
+      if (fit) { const nm = g.layout || t('Layout from the photo'); hit(nm + ' · ' + h.tr.name, t('Not a layout of the venue on Hutka yet: read from the picture at the venue\'s size'), () => actPlan(h.tr.id, ph, nm)); listHutka(res); await actPlan(h.tr.id, ph, nm); return; }
+    }
     if (ph) { const b = el('button', 'ai2-hit'); b.type = 'button'; b.innerHTML = `<b>${esc(t('This layout, read from the photo'))}</b><span>${esc(t('The corners as the picture draws them, the points from similar corners on Hutka'))}</span>`; b.onclick = () => idealFromPhoto(ph); out.appendChild(b); }
     if (!res || res.error) { if (ph) { await idealFromPhoto(ph); return; } out.appendChild(el('div', 'hint warn', res && res.error === 'offline' ? t('No connection to the map — try again online.') : t('Could not search the map just now — try again in a minute.'))); return; }
-    // tracks already on Hutka: their layouts straight to the ideal
-    for (const h of res.hutka) { const b = el('button', 'ai2-hit'); b.type = 'button'; const far = h.km !== null && h.km !== undefined ? ' · ' + esc(t('{d} km away', { d: h.km.toFixed(h.km < 10 ? 1 : 0) })) : ''; b.innerHTML = `<b>${esc(h.tr.name)}</b><span>${esc(h.lined ? t('On Hutka · {n} layouts', { n: h.ls.length }) : t('On Hutka, but nobody has uploaded a lap there yet'))}${far}</span>`; if (h.lined) b.onclick = () => actIdeal(h.tr.id, (h.ls[0] || {}).id); else b.disabled = true; out.appendChild(b); }
+    listHutka(res);
     // raceways on the map: every closed loop found, longest first
     for (const lp of res.loops) { const b = el('button', 'ai2-hit'); b.type = 'button'; b.innerHTML = `<b>${esc(lp.name || t('Raceway on the map'))}</b><span>${esc(t('OpenStreetMap · loop of {m} m', { m: Math.round(lp.lengthM) }))}</span>`; b.onclick = () => idealFromLoop(lp); out.appendChild(b); }
+    if (ph) { await idealFromPhoto(ph); return; }   // a photo: its own layout opened, what the search found listed under it
     if (!res.hutka.some(h => h.lined) && !res.loops.length) {
-      if (ph) { await idealFromPhoto(ph); return; }   // nothing on the map: the picture is the layout
       out.appendChild(el('div', 'hint', res.place ? t('Found {p}, but no karting raceway is drawn there on the map. Send a photo of its layout — Hutka reads the corners from it.', { p: res.place }) : t('Not on the map. Send a photo of its layout — Hutka reads the corners from it.')));
+      return;
     }
+    // the best answer, opened: the venue's main layout, or the longest raceway on the map (clockwise; one tap for the other way)
+    const h = res.hutka.find(x => x.lined), m = h ? TRACKFIND.mainLayout(h) : null;
+    if (h && m) await actIdeal(h.tr.id, m.id); else if (res.loops.length) await idealFromLoop(res.loops[0]);
+  }
+  // tracks already on Hutka: their layouts straight to the ideal (one with no line yet still opens: a picture of a layout reads it)
+  function listHutka(res) {
+    for (const h of res.hutka) { const b = el('button', 'ai2-hit'); b.type = 'button'; const far = h.km !== null && h.km !== undefined ? ' · ' + esc(t('{d} km away', { d: h.km.toFixed(h.km < 10 ? 1 : 0) })) : ''; b.innerHTML = `<b>${esc(h.tr.name)}</b><span>${esc(h.lined ? t('On Hutka · {n} layouts', { n: h.ls.length }) : t('On Hutka, but nobody has uploaded a lap there yet'))}${far}</span>`; const m = TRACKFIND.mainLayout(h); if (h.lined && m) b.onclick = () => actIdeal(h.tr.id, m.id); else b.disabled = true; out.appendChild(b); }
   }
   async function fromPhoto(f) {
     out.innerHTML = ''; out.appendChild(el('div', 'hint', t('Reading the photo…')));
@@ -11783,7 +12219,7 @@ function actTrack() {
 // a layout from a picture: traced, sized (the length the picture gives, else a guess) and read like any line — corner by corner from
 // the similar corners on Hutka; which way round from the picture's arrows when the AI saw them, clockwise otherwise
 async function idealFromPhoto(ph) {
-  const T = TRACKFIND.fromImage(ph.img, ph.guess), name = (ph.guess && ph.guess.name) || t('Layout from the photo');
+  const T = planTrace(ph), name = (ph.guess && (ph.guess.layout || ph.guess.name)) || t('Layout from the photo');
   if (!T) { const card = aiCard(name, ''); card.appendChild(el('div', 'hint warn', t('Could not read the layout from this picture. A straight-on picture of the map, the track a clear band on a plain background, works best.'))); pushCard(card); return; }
   const note = T.how === 'given' ? t('Read from the photo · {m} m, the length the picture gives', { m: T.lengthM }) : t('Read from the photo · about {m} m: the length is a guess, so the corners are right and the distances only roughly', { m: T.lengthM });
   await idealFromLoop(Object.assign({ name }, T.lp), !(ph.guess && ph.guess.direction === 'ccw'), note);

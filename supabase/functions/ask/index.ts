@@ -8,7 +8,8 @@
 // ASK_STREAM=1 streams the answer token by token (the edge runtime's CPU budget can cut long streams); default: the whole answer in one JSON reply.
 // v34.31 (Hutka AI): kb=1 puts the coach's course (table ai_knowledge, id 'course' — never sent to a page) in front of the page's prompt,
 // cached; purpose='identify_track' with a photo (image: base64, media_type) asks which karting track it shows and answers {track} without
-// keeping a chat (LIMIT_VISION_DAY=10 photos a day per driver, table ai_vision).
+// keeping a chat (LIMIT_VISION_DAY=10 photos a day per driver, table ai_vision). v34.37: {track} also says which layout a venue's plan
+// is about (its printed title).
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const cors = {
@@ -45,7 +46,8 @@ async function knowledge(db: any) {
   try { const { data } = await db.from("ai_knowledge").select("body").eq("id", "course").maybeSingle(); text = data && data.body ? String(data.body) : ""; } catch (_) { text = ""; }
   kbCache = { at: Date.now(), text }; return text;
 }
-// a photo of a track → which venue it is: {name, city, country, sure} or null. Not a chat message; counted per driver per day
+// a photo of a track → which venue it is: {name, city, country, sure, layout, length_m, direction} or null. Not a chat message; counted
+// per driver per day
 // deno-lint-ignore no-explicit-any
 async function identifyTrack(db: any, uid: string, body: any, key: string) {
   const img = String(body.image || ""), mt = String(body.media_type || "image/jpeg");
@@ -53,9 +55,10 @@ async function identifyTrack(db: any, uid: string, body: any, key: string) {
   const dayAgo = new Date(Date.now() - 86400_000).toISOString();
   let used = 0; try { const r = await db.from("ai_vision").select("id", { count: "exact", head: true }).eq("user_id", uid).gte("created_at", dayAgo); used = r.count || 0; } catch (_) { used = 0; }
   if (used >= LIM.vision) return json({ error: "rate_limited", scope: "day", used, limit: LIM.vision }, 429);
-  // besides the venue: the lap length when the picture prints it (the app traces the drawing itself and needs its size) and which way
+  // besides the venue: the layout the picture is about when it names one (a venue's plan prints its title: "SPEEDWAY CIRCUIT" — the app
+  // opens that layout), the lap length when the picture prints it (the app traces the drawing itself and needs its size) and which way
   // round it is driven when arrows or the corner numbers show it
-  const prompt = 'This picture shows a karting track: a layout diagram, a map, a screenshot or a photo. Which venue is it? Read every name, logo, sign or caption in it. Reply with JSON only, nothing else: {"name": "<the venue, or null if you cannot tell>", "city": "<city or null>", "country": "<country or null>", "sure": true or false, "length_m": <the lap length in metres if the picture states it, else null>, "direction": "cw" or "ccw" if arrows or the order of the corner numbers show which way round it is driven as seen in the picture, else null}.';
+  const prompt = 'This picture shows a karting track: a layout diagram, a map, a screenshot or a photo. Which venue is it? Read every name, logo, sign or caption in it. A venue often has several layouts (configurations) and a plan of one of them prints its name as a title, e.g. "SPEEDWAY CIRCUIT" or "INTERNATIONAL WITH BUS STOP", and draws that layout highlighted among the others. Reply with JSON only, nothing else: {"name": "<the venue, or null if you cannot tell>", "city": "<city or null>", "country": "<country or null>", "sure": true or false, "layout": "<the name of the layout this picture is about, as printed, if it prints one, else null>", "length_m": <the lap length in metres if the picture states it, else null>, "direction": "cw" or "ccw" if arrows or the order of the corner numbers show which way round the highlighted layout is driven as seen in the picture, else null}.';
   const up = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
@@ -70,8 +73,9 @@ async function identifyTrack(db: any, uid: string, body: any, key: string) {
     const m = out.match(/\{[\s\S]*\}/); const p = m ? JSON.parse(m[0]) : null;
     if (p) {
       const len = Number(p.length_m), dir = p.direction === "cw" || p.direction === "ccw" ? p.direction : null;
-      track = { name: p.name ? String(p.name).slice(0, 120) : "", city: p.city ? String(p.city).slice(0, 80) : "", country: p.country ? String(p.country).slice(0, 60) : "", sure: !!p.sure, length_m: isFinite(len) && len >= 200 && len <= 6000 ? Math.round(len) : null, direction: dir };
-      if (!track.name && !track.length_m && !track.direction) track = null;
+      const lay = p.layout && String(p.layout).trim().toLowerCase() !== "null" ? String(p.layout).trim().slice(0, 80) : "";
+      track = { name: p.name ? String(p.name).slice(0, 120) : "", city: p.city ? String(p.city).slice(0, 80) : "", country: p.country ? String(p.country).slice(0, 60) : "", sure: !!p.sure, layout: lay, length_m: isFinite(len) && len >= 200 && len <= 6000 ? Math.round(len) : null, direction: dir };
+      if (!track.name && !track.layout && !track.length_m && !track.direction) track = null;
     }
   } catch (_) { track = null; }
   return json({ track });
