@@ -37,13 +37,11 @@ Deno.serve(async (req) => {
     const A = '?area osmkey:ISO3166-1 "BE" ; osmkey:admin_level "2" . ?area ogc:sfContains ?el . ?el osmkey:sport "karting" . ';
     const R = 'PREFIX osmrel: <https://www.openstreetmap.org/relation/> ';
     const tests: [string, string][] = [
-      ["iso", P + 'SELECT ?a ?l WHERE { ?a osmkey:ISO3166-1 "BE" . OPTIONAL { ?a osmkey:admin_level ?l } } LIMIT 10'],
-      ["preds", P + R + 'SELECT ?p (COUNT(?x) AS ?n) WHERE { osmrel:52411 ?p ?x } GROUP BY ?p'],
-      ["rel", P + R + 'SELECT (COUNT(DISTINCT ?el) AS ?n) WHERE { osmrel:52411 ogc:sfContains ?el . ?el osmkey:sport "karting" . }'],
-      ["kart", P + 'SELECT ?el ?c WHERE { ?el osmkey:sport "karting" . ?el geo:hasCentroid/geo:asWKT ?c } LIMIT 3'],
+      ["one", P + R + 'SELECT ?p ?o WHERE { osmrel:52411 ogc:sfContains ?el . ?el osmkey:sport "karting" . ?el osmkey:name ?nm . ?el ?p ?o . FILTER(!STRSTARTS(STR(?p), "http://www.opengis.net/rdf#")) } LIMIT 80'],
+      ["geo", P + R + 'SELECT ?p2 ?o2 WHERE { osmrel:52411 ogc:sfContains ?el . ?el osmkey:sport "karting" . ?el osmkey:name ?nm . ?el geo:hasGeometry ?g . ?g ?p2 ?o2 } LIMIT 10'],
     ];
     const out: Record<string, unknown> = {};
-    for (const [k, q] of tests) { const t1 = Date.now(); try { const rows = await sparql(q, 30000); out[k] = { ms: Date.now() - t1, rows: rows.length, sample: JSON.stringify(rows).slice(0, 1500) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }
+    for (const [k, q] of tests) { const t1 = Date.now(); try { const rows = await sparql(q, 30000); out[k] = { ms: Date.now() - t1, rows: rows.length, sample: JSON.stringify(rows.map(r => Object.fromEntries(Object.entries(r).map(([k, b]) => [k, String((b as { value: string }).value).slice(0, 140)])))).slice(0, 6000) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }
     await db.from("import_queue").update({ status: "done", result: out, finished_at: new Date().toISOString() }).eq("area", area); return json(out);
   }
   if (!/^([A-Z]{2}|US-[A-Z]{2})$/.test(area)) return json({ error: "bad_area" }, 400);
