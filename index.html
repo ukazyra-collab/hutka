@@ -1465,6 +1465,95 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 .ai2-tapsheet .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.ai2-tapsheet .hd b{font-size:17px}
 .ai2-tapsheet .pic{display:block;margin:0 auto 10px;border-radius:10px;cursor:crosshair;touch-action:manipulation}
 .iconbtn{flex:none;width:36px;height:36px;border-radius:50%;border:0;background:var(--surface-2);color:var(--fg);font-size:22px;line-height:1;cursor:pointer}
+/* ---------- v34.39 navigation: the upload button in the side menu, the start page, the feed head, Hutka AI without its title row,
+   the chats drawer, a driver's last session, the example questions, the profile as a page of rows ---------- */
+.nav-up{width:100%;justify-content:flex-start;gap:12px;height:44px;padding:0 12px;margin:0 0 8px;border-radius:10px;font-size:15px}
+.nav-up svg{width:20px;height:20px}
+.st-mine{display:flex;flex-direction:column;gap:12px}
+.st-ask .ask-ex{margin-top:12px}
+.st-ask h2 svg{stroke:var(--accent)}
+/* example questions: how one talks to the AI — a tap asks */
+.ask-ex{display:flex;flex-wrap:wrap;gap:8px}
+.ask-ex:empty{display:none}
+.ask-ex button{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:8px 14px;border:1px solid var(--line-2);border-radius:999px;background:var(--surface);color:var(--fg);font:500 13.5px/1.3 var(--body);text-align:left;cursor:pointer}
+.ask-ex button:hover{border-color:var(--accent);color:var(--accent)}
+.ask-ex button svg{width:14px;height:14px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* Hutka AI: one slim row on top — the chats on the left, a new chat on the right */
+.ai2-bar{display:flex;align-items:center;gap:8px;min-height:44px;margin:-6px -8px -8px}
+.ai2-bar .btn{flex:none;height:44px;padding:0 10px;font-size:14px}
+.ai2-bar .btn svg{width:18px;height:18px}
+.ai2-bart{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;text-align:center;color:var(--muted);font-weight:600}
+.ai2-hello{padding:4px 2px 0}
+.ai2-hello h1{font-size:26px;line-height:1.15;letter-spacing:-.02em;margin:0 0 6px}
+.ai2-hello p{color:var(--muted);font-size:14.5px;line-height:1.5;max-width:56ch}
+.ai2.talking .ai2-hello,.ai2.talking #haiLast,.ai2.talking .ai2-up,.ai2.talking .ai2-intro{display:none!important}
+.ai2:not(.talking) #haiActSession{display:none}   /* before a conversation the last session is its own card (or the upload card) */
+.ai2-intro{display:flex;flex-direction:column;gap:12px}
+.ai2-up{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 14px;align-items:center}
+.ai2-up .ic{width:44px;height:44px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+.ai2-up .ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ai2-up .tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ai2-up .tx b{font-size:15.5px;line-height:1.3}
+.ai2-up .tx span{font-size:13px;color:var(--muted);line-height:1.45}
+.ai2-up .btn{grid-column:1/-1;height:56px;font-size:16px;border-radius:14px}
+.ai2-up .btn svg{width:18px;height:18px}
+/* a driver's last session: the lap, the numbers, one button */
+.last-card{display:flex;flex-direction:column;gap:12px}
+.last-card .lc-k{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.last-card .lc-b{display:grid;grid-template-columns:118px minmax(0,1fr);gap:14px;align-items:center;cursor:pointer}
+.last-card .lc-pv{height:104px;border-radius:12px;background:var(--surface-2);position:relative;overflow:hidden}
+.last-card .lc-pv canvas{position:absolute;inset:0;width:100%;height:100%}
+.last-card .lc-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.last-card .lc-t > b{font-size:17px;line-height:1.25;overflow:hidden;text-overflow:ellipsis}
+.last-card .lc-t > span{font-size:12.5px;color:var(--muted)}
+.last-card .lc-n{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+.last-card .lc-n span{display:grid;gap:1px}
+.last-card .lc-n i{font-style:normal;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.last-card .lc-n b{font:600 15px/1.2 var(--mono)}
+.last-card .lc-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.last-card .lc-go{flex:1 1 auto;height:56px;font-size:16px;border-radius:14px}
+.last-card .lc-go svg{width:18px;height:18px}
+/* the chats: a drawer from the left */
+.modal.drawer{display:block;padding:0}
+html .modal.drawer > .box.sheet{position:absolute;left:0;top:0;bottom:0;width:min(340px,86vw);max-height:none;height:100%;border-radius:0 18px 18px 0;border-left:0;border-bottom:1px solid var(--line);padding:var(--sa-top) 0 var(--sa-bottom);animation:drawerIn .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes drawerIn{from{transform:translateX(-100%)}to{transform:none}}
+/* the profile */
+.pf-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px 16px;align-items:center}
+.pf-head .avatar{width:72px;height:72px}
+.pf-name{font-size:21px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.pf-who .hint{margin-top:2px}
+.pf-who .hint:empty{display:none}
+.pf-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pf-set{display:flex;flex-direction:column;padding-bottom:6px}
+.pf-set h2{margin-bottom:2px}
+.pf-row{display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 2px;border:0;border-top:1px solid var(--line);background:none;color:var(--fg);font:inherit;font-size:14.5px;text-align:left;text-decoration:none;cursor:pointer;width:100%}
+.pf-set h2 + .pf-row{border-top:0}
+.pf-row .tx{flex:1;min-width:0;line-height:1.35}
+.pf-row .go{width:16px;height:16px;stroke:var(--faint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+a.pf-row:hover .tx,button.pf-row:hover .tx{color:var(--accent)}
+#profSignOut .tx{color:var(--danger)}
+.pf-set .status:empty{display:none}
+input.sw{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;border-radius:999px;background:var(--line-2);position:relative;cursor:pointer;transition:background .15s;margin:0;border:0;box-shadow:none}
+input.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+input.sw:checked{background:var(--ok)}
+input.sw:checked::after{transform:translateX(18px)}
+.pf-photo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.pf-photo .avatar{width:56px;height:56px}
+.pf-edit .form{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+@media (max-width:700px){
+  .pf-head{grid-template-columns:auto minmax(0,1fr)}
+  .pf-head .avatar{width:60px;height:60px}
+  .pf-head > .btn{grid-column:1/-1;height:56px;font-size:16px;border-radius:14px}
+  /* the landing's one main action: full width and tall on a phone, the second one quiet under it */
+  .ld-cta{flex-direction:column;align-items:stretch;gap:12px}
+  .ld-cta .btn.primary{height:56px;font-size:16px;border-radius:14px}
+  .ld-cta .btn:not(.primary){height:48px}
+  .pf-name{font-size:19px}
+  .pf-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ai2-hello h1{font-size:23px}
+  .last-card .lc-b{grid-template-columns:100px minmax(0,1fr);gap:12px}
+  .last-card .lc-pv{height:92px}
+}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -1511,6 +1600,7 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
     <symbol id="i-bt" viewBox="0 0 24 24"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></symbol>
+    <symbol id="i-side" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16M5.6 8.5h1.4M5.6 11.5h1.4"/></symbol><symbol id="i-feed" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol><symbol id="i-how" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.6l5.2 3.4-5.2 3.4z"/></symbol>
     <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol><symbol id="i-offline" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M6.3 8.3A5.5 5.5 0 0 0 7 19h10.5c.6 0 1.1-.1 1.6-.3M21 15.5A4 4 0 0 0 17.5 11h-.7A6.5 6.5 0 0 0 9.9 5.4"/></symbol>
   </defs>
 </svg>
@@ -1521,12 +1611,13 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       <img class="mark" src="logo.png?v=2" alt="" width="220" height="164">
       <b>Hutka</b>
     </a>
-    <nav class="nav">
-      <a href="#home" data-route="home"><svg><use href="#i-home"/></svg><span data-t="Home">Home</span></a>
-      <a href="#lab" data-route="lab"><svg><use href="#i-lab"/></svg><span data-t="Lab">Lab</span></a>
+    <!-- the links are laid out by NAV (app_core.js) in the order of the navigation variant; the profile is the avatar at the top right -->
+    <nav class="nav" id="sideNav">
+      <button class="btn primary nav-up" id="navUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button>
       <a href="#ai" data-route="ai" id="navAI"><svg><use href="#i-spark"/></svg><span data-t="Hutka AI">Hutka AI</span></a>
+      <a href="#lab" data-route="lab"><svg><use href="#i-lab"/></svg><span data-t="Lab">Lab</span></a>
+      <a href="#feed" data-route="feed"><svg><use href="#i-feed"/></svg><span data-t="Feed">Feed</span></a>
       <a href="#tracks" data-route="tracks"><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></a>
-      <a href="#profile" data-route="profile"><svg><use href="#i-user"/></svg><span data-t="Profile">Profile</span></a>
       <a href="#help" data-route="help"><svg><use href="#i-help"/></svg><span data-t="Help">Help</span></a>
       <div class="sep" id="adminSep" hidden></div>
       <a href="#admin" data-route="admin" id="navAdmin" hidden><svg><use href="#i-shield"/></svg><span data-t="Admin Panel">Admin Panel</span></a>
@@ -1554,8 +1645,22 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
     <!-- no connection: one line on every page — the lists cannot load, the lap timer still reads -->
     <div class="banner warn offbar" id="offBar" role="status" hidden><svg aria-hidden="true"><use href="#i-offline"/></svg><span data-t="No internet — reading the lap timer still works; the sessions upload by themselves once the connection is back.">No internet — reading the lap timer still works; the sessions upload by themselves once the connection is back.</span></div>
 
-    <!-- ========== HOME ========== -->
+    <!-- ========== START: how Hutka works (navigation variant A's first tab, C's Home) ========== -->
+    <section class="page" id="pg-start" hidden>
+      <div id="startLanding"></div>
+      <!-- C: a driver with sessions gets his own here instead of the explainer -->
+      <div class="st-mine" id="startMine" hidden></div>
+      <div class="card st-ask" id="startAsk">
+        <h2><svg><use href="#i-spark"/></svg><span data-t="Ask Hutka AI">Ask Hutka AI</span></h2>
+        <p class="hint" data-t="It knows the fastest laps on every track on Hutka — and yours, once you upload a session. Ask in your own words, for example:">It knows the fastest laps on every track on Hutka — and yours, once you upload a session. Ask in your own words, for example:</p>
+        <div class="ask-ex" id="startEx"></div>
+      </div>
+      <footer class="site-foot"><span>© 2026 KOZYRA MEDIA GROUP - FZCO · <span data-t="Dubai, UAE">Dubai, UAE</span></span><nav><a href="support.html" data-t="Support">Support</a><a href="privacy.html" data-t="Privacy">Privacy</a><a href="delete-account.html" data-t="Delete account">Delete account</a></nav></footer>
+    </section>
+
+    <!-- ========== FEED (was Home): what drivers publish ========== -->
     <section class="page" id="pg-home" hidden>
+      <div class="ph feed-ph" id="feedHead"><div><h1 data-t="Feed">Feed</h1><div class="sub" data-t="Sessions drivers publish on Hutka">Sessions drivers publish on Hutka</div></div></div>
       <!-- the landing for a guest: the product first — a real session with the seconds left in every corner -->
       <div class="landing" id="landing" hidden>
         <div class="ld-hero">
@@ -1788,60 +1893,72 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
       </div>
           </div>
       <div class="ai2" id="hai" hidden>
-        <div class="ai2-top">
-          <div class="ai2-ava" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="aiAvG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><circle cx="32" cy="32" r="32" fill="url(#aiAvG)"/><path d="M14 34c0-11 8-19 18-19s18 8 18 19v7c0 4.4-3.6 8-8 8H22c-4.4 0-8-3.6-8-8z" fill="#fff"/><rect x="18" y="28" width="28" height="9" rx="4.5" fill="#141c38"/><path d="M22.5 32.5h13" stroke="#5ff2c4" stroke-width="2.4" stroke-linecap="round"/><circle cx="40.5" cy="32.5" r="1.8" fill="#5ff2c4"/><path d="M32 15.6v7.4" stroke="#7a4dff" stroke-width="3.2" stroke-linecap="round"/><path d="M26 44h3M35 44h3" stroke="#b9c4f5" stroke-width="2" stroke-linecap="round"/></svg></div>
-          <div class="ai2-who"><h1 data-t="Hutka AI">Hutka AI</h1><div class="sub" data-t="Your racing AI: it knows your sessions and the fastest laps on Hutka">Your racing AI: it knows your sessions and the fastest laps on Hutka</div></div>
-          <button class="btn sm ghost ai2-histbtn" id="haiHistBtn" type="button"><svg><use href="#i-chat"/></svg><span data-t="Chats">Chats</span></button>
+        <!-- no title row: the logo is in the top bar; the chats slide out from the left, a new chat starts on the right -->
+        <div class="ai2-bar">
+          <button class="btn sm ghost ai2-histbtn" id="haiHistBtn" type="button"><svg><use href="#i-side"/></svg><span data-t="Chats">Chats</span></button>
+          <b class="ai2-bart" id="haiTitle"></b>
+          <button class="btn sm ghost" id="haiNew" type="button" hidden><svg><use href="#i-plus"/></svg><span data-t="New chat">New chat</span></button>
         </div>
         <div class="banner info" id="haiSoon" hidden><svg><use href="#i-info"/></svg><div id="haiSoonText"></div></div>
-        <!-- the main answer: the ideal lap of a layout (the layout is a setting next to it); three more below; a running conversation shrinks them to chips -->
-        <div class="ai2-main" id="haiMain">
+        <!-- navigation variant B: the live example and the three steps on top, for someone with no sessions yet -->
+        <div class="ai2-intro" id="haiIntro" hidden></div>
+        <div class="ai2-hello" id="haiHello">
+          <h1 data-t="Ask how to drive faster">Ask how to drive faster</h1>
+          <p data-t="Hutka AI knows the fastest laps on every track on Hutka — and yours, once you upload a session. Ask in your own words.">Hutka AI knows the fastest laps on every track on Hutka — and yours, once you upload a session. Ask in your own words.</p>
+        </div>
+        <!-- the one main action: a driver with sessions — where the time went in his last one; nobody's sessions yet — upload the first -->
+        <div id="haiLast" hidden></div>
+        <div class="card ai2-up" id="haiUp" hidden>
+          <div class="ic"><svg><use href="#i-upload"/></svg></div>
+          <div class="tx"><b data-t="Upload a session — the AI reads every lap">Upload a session — the AI reads every lap</b><span data-t="Alfano, AiM, RaceBox or any GPS logger: where you lose time, corner by corner, and what to change.">Alfano, AiM, RaceBox or any GPS logger: where you lose time, corner by corner, and what to change.</span></div>
+          <button class="btn primary" id="haiUpBtn" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload a session">Upload a session</span></button>
+        </div>
+        <!-- the layout the ideal lap is for: kept as a setting; the ideal lap itself is the first row below -->
+        <div class="ai2-main" id="haiMain" hidden>
           <button class="btn primary ai2-go" id="haiGo" type="button"><svg><use href="#i-flag"/></svg><span data-t="Show the ideal lap">Show the ideal lap</span></button>
           <button class="ai2-field" id="haiLay" type="button" data-ta="Which layout?" aria-label="Which layout?"><span class="v"><b id="haiLayName">—</b><span id="haiLayTrack"></span></span><svg><use href="#i-chev"/></svg></button>
         </div>
         <div class="ai2-acts" id="haiActs">
-          <button class="ai2-act ai2-chipideal" type="button" data-act="ideal"><span class="ic"><svg><use href="#i-flag"/></svg></span><b data-t="Ideal lap">Ideal lap</b></button>
-          <button class="ai2-act" type="button" data-act="session"><span class="ic"><svg><use href="#i-lab"/></svg></span><span class="tx"><b data-t="My last session">My last session</b><span class="d" data-t="Where the time goes and what to change">Where the time goes and what to change</span></span><svg class="go"><use href="#i-chev"/></svg></button>
+          <button class="ai2-act" type="button" data-act="ideal"><span class="ic"><svg><use href="#i-flag"/></svg></span><span class="tx"><b data-t="Ideal lap">Ideal lap</b><span class="d" id="haiIdealSub" data-t="How the fastest drive each corner">How the fastest drive each corner</span></span><svg class="go"><use href="#i-chev"/></svg></button>
+          <button class="ai2-act" type="button" data-act="session" id="haiActSession"><span class="ic"><svg><use href="#i-lab"/></svg></span><span class="tx"><b data-t="My last session">My last session</b><span class="d" data-t="Where the time goes and what to change">Where the time goes and what to change</span></span><svg class="go"><use href="#i-chev"/></svg></button>
           <button class="ai2-act" type="button" data-act="progress"><span class="ic"><svg><use href="#i-trend"/></svg></span><span class="tx"><b data-t="My progress">My progress</b><span class="d" data-t="What got better and what to work on next">What got better and what to work on next</span></span><svg class="go"><use href="#i-chev"/></svg></button>
           <button class="ai2-act" type="button" data-act="track"><span class="ic"><svg><use href="#i-pin"/></svg></span><span class="tx"><b data-t="New track">New track</b><span class="d" data-t="A photo, a link or a place: the line for a track you have never driven">A photo, a link or a place: the line for a track you have never driven</span></span><svg class="go"><use href="#i-chev"/></svg></button>
         </div>
         <div class="card ai2-chat" id="haiChat">
-          <div class="ai2-chathead" id="haiChatHead" hidden><b id="haiTitle"></b><button class="btn xs ghost" id="haiNew" type="button"><svg><use href="#i-plus"/></svg><span data-t="New chat">New chat</span></button></div>
           <div class="ai2-log" id="haiLog"></div>
+          <div class="ask-ex" id="haiEx"></div>
           <div class="ai2-ask"><textarea id="haiInput" rows="1"></textarea><button class="btn ai2-send" id="haiSend" type="button" data-ta="Send" aria-label="Send"><svg><use href="#i-send"/></svg></button><button class="btn ai2-send" id="haiStop" type="button" hidden data-ta="Stop" aria-label="Stop"><svg><use href="#i-x"/></svg></button></div>
           <div class="ai2-note"><span data-t="Hutka AI can make mistakes — check it on track.">Hutka AI can make mistakes — check it on track.</span> <span id="haiNote"></span></div>
         </div>
       </div>
+      <footer class="site-foot"><span>© 2026 KOZYRA MEDIA GROUP - FZCO · <span data-t="Dubai, UAE">Dubai, UAE</span></span><nav><a href="support.html" data-t="Support">Support</a><a href="privacy.html" data-t="Privacy">Privacy</a><a href="delete-account.html" data-t="Delete account">Delete account</a></nav></footer>
         </section>
 
     <!-- ========== PROFILE ========== -->
-    <section class="page" id="pg-profile" hidden>
-      <div class="ph"><div><h1 data-t="Profile">Profile</h1><div class="sub" id="profSub"></div></div></div>
-      <div class="grid2">
-        <div class="card"><div class="prof-head" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><img class="avatar" id="profAvatar" alt="" style="width:72px;height:72px"><div style="min-width:0;flex:1"><div style="font-size:20px;font-weight:800" id="profName">—</div><div class="hint" id="profMeta"></div></div><div class="row"><label class="btn sm filebtn"><span data-t="Change photo">Change photo</span><input type="file" id="profAvatarFile" accept="image/*"></label><button class="btn sm ghost" id="profAvatarClear" type="button" data-t="Remove">Remove</button></div></div>
-          <div class="form" style="margin-top:18px">
-            <div class="field"><label data-t="First name">First name</label><input type="text" id="profFirst" maxlength="40" autocomplete="given-name"></div>
-            <div class="field"><label data-t="Last name">Last name</label><input type="text" id="profLast" maxlength="40" autocomplete="family-name"></div>
-            <div class="field"><label data-t="Country">Country</label><select id="profCountry"></select></div>
-            <div class="field"><label data-t="Home track">Home track</label><select id="profHome"></select></div>
-            <div class="field"><label data-t="Birth year">Birth year</label><select id="profYear"></select></div>
-            <div class="field"><label data-t="Weight, kg">Weight, kg</label><input type="number" id="profWeight" min="20" max="200" inputmode="numeric" placeholder="—"></div>
-            <div class="field wide"><label data-t="About you (one or two lines)">About you (one or two lines)</label><input type="text" id="profBio" maxlength="160" placeholder="Rental karting since 2021, Kartdrome regular, chasing 1:14"></div>
-            <div class="field"><label>Instagram</label><input type="text" id="profIg" maxlength="80" placeholder="@name"></div>
-            <div class="field"><label data-t="Contact link (Telegram / WhatsApp)">Contact link (Telegram / WhatsApp)</label><input type="text" id="profContact" maxlength="160" placeholder="https://t.me/name"></div>
-            <div class="field wide"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profCoach" style="width:18px;height:18px"><span data-t="I coach — show “Book a training” on my page (uses the contact link)">I coach — show “Book a training” on my page (uses the contact link)</span></label></div>
-            <div class="field wide"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profNotify" style="width:18px;height:18px" checked><span data-t="E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)">E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)</span></label></div>
-            <div class="field wide" id="profPushField" hidden><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profPush" style="width:18px;height:18px" checked><span data-t="Push notifications in the app (likes and comments)">Push notifications in the app (likes and comments)</span></label></div>
-            <div class="field wide" id="profSwsField" hidden><label data-t="SWS (Sodi World Series) profile link">SWS (Sodi World Series) profile link</label><div class="row"><input type="url" id="profSws" class="grow" placeholder="https://www.sodiwseries.com/en-gb/drivers/…"><button class="btn sm" id="profSwsImport" type="button" data-t="Import SWS results">Import SWS results</button></div><div class="hint" id="profSwsHint"></div></div>
-          </div>
-          <div class="row" style="margin-top:12px"><button class="btn primary" id="profSave" type="button" data-t="Save">Save</button><button class="btn ghost" id="profSignOut" type="button" hidden data-t="Sign out">Sign out</button><span class="status" id="profStatus"></span></div>
-          <div class="danger-zone" id="profDanger" hidden><button class="btn sm ghost danger" id="profDelete" type="button" data-t="Delete account">Delete account</button><span class="hint" data-t="Everything goes at once — sessions, comments, likes, chats, the profile. No undo.">Everything goes at once — sessions, comments, likes, chats, the profile. No undo.</span> <a class="hint" href="delete-account.html" target="_blank" rel="noopener" data-t="What exactly is deleted">What exactly is deleted</a></div>
-          <div class="row mobile-only" style="margin-top:14px;gap:10px;align-items:center"><span class="hint" data-t="Language">Language</span><div class="lang" role="group"><button type="button" id="langEnM">EN</button><button type="button" id="langRuM">RU</button></div><a class="btn sm" href="#help"><svg><use href="#i-help"/></svg><span data-t="Help">Help</span></a><a class="btn sm" href="#admin" id="profAdminLink" hidden><svg><use href="#i-shield"/></svg><span data-t="Admin Panel">Admin Panel</span></a></div>
-        </div>
-        <div class="card" id="profSocialCard"><h2><svg><use href="#i-users"/></svg><span data-t="Community">Community</span></h2><div class="tiles" id="profSocial"></div><div class="hint" id="profSocialHint" style="margin-top:10px"></div></div>
+    <!-- the profile opens from the avatar in the top bar: who you are and one button to change it, your sessions, then the settings as rows;
+         the form itself is in the "Edit profile" sheet -->
+    <section class="page pf" id="pg-profile" hidden>
+      <div class="card pf-head">
+        <img class="avatar" id="profAvatar" alt="">
+        <div class="pf-who"><div class="pf-name" id="profName">—</div><div class="hint" id="profMeta"></div><div class="hint" id="profSub"></div></div>
+        <button class="btn primary" id="profEditBtn" type="button"><span data-t="Edit profile">Edit profile</span></button>
+        <button class="btn primary" id="profSignIn" type="button" hidden><span data-t="Sign in">Sign in</span></button>
       </div>
+      <div class="card" id="profSocialCard"><div class="tiles pf-tiles" id="profSocial"></div><div class="hint" id="profSocialHint" style="margin-top:10px"></div></div>
+      <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="profSessSub"></span></h2><div id="profProgress" hidden></div><div id="profSessions"></div><div class="hint" id="profSessHint"></div><div class="row" style="margin-top:12px" hidden><button class="btn primary" id="profUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div></div>
+      <div class="card pf-set">
+        <h2><span data-t="Settings">Settings</span></h2>
+        <label class="pf-row" id="profNotifyRow"><span class="tx" data-t="E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)">E-mail me when someone likes or comments on my sessions (one e-mail per hour at most)</span><input type="checkbox" class="sw" id="profNotify" checked></label>
+        <label class="pf-row" id="profPushField" hidden><span class="tx" data-t="Push notifications in the app (likes and comments)">Push notifications in the app (likes and comments)</span><input type="checkbox" class="sw" id="profPush" checked></label>
+        <div class="pf-row"><span class="tx" data-t="Language">Language</span><div class="lang" role="group"><button type="button" id="langEnM">EN</button><button type="button" id="langRuM">RU</button></div></div>
+        <a class="pf-row" href="#help"><span class="tx" data-t="How to upload a session">How to upload a session</span><svg class="go"><use href="#i-chev"/></svg></a>
+        <a class="pf-row" href="#admin" id="profAdminLink" hidden><span class="tx" data-t="Admin Panel">Admin Panel</span><svg class="go"><use href="#i-chev"/></svg></a>
+        <a class="pf-row" href="support.html" target="_blank" rel="noopener"><span class="tx" data-t="Support">Support</span><svg class="go"><use href="#i-chev"/></svg></a>
+        <button class="pf-row" id="profSignOut" type="button" hidden><span class="tx" data-t="Sign out">Sign out</span></button>
+        <span class="status" id="profFlagStatus"></span>
+      </div>
+      <div class="danger-zone" id="profDanger" hidden><button class="btn sm ghost danger" id="profDelete" type="button" data-t="Delete account">Delete account</button><span class="hint" data-t="Everything goes at once — sessions, comments, likes, chats, the profile. No undo.">Everything goes at once — sessions, comments, likes, chats, the profile. No undo.</span> <a class="hint" href="delete-account.html" target="_blank" rel="noopener" data-t="What exactly is deleted">What exactly is deleted</a></div>
       <div class="card" id="profSwsCard" hidden><h2><svg><use href="#i-flag"/></svg><span data-t="SWS results">SWS results</span><span class="sub" id="profSwsSub"></span></h2><div id="profSwsBox"></div></div>
-      <div class="card"><h2><svg><use href="#i-timer"/></svg><span data-t="My sessions">My sessions</span><span class="sub" id="profSessSub"></span></h2><div class="row" style="margin-bottom:12px"><button class="btn primary" id="profUpload" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button></div><div id="profProgress" hidden></div><div id="profSessions"></div><div class="hint" id="profSessHint"></div></div>
     </section>
 
     <!-- ========== DRIVER ========== -->
@@ -2044,13 +2161,35 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
   <div class="sheet-head"><h3 data-t="Which layout?">Which layout?</h3><button class="sheet-x" id="haiLayX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
   <div class="sheet-body"><div class="ai2-laylist" id="haiLayList"></div></div>
 </div></div>
-<div class="modal" id="haiHist" hidden><div class="box sheet ai2-hist">
+<div class="modal drawer" id="haiHist" hidden><div class="box sheet ai2-hist">
   <div class="sheet-head"><h3 data-t="Chats">Chats</h3><button class="sheet-x" id="haiHistX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
   <div class="sheet-body">
     <button class="btn primary" id="haiHistNew" type="button"><svg><use href="#i-plus"/></svg><span data-t="New chat">New chat</span></button>
     <div class="list chatlist" id="haiChats"></div>
     <div class="hint" id="haiWallet"></div>
   </div>
+</div></div>
+<!-- the profile form: a sheet over the profile (Edit profile) -->
+<div class="modal" id="profEditSheet" hidden><div class="box sheet pf-edit">
+  <div class="sheet-head"><h3 data-t="Edit profile">Edit profile</h3><button class="sheet-x" id="profEditX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="sheet-body">
+    <div class="pf-photo"><img class="avatar" id="profAvatarEd" alt=""><label class="btn sm filebtn"><span data-t="Change photo">Change photo</span><input type="file" id="profAvatarFile" accept="image/*"></label><button class="btn sm ghost" id="profAvatarClear" type="button" data-t="Remove">Remove</button></div>
+    <div class="form">
+      <div class="field"><label data-t="First name">First name</label><input type="text" id="profFirst" maxlength="40" autocomplete="given-name"></div>
+      <div class="field"><label data-t="Last name">Last name</label><input type="text" id="profLast" maxlength="40" autocomplete="family-name"></div>
+      <div class="field"><label data-t="Country">Country</label><select id="profCountry"></select></div>
+      <div class="field"><label data-t="Home track">Home track</label><select id="profHome"></select></div>
+      <div class="field"><label data-t="Birth year">Birth year</label><select id="profYear"></select></div>
+      <div class="field"><label data-t="Weight, kg">Weight, kg</label><input type="number" id="profWeight" min="20" max="200" inputmode="numeric" placeholder="—"></div>
+      <div class="field wide"><label data-t="About you (one or two lines)">About you (one or two lines)</label><input type="text" id="profBio" maxlength="160" placeholder="Rental karting since 2021, Kartdrome regular, chasing 1:14"></div>
+      <div class="field"><label>Instagram</label><input type="text" id="profIg" maxlength="80" placeholder="@name"></div>
+      <div class="field"><label data-t="Contact link (Telegram / WhatsApp)">Contact link (Telegram / WhatsApp)</label><input type="text" id="profContact" maxlength="160" placeholder="https://t.me/name"></div>
+      <div class="field wide"><label class="row" style="height:40px;cursor:pointer"><input type="checkbox" id="profCoach" style="width:18px;height:18px"><span data-t="I coach — show “Book a training” on my page (uses the contact link)">I coach — show “Book a training” on my page (uses the contact link)</span></label></div>
+      <div class="field wide" id="profSwsField" hidden><label data-t="SWS (Sodi World Series) profile link">SWS (Sodi World Series) profile link</label><div class="row"><input type="url" id="profSws" class="grow" placeholder="https://www.sodiwseries.com/en-gb/drivers/…"><button class="btn sm" id="profSwsImport" type="button" data-t="Import SWS results">Import SWS results</button></div><div class="hint" id="profSwsHint"></div></div>
+    </div>
+    <span class="status" id="profStatus"></span>
+  </div>
+  <div class="sheet-foot"><button class="btn primary" id="profSave" type="button" data-t="Save">Save</button></div>
 </div></div>
 <div class="modal" id="payModal" hidden><div class="box" style="width:min(720px,100%)"><h3 data-t="Credits and Pro">Credits and Pro</h3><p class="hint" id="payIntro"></p>
   <div class="plans" id="payPlans"></div>
@@ -5230,6 +5369,31 @@ Object.assign(I18N.RU, {
   "No track there — tap right on the line of the layout.": "Там нет трассы — ткни прямо в линию конфигурации.",
   "Read from the picture, sized by the map ({name}): {m} m": "По схеме, размер — по карте ({name}): {m} м"
 });
+// v34.39 — navigation: How it works / Hutka AI / Lab / Feed, the profile from the avatar, Hutka AI without its title row
+Object.assign(I18N.RU, {
+  "How it works": "Как работает",
+  "Feed": "Лента",
+  "Sessions drivers publish on Hutka": "Сессии, которые гонщики публикуют на Hutka",
+  "Ask Hutka AI": "Спроси Hutka AI",
+  "It knows the fastest laps on every track on Hutka — and yours, once you upload a session. Ask in your own words, for example:": "Он знает самые быстрые круги на каждой трассе Hutka — и твои, когда загрузишь сессию. Спрашивай своими словами, например:",
+  "Ask how to drive faster": "Спроси, как ехать быстрее",
+  "Hutka AI knows the fastest laps on every track on Hutka — and yours, once you upload a session. Ask in your own words.": "Hutka AI знает самые быстрые круги на каждой трассе Hutka — и твои, когда загрузишь сессию. Спрашивай своими словами.",
+  "Upload a session — the AI reads every lap": "Загрузи сессию — AI разберёт каждый круг",
+  "Alfano, AiM, RaceBox or any GPS logger: where you lose time, corner by corner, and what to change.": "Alfano, AiM, RaceBox или любой GPS-логгер: где теряешь время — поворот за поворотом — и что поменять.",
+  "How the fastest drive each corner": "Как самые быстрые проходят каждый поворот",
+  "Your last session": "Твоя последняя сессия",
+  "Where do I lose time?": "Где я теряю время?",
+  "Where do I lose time in my last session?": "Где я теряю время в последней сессии?",
+  "How do I drive {name}?": "Как проехать {name}?",
+  "How do I take a hairpin faster?": "Как быстрее проходить шпильку?",
+  "What got better since my first session?": "Что стало лучше с первой сессии?",
+  "How do I drive a track I have never been to?": "Как ехать трассу, где я ни разу не был?",
+  "Edit profile": "Изменить профиль",
+  "Settings": "Настройки",
+  "Profile saved.": "Профиль сохранён.",
+  "Saved ✓": "Сохранено ✓"
+});
+Object.assign(I18N.RU, { "Published sessions": "Опубликовано" });
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -6756,11 +6920,41 @@ const TZ_BY_COUNTRY = { AE: 'Asia/Dubai', OM: 'Asia/Muscat', QA: 'Asia/Qatar', B
 const minutesNowIn = (tz) => { const now = new Date(); if (tz) { try { const parts = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now); const h = +parts.find(p => p.type === 'hour').value, m = +parts.find(p => p.type === 'minute').value; return (h % 24) * 60 + m; } catch (e) { } } return now.getHours() * 60 + now.getMinutes(); };
 const trackHours = (tr) => { if (!tr.close) return null; if (!tr.open) return { open: null, closes: tr.close, opens: '' }; const cur = minutesNowIn(tr.tz || TZ_BY_COUNTRY[tr.country]), p = (s) => { const [h, m] = s.split(':').map(Number); return h * 60 + (m || 0); }; const o = p(tr.open), c = p(tr.close); const open = o <= c ? (cur >= o && cur < c) : (cur >= o || cur < c); return { open, closes: tr.close, opens: tr.open }; };
 
+// ---------- the navigation: four tabs around the upload button on a phone, the same order in the side menu, and where the app opens.
+// The profile is not a tab: it opens from the avatar in the top bar. Three variants (v34.39), ?nav=a|b|c picks one and this browser keeps it:
+//   a — How it works first: How it works · Hutka AI · ⬆ · Lab · Feed (the live example and the three steps are a page of their own)
+//   b — Hutka AI first: Hutka AI · Lab · ⬆ · Feed · Tracks (someone with no sessions sees the live example and the steps on top of it)
+//   c — an adaptive Home first: Home · Hutka AI · ⬆ · Lab · Feed (the explainer for a newcomer, his own last session for a regular)
+const NAV = (() => {
+  const KEY = 'hutka.nav', DEF = 'b', OK = /^[abc]$/;
+  let v = DEF;
+  try { const q = new URLSearchParams(location.search).get('nav'); if (q && OK.test(q)) localStorage.setItem(KEY, q); const s = localStorage.getItem(KEY); if (s && OK.test(s)) v = s; } catch (e) {}
+  const ITEM = { start: ['i-how', 'How it works'], home: ['i-home', 'Home'], ai: ['i-spark', 'Hutka AI'], lab: ['i-lab', 'Lab'], feed: ['i-feed', 'Feed'], tracks: ['i-track', 'Tracks'] };
+  const TABS = { a: ['start', 'ai', 'lab', 'feed'], b: ['ai', 'lab', 'feed', 'tracks'], c: ['home', 'ai', 'lab', 'feed'] }[v];
+  const SIDE = { a: ['start', 'ai', 'lab', 'feed', 'tracks'], b: ['ai', 'lab', 'feed', 'tracks'], c: ['home', 'ai', 'lab', 'feed', 'tracks'] }[v];
+  const first = TABS[0];
+  const LANDING_AT = { a: 'startLanding', b: 'haiIntro', c: 'startLanding' }[v];   // where the live example and the three steps live
+  const link = (key, id) => { const [ic, label] = ITEM[key], a = document.createElement('a'); a.href = '#' + key; a.dataset.route = key; if (id) a.id = id; a.innerHTML = `<svg><use href="#${ic}"/></svg><span data-t="${label}">${label}</span>`; a.addEventListener('pointerdown', () => NATIVE.haptic('light'), { passive: true }); return a; };
+  function build() {
+    const bar = $('tabbar'), up = $('tabUpload'); for (const a of [...bar.querySelectorAll('a')]) a.remove();
+    TABS.forEach((k, i) => { const a = link(k, k === 'ai' ? 'tabAI' : null); if (i < 2) bar.insertBefore(a, up); else bar.appendChild(a); });
+    const nav = $('sideNav'), help = nav.querySelector('a[data-route="help"]');
+    for (const a of [...nav.querySelectorAll('a[data-route]')]) if (a.dataset.route !== 'help' && a.dataset.route !== 'admin') a.remove();
+    for (const k of SIDE) nav.insertBefore(link(k, k === 'ai' ? 'navAI' : null), help);
+    const host = $(LANDING_AT), L = $('landing'); if (host && L && L.parentElement !== host) host.appendChild(L);
+    document.documentElement.dataset.nav = v;
+  }
+  // '#home' (the logo, older links, an empty address) opens the first tab; the feed is the former Home page
+  const resolve = (name) => name === 'home' && v !== 'c' ? first : name;
+  const pageOf = (name) => name === 'feed' ? 'home' : (name === 'home' && v === 'c') ? 'start' : name;
+  return { v, first, tabs: TABS, build, resolve, pageOf, landingAt: LANDING_AT };
+})();
+
 // ---------- routing ----------
 const APP = { route: 'tracks', a: null, b: null, geo: null, hoverTrack: null };
 function parseHash() { const h = (location.hash || '#home').slice(1); const parts = h.includes('~') ? h.split('~') : h.split('-'); return { name: parts[0] || 'home', a: parts[1] || null, b: parts[2] || null, c: parts[3] || null }; }
 function go(hash) { if (location.hash === '#' + hash) route(); else location.hash = hash; }
-const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver', 'ai', 'sws', 'help', 'activity'];
+const PAGES = ['home', 'tracks', 'track', 'layout', 'lab', 'profile', 'admin', 'driver', 'ai', 'sws', 'help', 'activity', 'start', 'feed'];
 let routeSeq = 0, routeHash = null;
 async function route() {
   if (routeHash === location.hash) return; routeHash = location.hash; const seq = ++routeSeq;   // the same hash twice in a row is one navigation
@@ -6768,13 +6962,17 @@ async function route() {
     const r = parseHash(); let name = PAGES.includes(r.name) ? r.name : 'home';
     if (name === 'sws') { const pre = SWS.decodeHash((location.hash.split('~')[1] || '')); history.replaceState(null, '', '#profile'); name = 'profile'; r.a = null; setTimeout(() => SWS.open(pre || {}), 300); }
     if (name === 'admin' && !STORE.isAdmin() && !(r.a && STORE.canEditTrack(STORE.getTrack(r.a)))) name = STORE.getTracks().some(tr => STORE.canEditTrack(tr)) ? 'admin' : 'home';
+    // '#home' and an empty address: the first tab of the navigation (without the AI here — the claude.ai preview — the feed)
+    { const to = NAV.resolve(name), ok = to !== 'ai' || STORE.hasAuth, dest = ok ? to : 'feed'; if (dest !== name) { name = dest; if (location.hash && location.hash !== '#' + name) { history.replaceState(null, '', '#' + name); routeHash = location.hash; } } }
     APP.route = name; APP.a = r.a; APP.b = r.b; APP.c = r.c;
     if (typeof STORE !== 'undefined' && STORE.track) { const pp = { route: name }; if (r.a && name !== 'lab') pp.a = String(r.a).slice(0, 60); STORE.track('page', pp); }
-    for (const p of PAGES) { const pg = $('pg-' + p); if (pg) pg.hidden = p !== name; } if (name === 'layout') $('pg-track').hidden = false;
+    { const show = NAV.pageOf(name); for (const p of PAGES) { const pg = $('pg-' + p); if (pg) pg.hidden = p !== show; } } if (name === 'layout') $('pg-track').hidden = false;
+    { const d = $('haiHist'); if (d && !d.hidden) d.hidden = true; }   // the chats drawer closes on any move
     if (typeof syncLand === 'function') syncLand();
-    for (const a of document.querySelectorAll('.nav a[data-route], .tabbar a[data-route]')) a.classList.toggle('active', a.dataset.route === name || (name === 'track' || name === 'layout') && a.dataset.route === 'tracks' || name === 'driver' && a.dataset.route === 'profile' || name === 'help' && a.dataset.route === 'lab' && a.closest('.tabbar'));
+    for (const a of document.querySelectorAll('.nav a[data-route], .tabbar a[data-route]')) a.classList.toggle('active', a.dataset.route === name || (name === 'track' || name === 'layout') && a.dataset.route === 'tracks' || name === 'help' && a.dataset.route === 'lab' && a.closest('.tabbar') || name === 'driver' && a.dataset.route === 'feed');
     window.scrollTo({ top: 0 });
-    if (name === 'home') await renderHomePage();
+    if (name === 'home' || name === 'start') await renderStartPage();
+    else if (name === 'feed') await renderHomePage();
     else if (name === 'tracks') await renderTracksPage();
     else if (name === 'track') await renderTrackPage(r.a, r.b);
     else if (name === 'layout') { history.replaceState(null, '', `#track~${r.a}~${r.b || ''}`.replace(/~$/, '')); $('pg-layout') && ($('pg-layout').hidden = true); $('pg-track').hidden = false; APP.route = 'track'; await renderTrackPage(r.a, r.b); }
@@ -6810,7 +7008,7 @@ async function renderShell() {
 }
 $('langEn').onclick = $('langEnM').onclick = () => { I18N.setLang('en'); renderShell(); route(); };
 $('langRu').onclick = $('langRuM').onclick = () => { I18N.setLang('ru'); renderShell(); route(); };
-$('tabUpload').onclick = () => UPLOAD.open(APP.route === 'lab' && LAB.tid ? { track: LAB.tid, layout: LAB.lid } : {});
+$('tabUpload').onclick = $('navUpload').onclick = () => UPLOAD.open(APP.route === 'lab' && LAB.tid ? { track: LAB.tid, layout: LAB.lid } : {});
 for (const a of document.querySelectorAll('.tabbar a, .tabbar button, .nav a')) a.addEventListener('pointerdown', () => NATIVE.haptic('light'), { passive: true });
 // ---------- the native shell (the iOS / Android app is a Capacitor wrapper around this site): deep links bring sign-in back from the
 // system browser, files opened "in Hutka" land in the upload window, and the splash screen goes away once the page is up ----------
@@ -7060,7 +7258,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.38';
+const APP_VERSION = 'v34.39';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -11512,7 +11710,7 @@ function drawPreview(cv, pv, color) {
 }
 // the last feed render, so a card computed in the background (CARDS.run) can refresh its post in place
 const HOME = { last: null,
-  refreshPost(id, card) { const L = HOME.last; if (!L || APP.route !== 'home') return; const pub = L.pubs.find(s => s.id === id), old = document.querySelector(`#homeFeed .post[data-sid="${CSS.escape(id)}"]`); if (!pub || !old) return; pub.card = card; old.replaceWith(postCard(pub, L.names, L.counts[id], { group: (L.groupOf || {})[id] || null })); } };
+  refreshPost(id, card) { const L = HOME.last; if (!L || $('pg-home').hidden) return; const pub = L.pubs.find(s => s.id === id), old = document.querySelector(`#homeFeed .post[data-sid="${CSS.escape(id)}"]`); if (!pub || !old) return; pub.card = card; old.replaceWith(postCard(pub, L.names, L.counts[id], { group: (L.groupOf || {})[id] || null })); } };
 // ---------- the landing for guests: a real session on the satellite picture of its track — the Lab's own map, live — then the promo pictures ----------
 const LANDING = {
   timer: 0, idx: 0, slides: [], ex: null, live: null, wired: false, capHtml: '', fellBack: false, waitT: 0, promoT: 0,
@@ -11649,7 +11847,18 @@ const LANDING = {
     const dots = $('ldDots').children; for (let i = 0; i < dots.length; i++) dots[i].classList.toggle('on', i === LANDING.idx);
     if (user) LANDING.start();
   },
-  start() { LANDING.stop(); const tick = () => { const s = LANDING.slides[LANDING.idx]; LANDING.timer = setTimeout(() => { if (document.visibilityState === 'visible' && APP.route === 'home' && !$('landing').hidden) LANDING.show(LANDING.idx + 1); tick(); }, s && s.kind === 'map' && s.k === 0 ? 6000 : 4500); }; tick(); },
+  // on screen: the landing is shown and the page it lives on is the one in view
+  on() { const L = $('landing'); if (!L || L.hidden) return false; const pg = L.closest('.page'); return !!pg && !pg.hidden; },
+  // the landing where NAV put it: the hero remembered from the last visit at once, then the live one picked from the feed; steps — the three steps under it
+  mineN: 0,
+  async showIn(steps, mineN) {
+    LANDING.mineN = mineN || 0; const Ld = $('landing'); Ld.hidden = false; Ld.querySelector('.ld-steps').hidden = !steps;
+    if (!LANDING.ex) { const h = LANDING.cached(); if (h) { try { await LANDING.render([h], null); } catch (e) { console.error('landing', e); } } }
+    const pubs = STORE.hasDb ? await STORE.recentPublished(100).catch(() => []) : [], C = STORE.hasDb ? await STORE.siteCounts().catch(() => null) : null;
+    if (!LANDING.on()) return;
+    try { await LANDING.render(pubs, C); } catch (e) { console.error('landing', e); }
+  },
+  start() { LANDING.stop(); const tick = () => { const s = LANDING.slides[LANDING.idx]; LANDING.timer = setTimeout(() => { if (document.visibilityState === 'visible' && LANDING.on()) LANDING.show(LANDING.idx + 1); tick(); }, s && s.kind === 'map' && s.k === 0 ? 6000 : 4500); }; tick(); },
   stop() { clearTimeout(LANDING.timer); LANDING.timer = 0; },
   // the hero remembered from the last visit: the next visit starts loading it before the feed has even been asked for
   cached() { try { const h = JSON.parse(localStorage.getItem('hutka.hero') || 'null'); return h && h.id && h.card ? h : null; } catch (e) { return null; } },
@@ -11660,11 +11869,12 @@ const LANDING = {
     const ex = LANDING.pick(pubs), trk = ex ? STORE.getTrack(ex.track) : null, fresh = !ex || !LANDING.ex || LANDING.ex.id !== ex.id;
     LANDING.ex = ex;
     const caption = (who) => { LANDING.capHtml = `<b>${esc(trk ? trk.name : ex.trackName || '')}</b> · ${esc(who || t('a driver'))} · ${esc(fmtMs(ex.bestMs))} · ${esc(t('{n} laps', { n: ex.nLaps || 0 })).replace(/ /g, ' ')}`; };
-    if (ex) { if (!STORE.hasIdentity) $('ldDemo').href = '#lab~' + ex.id; $('ldMap').hidden = false; $('ldMap').title = t('Open this session in the Lab'); $('ldMap').onclick = () => { location.hash = '#lab~' + ex.id; }; caption(ex.who || ''); }
-    else { $('ldMap').hidden = true; if (!STORE.hasIdentity) $('ldDemo').href = '#tracks'; LANDING.capHtml = ''; }
+    if (ex) { $('ldMap').hidden = false; $('ldMap').title = t('Open this session in the Lab'); $('ldMap').onclick = () => { location.hash = '#lab~' + ex.id; }; caption(ex.who || ''); }
+    else { $('ldMap').hidden = true; LANDING.capHtml = ''; }
     const pr = $('ldProof'); if (C) { pr.innerHTML = ''; const rows = STORE.hasIdentity ? [[C.tracks, t('tracks')], [C.sessions, t('sessions')], [C.drivers, t('drivers')], [C.laps, t('laps analysed')]] : [[C.tracks, t('tracks')], [C.laps, t('laps analysed')], [C.published, t('sessions published')]]; for (const [v, k] of rows) if (v) { const sp = el('span'); sp.innerHTML = `<b>${esc(String(v))}</b> ${esc(k)}`; pr.appendChild(sp); } }
     // a signed-in driver: the second button leads to their own library, the copy stays
-    { const d = $('ldDemo'), sp = d.querySelector('span'); if (STORE.hasIdentity) { d.href = '#lab'; if (sp) sp.textContent = t('My sessions'); } else if (sp) sp.textContent = t('Open a live example'); }
+    // the second button: a driver with sessions — his own library; anyone else (a guest, a driver before his first upload) — the live example
+    { const d = $('ldDemo'), sp = d.querySelector('span'), own = STORE.hasIdentity && LANDING.mineN > 0; if (own) { d.href = '#lab'; if (sp) sp.textContent = t('My sessions'); } else { d.href = ex ? '#lab~' + ex.id : '#tracks'; if (sp) sp.textContent = t('Open a live example'); } }
     // the drawn card goes up at once (the lap line with its points on the dark ground) and the live map on the imagery fades in over it when
     // its tiles are in — not a bare blue box for the seconds the imagery takes
     if (fresh) { LANDING.live = null; LANDING.fellBack = false; $('ldLive').classList.remove('on'); $('ldLive').innerHTML = ''; LANDING.idx = 0; const cv = $('ldCanvas'); cv.width = cv.width; if (ex && ex.card) LANDING.draw(cv, ex.card); $('ldMap').classList.toggle('ld-wait', !!ex); clearTimeout(LANDING.waitT); if (ex) LANDING.waitT = setTimeout(LANDING.fallback, 12000); clearTimeout(LANDING.promoT); LANDING.promoT = setTimeout(LANDING.loadPromo, 6000); }
@@ -11672,12 +11882,12 @@ const LANDING = {
     if (!ex) LANDING.loadPromo();
     LANDING.start();
     if (!LANDING.wired) { LANDING.wired = true;
-      window.addEventListener('resize', () => { if (APP.route !== 'home' || $('landing').hidden || !LANDING.ex) return; if (LANDING.fellBack) LANDING.draw($('ldCanvas'), LANDING.ex.card); const L = LANDING.live; if (L && L.map) { L.map.fit(); L.map.draw(); if (L.k) LANDING.camera(L.k); } });
+      window.addEventListener('resize', () => { if (!LANDING.on() || !LANDING.ex) return; if (LANDING.fellBack) LANDING.draw($('ldCanvas'), LANDING.ex.card); const L = LANDING.live; if (L && L.map) { L.map.fit(); L.map.draw(); if (L.k) LANDING.camera(L.k); } });
       const box = $('ldMap'); let x0 = null, y0 = null;   // a swipe moves between the slides
       box.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
       box.addEventListener('touchend', (e) => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) LANDING.show(LANDING.idx + (dx < 0 ? 1 : -1), true); }, { passive: true }); }
     // the live map comes in the background: the feed below must not wait for a session to load; a failure leaves the drawn card
-    if (ex && fresh) LANDING.buildLive(ex).then((L) => { if (LANDING.ex !== ex) return; if (L && !LANDING.live && APP.route === 'home') { LANDING.live = L; LANDING.mount(L); } else if (!L) LANDING.fallback(); }).catch((e) => { console.warn('landing: live map', e); if (LANDING.ex === ex) LANDING.fallback(); });
+    if (ex && fresh) LANDING.buildLive(ex).then((L) => { if (LANDING.ex !== ex) return; if (L && !LANDING.live && LANDING.on()) { LANDING.live = L; LANDING.mount(L); } else if (!L) LANDING.fallback(); }).catch((e) => { console.warn('landing: live map', e); if (LANDING.ex === ex) LANDING.fallback(); });
     // the driver's name (one lookup) and the hero remembered for the next visit
     if (ex && !ex.who) { try { const who = (await STORE.names([ex.owner]))[ex.owner]; if (LANDING.ex === ex) { caption(who ? who.name : ''); LANDING.labels(LANDING.slides[LANDING.idx]); LANDING.remember(ex, who ? who.name : '', trk ? trk.name : ''); } } catch (e) {} }
     else if (ex) LANDING.remember(ex, ex.who, trk ? trk.name : ex.trackName);
@@ -11687,25 +11897,16 @@ async function renderHomePage() {
   $('homeSub').textContent = t('Upload a session — every corner, compared with the fastest on the same layout.');
   $('homeUpload').onclick = () => UPLOAD.open({});
   $('homeSignIn').hidden = !(STORE.hasAuth && !STORE.hasIdentity); $('homeSignIn').onclick = () => AUTH.open();
-  // the app: one soft question about pushes for a signed-in driver (the system dialog follows "Turn on"; "Not now" asks again in a week)
-  { const ask = $('pushAsk'); ask.hidden = !(NATIVE.on && NATIVE.push.shouldAsk());
-    $('pushYes').onclick = async () => { NATIVE.haptic('light'); ask.hidden = true; const ok = await NATIVE.push.enable(); toast(ok ? t('Pushes are on.') : t('Pushes are off — turn them on in the phone settings when you want them.')); };
-    $('pushLater').onclick = () => { NATIVE.push.later(); ask.hidden = true; }; }
+  pushAskAt($('pg-home'), document.querySelector('#pg-home .home-grid'));
   const feed = $('homeFeed'); feed.innerHTML = '';
   for (let i = 0; i < 3; i++) { const sk = el('div', 'post skel'); sk.style.height = '220px'; feed.appendChild(sk); }
-  // a guest sees the landing at once — with the hero remembered from the last visit already loading — before the feed has been asked for
-  const landing0 = !!STORE.hasDb;
-  if (landing0) { document.querySelector('#pg-home .home-hero').hidden = true; $('landing').hidden = false; const h = LANDING.cached(); if (h) { try { await LANDING.render([h], null); } catch (e) { console.error('landing', e); } } }
+  document.querySelector('#pg-home .home-hero').hidden = !!STORE.hasDb;   // the old hero only for the preview with no database
   // 100 most recent published sessions — one driver uploading 30 files in a row must not push everyone else out of the feed (they fold into one post below)
   const pubs = STORE.hasDb ? await STORE.recentPublished(100) : [];
   const C = STORE.hasDb ? await STORE.siteCounts() : null;
   await STORE.socialAvailable();
   const names = await STORE.names(pubs.map(s => s.owner)), counts = await STORE.socialCounts(pubs.map(s => s.id));
   for (const tid of new Set(pubs.map(s => s.track).filter(Boolean))) await STORE.getLayouts(tid);
-  // everyone sees the landing hero (the live session on its track, then the product pictures); the three steps are for guests, a signed-in driver knows them
-  const guest = !STORE.hasIdentity, showLanding = !!STORE.hasDb;
-  document.querySelector('#pg-home .home-hero').hidden = showLanding; $('landing').hidden = !showLanding; document.querySelector('#landing .ld-steps').hidden = !guest;
-  if (showLanding) { try { await LANDING.render(pubs, C); } catch (e) { console.error('landing', e); } } else LANDING.stop();
   // hero stats
   // site-wide totals from hutka_counts; without the function (older database) — what the feed slice shows
   { const st = $('homeStats'); st.innerHTML = ''; const drivers = C ? C.drivers : new Set(pubs.map(s => s.owner)).size, laps = C ? C.laps : pubs.reduce((a, s) => a + (s.nLaps || 0), 0), nSess = C ? C.sessions : pubs.length; for (const [k, v] of [[t('Tracks'), C ? C.tracks : STORE.getTracks().length], [t('Sessions'), nSess], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="v">${v}</div><div class="k">${esc(k)}</div>`; st.appendChild(d); } }
@@ -11767,6 +11968,46 @@ function postCard(s, names, cnt, opts) {
 }
 function layoutName(tid, lid) { const l = STORE.getLayout(tid, lid); return l ? l.name : lid; }
 $('homeUpload').onclick = () => UPLOAD.open({});
+
+// the app: one soft question about pushes for a signed-in driver (the system dialog follows "Turn on"; "Not now" asks again in a week) —
+// on the first screen (Hutka AI) and on the feed: the card moves to the page in view
+function pushAskAt(host, before) {
+  const ask = $('pushAsk'); if (!ask || !host) return; if (ask.parentElement !== host || ask.nextElementSibling !== before) host.insertBefore(ask, before || null);
+  ask.hidden = !(NATIVE.on && NATIVE.push.shouldAsk());
+  $('pushYes').onclick = async () => { NATIVE.haptic('light'); ask.hidden = true; const ok = await NATIVE.push.enable(); toast(ok ? t('Pushes are on.') : t('Pushes are off — turn them on in the phone settings when you want them.')); };
+  $('pushLater').onclick = () => { NATIVE.push.later(); ask.hidden = true; };
+}
+// ---------- a driver's last session as one card: the lap with its corners, the numbers, one button — where the time went (Hutka AI on it) ----------
+function lastSessionCard(m, onGo) {
+  const tr = STORE.getTrack(m.track), lay = m.track && m.layout && m.layout !== 'custom' ? STORE.getLayout(m.track, m.layout) : null;
+  const c = el('div', 'card last-card'); c.appendChild(el('div', 'lc-k', t('Your last session')));
+  const b = el('div', 'lc-b'), pv = el('div', 'lc-pv'), cv = document.createElement('canvas'); pv.appendChild(cv);
+  const pic = m.card && m.card.v && m.card.pts ? m.card : m.preview;
+  if (pic && pic.pts) { requestAnimationFrame(() => drawPreview(cv, pic)); if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (cv.isConnected) drawPreview(cv, pic); }); ro.observe(pv); } } else pv.appendChild(svgUse('i-track'));
+  const tx = el('div', 'lc-t'), name = lay ? lay.name : (tr ? tr.name : (m.trackName || t('Custom track')));
+  tx.append(el('b', '', name), el('span', '', [lay && tr ? tr.name : '', fmtDate(m.date)].filter(Boolean).join(' · ')));
+  const n = el('div', 'lc-n'), num = (k, v) => { const s = el('span'); s.append(el('i', '', k), el('b', '', v)); n.appendChild(s); };
+  num(t('best lap'), fmtMs(m.bestMs)); num(t('laps'), String(m.nLaps || 0)); if (m.card && m.card.total) num(t('reserve'), m.card.total.toFixed(2) + ' ' + t('s'));
+  tx.appendChild(n); b.append(pv, tx); b.title = t('Open in the Lab'); b.onclick = () => { location.hash = '#lab~' + m.id; };
+  const go = el('button', 'btn primary lc-go'); go.type = 'button'; go.innerHTML = `<svg><use href="#i-spark"/></svg><span>${esc(t('Where do I lose time?'))}</span>`;
+  go.onclick = async () => { go.classList.add('busy'); try { await onGo(m); } finally { go.classList.remove('busy'); } };
+  const acts = el('div', 'lc-acts'); acts.appendChild(go); c.append(b, acts); return c;
+}
+// ---------- How it works (navigation variant A's first tab) and the adaptive Home (variant C) ----------
+// A: the live example, the three steps and how to talk to Hutka AI, for everyone. C: the same for a newcomer; a driver with sessions gets
+// his own instead — the last session (where the time went: one tap to the AI), the progress charts, the questions to ask.
+async function renderStartPage() {
+  const mine = STORE.hasIdentity && STORE.hasDb ? await STORE.mySessions().catch(() => []) : [];
+  const own = NAV.v === 'c' && mine.length > 0, box = $('startMine');
+  $('startLanding').hidden = own; box.hidden = !own;
+  if (own) {
+    LANDING.stop(); box.innerHTML = ''; if (mine[0].track) await STORE.getLayouts(mine[0].track).catch(() => []);
+    box.appendChild(lastSessionCard(mine[0], (m) => { HAI.queue({ act: 'session', sid: m.id }); location.hash = '#ai'; }));
+    const pc = el('div', 'card'); pc.innerHTML = `<h2><svg><use href="#i-trend"/></svg><span>${esc(t('My progress'))}</span></h2>`; const pb = el('div'); pc.appendChild(pb); box.appendChild(pc);
+    if (!renderProgress(pb, mine, { max: 2 })) pc.hidden = true;
+  } else await LANDING.showIn(true, mine.length);
+  await HAI.examples($('startEx'), { mine, here: false, last: own });
+}
 // ---------- AI coach: chats with memory of the driver's sessions; credits and the Pro plan ----------
 const AI = { chats: [], cur: null, msgs: [], wallet: null, busy: false, ctl: null, newCtx: '' };
 const AI_RULES_V2 = () => `You are Hutka's racing coach: an analyst of karting telemetry (Alfano and similar loggers). Most sessions are rental karts (Sodi RT8/RT10-class, ~70–80 km/h); a session may name a sport kart (Rotax, X30, KZ…) — a different world with far higher speeds and later deceleration points: never compare times across kart classes and fit the advice to the class named. Everything you say must come from the data below: the driver's own sessions, the corner-by-corner breakdown of the session this chat is about (if any), and the fastest published laps of other drivers on the same layouts. Corners T1…Tn are numbered from the start/finish line; points are metres from S/F, speeds in km/h. Compare the driver with the fast published laps when the layout matches; say which corners and what exactly (where the kart starts slowing, apex speed, where it starts accelerating, exit speed). All points come from the GPS speed, not from pedal sensors: speak of deceleration and acceleration — never of pressing or releasing the brake or the throttle. If a question needs data that is not here (another session, video, kart setup, a line more precise than ±1 m), say so and tell the driver what to upload or publish. Never invent numbers or corners. Always name corners as T<number> (T7, T12) — the app turns them into markers on the lap map. Be compact: lead with the one thing that matters, then at most three corners, one or two lines each with the numbers (decel / apex / accel / exit); about 180 words, never more than 260, unless the driver asks for a full breakdown. Finish every sentence — no trailing lists. Answer in ${I18N.lang === 'ru' ? 'Russian' : 'English'}, plain language, no headings or tables; short lists are fine. Address the driver as "you".`;
@@ -12050,11 +12291,45 @@ async function renderAIPage(a, b) {
   $('haiSoon').hidden = on; if (!on) $('haiSoonText').innerHTML = `<span class="soon">${esc(t('coming soon'))}</span> ${esc(t('The chat is being connected. The ideal lap already works.'))}`;
   if (a === 'paid') { toast(t('Payment received — credits appear within a few seconds.')); setTimeout(() => renderWallet(true), 2500); history.replaceState(null, '', '#ai'); a = null; }
   if (on && STORE.hasIdentity) { renderWallet(false).then(renderAiNote).catch(() => {}); STORE.chats().then(cs => { AI.chats = cs || []; renderChatList(); }).catch(() => {}); }
-  aiLayField().catch(() => {});
+  await aiTop();
   if (a === 'new') { newChat(); if (b) { const m = await STORE.getSessionMeta(b).catch(() => null); if (m) await actSession(m, true); } }
   else if (a === 'ideal' && b) { newChat(); const [tid, lid] = String(b).split('.'); await actIdeal(tid, lid); }
   else if (a && /^\d+$/.test(a)) { const cs = AI.chats.length ? AI.chats : (STORE.hasIdentity ? await STORE.chats().catch(() => []) : []); AI.chats = cs || []; const c = AI.chats.find(x => String(x.id) === a); if (c) await openChat(c); }
   renderLog(); renderAiNote();
+  if (pending) { const j = pending; pending = null; newChat(); await runJob(j); }   // a question asked from another page (How it works, Home)
+}
+// the top of the page before a conversation: someone with no sessions — upload the first (navigation B: the live example and the three
+// steps); a driver with sessions — his last one, one tap to where the time went; then the four answers and the questions to try
+let pending = null;
+async function aiTop() {
+  const mine = STORE.hasIdentity && STORE.hasDb ? await STORE.mySessions().catch(() => []) : [];
+  const intro = NAV.landingAt === 'haiIntro' && !mine.length;
+  $('haiIntro').hidden = !intro; $('haiUp').hidden = intro || mine.length > 0;
+  if (mine.length && mine[0].track) await STORE.getLayouts(mine[0].track).catch(() => []);   // the layout's own name on the card
+  const last = $('haiLast'); last.innerHTML = ''; last.hidden = !mine.length; if (mine.length) last.appendChild(lastSessionCard(mine[0], (m) => { newChat(); return actSession(m); }));
+  $('hai').classList.toggle('fresh', !mine.length);
+  for (const x of document.querySelectorAll('#haiActs [data-act="progress"]')) x.hidden = !mine.length;
+  await aiLayField().catch(() => {});
+  if (intro) LANDING.showIn(true, 0).catch(() => {}); else if (!LANDING.on()) LANDING.stop();
+  pushAskAt($('hai'), $('haiHello'));
+  await examples($('haiEx'), { mine, here: true, last: mine.length > 0 });
+}
+// what to ask: examples of how one talks to it (a tap asks); on another page a tap opens Hutka AI and asks there
+async function examples(box, o) {
+  await aiLayField().catch(() => {}); box.innerHTML = '';
+  const mine = o.mine || [], L = AI.lay, lay = L ? STORE.getLayout(L.tid, L.lid) : null, list = [];
+  if (mine.length && !o.last) list.push({ q: t('Where do I lose time in my last session?'), job: { act: 'session' } });
+  if (lay) list.push({ q: t('How do I drive {name}?', { name: lay.name }), job: { act: 'ideal' } });
+  list.push({ q: t('How do I take a hairpin faster?'), job: { act: 'ask' } });
+  list.push(mine.length ? { q: t('What got better since my first session?'), job: { act: 'progress' } } : { q: t('How do I drive a track I have never been to?'), job: { act: 'track' } });
+  for (const x of list) { const b = el('button'); b.type = 'button'; b.append(svgUse('i-spark'), el('span', '', x.q)); b.onclick = () => { const job = Object.assign({ text: x.q }, x.job); if (o.here) { newChat(); runJob(job); } else { pending = job; location.hash = '#ai'; } }; box.appendChild(b); }
+}
+async function runJob(j) {
+  if (j.act === 'ideal') await actIdeal(j.tid, j.lid);
+  else if (j.act === 'session') { const m = j.sid ? await STORE.getSessionMeta(j.sid).catch(() => null) : null; await actSession(m || undefined); }
+  else if (j.act === 'progress') await actProgress();
+  else if (j.act === 'track') actTrack();
+  else if (j.text) aiSend(j.text);
 }
 // fair-use replies from the ask function, in words
 function aiLimitText2(e) {
@@ -12069,7 +12344,8 @@ async function renderWallet(fresh) { const w = await STORE.wallet(fresh); AI.wal
 // ---- the conversation on screen
 function newChat() { if (AI.ctl) AI.ctl.abort(); AI.cur = null; AI.log = []; AI.ctx = {}; AI.busy = false; if (/^#ai~/.test(location.hash)) history.replaceState(null, '', '#ai'); renderLog(); renderAiNote(); }
 async function openChat(c) {
-  newChat(); AI.cur = c; AI.ctx = { sid: c.session_id || '', layouts: c.track_id && c.layout_id && c.layout_id !== 'custom' ? [c.track_id + '|' + c.layout_id] : [] };
+  newChat(); if (location.hash !== '#ai~' + c.id) history.replaceState(null, '', '#ai~' + c.id);   // the address names the chat on screen
+  AI.cur = c; AI.ctx = { sid: c.session_id || '', layouts: c.track_id && c.layout_id && c.layout_id !== 'custom' ? [c.track_id + '|' + c.layout_id] : [] };
   renderLog(true);
   const ms = await STORE.chatMessages(c.id).catch(() => []); if (AI.cur !== c) return;
   AI.log = ms.map(m => ({ t: m.role === 'user' ? 'user' : 'ai', content: m.content, at: m.created_at }));
@@ -12116,10 +12392,10 @@ function aiMiniMap(text) {
   return cv;
 }
 function renderLog(loading) {
-  const log = $('haiLog'); log.innerHTML = ''; $('hai').classList.toggle('talking', AI.log.length > 0 || !!loading);
-  $('haiChatHead').hidden = !(AI.cur || AI.log.length); $('haiTitle').textContent = AI.cur ? (AI.cur.title || t('Chat')) : '';
+  const log = $('haiLog'); log.innerHTML = ''; const talking = AI.log.length > 0 || !!loading; $('hai').classList.toggle('talking', talking);
+  $('haiNew').hidden = !(AI.cur || AI.log.length); $('haiTitle').textContent = AI.cur ? (AI.cur.title || t('Chat')) : ''; $('haiEx').hidden = talking; log.hidden = !talking;
   if (loading) { log.appendChild(el('div', 'msg ai thinking', t('Loading…'))); return null; }
-  if (!AI.log.length) { const e = el('div', 'ai2-empty'); e.textContent = t('Tap a button above, or ask anything: how to take a corner, why you lose time, how to drive a track you have never been to.'); log.appendChild(e); return null; }
+  if (!AI.log.length) return null;
   let last = null; const sid = aiLabSid();
   for (const m of AI.log) {
     if (m.t === 'card') { log.appendChild(m.node); last = m.node; continue; }
@@ -12204,7 +12480,7 @@ async function aiLayField() {
   if (AI.lay) { try { await STORE.getLayouts(AI.lay.tid); } catch (e) {} }   // the layout's own name, not its id
   aiLayShow();
 }
-function aiLayShow() { const L = AI.lay, tr = L ? STORE.getTrack(L.tid) : null, l = L ? STORE.getLayout(L.tid, L.lid) : null; $('haiLayName').textContent = L ? (l ? l.name : L.lid) : t('No layouts yet.'); $('haiLayTrack').textContent = tr ? tr.name : ''; }
+function aiLayShow() { const L = AI.lay, tr = L ? STORE.getTrack(L.tid) : null, l = L ? STORE.getLayout(L.tid, L.lid) : null; $('haiLayName').textContent = L ? (l ? l.name : L.lid) : t('No layouts yet.'); $('haiLayTrack').textContent = tr ? tr.name : ''; $('haiIdealSub').textContent = L ? [l ? l.name : L.lid, tr ? tr.name : ''].filter(Boolean).join(' · ') : t('How the fastest drive each corner'); }
 function aiSetLay(tid, lid) { AI.lay = { tid, lid, cls: (AI.lay && AI.lay.cls) || 'rental' }; try { localStorage.setItem('hutka.ai.lay', JSON.stringify(AI.lay)); } catch (e) {} aiLayShow(); }
 // the layouts to choose from, by track: the driver's own first (★), each saying whether real laps or a forecast stand behind its ideal
 async function aiLaySheet(onPick) {
@@ -12523,14 +12799,15 @@ async function idealFromLoop(lp, cw, note) {
 
 // ---- wiring
 for (const b of document.querySelectorAll('#haiActs .ai2-act')) b.onclick = async () => { const a = b.dataset.act; b.classList.add('busy'); try { if (a === 'ideal') await actIdeal(); else if (a === 'session') await actSession(); else if (a === 'progress') await actProgress(); else if (a === 'track') actTrack(); } finally { b.classList.remove('busy'); } };
-$('haiNew').onclick = () => newChat();
+$('haiNew').onclick = () => { newChat(); aiTop().catch(() => {}); };
+$('haiUpBtn').onclick = () => UPLOAD.open({});
 $('haiGo').onclick = async () => { const b = $('haiGo'); b.classList.add('busy'); try { await actIdeal(); } finally { b.classList.remove('busy'); } };
 $('haiLay').onclick = () => aiLaySheet();
 $('haiLayX').onclick = () => { $('haiLaySheet').hidden = true; }; $('haiLaySheet').addEventListener('click', (e) => { if (e.target === $('haiLaySheet')) $('haiLaySheet').hidden = true; });
 $('haiInput').addEventListener('input', () => { $('haiSend').classList.toggle('primary', !!$('haiInput').value.trim()); });
 $('haiHistBtn').onclick = () => { renderChatList(); $('haiHist').hidden = false; if (STORE.hasIdentity && STORE.aiOn) { renderWallet(false).catch(() => {}); STORE.chats().then(cs => { AI.chats = cs || []; renderChatList(); }).catch(() => {}); } };
 $('haiHistX').onclick = () => { $('haiHist').hidden = true; }; $('haiHist').addEventListener('click', (e) => { if (e.target === $('haiHist')) $('haiHist').hidden = true; });
-$('haiHistNew').onclick = () => { $('haiHist').hidden = true; newChat(); };
+$('haiHistNew').onclick = () => { $('haiHist').hidden = true; newChat(); if (/^#ai~/.test(location.hash) || APP.route !== 'ai') location.hash = '#ai'; aiTop().catch(() => {}); };
 $('haiSend').onclick = () => aiSend(); $('haiStop').onclick = () => { if (AI.ctl) AI.ctl.abort(); };
 $('haiInput').addEventListener('input', aiGrow);
 $('haiInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && !isPhone()) { e.preventDefault(); aiSend(); } });
@@ -12545,7 +12822,9 @@ $('haiInput').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.s
     if (!refreshed && STORE.me && STORE.me.canEdit && STORE.hasDb) { refreshed = true; setTimeout(() => { BRAINS.allAtlases('rental').catch(() => {}).then(() => BRAINS.allAtlases('sport')).catch(() => {}); }, 2000); }
   }
   function off() { $('hai').hidden = true; $('aiOld').hidden = false; }
-  return { on, render, off };
+  // from other pages: a question to ask once Hutka AI opens; the example questions for a box of their own
+  const queue = (job) => { pending = job; };
+  return { on, render, off, queue, examples };
 })();
 // ---------- SWS (Sodi World Series): the driver's own results, brought over from their SWS page ----------
 // SWS pages sit behind a captcha for servers, so the data comes from the driver's own browser: a bookmarklet on the SWS
@@ -12666,11 +12945,14 @@ for (const id of ['onbFirst', 'onbLast', 'onbWeight']) $(id).addEventListener('k
 async function renderProfile() {
   const me = STORE.me, prof = (STORE.hasIdentity ? await STORE.profile(me.id) : STORE.localProfile()) || {};
   pendingAvatar = undefined;
-  $('profAvatar').src = await myAvatar();
+  $('profAvatar').src = $('profAvatarEd').src = await myAvatar();
   $('profName').textContent = prof.racingName || me.name || t('Guest');
+  // a signed-in driver changes his profile in a sheet; a guest is asked to sign in (where there is sign-in)
+  { const guest = !STORE.hasIdentity && STORE.hasAuth; $('profEditBtn').hidden = guest; $('profSignIn').hidden = !guest; $('profSignIn').onclick = () => AUTH.open(); }
+  $('profEditBtn').onclick = () => { setStatus('profStatus', ''); $('profEditSheet').hidden = false; };
   const home = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null;
   $('profMeta').textContent = STORE.hasIdentity ? [me.canEdit ? t('Hutka admin') : t('Driver'), prof.country ? flag(prof.country) + ' ' + countryName(prof.country) : '', home ? t('Home track: {name}', { name: home.name }) : '', personBits(prof)].filter(Boolean).join(' · ') : t('Guest — this library lives in this browser only');
-  $('profSub').textContent = STORE.hasIdentity ? t('Your name and photo are what other drivers see next to your laps.') : (STORE.hasAuth ? t('Sign in to get a library that works on every device and to publish sessions.') : t('Sign in to claude.ai and open the shared Hutka link to get an account that works on every device.'));
+  $('profSub').textContent = STORE.hasIdentity ? '' : (STORE.hasAuth ? t('Sign in to get a library that works on every device and to publish sessions.') : t('Sign in to claude.ai and open the shared Hutka link to get an account that works on every device.'));
   $('profSignOut').hidden = !(STORE.hasAuth && STORE.hasIdentity);
   fillCountries($('profCountry'), true); $('profCountry').value = prof.country || '';
   const trs = STORE.getTracks(); fillSelect($('profHome'), [['', '—']].concat(trs.map(x => [x.id, x.name])), prof.homeTrack || '');
@@ -12689,13 +12971,19 @@ async function renderProfile() {
       const back = STORE.hasIdentity ? await STORE.refreshProfile() : body;
       Object.assign(prof, back || body); pendingAvatar = undefined;
       setStatus('profStatus', t('Saved ✓ {when}', { when: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }), 'ok');
-      renderShell(); $('profName').textContent = prof.racingName || me.name || t('Guest'); $('profAvatar').src = await myAvatar();
+      renderShell(); $('profName').textContent = prof.racingName || me.name || t('Guest'); $('profAvatar').src = $('profAvatarEd').src = await myAvatar();
+      $('profEditSheet').hidden = true; toast(t('Profile saved.'));
       const h2 = prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null; $('profMeta').textContent = [me.canEdit ? t('Hutka admin') : t('Driver'), prof.country ? flag(prof.country) + ' ' + countryName(prof.country) : '', h2 ? t('Home track: {name}', { name: h2.name }) : '', personBits(prof)].filter(Boolean).join(' · ');
     } catch (e) { setStatus('profStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
     b.classList.remove('busy');
   };
-  $('profAvatarFile').onchange = async (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; try { pendingAvatar = await imageToDataUrl(f, 256, 60000); $('profAvatar').src = pendingAvatar; setStatus('profStatus', t('Press Save to keep the new photo.')); } catch (err) { setStatus('profStatus', t('Could not read the image.'), 'warn'); } e.target.value = ''; };
-  $('profAvatarClear').onclick = () => { pendingAvatar = null; $('profAvatar').src = STORE.me.avatarUrl || GENERIC_AVATAR; setStatus('profStatus', t('Press Save to keep the change.')); };
+  $('profAvatarFile').onchange = async (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; try { pendingAvatar = await imageToDataUrl(f, 256, 60000); $('profAvatarEd').src = pendingAvatar; setStatus('profStatus', t('Press Save to keep the new photo.')); } catch (err) { setStatus('profStatus', t('Could not read the image.'), 'warn'); } e.target.value = ''; };
+  $('profAvatarClear').onclick = () => { pendingAvatar = null; $('profAvatarEd').src = STORE.me.avatarUrl || GENERIC_AVATAR; setStatus('profStatus', t('Press Save to keep the change.')); };
+  for (const id of ['profNotify', 'profPush']) $(id).onchange = async () => {
+    const body = Object.assign({}, prof, { notify: $('profNotify').checked, push: $('profPush').checked });
+    try { await STORE.saveProfile(body); const back = STORE.hasIdentity ? await STORE.refreshProfile() : body; Object.assign(prof, back || body); setStatus('profFlagStatus', t('Saved ✓'), 'ok'); setTimeout(() => setStatus('profFlagStatus', ''), 2500); }
+    catch (e) { $(id).checked = !$(id).checked; setStatus('profFlagStatus', t('Could not save: {e}', { e: e && e.message || e }), 'warn'); }
+  };
   $('profSignOut').onclick = async () => { try { await NATIVE.push.forget(); } catch (e) {} try { await STORE.adapter.signOut(); } catch (e) {} STORE.reload(); };
   // the account: everything at once (delete-account.html lists what goes and what stays)
   $('profDanger').hidden = !(STORE.hasAuth && STORE.hasIdentity && STORE.adapter && STORE.adapter.deleteAccount);
@@ -12709,10 +12997,12 @@ async function renderProfile() {
   $('profUpload').onclick = () => UPLOAD.open({});
   // community numbers
   const sc = $('profSocialCard'); sc.hidden = !(STORE.hasIdentity && STORE.hasDb && await STORE.socialAvailable());
-  if (!sc.hidden) { const box = $('profSocial'); box.innerHTML = ''; try { const f = await STORE.followInfo(me.id, true), pubs = await publishedBy(me.id); let likes = 0; try { const sc2 = await STORE.socialCounts(pubs.slice(0, 50).map(s => s.id)); for (const k in sc2) likes += sc2[k].likes || 0; } catch (e) {} for (const [k, v] of [[t('Followers'), f.followers], [t('Following'), f.following], [t('Published'), pubs.length], [t('Likes'), likes]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${v}</div>`; box.appendChild(d); } } catch (e) {} $('profSocialHint').textContent = t('Your public page: other drivers see your published sessions, follow you and discuss your laps.'); const a = el('a', 'btn sm', t('Open my public page')); a.href = '#driver~' + me.id; a.style.marginTop = '8px'; $('profSocialHint').appendChild(document.createElement('br')); $('profSocialHint').appendChild(a); }
+  if (!sc.hidden) { const box = $('profSocial'); box.innerHTML = ''; try { const f = await STORE.followInfo(me.id, true), pubs = await publishedBy(me.id); let likes = 0; try { const sc2 = await STORE.socialCounts(pubs.slice(0, 50).map(s => s.id)); for (const k in sc2) likes += sc2[k].likes || 0; } catch (e) {} for (const [k, v] of [[t('Followers'), f.followers], [t('Following'), f.following], [t('Published sessions'), pubs.length], [t('Likes'), likes]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="k">${esc(k)}</div><div class="v">${v}</div>`; box.appendChild(d); } } catch (e) {} $('profSocialHint').textContent = ''; const a = el('a', 'btn sm ghost', t('Open my public page')); a.href = '#driver~' + me.id; $('profSocialHint').appendChild(a); }
   await renderMySessionsTable($('profSessions'), { hint: $('profSessHint'), sub: $('profSessSub') });
   try { renderProgress($('profProgress'), await STORE.mySessions(), { max: 3 }); } catch (e) { $('profProgress').hidden = true; }   // the progress charts: the three layouts with the most sessions
 }
+$('profEditX').onclick = () => { $('profEditSheet').hidden = true; };
+$('profEditSheet').addEventListener('click', (e) => { if (e.target === $('profEditSheet')) $('profEditSheet').hidden = true; });
 // ---------- my sessions: one table for the profile and the Lab start screen ----------
 async function renderMySessionsTable(box, opts) {
   opts = opts || {}; const list = await STORE.mySessions(); box.innerHTML = '';
@@ -13060,6 +13350,7 @@ const ADMIN = (() => {
 
 // ---------- boot ----------
 (async () => {
+  try { NAV.build(); } catch (e) { console.error('nav', e); }   // the tabs and the side menu of this navigation variant, before anything is translated
   I18N.applyStatic();
   $('q').placeholder = t('Search tracks, drivers...');
   try { if (typeof INTRO !== 'undefined') INTRO.play(); } catch (e) {}   // the app's opening plays over the start-up (the gate or Home appear under it)
@@ -13068,7 +13359,7 @@ const ADMIN = (() => {
   renderShell(); I18N.applyStatic();
   try { await ONBOARD.check(); } catch (e) {}
   try { AUTH.gate(); } catch (e) {}   // the app: sign in first
-  window.__hutka = { GEOM, LAB, STORE, APP, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, sameTrackName, lineOf, BRAIN, BRAINS, TRACKFIND, fitsLayout, DATA, KLL, readAnyLogger, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, LAB, STORE, APP, NAV, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, sameTrackName, lineOf, BRAIN, BRAINS, TRACKFIND, fitsLayout, DATA, KLL, readAnyLogger, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { if (typeof INTRO !== 'undefined') INTRO.ready(); } catch (e) {}   // the opening may finish: the app is up
