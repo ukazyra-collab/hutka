@@ -38,6 +38,7 @@ function isVenue(e: El): boolean {
   if (t.shop || t.office || t.craft) return false;
   if (Object.keys(t).some(k => /^(disused|abandoned|demolished|razed|was|removed):/.test(k))) return false;
   if (/^(no|closed)$/i.test(t.opening_hours || "") || t["end_date"]) return false;
+  if (/mini[- ]?auto|verkeerspark|kinderauto|trapauto|pedal ?kart|tretauto|kinderverkehr/i.test(tag(t, "name"))) return false;   // children's pedal-car and traffic parks
   return true;
 }
 // a venue's pieces ranked: the venue itself (sports centre), its track, a raceway drawn with a name, a pin
