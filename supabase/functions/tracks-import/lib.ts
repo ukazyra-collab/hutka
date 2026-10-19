@@ -35,8 +35,9 @@ const similar = (a: string, b: string) => { const x = nameKey(a), y = nameKey(b)
 // center, kartódromo, kartodrom, gokart, картинг, картодром, motokáry, mikroautorata — not Kartause, Kartoffel, kartano, Kartverket
 export const KART_NAME = /(^|[^\p{L}])(go[- ]?)?karts?(?![\p{L}])|karting|kartbahn|kartbaan|kartsport|kart[- ]?(center|centre|centrum|club|klub|arena|hall|halle|park|ring|land|world|zone|racing|track|circuit|bane|bana)|kart[oó]drom|kartdrom|gokart|go-kart|картинг|картодром|motok[aá]r|mikroauto/iu;
 export const kartName = (s: string) => KART_NAME.test(String(s || "")) && !/orient|kompass/i.test(String(s || ""));
-// children's karts, pedal cars and traffic parks (Mini-Karts, Kinderkartbahn, Kids Karts, Kart pour enfants, Pédale-Kart, verkeerspark)
-export const KIDS = /mini[- ]?auto|mini[- ]?kart|verkeerspark|kinder[- ]?(kart|auto|verkehr|bahn)|(^|[^\p{L}])kids?(?![\p{L}])|pour enfants|per bambini|para niños|p[ée]dal|trapauto|tretauto/iu;
+// children's karts, pedal cars and traffic parks (Mini-Karts, Minicars, Kinder-Elektrokartbahn, Kids Karts, Karting Enfants, Pédale-Kart,
+// per bambini, verkeerspark, автогородок)
+export const KIDS = /mini[- ]?auto|mini[- ]?kart|(^|[^\p{L}])mini[- ]?cars?(?![\p{L}])|verkeerspark|verkehrsgarten|kinder[- ]?\p{L}*(kart|quad|auto|verkehr|bahn)|(^|[^\p{L}])(kids?|enfants?)(?![\p{L}])|per bambini|para niños|p[ée]dal|trapauto|tretauto|автогородок|детск/iu;
 // a name saying the place is gone: "Ex Kartdromo", "Kartodromo (Abbandonato)", "ehemalige Kartbahn", "former karting"
 export const CLOSED = /(^|[^\p{L}])(ex|former|ehemalige?[rns]?|stillgelegte?[rns]?|abbandonat[oaie]|abandonn?ed|abandonn[ée]e?s?|disused|closed|chiuso|ferm[ée]e?|cerrad[oa]|desaparecid[oa]|zamknięty)(?![\p{L}])/iu;
 // which elements are venues: something with karting among its sports, or named for karts (a raceway, a track or a hall with no sport
