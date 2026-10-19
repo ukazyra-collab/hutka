@@ -1376,6 +1376,8 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 .ai2.talking .ai2-act b{font-size:13px;white-space:nowrap}
 .ai2.talking .ai2-who .sub{display:none}
 .ai2-laylist{display:flex;flex-direction:column;gap:6px}
+.adm-q{width:100%;height:40px;margin:0 0 10px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);font:inherit}
+.ai2-layq{width:100%;height:46px;margin:0 0 12px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px}
 .ai2-laylist h4{margin:10px 2px 2px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .ai2-laylist h4:first-child{margin-top:0}
 .ai2-lay{display:flex;align-items:center;gap:10px;min-height:48px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font:inherit;text-align:left;cursor:pointer}
@@ -2146,7 +2148,7 @@ input.sw:checked::after{transform:translateX(18px)}
     <section class="page" id="pg-admin" hidden>
       <div class="ph"><div><h1 data-t="Admin Panel">Admin Panel</h1><div class="sub" id="admSub"></div></div><div class="row"><button class="btn primary" id="admAddTrack" type="button"><svg><use href="#i-plus"/></svg><span data-t="Add track">Add track</span></button></div></div>
       <div class="admin-grid">
-        <div class="card"><h2><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></h2><div class="list" id="admTracks"></div><div id="admClaimsWrap"><h2 style="margin-top:18px"><svg><use href="#i-flag"/></svg><span data-t="Claim requests">Claim requests</span></h2><div class="list" id="admClaims"></div></div></div>
+        <div class="card"><h2><svg><use href="#i-track"/></svg><span data-t="Tracks">Tracks</span></h2><input class="adm-q" id="admTrackQ" type="search" autocomplete="off" data-tp="Find a track…" placeholder="Find a track…" aria-label="Find a track…" data-ta="Find a track…"><div class="list" id="admTracks"></div><div id="admClaimsWrap"><h2 style="margin-top:18px"><svg><use href="#i-flag"/></svg><span data-t="Claim requests">Claim requests</span></h2><div class="list" id="admClaims"></div></div></div>
         <div style="display:flex;flex-direction:column;gap:16px;min-width:0" id="admRight">
           <div class="empty" id="admEmpty"><svg><use href="#i-track"/></svg><div class="t" data-t="Pick a track to edit, or add one">Pick a track to edit, or add one</div></div>
           <div class="card" id="admImportCard" hidden><h2><svg><use href="#i-globe"/></svg><span data-t="Import tracks from OpenStreetMap">Import tracks from OpenStreetMap</span></h2>
@@ -2320,7 +2322,7 @@ input.sw:checked::after{transform:translateX(18px)}
 <!-- credits & plan modal -->
 <div class="modal" id="haiLaySheet" hidden><div class="box sheet ai2-laysheet">
   <div class="sheet-head"><h3 data-t="Which layout?">Which layout?</h3><button class="sheet-x" id="haiLayX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
-  <div class="sheet-body"><div class="ai2-laylist" id="haiLayList"></div></div>
+  <div class="sheet-body"><input class="ai2-layq" id="haiLayQ" type="search" autocomplete="off" data-tp="Find a track…" placeholder="Find a track…" aria-label="Find a track…" data-ta="Find a track…"><div class="ai2-laylist" id="haiLayList"></div></div>
 </div></div>
 <div class="modal drawer" id="haiHist" hidden><div class="box sheet ai2-hist">
   <div class="sheet-head"><h3 data-t="Chats">Chats</h3><button class="sheet-x" id="haiHistX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
@@ -4122,6 +4124,22 @@ const DATA = (() => {
     const step = Math.max(1, Math.round(M * 10 / len)), pts = []; for (let i = 0; i < M; i += step) { const q = applyT(T, [mean[i][0], -mean[i][1]]); pts.push({ x: q[0], y: q[1] }); }
     return { T, lengthM: Math.round(len), pts, W, H, mppImg: mppM, merc: { z, x0, y0 } };
   }
+  // a line from the map (OpenStreetMap: lat/lon round the loop, in order) in the frame a driven line gets — Web Mercator at zoom 19,
+  // its points in that frame's pixels — so sessions attach to it, satellite tiles sit under it and the map views draw it like a lap's
+  function geoLayout(ll) {
+    if (!ll || ll.length < 8) return null;
+    let la = 0, lo = 0; for (const p of ll) { la += p.lat; lo += p.lon; } la /= ll.length; lo /= ll.length;
+    const F = { lat0: la, lon0: lo, kx: 111320 * Math.cos(la * Math.PI / 180), ky: 110574, T: null };
+    const z = 19, mppM = MERC.mpp(F.lat0, z), [px0, py0] = MERC.px(F.lat0, F.lon0, z);
+    let minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+    for (const p of ll) { const [x, y] = MERC.px(p.lat, p.lon, z); if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y; }
+    const pad = 60, x0 = Math.floor(minx - pad), y0 = Math.floor(miny - pad), W = Math.ceil(maxx + pad) - x0, H = Math.ceil(maxy + pad) - y0;
+    const T = { s: 1 / mppM, c: 1, si: 0, tx: px0 - x0, ty: py0 - y0 };
+    const xy = ll.map(p => [(p.lon - F.lon0) * F.kx, (p.lat - F.lat0) * F.ky]);
+    let len = 0; for (let i = 0; i < xy.length; i++) { const a = xy[i], b = xy[(i + 1) % xy.length]; len += Math.hypot(b[0] - a[0], b[1] - a[1]); }
+    F.T = T; F.merc = { z, x0, y0 };
+    return { F, T, pts: xy.map(m => { const q = applyT(T, [m[0], -m[1]]); return { x: q[0], y: q[1] }; }), W, H, lengthM: Math.round(len), mppImg: mppM, merc: F.merc };
+  }
   // session-level data stats (for the optional model calibration): top speed, peak braking and lateral g over the clean laps
   function sessionStats(laps) {
     const st = { vmax: 0, brake: 0, lat: 0 }, gxs = [], brs = [];
@@ -4557,7 +4575,7 @@ const DATA = (() => {
   }
   // where a projected lap is at station i, in frame metres: its own position when the projection carries one, else the centreline plus the offset
   const lapXYAt = (tr, P, i) => P.x ? [P.x[i], P.y[i]] : [tr.cx[i] + P.o[i] * tr.nx[i], tr.cy[i] + P.o[i] * tr.ny[i]];
-  return { lapXYAt, builtPath, MERC, applyT, parseAlfName, newFrame, distFromFrame, lapXY, lapPx, gpsLayout, sessionStats, projectLap, trackCurv, autoCorners, cornerWindows, windowMetrics, metricsText, diffs, compareWindow, buildComparison, buildCoach, coachText, avgProjection, buildComparisonP, tw, kmh, accelFrom, gradeCorner, GRADE_COLORS, kartStraight, kartMeasure, kartSession, kartRating, pedalModes, coastIn };
+  return { lapXYAt, builtPath, MERC, applyT, parseAlfName, newFrame, distFromFrame, lapXY, lapPx, gpsLayout, geoLayout, sessionStats, projectLap, trackCurv, autoCorners, cornerWindows, windowMetrics, metricsText, diffs, compareWindow, buildComparison, buildCoach, coachText, avgProjection, buildComparisonP, tw, kmh, accelFrom, gradeCorner, GRADE_COLORS, kartStraight, kartMeasure, kartSession, kartRating, pedalModes, coastIn };
 })();
 // @@DATA-END
 // ---------- i18n: English is the source text, Russian is a dictionary keyed by the English string ----------
@@ -5636,6 +5654,15 @@ Object.assign(I18N.RU, {
   // v34.41 — a layout read from a picture, added to Hutka
   "Add the track to Hutka": "Добавить трассу в Hutka",
   "Which layout is it?": "Какая это конфигурация?",
+  // v34.42 — thousands of tracks from the map
+  "No track by that name on Hutka yet.": "Трассы с таким названием в Hutka пока нет.",
+  "Type a track's name or its town.": "Напиши название трассы или город.",
+  "Show {n} more track|Show {n} more tracks": "Показать ещё {n} трассу|Показать ещё {n} трассы|Показать ещё {n} трасс",
+  "{n} in all": "всего {n}",
+  "{n} more — type to find them": "ещё {n} — найди поиском",
+  "From the map": "С карты",
+  "the line is drawn": "линия есть",
+  "The line is from the map (OpenStreetMap); nobody has published a session here yet. Upload yours: it makes the line exact, and others compare with it.": "Линия — с карты OpenStreetMap; сессий здесь ещё никто не публиковал. Загрузи свою: линия станет точной, и другие будут сравниваться с тобой.",
   "Tap a session to analyse it; ⋯ edits, publishes or deletes it.": "Тапни сессию, чтобы разобрать её; ⋯ — изменить, опубликовать или удалить.",
   "A new layout": "Новая конфигурация",
   "Add the layout to Hutka": "Добавить конфигурацию в Hutka",
@@ -6136,6 +6163,8 @@ const STORE = (() => {
     const dead = () => { const p = new Proxy(function () {}, { get(_, k) { if (k === 'then') return (res, rej) => Promise.resolve(OFF).then(res, rej); return () => p; }, apply() { return p; } }); return p; };
     const sb = new Proxy(sb0, { get(target, k) { if ((k === 'from' || k === 'rpc') && offline()) return () => dead(); const v = target[k]; return typeof v === 'function' ? v.bind(target) : v; } });
     const must = (r) => { if (r.error) { const e = new Error(r.error.message || 'db error'); e.code = r.error.code; throw e; } return r.data; };
+    // a whole table in pages: the API answers 1000 rows at most (thousands of tracks came from the map)
+    const everyRow = async (q) => { const out = []; for (let from = 0; from < 100000; from += 1000) { const rows = must(await q().range(from, from + 999)); out.push(...rows); if (rows.length < 1000) break; } return out; };
     const row2doc = (r) => Object.assign({ id: r.id }, r.data || {});
     const noCol = (err) => /column|schema cache|PGRST204|42703/i.test((err.message || '') + ' ' + (err.code || ''));   // a column the SQL update has not added yet
     let session = null, kept = false;
@@ -6174,7 +6203,7 @@ const STORE = (() => {
         try { const rows = must(await sb.from('profiles').select('id').eq('id', u.id).limit(1)); if (!rows.length) { must(await sb.from('profiles').insert({ id: u.id, racing_name: name })); firstLogin = true; } } catch (e) {}
         return { id: u.id, name, avatarUrl: (u.user_metadata && u.user_metadata.avatar_url) || '', color: '#2f6bf0', canEdit: admin, isOwner: admin, canWrite: true, email: u.email || '', firstLogin, offline: kept };
       },
-      async subscribeTracks(fn) { const rows = must(await sb.from('tracks').select('id,data')); fn(rows.map(row2doc)); },
+      async subscribeTracks(fn) { const rows = await everyRow(() => sb.from('tracks').select('id,data').order('id')); fn(rows.map(row2doc)); },
       async saveTrack(id, body) { const row = { id, data: body, updated_at: new Date().toISOString() }; if (body.createdBy && A.communityCols !== false) { const r = await sb.from('tracks').upsert(Object.assign({ created_by: body.createdBy }, row)); if (!(r.error && noCol(r.error))) return must(r); A.communityCols = false; } return must(await sb.from('tracks').upsert(row)); },
       deleteTrack: async (id) => must(await sb.from('tracks').delete().eq('id', id)),
       async listLayouts(tid) { return must(await sb.from('layouts').select('id,data').eq('track_id', tid)).map(row2doc); },
@@ -6259,7 +6288,7 @@ const STORE = (() => {
       async sessionsByOwners(ids) { if (!ids.length) return []; return must(await sb.from('sessions').select('id,meta').in('owner', ids.slice(0, 100)).eq('published', true).order('updated_at', { ascending: false }).limit(60)).map(r => Object.assign({ id: r.id }, r.meta)); },
       async recentPublished(n) { return must(await sb.from('sessions').select('id,meta').eq('published', true).order('created_at', { ascending: false }).limit(n)).map(r => Object.assign({ id: r.id }, r.meta)); },
       // the tracks library: every layout in one request; the published sessions without their bodies (who, where, when, how fast, which kart class)
-      async allLayouts() { return must(await sb.from('layouts').select('track_id,id,data')).map(r => ({ track: r.track_id, l: row2doc(r) })); },
+      async allLayouts() { return (await everyRow(() => sb.from('layouts').select('track_id,id,data').order('track_id').order('id'))).map(r => ({ track: r.track_id, l: row2doc(r) })); },
       async layoutActivity() { return must(await sb.from('sessions').select('track_id,layout_id,owner,created_at,best_ms,cls:meta->>kartClass').eq('published', true).limit(5000)); },
       async socialCounts(ids, me) { const out = {}; for (const id of ids) out[id] = { likes: 0, down: 0, comments: 0, liked: false, mine: 0 }; if (!ids.length) return out; try { let r = await sb.from('likes').select('session_id,user_id,vote').in('session_id', ids).limit(5000); if (r.error && noCol(r.error)) { A.votes = false; r = await sb.from('likes').select('session_id,user_id').in('session_id', ids).limit(5000); } for (const x of must(r)) { const o = out[x.session_id]; if (o) { const v = x.vote === -1 ? -1 : 1; if (v === -1) o.down++; else o.likes++; if (me && x.user_id === me) { o.mine = v; o.liked = v === 1; } } } } catch (e) {} try { for (const r of must(await sb.from('comments').select('session_id').in('session_id', ids).limit(5000))) { const o = out[r.session_id]; if (o) o.comments++; } } catch (e) {} return out; },
       // auth
@@ -7553,7 +7582,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.41';
+const APP_VERSION = 'v34.42';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -7750,6 +7779,8 @@ const GEOM = (() => {
   let revN = 0;
   async function layoutDoc(tid, lid) { if (!tid || !lid || lid === 'custom') return null; await STORE.getLayouts(tid); return STORE.getLayout(tid, lid); }
   function traceTrack(trc, lengthM, startU, reverse) { try { const tr = KLL.buildTrack(trc.pts.map(p => ({ x: +p.x, y: +p.y })), lengthM || trc.lengthM, startU === undefined ? (trc.startU || 0) : startU, reverse === undefined ? !!trc.reverse : reverse); return (isFinite(tr.mpp) && tr.mpp > 0) ? tr : null; } catch (e) { return null; } }
+  // the map's line drawn as the asphalt it is the middle of (its width in the frame's pixels), with the line itself thin on top
+  function bandCanvas(g, widthM) { const c = document.createElement('canvas'); c.width = g.W; c.height = g.H; const ctx = c.getContext('2d'); const path = () => { ctx.beginPath(); g.pts.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.closePath(); }; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; path(); ctx.strokeStyle = 'rgba(150,160,178,0.38)'; ctx.lineWidth = Math.max(4, (widthM || 8) / (g.mppImg || 0.3)); ctx.stroke(); path(); ctx.strokeStyle = 'rgba(120,130,150,0.6)'; ctx.lineWidth = 1.5; ctx.stroke(); return c; }
   function lapsCanvas(laps, g) { const c = document.createElement('canvas'); c.width = g.W; c.height = g.H; const ctx = c.getContext('2d'); ctx.strokeStyle = 'rgba(150,160,178,0.35)'; ctx.lineWidth = 1.5; ctx.lineJoin = 'round'; for (const L of laps) { ctx.beginPath(); L.xy.forEach((p, i) => { const q = DATA.applyT(g.T, [p[0], -p[1]]); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); ctx.stroke(); } return c; }
   // Build the geometry. `pref` is an already loaded session to use as the reference when the layout has none of its own.
   // the layout's pictures (drawn trace, aerial photo) — skipped for background work (opts.noMedia) and fetched when the Lab or a track page needs the geometry
@@ -7795,6 +7826,12 @@ const GEOM = (() => {
     const trace = layout && layout.trace && layout.trace.closed && Array.isArray(layout.trace.pts) && layout.trace.pts.length >= 3 ? layout.trace : null;
     const key = `${tid}|${lid}|${refSess ? refSess.id : '-'}|${layout ? layout.updatedAt || 0 : 0}`;
     if (cache.has(key)) { const G0 = cache.get(key); if (G0.mediaPending && !(opts && opts.noMedia)) await media(G0); return G0; }
+    // a line from the map (the raceway OpenStreetMap has, brought in by the track import) while nobody has driven or drawn the layout:
+    // the middle of the asphalt in a GPS frame like a driven line's — sessions attach to it, an upload finds its layout by it, the
+    // satellite goes under it, the brain reads it. The first published session takes over (it is the real line)
+    if (!refSess && !trace && layout && layout.line && layout.line.src === 'osm') {
+      const Go = await osmGeom(tid, lid, layout, key); if (Go) { if (opts && opts.noMedia) Go.mediaPending = true; else await media(Go); cache.set(key, Go); return Go; }
+    }
     if (!refSess && !trace) {
       // a reverse layout nobody has driven or drawn: the layout it reverses, driven the other way (its own laps or drawing replace it)
       const fwd = !(opts && opts.noReverse) ? await forwardOf(tid, layout) : null;
@@ -7818,6 +7855,20 @@ const GEOM = (() => {
     } else { const tr = traceTrack(trace, trace.lengthM); if (!tr) return null; G.track = tr; G.W = trace.w || 1600; G.H = trace.h || 1000; G.source = 'trace'; G.frame = null; G.wantTrace = { alpha: 1 }; }
     if (opts && opts.noMedia) G.mediaPending = true; else await media(G);
     cache.set(key, G); return G;
+  }
+  // the map's line (media: tracks/<id>/layouts/<id>/media/line — { pts: [[lat, lon]…] } in the way it is driven, else clockwise) as a
+  // layout geometry; the start/finish, which the map does not give, in the middle of the longest straight (as Hutka AI reads a raceway)
+  async function osmGeom(tid, lid, layout, key) {
+    let raw = null; try { raw = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/line`); } catch (e) { raw = null; }
+    let j = null; try { j = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch (e) { j = null; }
+    const ll = j && Array.isArray(j.pts) ? j.pts.map(p => ({ lat: +p[0], lon: +p[1] })).filter(p => isFinite(p.lat) && isFinite(p.lon)) : [];
+    const g = DATA.geoLayout(ll); if (!g) return null;
+    let tr = null; try { tr = KLL.buildTrack(g.pts, g.lengthM, 0, false); } catch (e) { tr = null; } if (!tr || !(isFinite(tr.mpp) && tr.mpp > 0)) return null;
+    const ks = DATA.trackCurv(tr), N = tr.N; let best = { len: 0, mid: 0 }, run = 0, start = 0;
+    for (let q = 0; q < 2 * N; q++) { const i = q % N; if (Math.abs(ks[i]) < 1 / 150) { if (!run) start = q; run++; if (run > best.len && run <= N) best = { len: run, mid: (start + Math.floor(run / 2)) % N }; } else run = 0; }
+    try { const t2 = KLL.buildTrack(g.pts, g.lengthM, best.mid / N, false); if (t2 && isFinite(t2.mpp) && t2.mpp > 0) tr = t2; } catch (e) {}
+    return { key, rev: 'g' + (++revN), tid, lid, layout, refSess: null, widthM: +layout.widthM || 8, corners: { R: +layout.cornerR || 110, add: layout.cornersAdd || [], del: layout.cornersDel || [] }, source: 'osm', image: { src: bandCanvas(g, +layout.widthM || 8), w: g.W, h: g.H, alpha: 1 }, aerial: null,
+      track: tr, W: g.W, H: g.H, lengthM: g.lengthM, frame: g.F, sat: layout.sat ? { dx: +layout.sat.dx || 0, dy: +layout.sat.dy || 0 } : { dx: 0, dy: 0 }, osm: { driven: !!(j && j.driven) } };
   }
   function attach(sess, G) {
     if (!G || !G.frame) return { error: t('This layout has no GPS reference yet.') };
@@ -7850,7 +7901,7 @@ const GEOM = (() => {
 // tracks nobody has uploaded to yet, the nearest first. Countries as chips; the search is the bar on top (on this page it filters the
 // library). Nothing found, or a track that is not here: upload a session from it (its page is made from the session's GPS) or find it
 // on the map (Hutka AI → New track).
-const TRK = { cc: null, data: null, open: new Set() };
+const TRK = { cc: null, data: null, open: new Set(), limit: 40 };
 // a country's name in the reader's language ("ОАЭ", "Великобритания"); the stored English name where the browser cannot say it
 const countryLocal = (cc) => { try { if (cc && I18N.lang === 'ru' && window.Intl && Intl.DisplayNames) return new Intl.DisplayNames(['ru'], { type: 'region' }).of(cc) || countryName(cc); } catch (e) {} return countryName(cc); };
 async function renderTracksPage() {
@@ -7869,19 +7920,23 @@ async function renderTracksPage() {
     Promise.all(trs.map(tr => STORE.getLayouts(tr.id).catch(() => [])))]);
   const pics = new Map(); for (const s of pubs) { const k = s.track + '|' + (s.layout || 'custom'), pic = s.preview && s.preview.pts ? s.preview : (s.card && s.card.v && s.card.pts ? s.card : null); if (pic && !pics.has(k)) pics.set(k, pic); }
   const home = prof && prof.homeTrack ? STORE.getTrack(prof.homeTrack) : null;
-  TRK.data = { act, pics, home, ls: new Map(trs.map((tr, i) => [tr.id, lists[i] || []])), mineK: new Set(mine.map(m => m.track + '|' + (m.layout || 'custom'))) };
+  // where "nearest" is measured from: the home track; else the middle of the tracks of his country (the profile's, or the clock's)
+  let ref = home && isFinite(home.lat) && isFinite(home.lon) ? home : null;
+  if (!ref) { const cc = (prof && prof.country) || (typeof guessCountry === 'function' ? guessCountry() : ''), mine2 = trs.filter(x => x.country === cc && isFinite(x.lat) && isFinite(x.lon)); if (mine2.length) ref = { lat: mine2.reduce((a, x) => a + x.lat, 0) / mine2.length, lon: mine2.reduce((a, x) => a + x.lon, 0) / mine2.length }; }
+  TRK.data = { act, pics, home, ref, ls: new Map(trs.map((tr, i) => [tr.id, lists[i] || []])), mineK: new Set(mine.map(m => m.track + '|' + (m.layout || 'custom'))) };
   if (APP.route === 'tracks') trkRender();
 }
 function trkRender() {
   const D = TRK.data; if (!D) return;
   const raw = $('q').value.trim(), words = raw.toLowerCase().split(/\s+/).filter(Boolean), hit = (text) => words.every(w => text.includes(w));
+  { const key = raw + '|' + (TRK.cc || ''); if (TRK.key !== key) { TRK.key = key; TRK.limit = 40; } }   // another search or country: the first page again
   const all = STORE.getTracks(), rows = [];
   for (const tr of all) {
     const lays = (D.ls.get(tr.id) || []).map(l => ({ l, a: D.act.get(tr.id + '|' + l.id) || null, mine: D.mineK.has(tr.id + '|' + l.id) }));
     const custom = D.act.get(tr.id + '|custom'), owners = new Set(); let n = custom ? custom.n : 0; if (custom) for (const o of custom.owners) owners.add(o);
     for (const x of lays) if (x.a) { n += x.a.n; for (const o of x.a.owners) owners.add(o); }
-    const d = D.home && isFinite(tr.lat) && isFinite(D.home.lat) ? GEO.distKm(D.home, tr) : null;
-    rows.push({ tr, all: lays, lays, n, drivers: owners.size, d, home: !!(D.home && D.home.id === tr.id) });
+    const d = D.ref && isFinite(tr.lat) && isFinite(tr.lon) ? GEO.distKm(D.ref, tr) : null;
+    rows.push({ tr, all: lays, lays, n, drivers: owners.size, d, dShow: D.home ? d : null, home: !!(D.home && D.home.id === tr.id) });
   }
   // the country chips count what the search leaves
   const found = rows.filter(r => { if (!words.length || hit([r.tr.name, r.tr.city, countryName(r.tr.country), countryLocal(r.tr.country)].join(' ').toLowerCase())) return true; r.lays = r.all.filter(x => hit((r.tr.name + ' ' + x.l.name).toLowerCase())); return r.lays.length > 0; });
@@ -7889,11 +7944,14 @@ function trkRender() {
   const shown = found.filter(r => !TRK.cc || r.tr.country === TRK.cc);
   const near = (a, b) => (a.d === null) - (b.d === null) || (a.d || 0) - (b.d || 0);
   const driven = shown.filter(r => r.n > 0).sort((a, b) => (b.home - a.home) || (b.n - a.n));
-  const fresh = shown.filter(r => !r.n).sort((a, b) => D.home ? (near(a, b) || (b.all.length > 0) - (a.all.length > 0) || a.tr.name.localeCompare(b.tr.name)) : ((b.all.length > 0) - (a.all.length > 0) || countryName(a.tr.country).localeCompare(countryName(b.tr.country)) || a.tr.name.localeCompare(b.tr.name)));
+  const fresh = shown.filter(r => !r.n).sort((a, b) => D.ref ? (near(a, b) || a.tr.name.localeCompare(b.tr.name)) : (countryName(a.tr.country).localeCompare(countryName(b.tr.country)) || a.tr.name.localeCompare(b.tr.name)));
   const box = $('trList'); box.innerHTML = '';
   const sec = (title, hint) => { const h = el('div', 'trk-sec'); h.appendChild(el('b', '', title)); if (hint) h.appendChild(el('span', 'hint', hint)); return h; };
   if (driven.length) { box.appendChild(sec(t('Where people drive'))); const g = el('div', 'trk-grid'); for (const r of driven) g.appendChild(trkCard(r, words.length > 0)); box.appendChild(g); }
-  if (fresh.length) { box.appendChild(sec(t('Nobody has uploaded here yet'), t('be the first — upload a session'))); const c = el('div', 'card trk-rows'); for (const r of fresh) c.appendChild(trkRow(r)); box.appendChild(c); }
+  // thousands of tracks from the map: the nearest first, a page at a time
+  if (fresh.length) { box.appendChild(sec(t('Nobody has uploaded here yet'), t('be the first — upload a session'))); const c = el('div', 'card trk-rows'); for (const r of fresh.slice(0, TRK.limit)) c.appendChild(trkRow(r));
+    if (fresh.length > TRK.limit) { const k = Math.min(40, fresh.length - TRK.limit), b = el('button', 'trk-more', t(tn(k, 'Show {n} more track', 'Show {n} more tracks'), { n: k }) + ' · ' + t('{n} in all', { n: fresh.length })); b.type = 'button'; b.onclick = () => { TRK.limit += 40; trkRender(); }; c.appendChild(b); }
+    box.appendChild(c); }
   const none = !driven.length && !fresh.length;
   if (none && !words.length) box.appendChild(el('div', 'trk-empty', t('No tracks here yet.')));   // a search that finds nothing: the card under says so
   $('trAddT').textContent = none && words.length ? t('“{q}” is not on Hutka yet', { q: raw }) : t('Your track is not here?');
@@ -7936,7 +7994,7 @@ function trkLay(tr, x) {
 }
 function trkRow(r) {
   const a = el('a', 'trk-row'); a.href = '#track~' + r.tr.id; const lg = el('div', 'logo'); logoInto(lg, r.tr);
-  const tx = el('div', 'tx'); tx.append(el('b', '', r.tr.name), el('span', '', [[r.tr.city, flag(r.tr.country)].filter(Boolean).join(' '), r.all.length ? tn(r.all.length, '{n} layout', '{n} layouts').replace('{n}', r.all.length) : t('no layouts yet'), r.d !== null ? `${r.d < 10 ? r.d.toFixed(1) : Math.round(r.d)} ${t('km')}` : ''].filter(Boolean).join(' · ')));
+  const tx = el('div', 'tx'); tx.append(el('b', '', r.tr.name), el('span', '', [[r.tr.city, flag(r.tr.country)].filter(Boolean).join(' '), r.all.length ? tn(r.all.length, '{n} layout', '{n} layouts').replace('{n}', r.all.length) : t('no layouts yet'), r.all.some(x => x.l.line || (x.l.trace && x.l.trace.closed)) ? t('the line is drawn') : '', r.dShow !== null && r.dShow !== undefined ? `${r.dShow < 10 ? r.dShow.toFixed(1) : Math.round(r.dShow)} ${t('km')}` : ''].filter(Boolean).join(' · ')));
   a.append(lg, tx, svgUse('i-chev', 'go')); return a;
 }
 // a layout's shape from a published lap: a card (y down) or a preview (y up)
@@ -7952,6 +8010,14 @@ $('trAddFind').onclick = () => { const q = $('q').value.trim(); HAI.queue({ act:
 // a generated cover: the layout's shape from a published session on a brand gradient (until the track has a real photo)
 // a layout's drawing (a trace: picture pixels, y down) as a shape for the cover (y up, the longer side 1)
 const traceShape = (trc) => { const xs = trc.pts.map(p => +p.x), ys = trc.pts.map(p => +p.y), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), S = Math.max(x1 - x0, y1 - y0) || 1; return { w: (x1 - x0) / S, h: (y1 - y0) / S, pts: trc.pts.map(p => [(+p.x - x0) / S, (y1 - +p.y) / S]) }; };
+// the map's line of a layout (media, lat/lon) as a shape for the cover: metres, north up, the longer side 1
+async function lineShape(tid, lid) {
+  let j = null; try { const raw = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/line`); j = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch (e) { j = null; }
+  const ll = j && Array.isArray(j.pts) ? j.pts : []; if (ll.length < 8) return null;
+  const la0 = ll[0][0], kx = Math.cos(la0 * Math.PI / 180), xs = ll.map(p => p[1] * kx), ys = ll.map(p => p[0]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), S = Math.max(x1 - x0, y1 - y0) || 1;
+  return { w: (x1 - x0) / S, h: (y1 - y0) / S, pts: ll.map((p, i) => [(xs[i] - x0) / S, (ys[i] - y0) / S]) };
+}
 function drawCoverShape(cv, pv, name, tag) {
   const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1)), w = cv.clientWidth || 900, h = cv.clientHeight || 300; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#1b2340'); g.addColorStop(1, '#30406f'); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
@@ -7977,10 +8043,12 @@ async function renderTrackPage(tid, lid) {
   if (tr.website) add('i-globe', `<a href="${esc(tr.website)}" target="_blank" rel="noopener">${t('Website')}</a>`);
   if (open) add('i-clock', open.open === false && open.opens ? t('Opens at {t}', { t: open.opens }) : t('Closes at {t}', { t: open.closes }));
   if (tr.community && tr.createdBy) { const nm = await STORE.names([tr.createdBy]); add('i-users', t('added by {who}', { who: `<a href="#driver~${esc(tr.createdBy)}">${esc((nm[tr.createdBy] || {}).name || t('a driver'))}</a>` })); }
+  if (tr.source === 'osm') { const o = String(tr.osm || ''), typ = { n: 'node', w: 'way', r: 'relation' }[o[0]] || ''; add('i-globe', `${esc(t('From the map'))} · <a href="${typ ? `https://www.openstreetmap.org/${typ}/${esc(o.slice(1))}` : 'https://www.openstreetmap.org/copyright'}" target="_blank" rel="noopener">© OpenStreetMap</a>`); }   // ODbL: the data is the map's
   const cover = await STORE.getMedia(`tracks/${tid}/media/cover`);
   $('tCoverImg').hidden = !cover; if (cover) $('tCoverImg').src = cover;
   const pubsEarly = cover ? [] : await STORE.sessionsFor(tid); let shape = pubsEarly.map(s => s.preview).find(p => p && p.pts), tag;
-  if (!cover && !shape) { const tl = (await STORE.getLayouts(tid).catch(() => [])).find(l => l.trace && l.trace.closed && Array.isArray(l.trace.pts) && l.trace.pts.length >= 8); if (tl) { shape = traceShape(tl.trace); tag = ''; } }   // nobody has driven here yet: the layout's drawing (a picture read in Hutka AI)
+  if (!cover && !shape) { const ls0 = await STORE.getLayouts(tid).catch(() => []), tl = ls0.find(l => l.trace && l.trace.closed && Array.isArray(l.trace.pts) && l.trace.pts.length >= 8); if (tl) { shape = traceShape(tl.trace); tag = ''; }   // nobody has driven here yet: the layout's drawing (a picture read in Hutka AI)
+    else { const ol = ls0.find(l => l.line && l.line.src === 'osm'); if (ol) { shape = await lineShape(tid, ol.id); tag = shape ? 'OSM' : tag; } } }   // or the map's line
   $('tCover').classList.toggle('nocover', !cover && !shape); $('tCover').classList.toggle('gen', !cover && !!shape); $('tCoverGen').hidden = !(!cover && shape);
   if (!cover && shape) requestAnimationFrame(() => drawCoverShape($('tCoverGen'), shape, tr.name, tag));
   logoInto($('tLogo'), tr);
@@ -8075,7 +8143,7 @@ async function renderLayoutBlock(tid, lid, shownId) {
   let G = null; try { G = await GEOM.build(tid, lid); } catch (e) { G = null; }
   LP.G = G;
   $('lFirst').hidden = !!pubs.length;
-  $('lFirstText').innerHTML = G ? t('Nobody has published a session on this layout yet. Be the first: upload your session and it will appear here for others to compare with.') : t('Nobody has published a session on this layout yet, so there is no track line to show. The first uploaded session defines it — be the first.');
+  $('lFirstText').innerHTML = G ? (G.source === 'osm' ? t('The line is from the map (OpenStreetMap); nobody has published a session here yet. Upload yours: it makes the line exact, and others compare with it.') : t('Nobody has published a session on this layout yet. Be the first: upload your session and it will appear here for others to compare with.')) : t('Nobody has published a session on this layout yet, so there is no track line to show. The first uploaded session defines it — be the first.');
   { const src = l.photo ? await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/photo`) : null; $('lPhotoCard').hidden = !src; if (src) $('lPhoto').src = src; }
   if (!LP.map) {
     LP.map = createMapView($('lmap'), { height: (w) => Math.round(clamp(w * 0.72, 380, 760)), getTrack: () => LP.G ? LP.G.track : null, getWidthM: () => LP.G ? LP.G.widthM : 8, getFrameSize: () => LP.G ? [LP.G.W, LP.G.H] : null,
@@ -11000,7 +11068,9 @@ const BRAINS = (() => {
   // every driven layout of this class: what a prediction learns from (an admin brings stale and missing ones up to date as he goes)
   async function allAtlases(cls) {
     cls = cls || 'rental'; const out = [], seen = new Set();
-    if (STORE.me.canEdit) for (const tr of STORE.getTracks()) { let ls = []; try { ls = await STORE.getLayouts(tr.id); } catch (e) { ls = []; } for (const l of ls) { const v = await layoutAtlas(tr.id, l.id, cls); if (v) { out.push(v); seen.add(v.C.key); } } }
+    // (only layouts somebody has driven: thousands of tracks from the map have none — one light query says which)
+    if (STORE.me.canEdit) { let act = new Map(); try { act = await STORE.layoutActivity(); } catch (e) { act = new Map(); }
+      for (const k of act.keys()) { const [tid, lid] = k.split('|'); if (!lid || lid === 'custom' || !STORE.getTrack(tid)) continue; try { await STORE.getLayouts(tid); } catch (e) {} const v = await layoutAtlas(tid, lid, cls); if (v) { out.push(v); seen.add(v.C.key); } } }
     for (const r of (await stored(cls)).values()) if (r.data && r.data.v >= COMPAT && !seen.has(r.data.key)) { out.push({ C: r.data, G: null }); seen.add(r.data.key); }
     return out;
   }
@@ -11987,7 +12057,7 @@ const TRACKFIND = (() => {
   // that has. A Set of layout ids
   async function linedIds(tid, ls) {
     const out = new Set(); ls = ls || await STORE.getLayouts(tid).catch(() => []);
-    for (const l of ls) { let n = 0; if (!(l.trace && l.trace.closed) && !l.photoLine) { try { n = (await STORE.sessionsFor(tid, l.id)).length; } catch (e) { n = 0; } } if ((l.trace && l.trace.closed) || l.photoLine || n) out.add(l.id); }
+    for (const l of ls) { let n = 0; if (!(l.trace && l.trace.closed) && !l.photoLine && !l.line) { try { n = (await STORE.sessionsFor(tid, l.id)).length; } catch (e) { n = 0; } } if ((l.trace && l.trace.closed) || l.photoLine || l.line || n) out.add(l.id); }   // l.line: the map's raceway (track import)
     for (const l of ls) if (!out.has(l.id)) { let f = null; try { f = await GEOM.forwardOf(tid, l); } catch (e) { f = null; } if (f && out.has(f.id)) out.add(l.id); }
     return out;
   }
@@ -12082,7 +12152,7 @@ const TRACKFIND = (() => {
     for (const l of ls) {
       if (/reverse|реверс|обратн/i.test(l.name || '')) continue;
       let n = 0; try { n = (await STORE.sessionsFor(tid, l.id)).length; } catch (e) { n = 0; }
-      if (!n && !(l.trace && l.trace.closed)) continue;
+      if (!n && !(l.trace && l.trace.closed) && !l.line) continue;
       refs.push({ l, n });
     }
     // the venue's main layout first (the classic one: it shares the most with the others), then the most driven
@@ -12959,9 +13029,14 @@ const aiBtn = (label, cls, fn) => { const b = el('button', 'btn sm ' + (cls || '
 // ---- 1. the ideal lap: any layout, at once, from the data
 async function aiLayoutOptions() {
   const mineK = new Set(); if (STORE.hasIdentity) for (const m of await STORE.mySessions().catch(() => [])) if (m.track && m.layout && m.layout !== 'custom') mineK.add(m.track + '|' + m.layout);
+  await STORE.allLayouts().catch(() => {});   // every layout in one request (thousands of tracks from the map); then from memory
+  let act = new Map(); try { act = STORE.hasDb ? await STORE.layoutActivity() : new Map(); } catch (e) { act = new Map(); }
   const groups = [];
-  for (const tr of STORE.getTracks()) { let ls = []; try { ls = await STORE.getLayouts(tr.id); } catch (e) { ls = []; } if (!ls.length) continue; groups.push({ tr, ls }); }
-  return { groups, mineK };
+  for (const tr of STORE.getTracks()) {
+    let ls = []; try { ls = await STORE.getLayouts(tr.id); } catch (e) { ls = []; } if (!ls.length) continue;
+    groups.push({ tr, ls, mine: ls.some(l => mineK.has(tr.id + '|' + l.id)), driven: ls.some(l => act.has(tr.id + '|' + l.id)), lined: ls.some(l => (l.trace && l.trace.closed) || l.photoLine || l.line) });
+  }
+  return { groups, mineK, act };
 }
 async function aiDefaultLayout() {
   if (STORE.hasIdentity) { const last = (await STORE.mySessions().catch(() => [])).find(m => m.track && m.layout && m.layout !== 'custom'); if (last) return [last.track, last.layout, kartClassOf(last) === 'sport' ? 'sport' : 'rental']; }
@@ -12979,21 +13054,34 @@ async function aiLayField() {
 function aiLayShow() { const L = AI.lay, tr = L ? STORE.getTrack(L.tid) : null, l = L ? STORE.getLayout(L.tid, L.lid) : null; $('haiLayName').textContent = L ? (l ? l.name : L.lid) : t('No layouts yet.'); $('haiLayTrack').textContent = tr ? tr.name : ''; $('haiIdealSub').textContent = L ? [l ? l.name : L.lid, tr ? tr.name : ''].filter(Boolean).join(' · ') : t('How the fastest drive each corner'); }
 function aiSetLay(tid, lid) { AI.lay = { tid, lid, cls: (AI.lay && AI.lay.cls) || 'rental' }; try { localStorage.setItem('hutka.ai.lay', JSON.stringify(AI.lay)); } catch (e) {} aiLayShow(); }
 // the layouts to choose from, by track: the driver's own first (★), each saying whether real laps or a forecast stand behind its ideal
+// the sheet: his layouts and the tracks people drive first, then the nearest tracks the map has a line for; any other by its name
 async function aiLaySheet(onPick) {
-  const box = $('haiLayList'); box.innerHTML = ''; box.appendChild(el('div', 'hint', t('Loading…'))); $('haiLaySheet').hidden = false;
-  const { groups, mineK } = await aiLayoutOptions(); box.innerHTML = '';
-  groups.sort((a, b) => (b.ls.some(l => mineK.has(b.tr.id + '|' + l.id)) - a.ls.some(l => mineK.has(a.tr.id + '|' + l.id))));
-  for (const g of groups) {
-    box.appendChild(el('h4', '', g.tr.name));
-    for (const l of g.ls) {
-      const k = g.tr.id + '|' + l.id, b = el('button', 'ai2-lay' + (AI.lay && AI.lay.tid === g.tr.id && AI.lay.lid === l.id ? ' sel' : '')); b.type = 'button';
-      const hint = el('span', mineK.has(k) ? 'mine' : '', mineK.has(k) ? t('you drove it') : '');
-      b.append(el('b', '', l.name), hint);
-      if (!mineK.has(k)) STORE.sessionsFor(g.tr.id, l.id).then(ms => { hint.textContent = ms.length ? t('real laps') : t('forecast'); }).catch(() => {});
-      b.onclick = () => { $('haiLaySheet').hidden = true; aiSetLay(g.tr.id, l.id); if (onPick) onPick(g.tr.id, l.id); };
-      box.appendChild(b);
+  const box = $('haiLayList'), q = $('haiLayQ'); box.innerHTML = ''; box.appendChild(el('div', 'hint', t('Loading…'))); q.value = ''; $('haiLaySheet').hidden = false;
+  const { groups, mineK, act } = await aiLayoutOptions();
+  const prof = STORE.hasIdentity ? (await STORE.profile(STORE.me.id).catch(() => null) || {}) : {};
+  const ref = [AI.lay && STORE.getTrack(AI.lay.tid), prof.homeTrack && STORE.getTrack(prof.homeTrack)].find(x => x && isFinite(x.lat) && isFinite(x.lon)) || null;
+  const render = () => {
+    box.innerHTML = ''; const words = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    let list;
+    if (words.length) list = groups.filter(g => { const s = [g.tr.name, g.tr.city, countryName(g.tr.country), countryLocal(g.tr.country)].join(' ').toLowerCase(); return words.every(w => s.includes(w)); }).sort((a, b) => (b.mine - a.mine) || (b.driven - a.driven) || (b.lined - a.lined)).slice(0, 30);
+    else {
+      const top = groups.filter(g => g.mine || g.driven).sort((a, b) => (b.mine - a.mine) || (b.driven - a.driven));
+      const near = ref ? groups.filter(g => !g.mine && !g.driven && g.lined && isFinite(g.tr.lat) && isFinite(g.tr.lon)).map(g => ({ g, d: GEO.distKm(ref, g.tr) })).sort((a, b) => a.d - b.d).slice(0, 12).map(x => x.g) : [];
+      list = top.concat(near);
     }
-  }
+    if (!list.length) { box.appendChild(el('div', 'hint', words.length ? t('No track by that name on Hutka yet.') : t('Type a track\'s name or its town.'))); return; }
+    for (const g of list) {
+      box.appendChild(el('h4', '', g.tr.name + (g.tr.city ? ' · ' + g.tr.city : '') + ' ' + flag(g.tr.country)));
+      for (const l of g.ls) {
+        const k = g.tr.id + '|' + l.id, b = el('button', 'ai2-lay' + (AI.lay && AI.lay.tid === g.tr.id && AI.lay.lid === l.id ? ' sel' : '')); b.type = 'button';
+        const lined = act.has(k) || (l.trace && l.trace.closed) || l.photoLine || l.line;
+        b.append(el('b', '', l.name), el('span', mineK.has(k) ? 'mine' : '', mineK.has(k) ? t('you drove it') : (act.has(k) ? t('real laps') : (lined ? t('forecast') : ''))));
+        b.onclick = () => { $('haiLaySheet').hidden = true; aiSetLay(g.tr.id, l.id); if (onPick) onPick(g.tr.id, l.id); };
+        box.appendChild(b);
+      }
+    }
+  };
+  q.oninput = render; render();
 }
 // ph: a picture of this layout (a venue's plan sent in New track) — read when the layout has no line yet, instead of asking for one
 async function actIdeal(tid, lid, cls, ph) {
@@ -13528,8 +13616,8 @@ const ONBOARD = {
     ONBOARD.photo = undefined; $('onbAvatar').src = (prof && prof.avatar) || me.avatarUrl || GENERIC_AVATAR;
     $('onbFirst').value = nm.first; $('onbLast').value = nm.last;
     fillCountries($('onbCountry'), true); $('onbCountry').querySelector('option').textContent = t('— choose —'); $('onbCountry').value = prof.country || guessCountry() || '';
-    const trs = STORE.getTracks().slice().sort((a, b) => (a.country || '').localeCompare(b.country || '') || a.name.localeCompare(b.name));
-    fillSelect($('onbHome'), [['', t('— choose —')]].concat(trs.map(x => [x.id, `${x.name}${x.city ? ' · ' + x.city : ''} ${flag(x.country)}`])).concat([['-', t('My track is not listed yet')]]), prof.homeTrack || '');
+    const fillHome = () => { const v = $('onbHome').value || prof.homeTrack || ''; fillSelect($('onbHome'), [['', t('— choose —')]].concat(homeOptions($('onbCountry').value, v)).concat([['-', t('My track is not listed yet')]]), v); };
+    fillHome(); $('onbCountry').onchange = fillHome;   // the country first: its tracks
     fillYears($('onbYear'), prof.birthYear); $('onbWeight').value = prof.weightKg || '';
     $('onbWho').textContent = me.email ? t('Signed in as {email}', { email: me.email }) : '';
     setStatus('onbStatus', ''); $('onbModal').hidden = false; document.body.classList.add('onboarding');
@@ -13537,6 +13625,15 @@ const ONBOARD = {
   },
   close() { $('onbModal').hidden = true; document.body.classList.remove('onboarding'); }
 };
+// the home-track choice (thousands of tracks came from the map — one list of all of them is no choice): the tracks of the chosen
+// country, of the country the clock says he lives in, of the countries he has driven in and of his home track (a Belarusian racing
+// in Dubai sees both); the chosen country's first. None of these known: every track, by country
+function homeOptions(cc, cur, extra) {
+  const all = STORE.getTracks(), curTr = cur ? STORE.getTrack(cur) : null;
+  const ccs = [...new Set([cc, guessCountry(), ...(extra || []), curTr && curTr.country].filter(Boolean))];
+  const pick = ccs.length ? all.filter(x => ccs.includes(x.country) || x.id === cur) : all, rank = (x) => { const i = ccs.indexOf(x.country); return i < 0 ? 99 : i; };
+  return pick.slice().sort((a, b) => rank(a) - rank(b) || (a.country || '').localeCompare(b.country || '') || a.name.localeCompare(b.name)).map(x => [x.id, `${x.name}${x.city ? ' · ' + x.city : ''} ${flag(x.country)}`]);
+}
 function guessCountry() { try { const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; const m = { 'Asia/Dubai': 'AE', 'Asia/Muscat': 'OM', 'Asia/Qatar': 'QA', 'Asia/Bahrain': 'BH', 'Asia/Riyadh': 'SA', 'Asia/Kuwait': 'KW', 'Europe/Minsk': 'BY', 'Europe/Moscow': 'RU', 'Europe/Kiev': 'UA', 'Europe/Kyiv': 'UA', 'Europe/Warsaw': 'PL', 'Europe/Vilnius': 'LT', 'Europe/Riga': 'LV', 'Europe/Tallinn': 'EE', 'Asia/Almaty': 'KZ', 'Asia/Tbilisi': 'GE', 'Asia/Yerevan': 'AM', 'Europe/London': 'GB', 'Europe/Berlin': 'DE', 'Europe/Paris': 'FR', 'Europe/Madrid': 'ES', 'Europe/Rome': 'IT', 'Europe/Istanbul': 'TR', 'Asia/Bangkok': 'TH', 'Asia/Singapore': 'SG', 'Asia/Kolkata': 'IN', 'America/New_York': 'US', 'America/Los_Angeles': 'US', 'America/Chicago': 'US' }; return m[tz] || ''; } catch (e) { return ''; } }
 $('onbPhoto').onchange = async (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; try { ONBOARD.photo = await imageToDataUrl(f, 256, 60000); $('onbAvatar').src = ONBOARD.photo; } catch (err) { setStatus('onbStatus', t('Could not read the image.'), 'warn'); } e.target.value = ''; };
 $('onbSignOut').onclick = async () => { try { await NATIVE.push.forget(); } catch (e) {} try { await STORE.adapter.signOut(); } catch (e) {} STORE.reload(); };
@@ -13569,7 +13666,8 @@ async function renderProfile() {
   $('profSub').textContent = STORE.hasIdentity ? '' : (STORE.hasAuth ? t('Sign in to get a library that works on every device and to publish sessions.') : t('Sign in to claude.ai and open the shared Hutka link to get an account that works on every device.'));
   $('profSignOut').hidden = !(STORE.hasAuth && STORE.hasIdentity);
   fillCountries($('profCountry'), true); $('profCountry').value = prof.country || '';
-  const trs = STORE.getTracks(); fillSelect($('profHome'), [['', '—']].concat(trs.map(x => [x.id, x.name])), prof.homeTrack || '');
+  { const drove = [...new Set((await STORE.mySessions().catch(() => [])).map(m => (STORE.getTrack(m.track) || {}).country).filter(Boolean))];   // the countries he has driven in
+    const fillHome = () => { const v = $('profHome').value || prof.homeTrack || ''; fillSelect($('profHome'), [['', '—']].concat(homeOptions($('profCountry').value, v, drove)), v); }; $('profHome').value = ''; fillHome(); $('profCountry').onchange = fillHome; }
   { const nm = splitName(prof); $('profFirst').value = nm.first; $('profLast').value = nm.last; } fillYears($('profYear'), prof.birthYear); $('profNotify').checked = prof.notify !== false; $('profPush').checked = prof.push !== false; $('profPushField').hidden = !NATIVE.on; $('profWeight').value = prof.weightKg || ''; $('profBio').value = prof.bio || ''; $('profIg').value = prof.instagram || ''; $('profContact').value = prof.contact || ''; $('profCoach').checked = !!prof.coach; $('profSws').value = prof.sws || '';
   $('profSwsHint').textContent = t('Paste the link to your SWS driver page; it is shown on your public page. “Import SWS results” brings your race history here.');
   $('profSwsImport').onclick = () => SWS.open({});
@@ -13664,7 +13762,9 @@ const SESSEDIT = (() => {
   async function open(meta, onSaved) {
     cur = meta; done = onSaved || null; setStatus('seStatus', '');
     $('seName').value = meta.label || meta.name || ''; $('seNote').value = meta.note || '';
-    fillSelect($('seTrack'), [['', t('— not in the catalogue (custom) —')]].concat(STORE.getTracks().map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), meta.track || '');
+    { const at = isFinite(meta.lat) && isFinite(meta.lon) ? { lat: +meta.lat, lon: +meta.lon } : (STORE.getTrack(meta.track) || null), all = STORE.getTracks();   // where it was driven: the tracks within 300 km, nearest first (thousands from the map)
+      const list = at && isFinite(at.lat) ? all.filter(x => x.id === meta.track || (isFinite(x.lat) && GEO.distKm(at, x) < 300)).sort((a, b) => GEO.distKm(at, a) - GEO.distKm(at, b)) : all;
+      fillSelect($('seTrack'), [['', t('— not in the catalogue (custom) —')]].concat(list.map(x => [x.id, x.name + (x.city ? ' · ' + x.city : '')])), meta.track || ''); }
     await fillLayouts(meta.track || '', meta.layout || ''); fillKarts(meta); fillFormats($('seFormat'), meta.format || ''); $('sePos').value = meta.pos || ''; $('seDrivers').value = meta.drivers || '';
     // a session the admins hid cannot be published again by its owner (setPublished and the Lab's button say the same)
     { const locked = !!(meta.moderated && !meta.published && !STORE.isAdmin()); $('sePubField').hidden = !(STORE.canWrite() && meta.owner !== 'local'); $('sePublish').checked = !!meta.published; $('sePublish').disabled = locked; $('sePubField').title = locked ? t('The site admins hid this session from the public (a broken recording or a wrong layout). Upload it again if the data is fine.') : ''; }
@@ -13842,7 +13942,12 @@ const ADMIN = (() => {
     ctx.fillStyle = acc; vals.forEach((v, i) => { const bh = Math.round((h - 20) * v / mx); if (v) ctx.fillRect(i * bw + 1, h - 15 - bh, Math.max(2, bw - 2), bh); });
     ctx.fillStyle = muted; ctx.font = '10px system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.fillText(days[0].slice(5), 0, h - 3); ctx.textAlign = 'right'; ctx.fillText(t('today'), w, h - 3); ctx.textAlign = 'center'; ctx.fillText(String(mx), w / 2, 10);
   }
-  async function renderTrackList() { const box = $('admTracks'); box.innerHTML = ''; for (const tr of STORE.getTracks().filter(tr => STORE.canEditTrack(tr))) { const a = el('a', 'item' + (tr.id === A.tid ? ' sel' : '')); a.href = '#admin~' + tr.id; const lg = el('div', 'logo'); logoInto(lg, tr); a.append(lg, el('span', 'name', tr.name), el('span', 'meta', [tr.city, flag(tr.country)].filter(Boolean).join(' '))); box.appendChild(a); } if (!STORE.getTracks().length) box.appendChild(el('div', 'hint', t('No tracks yet.'))); }
+  // the tracks he can edit — thousands from the map: the open one, then what the search finds (or the first 60), a line under them
+  async function renderTrackList() { const box = $('admTracks'); box.innerHTML = ''; const words = ($('admTrackQ').value || '').trim().toLowerCase().split(/\s+/).filter(Boolean), mine = STORE.getTracks().filter(tr => STORE.canEditTrack(tr)), hit = mine.filter(tr => tr.id === A.tid || words.every(w => [tr.name, tr.city, countryName(tr.country)].join(' ').toLowerCase().includes(w))), shown = hit.slice(0, 60);
+    if (A.tid && !shown.some(tr => tr.id === A.tid)) { const cur = mine.find(tr => tr.id === A.tid); if (cur) shown.unshift(cur); }
+    if (hit.length > shown.length) setTimeout(() => box.appendChild(el('div', 'hint', t('{n} more — type to find them', { n: hit.length - shown.length }))), 0);
+    for (const tr of shown) { const a = el('a', 'item' + (tr.id === A.tid ? ' sel' : '')); a.href = '#admin~' + tr.id; const lg = el('div', 'logo'); logoInto(lg, tr); a.append(lg, el('span', 'name', tr.name), el('span', 'meta', [tr.city, flag(tr.country)].filter(Boolean).join(' '))); box.appendChild(a); } if (!STORE.getTracks().length) box.appendChild(el('div', 'hint', t('No tracks yet.'))); }
+  $('admTrackQ').addEventListener('input', () => renderTrackList());
   async function renderClaims() { const box = $('admClaims'); box.innerHTML = ''; const cl = await STORE.claims(); if (!cl.length) { box.appendChild(el('div', 'hint', t('No requests.'))); return; } const names = await STORE.names(cl.map(c => c.by)); for (const c of cl) { const row = el('div', 'item'); const tr = STORE.getTrack(c.track); row.append(el('span', 'name', `${tr ? tr.name : c.track} — ${names[c.by] ? names[c.by].name : c.by}`), el('span', 'meta', fmtDate(c.createdAt))); const x = el('button', 'x', '×'); x.type = 'button'; x.onclick = async () => { await STORE.deleteClaim(c.id); renderClaims(); }; row.appendChild(x); box.appendChild(row); } }
   const F = { aName: 'name', aCity: 'city', aCountry: 'country', aLat: 'lat', aLon: 'lon', aAddress: 'address', aPhone: 'phone', aWeb: 'website', aBooking: 'booking', aVideo: 'video', aOpen: 'open', aClose: 'close', aLen: 'lengthM', aCorners: 'corners', aVmax: 'vmax', aSessMin: 'sessMin', aFia: 'fia', aIg: 'instagram', aYt: 'youtube', aFb: 'facebook', aTt: 'tiktok', aDesc: 'description' };
   let pendingCover = undefined, pendingLogo = undefined, pendingPhoto = undefined;

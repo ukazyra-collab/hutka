@@ -18,3 +18,5 @@ verify_jwt = false
 verify_jwt = false
 [functions.stripe-webhook]
 verify_jwt = false
+[functions.tracks-import]
+verify_jwt = false
