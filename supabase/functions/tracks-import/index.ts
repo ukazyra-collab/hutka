@@ -65,9 +65,19 @@ Deno.serve(async (req) => {
   let body: { area?: string; dry?: boolean } = {};
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
   const area = String(body.area || "").toUpperCase(), dry = !!body.dry;
-  if (area === "PING") {   // which map servers answer from here, and how fast (a run from the queue: area "PING")
-    const out: Record<string, unknown> = {};
-    for (const m of MIRRORS) { const t1 = Date.now(), ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000); try { const r = await fetch(m, { method: "POST", body: "data=" + encodeURIComponent("[out:json][timeout:10];node(1);out;"), headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": "Hutka track import (https://hutka.ai)" }, signal: ctl.signal }); out[m] = { status: r.status, ms: Date.now() - t1, body: (await r.text()).slice(0, 120) }; } catch (e) { out[m] = { error: String((e as Error).message || e), ms: Date.now() - t1 }; } finally { clearTimeout(timer); } }
+  if (area === "PING") {   // which map servers answer from here, and how (a run from the queue: area "PING")
+    const q = "[out:json][timeout:10];node(1);out;", out: Record<string, unknown> = {};
+    const tries: [string, string, RequestInit][] = [
+      ["de post", "https://overpass-api.de/api/interpreter", { method: "POST", body: "data=" + encodeURIComponent(q), headers: { "Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json", "User-Agent": "Hutka/1.0 (+https://hutka.ai; track catalogue)" } }],
+      ["de get", "https://overpass-api.de/api/interpreter?data=" + encodeURIComponent(q), { headers: { "Accept": "*/*", "User-Agent": "Mozilla/5.0 (compatible; Hutka/1.0; +https://hutka.ai)" } }],
+      ["z.de", "https://z.overpass-api.de/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
+      ["lz4.de", "https://lz4.overpass-api.de/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
+      ["mail.ru", "https://maps.mail.ru/osm/tools/overpass/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
+      ["osm.jp", "https://overpass.osm.jp/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
+      ["osm.fr", "https://overpass.openstreetmap.fr/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
+      ["kumi get", "https://overpass.kumi.systems/api/interpreter?data=" + encodeURIComponent(q), { headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai)" } }],
+    ];
+    await Promise.all(tries.map(async ([k, u, init]) => { const t1 = Date.now(), ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 25000); try { const r = await fetch(u, { ...init, signal: ctl.signal }); out[k] = { status: r.status, ms: Date.now() - t1, body: (await r.text()).slice(0, 90) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 90), ms: Date.now() - t1 }; } finally { clearTimeout(timer); } }));
     await db.from("import_queue").update({ status: "done", result: out, finished_at: new Date().toISOString() }).eq("area", area); return json(out);
   }
   if (!/^([A-Z]{2}|US-[A-Z]{2})$/.test(area)) return json({ error: "bad_area" }, 400);
