@@ -5205,6 +5205,8 @@ Object.assign(I18N.RU, {
   "Save to this layout": "Сохранить в конфигурацию",
   "Saved — everyone sees this line now": "Сохранено — теперь эту линию видят все"
 });
+// v34.36 — a reverse layout: the layout it reverses, driven the other way
+Object.assign(I18N.RU, {"Nobody has driven this layout on Hutka yet: it is {name} driven the other way — the line from there, the points from similar corners.": "Эту конфигурацию на Hutka ещё не ездили: это {name} в обратную сторону — линия оттуда, точки из похожих поворотов."});
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -7030,7 +7032,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.35';
+const APP_VERSION = 'v34.36';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -7234,6 +7236,30 @@ const GEOM = (() => {
     if (G.wantTrace) { const img = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/trace`); if (img) { try { const im = await loadImg(img); G.image = { src: im, w: im.naturalWidth, h: im.naturalHeight, alpha: G.wantTrace.alpha }; } catch (e) {} } }
     if (layout && layout.aerial && G.frame && G.frame.merc) { const src = await STORE.getMedia(`tracks/${tid}/layouts/${lid}/media/aerial`); if (src) { try { const im = await loadImg(src); G.aerial = Object.assign({}, layout.aerial, { src: im }); } catch (e) {} } }
   }
+  // a reverse layout ("Reverse" — the track's classic layout driven the other way; "Reverse Links" — Links; "Reverse A" — "Forward A"):
+  // the layout it reverses, by name. Words that only say which way round or that it is a layout do not count
+  const isRev = (n) => /reverse|реверс|обратн/i.test(String(n || ''));
+  const baseName = (n) => String(n || '').toLowerCase().replace(/reversed|reverse|forward|реверс\S*|обратн\S*|layout|track|circuit|configuration|config|version|конфигурация|трасса/g, ' ').replace(/[()\-–—·,_/]+/g, ' ').replace(/\s+/g, ' ').trim();
+  async function forwardOf(tid, layout) {
+    if (!layout || !isRev(layout.name)) return null;
+    const ls = ((await STORE.getLayouts(tid)) || []).filter(x => x.id !== layout.id && !isRev(x.name)); if (!ls.length) return null;
+    const b = baseName(layout.name);
+    if (b) return ls.find(x => baseName(x.name) === b) || null;
+    const byOrder = ls.slice().sort((a, c) => (+a.order || 0) - (+c.order || 0));
+    return byOrder.find(x => /international|classic|full|main|standard|grand prix|\bgp\b|классик|основн/i.test(x.name || '')) || byOrder[0];
+  }
+  // that layout's line driven the other way: the same points in the same frame, the stations counted backwards from the same start/finish
+  function reverseTrack(t0) {
+    const N = t0.N, pts = [];
+    for (let k = 0; k < N; k++) { const i = (N - k) % N; pts.push({ x: t0.cx[i] / t0.mpp, y: t0.cy[i] / t0.mpp }); }
+    let tr = null; try { tr = KLL.buildTrack(pts, t0.lengthM || N * t0.ds, 0, false); } catch (e) { tr = null; }
+    return tr && tr.mpp > 0 && isFinite(tr.mpp) ? tr : null;
+  }
+  function reversedOf(G0, key, tid, lid, layout, fwd) {
+    const tr = reverseTrack(G0.track); if (!tr) return null;
+    return Object.assign({}, G0, { key, rev: 'g' + (++revN), tid, lid, layout, refSess: null, track: tr, _apex: null, mediaPending: false,
+      corners: { R: (layout && +layout.cornerR) || G0.corners.R, add: (layout && layout.cornersAdd) || [], del: (layout && layout.cornersDel) || [] }, reverseOf: { lid: fwd.id, name: fwd.name || '' } });
+  }
   async function build(tid, lid, pref, opts) {
     const layout = await layoutDoc(tid, lid);
     let refSess = null, refMeta = null;
@@ -7247,7 +7273,14 @@ const GEOM = (() => {
     const trace = layout && layout.trace && layout.trace.closed && Array.isArray(layout.trace.pts) && layout.trace.pts.length >= 3 ? layout.trace : null;
     const key = `${tid}|${lid}|${refSess ? refSess.id : '-'}|${layout ? layout.updatedAt || 0 : 0}`;
     if (cache.has(key)) { const G0 = cache.get(key); if (G0.mediaPending && !(opts && opts.noMedia)) await media(G0); return G0; }
-    if (!refSess && !trace) return null;
+    if (!refSess && !trace) {
+      // a reverse layout nobody has driven or drawn: the layout it reverses, driven the other way (its own laps or drawing replace it)
+      const fwd = !(opts && opts.noReverse) ? await forwardOf(tid, layout) : null;
+      const G0 = fwd ? await build(tid, fwd.id, null, Object.assign({}, opts, { noReverse: true })) : null;
+      const Gr = G0 && G0.track ? reversedOf(G0, key, tid, lid, layout, fwd) : null;
+      if (Gr) cache.set(key, Gr);
+      return Gr;
+    }
     const G = { key, rev: 'g' + (++revN), tid, lid, layout, refSess, widthM: (layout && +layout.widthM) || 8, corners: { R: (layout && +layout.cornerR) || 110, add: (layout && layout.cornersAdd) || [], del: (layout && layout.cornersDel) || [] }, source: '', image: null, aerial: null };
     if (refSess) {
       const clean = refSess.laps.filter(L => L.clean), laps = clean.length ? clean : refSess.laps;
@@ -7286,7 +7319,7 @@ const GEOM = (() => {
   // aerial photo placed in this frame: image-space offset from its Mercator anchor
   function aerialImage(G) { const a = G.aerial; if (!a || !G.frame || !G.frame.merc) return null; return { src: a.src, x: a.mx - G.frame.merc.x0, y: a.my - G.frame.merc.y0, w: a.src.naturalWidth * a.s, h: a.src.naturalHeight * a.s, rot: a.rot || 0, photo: true, alpha: 1 }; }
   const invalidate = () => cache.clear();
-  return { build, attach, apexes, aerialImage, invalidate, traceTrack };
+  return { build, attach, apexes, aerialImage, invalidate, traceTrack, forwardOf, reverseTrack };
 })();
 
 // ---------- tracks page ----------
@@ -10371,6 +10404,11 @@ const BRAINS = (() => {
     let G = v ? await geomOf(tid, lid, v) : null;
     if (!G) { try { G = await GEOM.build(tid, lid, null, { noMedia: true }); } catch (e) { G = null; } }
     if (!G) G = photoGeom(tid, lid);
+    if (!G) {   // a reverse layout: the picture saved to the layout it reverses, driven the other way
+      let fwd = null; try { fwd = await GEOM.forwardOf(tid, STORE.getLayout(tid, lid)); } catch (e) { fwd = null; }
+      const P = fwd ? photoGeom(tid, fwd.id) : null, tr = P ? GEOM.reverseTrack(P.track) : null;
+      if (tr) G = Object.assign({}, P, { rev: P.rev + '~rev', lid, track: tr, reverseOf: { lid: fwd.id, name: fwd.name || '' } });
+    }
     if (!G) return { mode: 'none', tid, lid, cls, name };
     return predictOn(G, { tid, lid, cls, name });
   }
@@ -11597,7 +11635,8 @@ function renderIdeal(body, sub, res) {
   }
   const trName = res.tid && STORE.getTrack(res.tid) ? STORE.getTrack(res.tid).name + ' · ' : '';
   sub.textContent = res.mode === 'real' ? trName + t('Real laps here: {n} · drivers: {d} · best {b}', { n: res.info.laps, d: res.info.drivers, b: fmtMs(res.info.best * 1000) }) : res.tid ? trName + t('Too few laps here yet: built from similar corners of other layouts ({n}) — a forecast, check it on track', { n: res.info.books }) : t('A forecast from similar corners of {n} layouts on Hutka — check it on track', { n: res.info.books });   // a track off the map or a photo: nobody drove it here
-  if (res.G && res.G.photo) body.appendChild(el('div', 'hint', t('From the layout map · {m} m', { m: res.G.photo.lengthM })));   // a picture saved to the layout
+  if (res.G && res.G.reverseOf) body.appendChild(el('div', 'hint', t('Nobody has driven this layout on Hutka yet: it is {name} driven the other way — the line from there, the points from similar corners.', { name: res.G.reverseOf.name })));
+  else if (res.G && res.G.photo) body.appendChild(el('div', 'hint', t('From the layout map · {m} m', { m: res.G.photo.lengthM })));   // a picture saved to the layout
   const cv = el('canvas', 'ai2-map'); body.appendChild(cv);
   const lg = el('div', 'ai2-legend'); lg.innerHTML = (res.G && res.G.band ? `<span><i class="r"></i>${esc(t('Racing line'))}</span>` : '') + `<span><i class="b"></i>${esc(t('Braking zone'))}</span><span><i class="l"></i>${esc(t('Lift zone'))}</span><span><i class="g"></i>${esc(t('back on the gas'))}</span><span><i class="f"></i>${esc(t('Flat-out corner'))}</span>`; body.appendChild(lg);
   const list = el('div', 'ai2-crn'); body.appendChild(list);
