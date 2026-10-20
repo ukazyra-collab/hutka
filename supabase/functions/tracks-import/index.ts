@@ -33,6 +33,21 @@ Deno.serve(async (req) => {
   let body: { area?: string; dry?: boolean; find?: string; ids?: string[]; mode?: string } = {};
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
   const area = String(body.area || "").toUpperCase(), dry = !!body.dry;
+  // by hand: which map databases answer from here ({probe:true}) — QLever's hosts and the Overpass servers, one tiny question each
+  if ((body as { probe?: boolean }).probe) {
+    const UA = { "User-Agent": "Hutka/1.0 (+https://hutka.ai; karting track catalogue)" }, out: Record<string, unknown> = {};
+    const sq = "SELECT ?x WHERE { <https://www.openstreetmap.org/way/832870199> ?p ?x } LIMIT 1", oq = "[out:json][timeout:20];way(832870199);out tags;";
+    const tries: [string, () => Promise<Response>][] = [
+      ["qlever.cs.uni-freiburg.de", () => fetch("https://qlever.cs.uni-freiburg.de/api/osm-planet", { method: "POST", body: new URLSearchParams({ query: sq }), headers: { ...UA, Accept: "application/sparql-results+json" } })],
+      ["qlever.dev", () => fetch("https://qlever.dev/api/osm-planet", { method: "POST", body: new URLSearchParams({ query: sq }), headers: { ...UA, Accept: "application/sparql-results+json" } })],
+      ["overpass-api.de", () => fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+      ["overpass.private.coffee", () => fetch("https://overpass.private.coffee/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+      ["maps.mail.ru", () => fetch("https://maps.mail.ru/osm/tools/overpass/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+      ["overpass.kumi.systems", () => fetch("https://overpass.kumi.systems/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+    ];
+    await Promise.all(tries.map(async ([k, f]) => { const t1 = Date.now(); try { const r = await Promise.race([f(), new Promise<Response>((_, rej) => setTimeout(() => rej(new Error("no answer in 25 s")), 25000))]); out[k] = { status: r.status, ms: Date.now() - t1, body: (await r.text()).slice(0, 160) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }));
+    return json(out);
+  }
   // by hand: what the map has under a name in an area ({area:"BY", find:"Стайк|Staik"}), or the given elements ({ids:["way/1"]})
   if (body.find || body.ids) {
     const byEl = (rows: Record<string, { value: string } | undefined>[]) => { const o: Record<string, Record<string, string>> = {}; for (const r of rows) { if (!r.el || !r.key || !r.val) continue; const k = r.el.value.replace("https://www.openstreetmap.org/", ""); (o[k] = o[k] || {})[r.key.value.replace(/^.*\/Key:/, "")] = r.val.value; } return o; };
