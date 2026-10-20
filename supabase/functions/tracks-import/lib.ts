@@ -13,8 +13,8 @@ export type El = {
 };
 // from: "raceway" (the raceways drawn), "joined" (raceways whose loose ends were 25 m apart or less), "outline" (the venue's track
 // drawn as a closed shape: its middle, or the edge of its asphalt — a few metres off the middle)
-// loose: found only by the second, looser look (nothing drawn round otherwise): loose ends up to 50 m apart, a loop from 150 m, the
-// venue's track drawn as an open line — the drawing as it is, its gap closed by a straight
+// loose: found only by the second, looser look (nothing drawn round otherwise): a small track drawn round (a loop from 150 m), the
+// venue's track drawn as an open line — the drawing as it is
 export type Line = { pts: [number, number][]; lengthM: number; ways: number[]; driven: boolean; dir: "cw" | "ccw"; widthM: number; corners: number; from: "raceway" | "joined" | "outline"; loose?: boolean };
 export type Venue = {
   id: string; osm: string; name: string; lat: number; lon: number; city: string; address: string; website: string; phone: string;
@@ -288,9 +288,10 @@ export function venuesOf(elements: El[]): Venue[] {
     let line = indoor && !loops.length ? null : lineFor(c, loops);
     const tiny = !line && tinyVenue(all);
     if (tiny) continue;   // a children's ride
-    // nothing drawn round: a second, looser look (never for a hall) — the venue's track drawn as an open line (leisure=track not
-    // closed: its middle), loose ends up to 50 m apart joined by a straight, a loop from 150 m (a small outdoor track), only near the
-    // venue's pin (250 m) or inside its outline, only a track's shape. The drawing as it is, its gap closed
+    // nothing drawn round: a second, looser look (never for a hall) — a small outdoor track (a loop from 150 m, not 300), the venue's
+    // track drawn as an open line (leisure=track not closed: its middle; loose ends 25 m apart at most, as raceways), only near the
+    // venue's pin (250 m) or inside its outline, only a track's shape. The drawing as it is: gaps wider than 25 m stay open (joined at
+    // 50 m they made outlines of ribbons and pit lanes run into the track — a dry run over Germany)
     if (!line && !indoor && looseMs < 400) {
       const tL = Date.now(), rw = near.get(c) || [], key = (p: LL) => p.lat.toFixed(7) + "," + p.lon.toFixed(7), ids = new Map<string, number>();
       for (const w of rw) if (w.nodes && w.geometry) w.geometry.forEach((p, i) => ids.set(key(p), w.nodes![i]));
@@ -302,7 +303,7 @@ export function venuesOf(elements: El[]): Venue[] {
         // only a loop shaped like a track (twisty: not the box of a paved pad, an oval or a car park drawn as a raceway), not a children's
         // ride's (all of it within 70 m, as tinyVenue), and only when it is most of what is drawn there (a small loop beside a bigger
         // track drawn in pieces is not that track)
-        const pool = rw.concat(outl, opens), loops2 = loopsOf(pool, { gap: 50, min: 150, budget: 6000 }).filter(lp => trackLike(lp.pts) && spanM(lp.pts) >= TINY_M);
+        const pool = rw.concat(outl, opens), loops2 = loopsOf(pool, { min: 150, budget: 6000 }).filter(lp => trackLike(lp.pts) && spanM(lp.pts) >= TINY_M);
         const loose = lineFor(c, loops2, 250);
         const drawn = pool.filter(w => !(w.tags && w.tags.sport && !/karting/i.test(w.tags.sport))).reduce((a, w) => a + lenOf(w.geometry || []), 0);
         if (loose && drawn <= 2 * loose.lengthM + 200) line = Object.assign(loose, { loose: true });

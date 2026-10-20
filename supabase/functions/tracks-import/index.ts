@@ -123,6 +123,8 @@ Deno.serve(async (req) => {
     for (const r of (data || []) as Record<string, unknown>[]) known.push({ id: String(r.id), osm: String(r.osm || ""), name: String(r.name || ""), lat: Number(r.lat), lon: Number(r.lon), len: Number(r.len) || 0, approx: r.approx === true });
     if (!data || data.length < 1000) break;
   }
+  // what a person took out (import_skip: the elements of pages removed by hand) is never made again, whatever the rules say then
+  { const { data, error } = await db.from("import_skip").select("osm"); if (!error) for (const r of (data || []) as { osm: string }[]) if (r.osm) known.push({ id: "skip:" + r.osm, osm: String(r.osm), name: "", lat: NaN, lon: NaN, len: 0 }); }
   // which venues are new, which Hutka has, which complete a track it knows by its town only (lib.ts placeVenues)
   const { fresh, skipped, upgrades, maybe } = placeVenues(venues, known);
   const withLine = fresh.filter(v => v.line).length;
