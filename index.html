@@ -325,6 +325,10 @@ html.native .modal.auth.gate .box.auth-box{background:var(--bg);backdrop-filter:
 .onb-photo{display:flex;gap:16px;align-items:center}
 .onb-foot{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
 body.onboarding #toast{z-index:90}
+.ga-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:85;width:min(560px,calc(100% - 24px));background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:10px 10px 10px 16px;display:flex;align-items:center;gap:12px}
+.ga-bar p{margin:0;flex:1;font-size:13.5px;line-height:1.4}.ga-bar p a{color:var(--muted);white-space:nowrap}
+.ga-acts{display:flex;gap:8px;flex:none}.ga-acts .btn{height:44px;min-width:72px}
+@media (max-width:700px){.ga-bar{bottom:calc(76px + var(--sa-bottom));flex-wrap:wrap;padding:12px}.ga-bar p{flex:1 1 100%}.ga-acts{flex:1 1 100%}.ga-acts .btn{flex:1}}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13.5px;box-shadow:var(--shadow);z-index:90;max-width:min(560px,calc(100% - 32px))}
 .flag{font-size:18px;line-height:1}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13.5px}
@@ -2500,6 +2504,7 @@ input.sw:checked::after{transform:translateX(18px)}
   <div class="row" style="align-items:center;gap:10px"><label class="btn sm filebtn"><span data-t="Attach a screenshot">Attach a screenshot</span><input type="file" id="bugShot" accept="image/*"></label><span class="hint" id="bugShotName"></span></div>
   <div class="row"><button class="btn primary" id="bugSend" type="button" data-t="Send">Send</button><button class="btn ghost" id="bugCancel" type="button" data-t="Cancel">Cancel</button><span class="status" id="bugStatus"></span></div>
 </div></div>
+<div class="ga-bar" id="gaBar" role="region" aria-label="Analytics" hidden><p><span data-t="Allow Hutka to count visits with Google Analytics?">Allow Hutka to count visits with Google Analytics?</span> <a href="privacy.html#analytics" target="_blank" rel="noopener" data-t="Privacy">Privacy</a></p><div class="ga-acts"><button class="btn ghost" id="gaNo" type="button" data-t="No">No</button><button class="btn primary" id="gaYes" type="button" data-t="Allow">Allow</button></div></div>
 <div class="toast" id="toast" hidden></div>
 <button class="dev-pill" id="devPill" type="button" hidden></button>
 <script>
@@ -5715,6 +5720,10 @@ Object.assign(I18N.RU, {
 Object.assign(I18N.RU, {
   "Sodi World Series track": "Трек Sodi World Series", "pin on the town, not on the track": "точка на городе, не на самом треке"
 });
+// v34.47 — Google Analytics on the website: the consent bar (Europe)
+Object.assign(I18N.RU, {
+  "Allow Hutka to count visits with Google Analytics?": "Разрешить Hutka считать посещения через Google Analytics?", "Privacy": "Конфиденциальность", "No": "Нет", "Allow": "Разрешить"
+});
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -6617,6 +6626,7 @@ const STORE = (() => {
   function visitId() { const now = Date.now(); try { const s = JSON.parse(sessionStorage.getItem('hutka.visit') || 'null'); if (s && s.id && now - s.t < 30 * 60000) { s.t = now; sessionStorage.setItem('hutka.visit', JSON.stringify(s)); return s.id; } const id = 'v' + Math.random().toString(36).slice(2, 12) + now.toString(36); sessionStorage.setItem('hutka.visit', JSON.stringify({ id, t: now })); return id; } catch (e) { return ''; } }
   let eventsOk = true;
   function track(name, props) {
+    if (window.GA) window.GA.event(name, props);   // the same event in Google Analytics (ga.js), when it is on
     if (!eventsOk || !adapter || adapter.kind !== 'supabase' || !adapter.event) return; const vid = visitorId(), vis = visitId(); if (!vid || !vis) return;
     const dev = ((window.NATIVE && window.NATIVE.on) ? 'app ' : '') + (window.innerWidth < 700 ? 'phone' : window.innerWidth < 1100 ? 'tablet' : 'desktop');
     adapter.event(vid, vis, name, props || {}, dev).catch((e) => { if (/hutka_event|PGRST202|42883/.test(String(e && e.message || e))) eventsOk = false; });
@@ -7339,6 +7349,7 @@ async function route() {
     else if (name === 'admin') await ADMIN.show(r.a, r.b);
     else if (name === 'help') renderHelpPage();
     else if (name === 'activity') await renderActivity();
+    if (window.GA) GA.page(APP.route, APP.a, APP.b);   // Google Analytics: the page once it is drawn (ga.js)
   } catch (e) { console.error('route', e); }
   finally { if (seq === routeSeq) routeHash = null; }
 }
@@ -7613,7 +7624,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.46';
+const APP_VERSION = 'v34.47';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -7664,8 +7675,6 @@ window.addEventListener('error', (e) => { BUG.note((e.message || 'error') + (e.f
 window.addEventListener('unhandledrejection', (e) => { const r = e.reason; BUG.note('promise: ' + (r && (r.message || r.code) || String(r)).slice(0, 200)); });
 $('bugBtn').onclick = BUG.open; $('bugTop').onclick = BUG.open; $('bugCancel').onclick = BUG.close; $('bugSend').onclick = BUG.send; $('bugModal').addEventListener('click', (e) => { if (e.target === $('bugModal')) BUG.close(); });
 $('bugShot').onchange = async (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; try { BUG.shot = await imageToDataUrl(f, 1400, 600000); $('bugShotName').textContent = f.name.slice(0, 40); } catch (err) { BUG.shot = null; setStatus('bugStatus', t('Could not read the image.'), 'warn'); } e.target.value = ''; };
-// ---------- visits: Google Analytics when config.js names a measurement id (not a secret) ----------
-(() => { const cfg = window.HUTKA_CONFIG || {}, id = cfg.analytics || cfg.gaId; if (!id || !/^G-[A-Z0-9]+$/.test(id) || location.protocol !== 'https:') return; try { if (navigator.doNotTrack === '1') return; } catch (e) {} const sc = document.createElement('script'); sc.async = true; sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + id; document.head.appendChild(sc); window.dataLayer = window.dataLayer || []; window.gtag = function () { window.dataLayer.push(arguments); }; gtag('js', new Date()); gtag('config', id, { anonymize_ip: true, send_page_view: true }); addEventListener('hashchange', () => gtag('event', 'page_view', { page_location: location.href, page_path: location.pathname + location.hash })); })();
 // ---------- search ----------
 let qT = null;
 $('q').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(renderSearch, 120); });
@@ -7733,6 +7742,87 @@ function renderProgress(box, list, opts) {
   }
   return groups.length;
 }
+// ---------- Google Analytics 4 (config.js: analytics: "G-…", not a secret): visits, where visitors come from, countries, devices — next to
+// Hutka's own counters (events.sql, Admin → Statistics). Only the website on https: not the iOS/Android app (its store privacy labels say no
+// third-party analytics), not the test copies, not when the browser asks not to be tracked.
+//  · consent (Consent Mode v2): in Europe (the EEA, the UK, Switzerland — Google decides by the visitor's IP) nothing is stored until the
+//    visitor allows it; a one-line bar asks visitors whose clock is set to a European time zone; the choice is kept on the device and can be
+//    changed on the privacy page. Elsewhere analytics is on. Google's advertising features are always off.
+//  · pages: the app's hash routes become virtual pages (/tracks, /track/<id>, /lab/<id>, /driver/<id>, …) with readable titles; the
+//    automatic page view is off (the data stream's "page changes based on browser history events" must be off too — README)
+//  · events: Hutka's own (Lab open, comparison, AI question, upload, publish, share, like, comment …) go along under GA4 names, without
+//    anything personal; sign_up / login once per account and browser; a signed-in driver is one user across devices (user_id = the
+//    account's random id — never the e-mail or the name)
+const GA = window.GA = (() => {
+  const cfg = window.HUTKA_CONFIG || {}, id = String(cfg.analytics || cfg.gaId || '');
+  const EEA = ['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'IS', 'LI', 'NO', 'GB', 'CH'];
+  const KEY = 'hutka.ga';   // 'yes' | 'no': the visitor's own choice on this device
+  const native = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  let dnt = false; try { dnt = navigator.doNotTrack === '1' || window.doNotTrack === '1'; } catch (e) {}
+  const on = /^G-[A-Z0-9]{4,}$/.test(id) && !native && !dnt && (location.protocol === 'https:' || !!cfg.analyticsDebug);
+  const choice = () => { try { const v = localStorage.getItem(KEY); return v === 'yes' || v === 'no' ? v : ''; } catch (e) { return ''; } };
+  // a European clock: the bar asks (Russia, Belarus, Turkey, Ukraine's occupied south and the like are outside the EEA rules)
+  const euClock = () => { try { const z = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; return (/^Europe\//.test(z) && !/^Europe\/(Moscow|Minsk|Kirov|Volgograd|Saratov|Ulyanovsk|Astrakhan|Samara|Istanbul|Simferopol|Kaliningrad)$/.test(z)) || /^Atlantic\/(Reykjavik|Canary|Madeira|Azores|Faroe)$/.test(z); } catch (e) { return false; } };
+  const g = function () { window.dataLayer.push(arguments); };
+  if (on) {
+    window.dataLayer = window.dataLayer || []; window.gtag = g;
+    const ads = { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' };
+    g('consent', 'default', Object.assign({ analytics_storage: 'denied', region: EEA, wait_for_update: 500 }, ads));
+    g('consent', 'default', Object.assign({ analytics_storage: 'granted' }, ads));
+    const c = choice(); if (c) g('consent', 'update', { analytics_storage: c === 'yes' ? 'granted' : 'denied' });
+    g('set', 'ads_data_redaction', true); g('set', 'url_passthrough', false);
+    g('js', new Date());
+    g('config', id, Object.assign({ send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false }, cfg.analyticsDebug ? { debug_mode: true } : {}));
+    const sc = document.createElement('script'); sc.async = true; sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id); document.head.appendChild(sc);
+  }
+  // the page a route is: a virtual path and a title
+  const TITLES = { home: 'Start', start: 'Start', feed: 'Feed', tracks: 'Tracks', track: 'Track', layout: 'Track', lab: 'Lab', profile: 'My profile', driver: 'Driver', ai: 'Hutka AI', admin: 'Admin', help: 'Help', activity: 'Activity' };
+  let lastPath = '';
+  function page(name, a, b) {
+    if (!on) return;
+    const safe = (s) => encodeURIComponent(String(s || '').slice(0, 80));
+    let path = '/' + (name || 'home'), title = TITLES[name] || name;
+    if ((name === 'track' || name === 'layout') && a) { path = '/track/' + safe(a) + (b ? '/' + safe(b) : ''); try { const tr = STORE.getTrack(a); if (tr && tr.name) title = 'Track · ' + tr.name; } catch (e) {} }
+    else if (name === 'lab' && a) path = '/lab/' + safe(a);
+    else if (name === 'driver' && a) path = '/driver/' + safe(a);
+    else if (name === 'ai' && a) path = '/ai/' + safe(a);
+    else if (name === 'admin') path = '/admin';
+    if (path === lastPath) return; lastPath = path;
+    g('event', 'page_view', { page_location: location.origin + path, page_path: path, page_title: title + ' — Hutka', page_referrer: document.referrer || undefined, ui_lang: lang() });
+  }
+  const lang = () => { try { return I18N.lang || 'en'; } catch (e) { return 'en'; } };
+  // Hutka's own events under GA4 names (the parameters: nothing personal — kinds, counts, the session's random id)
+  const MAP = { lab: 'open_session', compare: 'compare_laps', third: 'third_lap', replay: 'replay', ask: 'ask_ai', upload: 'upload_session', publish: 'publish_session', share: 'share', like: 'like', comment: 'comment', track_from_photo: 'track_from_photo', layout_pick: 'pick_layout', device_import: 'import_from_device' };
+  function event(name, props) {
+    if (!on) return; const ev = MAP[name]; if (!ev) return; const p = {};
+    for (const [k, v] of Object.entries(props || {})) if (/^(sid|mode|n|kart|app|from|act|page|mine|cmp|left)$/.test(k) && v !== undefined && v !== null && v !== '') p[k === 'sid' ? 'session_id' : k] = typeof v === 'boolean' ? String(v) : (typeof v === 'number' ? v : String(v).slice(0, 100));
+    if (ev === 'share') { p.method = 'card'; p.content_type = 'session'; p.item_id = p.session_id || ''; }
+    g('event', ev, p);
+  }
+  // who: a signed-in driver is one user on every device; a new account says sign_up once, a known one login (once per browser)
+  async function identify() {
+    if (!on) return;
+    let me = null; try { me = STORE.me && STORE.me.id ? STORE.me : null; } catch (e) {}
+    g('set', 'user_properties', { signed_in: me ? 'yes' : 'no', ui_lang: lang(), app_version: (typeof APP_VERSION !== 'undefined' ? APP_VERSION : '') });
+    if (!me) return;
+    g('set', { user_id: me.id });
+    let last = ''; try { last = localStorage.getItem('hutka.ga.uid') || ''; } catch (e) {}
+    if (last === me.id) return;
+    let created = 0, method = 'email';
+    try { const s = await STORE.adapter.sb.auth.getSession(), u = s && s.data && s.data.session && s.data.session.user; if (u) { created = Date.parse(u.created_at) || 0; method = (u.app_metadata && u.app_metadata.provider) || 'email'; } } catch (e) {}
+    g('event', created && Date.now() - created < 30 * 60000 ? 'sign_up' : 'login', { method });
+    try { localStorage.setItem('hutka.ga.uid', me.id); } catch (e) {}
+  }
+  // the visitor's choice (the bar, the privacy page)
+  function set(yes) { try { localStorage.setItem(KEY, yes ? 'yes' : 'no'); } catch (e) {} if (on) g('consent', 'update', { analytics_storage: yes ? 'granted' : 'denied' }); const b = document.getElementById('gaBar'); if (b) b.hidden = true; }
+  function bar() {
+    if (!on || choice() || !euClock()) return; const b = document.getElementById('gaBar'); if (!b) return;
+    const yes = document.getElementById('gaYes'), no = document.getElementById('gaNo');
+    if (yes) yes.onclick = () => set(true); if (no) no.onclick = () => set(false);
+    b.hidden = false;
+  }
+  return { on, page, event, identify, set, bar, choice, euClock };
+})();
 // ---------- the opening of the app: the brand intro ----------
 // The native splash (the H mark on white) hands over to this overlay: the mark settles up, under it the lap line of a real Dubai
 // Kartdrome lap draws itself — brake, apex and throttle points popping as the line passes them, the corner numbers after — and the
@@ -14181,6 +14271,7 @@ const ADMIN = (() => {
   try { await STORE.init(); } catch (e) {}
   try { STORE.visit(); } catch (e) {}   // visitors & retention for the admin panel (visits.sql)
   renderShell(); I18N.applyStatic();
+  try { GA.identify(); GA.bar(); } catch (e) {}   // Google Analytics: the user (signed in or not) and, in Europe, the consent bar (ga.js)
   try { await ONBOARD.check(); } catch (e) {}
   try { AUTH.gate(); } catch (e) {}   // the app: sign in first
   window.__hutka = { GEOM, LAB, STORE, APP, NAV, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, sameTrackName, lineOf, BRAIN, BRAINS, TRACKFIND, fitsLayout, DATA, KLL, readAnyLogger, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };

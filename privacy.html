@@ -15,6 +15,9 @@
   .lang button.on{background:#1f2b48;color:#fff;border-color:#1f2b48}
   [hidden]{display:none!important}
   ul{padding-left:20px}
+  .ga button{border:1px solid #cdd3dd;background:#fff;border-radius:8px;padding:6px 12px;font:600 14px inherit;cursor:pointer;margin:2px 4px 2px 0}
+  .ga button.on{background:#1f2b48;color:#fff;border-color:#1f2b48}
+  .ga-now{color:#5b6475;font-size:14px}
 </style>
 </head>
 <body>
@@ -23,7 +26,7 @@
 
   <section id="s-en">
     <h1>Hutka — Privacy Policy</h1>
-    <div class="sub">Last updated: 16 October 2026 · applies to the Hutka website and the Hutka iOS / Android app</div>
+    <div class="sub">Last updated: 20 October 2026 · applies to the Hutka website and the Hutka iOS / Android app</div>
 
     <h2>Who we are</h2>
     <p>Hutka (hutka.ai) and the Hutka app are operated by <b>KOZYRA MEDIA GROUP - FZCO</b>, a free zone company registered in Dubai, United Arab Emirates (IFZA / Dubai Integrated Economic Zones Authority, licence no. 41793), IFZA Properties, Dubai Silicon Oasis, Dubai, UAE. It is the controller of the data described here. Contact: <a href="mailto:hello@hutka.ai">hello@hutka.ai</a>.</p>
@@ -38,7 +41,8 @@
       <li><b>Community content</b>: comments, helpful/not-helpful votes, follows, tracks you add; reports you send about content or drivers, and the drivers you block (kept so the block works; not shown to anyone).</li>
       <li><b>AI coach chats</b>: the questions you ask and the answers; the relevant parts of your sessions are sent to the AI provider to answer. Usage counts (requests per hour/day) are kept to prevent abuse; the IP address is stored only as a one-way hash for the same purpose.</li>
       <li><b>Notifications</b>: if you turn on push notifications in the app, the device token that delivers them (through Apple Push Notification service or Google Firebase Cloud Messaging) is stored with your account until you turn them off or sign out. Notification e-mails (a comment or a like on your session) go to your account address; you can switch them off in your profile.</li>
-      <li><b>Usage</b>: which pages are opened and for how long, tied to your account when you are signed in and to a random per-browser id otherwise — our own counters in our own database, used to see which parts of Hutka are useful. We do not run advertising trackers or third-party analytics SDKs.</li>
+      <li><b>Usage</b>: which pages are opened and for how long, tied to your account when you are signed in and to a random per-browser id otherwise — our own counters in our own database, used to see which parts of Hutka are useful. We do not run advertising trackers.</li>
+      <li id="analytics"><b>Website statistics (Google Analytics)</b>: on the website (not in the iOS / Android app) we use Google Analytics 4 to count visits and see where visitors come from (search, links, social networks), from which countries and on which devices, and which pages and features are used. It sets cookies on your browser only where allowed: in the European Economic Area, the United Kingdom and Switzerland only after you press <b>Allow</b> in the bar at the bottom of the page. When you are signed in, the visit is counted with your account's random id, never your e-mail or name. Google's advertising features (signals, personalisation) are off; Google Analytics 4 does not store IP addresses. Your choice on this device: <span class="ga"><button type="button" data-ga="yes">Allow analytics</button> <button type="button" data-ga="no">Don't allow</button> <span class="ga-now" data-lang="en"></span></span> You can also block it with Google's <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">opt-out add-on</a> or your browser's "Do Not Track" setting, which Hutka respects.</li>
       <li><b>Technical</b>: standard server logs of our hosting providers.</li>
     </ul>
 
@@ -50,6 +54,7 @@
       <li><b>Esri</b> — satellite imagery tiles shown under the track line (your device requests the tiles directly).</li>
       <li><b>Apple / Google (Firebase)</b> — deliver push notifications to the app, if you turn them on; <b>Resend</b> — sends our e-mails (sign-in codes, notifications).</li>
       <li><b>Google / Apple</b> — only if you choose to sign in with them.</li>
+      <li><b>Google (Analytics)</b> — website visit statistics, as described above.</li>
     </ul>
     <p>Data is not sold and not used for advertising. Published sessions, profiles, comments and track pages are visible to everyone; private sessions are visible only to you.</p>
 
@@ -65,7 +70,7 @@
 
   <section id="s-ru" hidden lang="ru">
     <h1>Hutka — Политика конфиденциальности</h1>
-    <div class="sub">Обновлено: 16 октября 2026 · действует для сайта Hutka и приложения Hutka для iOS / Android</div>
+    <div class="sub">Обновлено: 20 октября 2026 · действует для сайта Hutka и приложения Hutka для iOS / Android</div>
 
     <h2>Кто мы</h2>
     <p>Сайт Hutka (hutka.ai) и приложение Hutka принадлежат и управляются компанией <b>KOZYRA MEDIA GROUP - FZCO</b>, зарегистрированной в свободной зоне Дубая, ОАЭ (IFZA / Dubai Integrated Economic Zones Authority, лицензия № 41793), адрес: IFZA Properties, Dubai Silicon Oasis, Dubai, UAE. Она — оператор описанных здесь данных. Контакт: <a href="mailto:hello@hutka.ai">hello@hutka.ai</a>.</p>
@@ -80,7 +85,8 @@
       <li><b>Сообщество</b>: комментарии, оценки «полезно / не полезно», подписки, добавленные вами трассы; ваши жалобы на контент или гонщиков и список заблокированных вами гонщиков (хранится, чтобы блокировка работала; никому не показывается).</li>
       <li><b>Чаты с ИИ-тренером</b>: вопросы и ответы; нужные для ответа части ваших сессий отправляются провайдеру ИИ. Счётчики запросов (в час / в день) хранятся для защиты от злоупотреблений; IP-адрес — только в виде необратимого хеша для той же цели.</li>
       <li><b>Уведомления</b>: если включить пуши в приложении, токен устройства, по которому они доставляются (через Apple Push Notification service или Google Firebase Cloud Messaging), хранится вместе с аккаунтом, пока вы их не выключите или не выйдете. Письма-уведомления (комментарий или лайк к вашей сессии) приходят на почту аккаунта; их можно отключить в профиле.</li>
-      <li><b>Использование</b>: какие страницы открываются и надолго ли — привязано к аккаунту, когда вы вошли, и к случайному идентификатору браузера, когда нет; это наши собственные счётчики в нашей базе, чтобы видеть, какие части Hutka полезны. Рекламных трекеров и сторонних аналитических SDK нет.</li>
+      <li><b>Использование</b>: какие страницы открываются и надолго ли — привязано к аккаунту, когда вы вошли, и к случайному идентификатору браузера, когда нет; это наши собственные счётчики в нашей базе, чтобы видеть, какие части Hutka полезны. Рекламных трекеров нет.</li>
+      <li id="analytics-ru"><b>Статистика сайта (Google Analytics)</b>: на сайте (не в приложении iOS / Android) мы используем Google Analytics 4, чтобы считать посещения и видеть, откуда приходят посетители (поиск, ссылки, соцсети), из каких стран и с каких устройств и какими страницами и функциями пользуются. Cookie в браузере он ставит только там, где это разрешено: в Европейской экономической зоне, Великобритании и Швейцарии — только после того, как вы нажмёте <b>Разрешить</b> в строке внизу страницы. Когда вы вошли, визит считается по случайному идентификатору аккаунта, никогда не по почте или имени. Рекламные функции Google (сигналы, персонализация) выключены; Google Analytics 4 не хранит IP-адреса. Ваш выбор на этом устройстве: <span class="ga"><button type="button" data-ga="yes">Разрешить статистику</button> <button type="button" data-ga="no">Не разрешать</button> <span class="ga-now" data-lang="ru"></span></span> Заблокировать её можно и <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">дополнением Google</a> или настройкой браузера «Do Not Track» — Hutka её соблюдает.</li>
       <li><b>Техническое</b>: стандартные серверные логи хостинг-провайдеров.</li>
     </ul>
 
@@ -92,6 +98,7 @@
       <li><b>Esri</b> — спутниковые снимки под линией трассы (устройство запрашивает их напрямую).</li>
       <li><b>Apple / Google (Firebase)</b> — доставляют пуши в приложение, если вы их включили; <b>Resend</b> — отправляет наши письма (коды входа, уведомления).</li>
       <li><b>Google / Apple</b> — только если вы выбрали вход через них.</li>
+      <li><b>Google (Analytics)</b> — статистика посещений сайта, как описано выше.</li>
     </ul>
     <p>Данные не продаются и не используются для рекламы. Опубликованные сессии, профили, комментарии и страницы трасс видны всем; приватные сессии — только вам.</p>
 
@@ -109,6 +116,10 @@
   const pick = (l) => { document.getElementById('s-en').hidden = l !== 'en'; document.getElementById('s-ru').hidden = l !== 'ru'; document.getElementById('en').classList.toggle('on', l === 'en'); document.getElementById('ru').classList.toggle('on', l === 'ru'); document.documentElement.lang = l; };
   document.getElementById('en').onclick = () => pick('en'); document.getElementById('ru').onclick = () => pick('ru');
   if (/^ru/i.test(navigator.language || '') || location.hash === '#ru') pick('ru');
+  // the visitor's Google Analytics choice on this device (the same key the site reads: hutka.ga = yes | no)
+  const gaShow = () => { let v = ''; try { v = localStorage.getItem('hutka.ga') || ''; } catch (e) {} for (const b of document.querySelectorAll('.ga button')) b.classList.toggle('on', b.dataset.ga === v); for (const n of document.querySelectorAll('.ga-now')) n.textContent = n.dataset.lang === 'ru' ? (v === 'yes' ? 'Сейчас: разрешено.' : v === 'no' ? 'Сейчас: не разрешено.' : '') : (v === 'yes' ? 'Now: allowed.' : v === 'no' ? 'Now: not allowed.' : ''); };
+  for (const b of document.querySelectorAll('.ga button')) b.onclick = () => { try { localStorage.setItem('hutka.ga', b.dataset.ga); } catch (e) {} gaShow(); };
+  gaShow();
 </script>
 </body>
 </html>
