@@ -6788,10 +6788,17 @@ const STORE = (() => {
 // optional model line, and (for the admin editor) the traced control points. Pan, smooth zoom, rotation, hover and click. ----------
 function createMapView(canvas, host) {
   const V = { s: 1, tx: 0, ty: 0, rot: 0, auto: true, ts: 1, anchor: null };
+  // the view a person framed (zoomed in, moved, turned) outlives a change of the canvas's size — full screen and back, a window resized:
+  // (the whole track, nobody's framing, is fitted again at the new size)
+  // the same place in the middle of the free part of the map, the same stretch of track in view (scaled to fit the new size), not the
+  // same pixels, so the picture never flies aside. region: what was in view (the point in the middle and the width and height in
+  // track units), taken at a settled size whenever the view changes; adjusted: the view this code set (a paint at it keeps region as
+  // it was, so full screen and back returns exactly). An automatic view (the whole track) is refitted by its host instead
+  let vw = 0, vh = 0, region = null, adjusted = null, land0 = null;   // land0: the screen's orientation at a settled paint — a phone turned is the turn's business (deviceTurn), not this
   const M = { view: V, hoverIdx: -1, dragIdx: -1, selIdx: -1, panning: null, spaceDown: false, tool: 'pan', badges: [] };
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   function tokens() { const cs = getComputedStyle(document.documentElement), g = (n) => cs.getPropertyValue(n).trim(); return { bg: g('--bg'), surface: g('--surface'), surface2: g('--surface-2'), line: g('--line'), line2: g('--line-2'), fg: g('--fg'), muted: g('--muted'), faint: g('--faint'), accent: g('--accent'), accentInk: g('--accent-ink'), brake: g('--brake'), limit: g('--limit'), lift: g('--lift'), throttle: g('--throttle'), turnin: g('--turnin'), actual: g('--actual'), cmp: g('--cmp'), cmp2: g('--cmp2') || '#17a2b8', shiftUp: g('--shift-up') || '#f2c94c', shiftDown: g('--shift-down') || '#8b5cf6', mono: g('--mono') || 'monospace', body: g('--body') || 'sans-serif' }; }
-  function setup() { const w = canvas.clientWidth || canvas.parentElement.clientWidth || 600, h = host.height ? host.height(w) : Math.round(clamp(w * 0.7, 420, 900)); const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1, Math.sqrt(3.2e6 / Math.max(1, w * h)))); if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); canvas.style.height = h + 'px'; } const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, w, h }; }
+  function setup() { const w = canvas.clientWidth || canvas.parentElement.clientWidth || 600, h = host.height ? host.height(w) : Math.round(clamp(w * 0.7, 420, 900)); const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1, Math.sqrt(3.2e6 / Math.max(1, w * h)))); if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); canvas.style.height = h + 'px'; } const grew = vw && vh && (w !== vw || h !== vh); vw = w; vh = h; if (grew) keepRegion(w, h); const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, w, h }; }
   const imgSize = () => { const fs = host.getFrameSize ? host.getFrameSize() : null; if (fs) return fs; const im = host.getImage ? host.getImage() : null; return im ? [im.w, im.h] : [1600, 1000]; };
   const toS = (x, y) => { const c = Math.cos(V.rot), si = Math.sin(V.rot); return [V.tx + V.s * (c * x - si * y), V.ty + V.s * (si * x + c * y)]; };
   const toI = (sx, sy) => { const c = Math.cos(V.rot), si = Math.sin(V.rot), x = (sx - V.tx) / V.s, y = (sy - V.ty) / V.s; return [c * x + si * y, -si * x + c * y]; };
@@ -6806,6 +6813,16 @@ function createMapView(canvas, host) {
     V.s = s; V.ts = s; V.sFit = s; V.anchor = null; V.tx = I.cx - s * (c * cx - si * cy); V.ty = I.cy - s * (si * cx + c * cy); V.auto = true; turnFix = null;
   }
   // the part of the canvas that overlays leave free (the cockpit HUD, the scrub bar, a side sheet): fit and focus aim at its centre
+  function keepRegion(w, h) {
+    if (land0 !== null && (window.innerWidth > window.innerHeight) !== land0) return;   // the phone turned: the map stays taped to the glass (deviceTurn)
+    if (V.auto && !turnFix) { fit(true); return; }   // the whole track: the whole track again, at the new size (the size is settled: no loop)
+    if (V.auto || turnFix || !region) return;
+    const I = inset(w, h), s = Math.min(I.w / region.w, I.h / region.h); if (!(s > 0) || !isFinite(s)) return;
+    const k = s / V.s, c = Math.cos(V.rot), si = Math.sin(V.rot);
+    V.s = s; V.ts = s; if (V.sFit) V.sFit *= k; V.anchor = null; fly = null;
+    V.tx = I.cx - s * (c * region.px - si * region.py); V.ty = I.cy - s * (si * region.px + c * region.py);
+    adjusted = { s: V.s, tx: V.tx, ty: V.ty, rot: V.rot };
+  }
   function inset(w, h) { const o = host.viewInset ? host.viewInset(w, h) : null; const l = o && o.l || 0, t = o && o.t || 0, r = o && o.r || 0, b = o && o.b || 0; const iw = Math.max(60, w - l - r), ih = Math.max(60, h - t - b); return { l, t, r, b, w: iw, h: ih, cx: l + iw / 2, cy: t + ih / 2 }; }
   // pan just enough to keep a lap position inside the free part of the canvas (the scrub bar drags the marker out of a zoomed-in view)
   function keepInView(P, i) {
@@ -6896,6 +6913,9 @@ function createMapView(canvas, host) {
     if (turnFix) recentre();
     const { ctx, w, h } = setup(), C = tokens(), sc = V.s, T = toS, O = host.getOverlay ? host.getOverlay() : {};
     if (w === lastW && h === lastH) centreImg = toI(w / 2, h / 2); else { lastW = w; lastH = h; }   // the point under the middle of the glass, from a paint at a settled size (a resize may land before the turn event)
+    land0 = window.innerWidth > window.innerHeight;
+    if (V.auto) { region = null; adjusted = null; }   // what is in view, when a person (or a fly-to) set it — not when a resize did (keepRegion)
+    else if (!adjusted || adjusted.s !== V.s || adjusted.tx !== V.tx || adjusted.ty !== V.ty || adjusted.rot !== V.rot) { const I = inset(w, h), [px, py] = toI(I.cx, I.cy); region = { px, py, w: I.w / V.s, h: I.h / V.s }; adjusted = null; }
     const rc = Math.cos(V.rot), rs = Math.sin(V.rot), RN = (nx, ny) => [rc * nx - rs * ny, rs * nx + rc * ny];
     const tr = host.getTrack ? host.getTrack() : null, mpp = tr ? tr.mpp : null, widthM = host.getWidthM ? host.getWidthM() : 8, im = host.getImage ? host.getImage() : null;
     ctx.fillStyle = C.surface2; ctx.fillRect(0, 0, w, h);
@@ -7173,7 +7193,7 @@ function createMapView(canvas, host) {
   }
   function fitAnimated() { const keep = { s: V.s, tx: V.tx, ty: V.ty }; fit(true); const to = { s: V.s, tx: V.tx, ty: V.ty }; V.s = keep.s; V.tx = keep.tx; V.ty = keep.ty; flyTo(to.s, to.tx, to.ty, 280); V.auto = true; }
   canvas.addEventListener('pointerdown', () => { fly = null; turnFix = null; });
-  return { V, M, host, fit, fitAnimated, focusWindow, keepInView, draw, zoomAt, zoomCenter, rotateBy, deviceTurn, toS, toI, setTool, setHover, setTouchFree, nearestStation, nearestLineIdx, badgeAt, setup, tokens, lapPos: (P, i) => lapPos(host.getTrack(), P, i) };
+  return { V, M, host, fit, fitAnimated, focusWindow, keepInView, inset, draw, zoomAt, zoomCenter, rotateBy, deviceTurn, toS, toI, setTool, setHover, setTouchFree, nearestStation, nearestLineIdx, badgeAt, setup, tokens, lapPos: (P, i) => lapPos(host.getTrack(), P, i) };
 }
 (() => {
 const $ = (id) => document.getElementById(id);
@@ -7710,7 +7730,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.50';
+const APP_VERSION = 'v34.51';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
