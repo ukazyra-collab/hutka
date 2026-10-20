@@ -10,7 +10,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { venuesOf, distM, nameKey, type El, type Venue } from "./lib.ts";
 import { update, putRows, namesOf, lineMeta, mediaRow } from "./update.ts";
 import { QLEVER, qVenueTags, qVenueGeom, qRacewayGeom, qRacewayTags, qTowns, qFind, qIdTags, qIdGeom, sparql, venueEls, racewayEls, townEls } from "./qlever.ts";
-import { overpass, overpassEls, qArea } from "./overpass.ts";
+import { overpass, overpassEls, qVenues, qRaceways, qTownsO } from "./overpass.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-import-token", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
@@ -54,8 +54,11 @@ Deno.serve(async (req) => {
       ["api.openstreetmap.org", () => fetch("https://api.openstreetmap.org/api/0.6/way/832870199.json", { headers: UA })],
       ["photon.komoot.io", () => fetch("https://photon.komoot.io/api/?q=karting%20minsk&limit=2", { headers: UA })],
       ["download.geofabrik.de", () => fetch("https://download.geofabrik.de/asia/gcc-states-latest.osm.pbf", { headers: { ...UA, Range: "bytes=0-99" } })],
+      // the satellite imagery the app draws under the lines (Esri World Imagery): does a tile come, with the CORS header the app needs
+      ["esri services", () => fetch("https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/16/28451/42760", { headers: { ...UA, Origin: "https://hutka.ai", Referer: "https://hutka.ai/" } })],
+      ["esri server", () => fetch("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/16/28451/42760", { headers: { ...UA, Origin: "https://hutka.ai", Referer: "https://hutka.ai/" } })],
     ];
-    await Promise.all(tries.map(async ([k, f]) => { const t1 = Date.now(); try { const r = await Promise.race([f(), new Promise<Response>((_, rej) => setTimeout(() => rej(new Error("no answer in 25 s")), 25000))]); out[k] = { status: r.status, ms: Date.now() - t1, body: (await r.text()).slice(0, 160) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }));
+    await Promise.all(tries.map(async ([k, f]) => { const t1 = Date.now(); try { const r = await Promise.race([f(), new Promise<Response>((_, rej) => setTimeout(() => rej(new Error("no answer in 25 s")), 25000))]); out[k] = { status: r.status, ms: Date.now() - t1, type: r.headers.get("content-type"), cors: r.headers.get("access-control-allow-origin"), body: /image|octet|pbf/.test(r.headers.get("content-type") || "") ? `(${(await r.arrayBuffer()).byteLength} bytes)` : (await r.text()).slice(0, 160) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }));
     return json(out);
   }
   // by hand: what the map has under a name in an area ({area:"BY", find:"Стайк|Staik"}), or the given elements ({ids:["way/1"]})
@@ -80,7 +83,11 @@ Deno.serve(async (req) => {
   let els: El[] = [], mirror = "qlever";
   const left = (cap: number) => Math.max(5000, Math.min(cap, deadline - Date.now()));
   // the map through Overpass (VK's server): when QLever is down, or asked for ({src:"overpass"})
-  const viaOverpass = async () => { els = overpassEls(await overpass(qArea(area), left(110000))); mirror = "overpass"; };
+  const viaOverpass = async () => {
+    const v = await overpass(qVenues(area), left(58000)); let rows = v;
+    if (v.length) { rows = rows.concat(await overpass(qRaceways(area), left(58000))); if (deadline - Date.now() > 15000) { try { rows = rows.concat(await overpass(qTownsO(area), left(45000))); } catch { /* the venues keep the address they have */ } } }
+    els = overpassEls(rows); mirror = "overpass";
+  };
   if ((body as { src?: string }).src === "overpass") {
     try { await viaOverpass(); } catch (e) { const msg = String((e as Error).message || e); return done({ area, error: msg.slice(0, 300), ms: Date.now() - t0, down: true }, "pending"); }
   } else try {

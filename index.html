@@ -1316,6 +1316,19 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 .ld-dots button.on{width:22px;border-radius:4px;background:var(--accent)}
 @media (prefers-reduced-motion:reduce){.ld-slide,.ld-slide.on,.ld-slide.out{transition:none}}
 .ld-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+/* v34.45 — a wide screen: the pages sit in the middle; the guest's start page is one screen — the live example with the three steps
+   stacked beside it, then asking Hutka AI with its two actions beside it (no empty right half, no pile under the fold) */
+@media (min-width:1200px){
+  .page{margin-inline:auto}
+  #hai.land{max-width:1280px;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:14px 16px;align-items:start}
+  #hai.land>*{grid-column:1/-1}
+  #hai.land>#haiHello,#hai.land>#haiChat{grid-column:1}
+  #hai.land>#haiActs{grid-column:2;grid-row:span 2}
+  #hai.land #landing{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,300px);gap:14px;align-items:stretch}
+  #hai.land .ld-steps{grid-template-columns:1fr;grid-auto-rows:1fr}
+  #hai.land .ld-step{justify-content:center;padding:14px 16px}
+  #hai.land #haiHello h1{font-size:26px}
+}
 .ld-step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:4px}
 .ld-step .n{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:700 12.5px var(--body);margin-bottom:6px}
 .ld-step b{font-size:14.5px;line-height:1.3}
@@ -12931,7 +12944,7 @@ async function aiTop() {
   $('haiIntro').hidden = !intro; $('haiUp').hidden = intro || mine.length > 0;
   if (mine.length && mine[0].track) await STORE.getLayouts(mine[0].track).catch(() => []);   // the layout's own name on the card
   const last = $('haiLast'); last.innerHTML = ''; last.hidden = !mine.length; if (mine.length) last.appendChild(lastSessionCard(mine[0], (m) => { newChat(); return actSession(m); }));
-  $('hai').classList.toggle('fresh', !mine.length);
+  $('hai').classList.toggle('fresh', !mine.length); $('hai').classList.toggle('land', intro);   // land: the guest's start page (wide desktop: one screen)
   for (const x of document.querySelectorAll('#haiActs [data-act="progress"]')) x.hidden = !mine.length;
   await aiLayField().catch(() => {});
   if (intro) LANDING.showIn(true, 0).catch(() => {}); else if (!LANDING.on()) LANDING.stop();

@@ -6,9 +6,18 @@ import { kartName, type El } from "./lib.ts";
 export const OVERPASS = ["https://maps.mail.ru/osm/tools/overpass/api/interpreter"];
 const KN = "kart|картинг|картодром|motok[aá]r|mikroauto";
 const areaSel = (area: string) => /^US-[A-Z]{2}$/.test(area) ? `area["ISO3166-2"="${area}"]` : `area["ISO3166-1"="${area}"]["admin_level"="2"]`;
-export const qArea = (area: string) => `[out:json][timeout:110][maxsize:536870912];
-${areaSel(area)}->.a;
-( nwr["sport"~"karting",i](area.a);
+// three light questions an area (VK's gateway gives up after about a minute): the venues with their outlines, the raceways, the towns
+const head = (area: string, t: number) => `[out:json][timeout:${t}][maxsize:536870912];\n${areaSel(area)}->.a;\n`;
+export const qVenues = (area: string) => head(area, 50) + `( nwr["sport"~"karting",i](area.a);
+  way["highway"="raceway"]["name"~"${KN}",i][!"sport"](area.a);
+  nwr["leisure"~"^(track|sports_centre|sports_hall|amusement_arcade)$"]["name"~"${KN}",i][!"sport"](area.a);
+  nwr["sport"~"^(motor|motorsport)$"]["name"~"${KN}",i](area.a); )->.v;
+.v out center bb;
+way.v["leisure"="track"]; out ids geom;`;
+export const qRaceways = (area: string) => head(area, 50) + `way["highway"="raceway"](area.a); out geom;`;
+export const qTownsO = (area: string) => head(area, 40) + `node["place"~"^(city|town)$"]["name"](area.a); out;`;
+// the old single question, kept for the tests
+export const qArea = (area: string) => head(area, 110) + `( nwr["sport"~"karting",i](area.a);
   way["highway"="raceway"]["name"~"${KN}",i][!"sport"](area.a);
   nwr["leisure"~"^(track|sports_centre|sports_hall|amusement_arcade)$"]["name"~"${KN}",i][!"sport"](area.a);
   nwr["sport"~"^(motor|motorsport)$"]["name"~"${KN}",i](area.a); )->.v;
@@ -20,8 +29,10 @@ node(around.v:30000)["place"~"^(city|town)$"]["name"]; out;`;
 type OEl = { type: string; id: number; lat?: number; lon?: number; center?: { lat: number; lon: number }; bounds?: { minlat: number; minlon: number; maxlat: number; maxlon: number }; tags?: Record<string, string>; nodes?: number[]; geometry?: { lat: number; lon: number }[] };
 export async function overpass(q: string, ms: number): Promise<OEl[]> {
   let last = "";
-  for (const url of OVERPASS) for (let k = 0; k < 2; k++) {
-    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), ms);
+  const t0 = Date.now();
+  for (const url of OVERPASS) for (let k = 0; k < 3; k++) {   // a gateway that refuses at once (504 in a second) is asked again; a slow one is not
+    if (k && Date.now() - t0 > 12000) break;
+    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), Math.max(3000, ms - (Date.now() - t0)));
     try {
       const r = await fetch(url, { method: "POST", body: new URLSearchParams({ data: q }), headers: { "User-Agent": "Hutka/1.0 (+https://hutka.ai; karting track catalogue)" }, signal: ctl.signal });
       if (r.ok) { const j = await r.json(); return (j && j.elements) || []; }
