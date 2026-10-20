@@ -44,6 +44,15 @@ Deno.serve(async (req) => {
       ["overpass.private.coffee", () => fetch("https://overpass.private.coffee/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
       ["maps.mail.ru", () => fetch("https://maps.mail.ru/osm/tools/overpass/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
       ["overpass.kumi.systems", () => fetch("https://overpass.kumi.systems/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+      ["overpass.openstreetmap.fr", () => fetch("https://overpass.openstreetmap.fr/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+      ["z.overpass-api.de", () => fetch("https://z.overpass-api.de/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+      ["lz4.overpass-api.de", () => fetch("https://lz4.overpass-api.de/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+      ["overpass.openstreetmap.ru", () => fetch("https://overpass.openstreetmap.ru/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+      ["overpass.nchc.org.tw", () => fetch("https://overpass.nchc.org.tw/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+      ["overpass.osm.jp", () => fetch("https://overpass.osm.jp/api/interpreter", { method: "POST", body: new URLSearchParams({ data: oq }), headers: UA })],
+      ["api.openstreetmap.org", () => fetch("https://api.openstreetmap.org/api/0.6/way/832870199.json", { headers: UA })],
+      ["photon.komoot.io", () => fetch("https://photon.komoot.io/api/?q=karting%20minsk&limit=2", { headers: UA })],
+      ["download.geofabrik.de", () => fetch("https://download.geofabrik.de/asia/gcc-states-latest.osm.pbf", { headers: { ...UA, Range: "bytes=0-99" } })],
     ];
     await Promise.all(tries.map(async ([k, f]) => { const t1 = Date.now(); try { const r = await Promise.race([f(), new Promise<Response>((_, rej) => setTimeout(() => rej(new Error("no answer in 25 s")), 25000))]); out[k] = { status: r.status, ms: Date.now() - t1, body: (await r.text()).slice(0, 160) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }));
     return json(out);
