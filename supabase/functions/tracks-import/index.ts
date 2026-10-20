@@ -10,6 +10,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { venuesOf, distM, nameKey, type El, type Venue } from "./lib.ts";
 import { update, putRows, namesOf, lineMeta, mediaRow } from "./update.ts";
 import { QLEVER, qVenueTags, qVenueGeom, qRacewayGeom, qRacewayTags, qTowns, qFind, qIdTags, qIdGeom, sparql, venueEls, racewayEls, townEls } from "./qlever.ts";
+import { overpass, overpassEls, qArea } from "./overpass.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-import-token", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
@@ -77,17 +78,22 @@ Deno.serve(async (req) => {
   const done = async (result: Record<string, unknown>, status = "done") => { await db.from("import_queue").update({ status, result, finished_at: new Date().toISOString() }).eq("area", area); return json(result, status === "done" ? 200 : 502); };
   await db.from("import_queue").update({ status: "running", started_at: new Date().toISOString() }).eq("area", area);
   let els: El[] = [], mirror = "qlever";
-  try {
-    const left = (cap: number) => Math.max(5000, Math.min(cap, deadline - Date.now()));
+  const left = (cap: number) => Math.max(5000, Math.min(cap, deadline - Date.now()));
+  // the map through Overpass (VK's server): when QLever is down, or asked for ({src:"overpass"})
+  const viaOverpass = async () => { els = overpassEls(await overpass(qArea(area), left(110000))); mirror = "overpass"; };
+  if ((body as { src?: string }).src === "overpass") {
+    try { await viaOverpass(); } catch (e) { const msg = String((e as Error).message || e); return done({ area, error: msg.slice(0, 300), ms: Date.now() - t0, down: true }, "pending"); }
+  } else try {
     const vEls = venueEls(await sparql(qVenueTags(area), left(50000)), await sparql(qVenueGeom(area), left(50000))); els = vEls;
     if (vEls.length) {
       els = els.concat(racewayEls(await sparql(qRacewayGeom(area), left(50000)), await sparql(qRacewayTags(area), left(40000))));
       const needTowns = vEls.some(e => e.tags && !(e.tags["addr:city"] || e.tags["addr:town"] || e.tags["addr:village"]));
       if (needTowns && deadline - Date.now() > 20000) { try { els = els.concat(townEls(await sparql(qTowns(area), left(40000)))); } catch { /* no towns: the venues keep the address they have */ } }
     }
-  } catch (e) {   // the map database down (5xx, no connection): the area waits in the queue (pending, "down"), the queue asks again later
+  } catch (e) {   // QLever down (5xx, no connection): Overpass instead; both down — the area waits in the queue (pending, "down")
     const msg = String((e as Error).message || e), down = /^qlever 5\d\d|error sending request|connection (refused|reset|closed)|dns error/i.test(msg);
-    return done(Object.assign({ area, error: msg.slice(0, 300), ms: Date.now() - t0 }, down ? { down: true } : {}), down ? "pending" : "error");
+    if (!down) return done({ area, error: msg.slice(0, 300), ms: Date.now() - t0 }, "error");
+    try { await viaOverpass(); } catch (e2) { return done({ area, error: (msg.slice(0, 120) + " | " + String((e2 as Error).message || e2)).slice(0, 300), ms: Date.now() - t0, down: true }, "pending"); }
   }
   const venues = venuesOf(els);
   // what Hutka has: the same element, a track within 300 m, or within 1 km under the same name
