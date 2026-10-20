@@ -56,7 +56,7 @@ export function overpassEls(rows: OEl[]): El[] {
   const out: El[] = [], seen = new Set<string>();
   for (const r of rows) {
     const t = r.tags || {};
-    if (r.type === "node" && /^(city|town)$/.test(t.place || "")) { out.push({ type: "node", id: r.id, lat: r.lat, lon: r.lon, tags: Object.assign({ place: t.place, name: t.name || "" }, t["name:en"] ? { "name:en": t["name:en"] } : {}) }); continue; }
+    if (r.type === "node" && /^(city|town)$/.test(t.place || "")) { out.push({ type: "node", id: r.id, lat: r.lat, lon: r.lon, tags: Object.assign({ place: t.place, name: t.name || "" }, t["name:en"] ? { "name:en": t["name:en"] } : {}) as Record<string, string> }); continue; }
     if (r.type === "way" && r.geometry && t.highway === "raceway") { if (r.nodes && r.nodes.length === r.geometry.length) out.push({ type: "way", id: r.id, tags: Object.assign({ highway: "raceway" }, t), geometry: r.geometry, nodes: r.nodes }); continue; }
     if (!r.tags || (!r.center && r.type !== "node")) continue;
     const key = r.type + r.id; if (seen.has(key)) continue; seen.add(key);

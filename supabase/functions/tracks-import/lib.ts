@@ -38,6 +38,47 @@ export function nameKey(s: string): string {
   return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/&/g, " ").replace(GENERIC, " ").replace(/[^a-z0-9а-яё]+/gi, " ").trim();
 }
 const similar = (a: string, b: string) => { const x = nameKey(a), y = nameKey(b); if (!x || !y) return false; return x === y || (x.length >= 4 && y.includes(x)) || (y.length >= 4 && x.includes(y)); };
+// one name however it is spaced or run together: "Pit Stop Karting" = "Pitstop Karting", "Go-Kart Town" = "GoKart Town"
+export const nameSquash = (s: string) => nameKey(s).replace(/\s+/g, "");
+export const sameName = (a: string, b: string) => { const x = nameSquash(a); return !!x && x === nameSquash(b); };
+// one name inside the other ("Racing Dakart" / "Karting Racing Dakart Valencia"): as often another venue of the same town ("Karting
+// Sevilla" / "Karting Marineda Sevilla"), so only a hint for a person to look at
+export const nameInside = (a: string, b: string) => { const x = nameSquash(a), y = nameSquash(b); return !!x && !!y && x !== y && ((x.length >= 4 && y.includes(x)) || (y.length >= 4 && x.includes(y))); };
+
+// what Hutka has (the import reads it before a run)
+export type Known = { id: string; osm: string; name: string; lat: number; lon: number; len: number; approx?: boolean };
+// where each venue of a run goes:
+//  · skipped: Hutka has it — the same element; a track within 300 m (an imported one) or 1.5 km (one made by hand: its pin may sit at
+//    the gate or the car park); one within 1 km under the same name
+//  · upgrades: a track Hutka knows by its town only (an SWS track the map did not have then: approx, its pin on the town's centre)
+//    under the same name within 30 km — the venue becomes that track (its spot, element, details and line: update.ts upgrade); two
+//    venues for one such track: the one with a line, then the nearer; the other is a track of its own (or the same place)
+//  · fresh: a new track; "maybe" notes one with a town-only track nearby whose name is inside its own (or the same, taken by the
+//    nearer venue) — for a person to look at, nothing done
+export function placeVenues(venues: Venue[], known: Known[]) {
+  const ok = (k: Known) => isFinite(k.lat) && isFinite(k.lon);
+  const skipped: string[] = [], maybe: string[] = [], rest = new Set<Venue>(), claim = new Map<string, { v: Venue; k: Known; d: number }>();
+  for (const v of venues) {
+    const dup = known.find(k => k.id === v.id || (k.osm && k.osm === v.osm) || (!k.approx && ok(k) && (distM(k, v) < (k.id.startsWith("osm-") ? 300 : 1500) || (distM(k, v) < 1000 && sameName(k.name, v.name)))));
+    if (dup) { skipped.push(`${v.name} → ${dup.id}`); continue; }
+    let best: Known | null = null, bd = 30000;
+    for (const k of known) if (k.approx && ok(k) && sameName(k.name, v.name)) { const d = distM(k, v); if (d < bd) { best = k; bd = d; } }
+    if (!best) { rest.add(v); continue; }
+    const c = claim.get(best.id);   // two venues for it: the one with a line, then the nearer
+    if (c && ((c.v.line && !v.line) || (!!c.v.line === !!v.line && c.d <= bd))) { rest.add(v); continue; }
+    if (c) rest.add(c.v);
+    claim.set(best.id, { v, k: best, d: bd });
+  }
+  const upgrades = [...claim.values()], fresh: Venue[] = [];
+  for (const v of venues) {
+    if (!rest.has(v)) continue;
+    if (upgrades.some(u => distM(u.v, v) < 120) || fresh.some(f => distM(f, v) < 120)) { skipped.push(`${v.name} (same place)`); continue; }
+    const near = known.find(k => k.approx && ok(k) && distM(k, v) < 30000 && (sameName(k.name, v.name) || nameInside(k.name, v.name)));
+    if (near) maybe.push(`${v.name} ~ ${near.id} (${Math.round(distM(near, v) / 100) / 10} km)`);
+    fresh.push(v);
+  }
+  return { fresh, skipped, upgrades, maybe };
+}
 
 // a name that says karting in the map's languages: "kart"/"karts" as a word (Go Karts, E-Kart), karting, kartbahn, kartbaan, kart
 // center, kartódromo, kartodrom, gokart, картинг, картодром, motokáry, mikroautorata — not Kartause, Kartoffel, kartano, Kartverket

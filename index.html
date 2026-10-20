@@ -6381,8 +6381,8 @@ const STORE = (() => {
     if (adapter) await adapter.saveTrack(id, body); tracks.set(id, localTrack(Object.assign({ id }, body))); notify('tracks'); return id;
   }
   async function deleteTrack(tid) { if (adapter) { const ls = await getLayouts(tid, true); await adapter.deleteTrack(tid, ls.map(l => l.id)); } tracks.delete(tid); layouts.delete(tid); notify('tracks'); }
-  // a track from the map has its one layout named "Main" in the data: shown in the reader's language
-  const localNames = (tid, list) => { const tr = tracks.get(tid); if (tr && tr.source === 'osm' && I18N.lang !== 'en') for (const l of list) if (l.name === 'Main') l.name = I18N.t('Main'); return list; };
+  // a track from the map or the SWS list has its one layout named "Main" in the data: shown in the reader's language
+  const localNames = (tid, list) => { const tr = tracks.get(tid); if (tr && (tr.source === 'osm' || tr.source === 'sws') && I18N.lang !== 'en') for (const l of list) if (l.name === 'Main') l.name = I18N.t('Main'); return list; };
   async function getLayouts(tid, fresh) {
     if (!fresh && layouts.has(tid)) return layouts.get(tid);
     let list = [], ok = true; if (adapter) { try { list = await adapter.listLayouts(tid); } catch (e) { list = []; ok = false; } }
@@ -7122,7 +7122,8 @@ function fillSelect(sel, opts, value) {
 }
 const COUNTRIES = [['AE', 'United Arab Emirates'], ['BY', 'Belarus'], ['RU', 'Russia'], ['PL', 'Poland'], ['LT', 'Lithuania'], ['LV', 'Latvia'], ['UA', 'Ukraine'], ['KZ', 'Kazakhstan'], ['GE', 'Georgia'], ['TR', 'Türkiye'], ['OM', 'Oman'], ['QA', 'Qatar'], ['BH', 'Bahrain'], ['SA', 'Saudi Arabia'], ['KW', 'Kuwait'], ['EG', 'Egypt'], ['GB', 'United Kingdom'], ['DE', 'Germany'], ['FR', 'France'], ['IT', 'Italy'], ['ES', 'Spain'], ['PT', 'Portugal'], ['NL', 'Netherlands'], ['BE', 'Belgium'], ['AT', 'Austria'], ['CH', 'Switzerland'], ['CZ', 'Czechia'], ['SK', 'Slovakia'], ['HU', 'Hungary'], ['RO', 'Romania'], ['BG', 'Bulgaria'], ['GR', 'Greece'], ['RS', 'Serbia'], ['HR', 'Croatia'], ['SE', 'Sweden'], ['NO', 'Norway'], ['FI', 'Finland'], ['DK', 'Denmark'], ['EE', 'Estonia'], ['IE', 'Ireland'], ['US', 'United States'], ['CA', 'Canada'], ['MX', 'Mexico'], ['BR', 'Brazil'], ['AR', 'Argentina'], ['AU', 'Australia'], ['NZ', 'New Zealand'], ['JP', 'Japan'], ['KR', 'South Korea'], ['CN', 'China'], ['IN', 'India'], ['TH', 'Thailand'], ['MY', 'Malaysia'], ['SG', 'Singapore'], ['ID', 'Indonesia'], ['ZA', 'South Africa'], ['IL', 'Israel'], ['CY', 'Cyprus'], ['AM', 'Armenia'], ['AZ', 'Azerbaijan'], ['UZ', 'Uzbekistan']];
 const flag = (cc) => cc && /^[A-Z]{2}$/i.test(cc) ? String.fromCodePoint(...cc.toUpperCase().split('').map(c => 127397 + c.charCodeAt(0))) : '';
-const countryName = (cc) => { const c = COUNTRIES.find(x => x[0] === cc); return c ? c[1] : (cc || ''); };
+// a country Hutka's list lacks (Lebanon, Morocco, Slovenia … the tracks the map and SWS brought): its English name from the browser
+const countryName = (cc) => { const c = COUNTRIES.find(x => x[0] === cc); if (c) return c[1]; try { if (cc && /^[A-Z]{2}$/.test(cc) && window.Intl && Intl.DisplayNames) return new Intl.DisplayNames(['en'], { type: 'region' }).of(cc) || cc; } catch (e) {} return cc || ''; };
 function fillCountries(sel, withEmpty) { sel.innerHTML = ''; if (withEmpty) { const o = document.createElement('option'); o.value = ''; o.textContent = '—'; sel.appendChild(o); } for (const [cc, nm] of COUNTRIES) { const o = document.createElement('option'); o.value = cc; o.textContent = `${flag(cc)} ${nm}`; sel.appendChild(o); } }
 // resize an image file to a data URL that fits a db document (JPEG; logos keep transparency as PNG when small)
 async function imageToDataUrl(file, maxDim, maxChars, png) {
@@ -7624,7 +7625,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.47';
+const APP_VERSION = 'v34.48';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -8181,7 +8182,7 @@ async function renderTrackPage(tid, lid) {
   if (tr.website) add('i-globe', `<a href="${esc(tr.website)}" target="_blank" rel="noopener">${t('Website')}</a>`);
   if (open) add('i-clock', open.open === false && open.opens ? t('Opens at {t}', { t: open.opens }) : t('Closes at {t}', { t: open.closes }));
   if (tr.community && tr.createdBy) { const nm = await STORE.names([tr.createdBy]); add('i-users', t('added by {who}', { who: `<a href="#driver~${esc(tr.createdBy)}">${esc((nm[tr.createdBy] || {}).name || t('a driver'))}</a>` })); }
-  if (tr.source === 'osm') { const o = String(tr.osm || ''), typ = { n: 'node', w: 'way', r: 'relation' }[o[0]] || ''; add('i-globe', `${esc(t('From the map'))} · <a href="${typ ? `https://www.openstreetmap.org/${typ}/${esc(o.slice(1))}` : 'https://www.openstreetmap.org/copyright'}" target="_blank" rel="noopener">© OpenStreetMap</a>`); }   // ODbL: the data is the map's
+  if (tr.source === 'osm' || tr.osm) { const o = String(tr.osm || ''), typ = { n: 'node', w: 'way', r: 'relation' }[o[0]] || ''; add('i-globe', `${esc(t('From the map'))} · <a href="${typ ? `https://www.openstreetmap.org/${typ}/${esc(o.slice(1))}` : 'https://www.openstreetmap.org/copyright'}" target="_blank" rel="noopener">© OpenStreetMap</a>`); }   // ODbL: the data is the map's
   const cover = await STORE.getMedia(`tracks/${tid}/media/cover`);
   $('tCoverImg').hidden = !cover; if (cover) $('tCoverImg').src = cover;
   const pubsEarly = cover ? [] : await STORE.sessionsFor(tid); let shape = pubsEarly.map(s => s.preview).find(p => p && p.pts), tag;

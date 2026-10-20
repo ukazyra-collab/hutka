@@ -1,14 +1,15 @@
 // Hutka — tracks from OpenStreetMap (read through QLever, qlever.ts): every named karting venue of an area (a country "FR", or a US state "US-CA") becomes a track
 // page with a "Main" layout; where the map has the raceway drawn, the middle of the asphalt is the layout's line (kept in media:
 // tracks/<id>/layouts/main/media/line, so the catalogue stays light), with its length. Idempotent: ids come from the OSM element
-// (osm-w123); a venue Hutka has already (the same element, a track within 300 m, or within 1 km under the same name) is left alone.
+// (osm-w123); a venue Hutka has already (the same element, a track within 300 m, or within 1 km under the same name) is left alone; one
+// Hutka knows by its town only (an SWS track the map did not have then: approx) under the same name within 30 km completes that track.
 // Who may run it: the import queue (a cron job sends one area at a time with the token kept in the Vault: x-import-token), or an
 // admin (his own session token). Body: { area: "FR", dry?: true } — dry: nothing written, the counts and a sample returned.
 // Data © OpenStreetMap contributors (ODbL): the track pages say so.
 // Deploy as `tracks-import` with "Verify JWT" OFF (checked here).
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { venuesOf, distM, nameKey, type El, type Venue } from "./lib.ts";
-import { update, putRows, namesOf, lineMeta, mediaRow } from "./update.ts";
+import { venuesOf, placeVenues, type El, type Known } from "./lib.ts";
+import { update, upgrade, putRows, namesOf, lineMeta, mediaRow } from "./update.ts";
 import { QLEVER, qVenueTags, qVenueGeom, qRacewayGeom, qRacewayTags, qTowns, qFind, qIdTags, qIdGeom, sparql, venueEls, racewayEls, townEls } from "./qlever.ts";
 import { overpass, overpassEls, qVenues, qRaceways, qTownsO } from "./overpass.ts";
 import { geocodeAll, type Ask } from "./geocode.ts";
@@ -111,25 +112,19 @@ Deno.serve(async (req) => {
   const venues = venuesOf(els);
   // what Hutka has: the same element, a track within 300 m, or within 1 km under the same name
   // (in pages: the API answers 1000 rows at most)
-  const known: { id: string; osm: string; name: string; lat: number; lon: number; len: number; approx?: boolean }[] = [];
+  const known: Known[] = [];
   for (let from = 0; from < 200000; from += 1000) {
     const { data, error } = await db.from("tracks").select("id, name:data->>name, osm:data->>osm, lat:data->lat, lon:data->lon, len:data->lengthM, approx:data->approx").order("id").range(from, from + 999);
     if (error) return done({ area, error: "tracks: " + error.message, ms: Date.now() - t0 }, "error");
     for (const r of (data || []) as Record<string, unknown>[]) known.push({ id: String(r.id), osm: String(r.osm || ""), name: String(r.name || ""), lat: Number(r.lat), lon: Number(r.lon), len: Number(r.len) || 0, approx: r.approx === true });
     if (!data || data.length < 1000) break;
   }
-  const fresh: Venue[] = [], skipped: string[] = [];
-  for (const v of venues) {
-    // a track made by hand (Hutka's own, a driver's) keeps a wider berth: its pin may sit at the gate or the car park, not on the map's spot
-    // a track known by its town only (an SWS track not found on the map, approx): its pin is the town's centre — the same name within 30 km
-    const dup = known.find(k => k.id === v.id || (k.osm && k.osm === v.osm) || (isFinite(k.lat) && isFinite(k.lon) && (k.approx ? (distM(k, v) < 30000 && !!nameKey(k.name) && nameKey(k.name) === nameKey(v.name)) : (distM(k, v) < (k.id.startsWith("osm-") ? 300 : 1500) || (distM(k, v) < 1000 && nameKey(k.name) && nameKey(k.name) === nameKey(v.name))))));
-    if (dup) { skipped.push(`${v.name} → ${dup.id}`); continue; }
-    if (fresh.some(f => distM(f, v) < 120)) { skipped.push(`${v.name} (same place)`); continue; }
-    fresh.push(v);
-  }
+  // which venues are new, which Hutka has, which complete a track it knows by its town only (lib.ts placeVenues)
+  const { fresh, skipped, upgrades, maybe } = placeVenues(venues, known);
   const withLine = fresh.filter(v => v.line).length;
-  const summary = { area, mirror, elements: els.length, venues: venues.length, fresh: fresh.length, withLine, indoor: fresh.filter(v => v.indoor).length, skipped: skipped.length, sample: fresh.slice(0, 12).map(v => ({ name: v.name, city: v.city, line: v.line ? v.line.lengthM : 0, indoor: v.indoor })), skippedSample: skipped.slice(0, 8), dry, ms: 0 };
+  const summary = { area, mirror, elements: els.length, venues: venues.length, fresh: fresh.length, withLine, indoor: fresh.filter(v => v.indoor).length, skipped: skipped.length, sample: fresh.slice(0, 12).map(v => ({ name: v.name, city: v.city, line: v.line ? v.line.lengthM : 0, indoor: v.indoor })), skippedSample: skipped.slice(0, 8), toUpgrade: upgrades.length, maybe: maybe.slice(0, 12), dry, ms: 0 };
   if (dry) {
+    try { Object.assign(summary, await upgrade(db, upgrades, true)); } catch (e) { Object.assign(summary, { error: "upgrade: " + String((e as Error).message || e).slice(0, 280) }); }
     if (body.mode === "update") { try { Object.assign(summary, await update(db, venues, known, cc, true)); } catch (e) { Object.assign(summary, { error: "update: " + String((e as Error).message || e).slice(0, 280) }); } }
     summary.ms = Date.now() - t0; return done(Object.assign(summary, { names: fresh.map(v => `${v.name} · ${v.city}${v.line ? " · " + v.line.lengthM + " m" : ""}`) }));
   }
@@ -138,7 +133,7 @@ Deno.serve(async (req) => {
   const tracks = fresh.map(v => ({ id: v.id, data: Object.assign({ name: v.name, city: v.city, country: cc, lat: v.lat, lon: v.lon, address: v.address, website: v.website, phone: v.phone, indoor: v.indoor, osm: v.osm, source: "osm", createdAt: ts, updatedAt: ts }, v.line ? { lengthM: v.line.lengthM } : {}, namesOf(v)), updated_at: now }));
   const layouts = fresh.map(v => ({ track_id: v.id, id: "main", data: Object.assign({ name: "Main", order: 0, cornerR: 110, widthM: v.line ? v.line.widthM : 8, createdAt: ts, updatedAt: ts }, v.line ? lineMeta(v) : {}), updated_at: now }));
   const media = fresh.filter(v => v.line).map(v => mediaRow(v, now));
-  try { await putRows(db, "tracks", tracks); await putRows(db, "layouts", layouts); await putRows(db, "media", media); }
+  try { await putRows(db, "tracks", tracks); await putRows(db, "layouts", layouts); await putRows(db, "media", media); Object.assign(summary, await upgrade(db, upgrades, false)); }
   catch (e) { summary.ms = Date.now() - t0; return done(Object.assign(summary, { error: String((e as Error).message || e).slice(0, 300) }), "error"); }
   // "update": the tracks this import made before get what the rules give now — a line where they had none (the venue's track drawn
   // as a closed shape, raceways joined at their loose ends), the corners of the line they have, their other names (for the search).

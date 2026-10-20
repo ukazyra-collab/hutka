@@ -15,6 +15,38 @@ async function rowsIn(db: Db, table: string, cols: string, key: string, vals: st
   for (let i = 0; i < vals.length; i += 100) { let q: any = db.from(table).select(cols).in(key, vals.slice(i, i + 100)); if (extra) q = extra(q); const { data, error } = await q; if (error) throw new Error(`${table}: ${error.message}`); out.push(...((data || []) as Record<string, any>[])); }
   return out;
 }
+// a track Hutka knew by its town only (an SWS track the map did not have then: approx, its pin on the town's centre), found on the map
+// now under its name (lib.ts placeVenues): its pin goes onto the venue, it gets the venue's element (the page then credits the map) and
+// the details it lacks (address, website, phone, indoor, town, other names); its "Main" layout the venue's line when it has no line,
+// drawing or reference session of its own. Its id, name, SWS mark, sessions and anything a person wrote stay. A track placed by a person
+// since (no longer approx) is left alone.
+export async function upgrade(db: Db, ups: { v: Venue; k: { id: string } }[], dry: boolean) {
+  if (!ups.length) return { upgraded: 0, upgradedLines: 0, upgradedSample: [] as string[] };
+  const ids = ups.map(u => u.k.id);
+  const trows = new Map((await rowsIn(db, "tracks", "id, data", "id", ids)).map(r => [r.id as string, r]));
+  const lrows = new Map((await rowsIn(db, "layouts", "track_id, id, data", "track_id", ids, q => q.eq("id", "main"))).map(r => [r.track_id as string, r]));
+  const now = new Date().toISOString(), ts = Date.now(), tOut: Record<string, any>[] = [], lOut: Record<string, any>[] = [], mOut: Record<string, any>[] = [], done: string[] = [];
+  for (const { v, k } of ups) {
+    const tr = trows.get(k.id); if (!tr || !tr.data || tr.data.approx !== true) continue;
+    const td: Record<string, any> = Object.assign({}, tr.data); delete td.approx;
+    Object.assign(td, { lat: v.lat, lon: v.lon, osm: v.osm });
+    for (const f of ["address", "website", "phone"] as const) if (!td[f] && v[f]) td[f] = v[f];
+    if (typeof td.indoor !== "boolean") td.indoor = v.indoor;
+    if (!td.city && v.city) td.city = v.city;
+    const nm = namesOf(v); if (nm.aka && !td.aka) td.aka = nm.aka; if (nm.names && !(td.names && td.names.ru)) td.names = Object.assign({}, td.names || {}, nm.names);
+    const lo = lrows.get(k.id), ld: Record<string, any> = lo ? Object.assign({}, lo.data) : { name: "Main", order: 0, cornerR: 110, widthM: 8, createdAt: ts };
+    let said = "";
+    if (v.line && !ld.line && !ld.trace && !ld.refSession && !ld.refSess && !ld.photo && !ld.lengthM && !td.lengthM) {
+      const vv = Object.assign({}, v, { id: k.id });
+      Object.assign(ld, lineMeta(vv), { widthM: v.line.widthM, updatedAt: ts }); td.lengthM = v.line.lengthM;
+      lOut.push({ track_id: k.id, id: "main", data: ld, updated_at: now }); mOut.push(mediaRow(vv, now)); said = ` · ${v.line.lengthM} m · ${v.line.corners} T`;
+    }
+    tOut.push({ id: k.id, data: Object.assign(td, { updatedAt: ts }), updated_at: now });
+    done.push(`${td.name} → ${v.osm}${said}`);
+  }
+  if (!dry) { await putRows(db, "layouts", lOut); await putRows(db, "media", mOut); await putRows(db, "tracks", tOut); }
+  return { upgraded: tOut.length, upgradedLines: lOut.length, upgradedSample: done.slice(0, 20) };
+}
 export async function update(db: Db, venues: Venue[], known: { id: string; osm: string; name: string; lat: number; lon: number; len: number }[], cc: string, dry: boolean) {
   // the import's own track for each venue: the same map element, or the same name within 1 km, or 150 m away
   const pairs: { v: Venue; k: typeof known[number] }[] = [];
