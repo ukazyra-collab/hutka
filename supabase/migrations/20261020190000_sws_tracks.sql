@@ -6,7 +6,9 @@
 --  2. 405 new tracks (source "sws"): at the venue when the map has it (75; data.osm = the element), else at the
 --     town's centre (330; data.approx = true: the page says the pin is on the town), each with a "Main" layout
 --  3. two tracks the import filed under the Netherlands and France get their own countries: Aruba, New Caledonia
--- Re-runnable: new rows only where missing, the tags are idempotent.
+-- Re-runnable: new rows only where missing, the tags are idempotent. The daily ceiling on new tracks and layouts (hutka_quota_guard,
+-- limits.sql) is for drivers; this script counts as the service (as the import function does), and says so for its own session only.
+select set_config('request.jwt.claims', '{"role":"service_role"}', false);
 with v(id, n) as (values ('osm-w219287948','Actua Organisation - Circuit de Lyon'),('osm-w319562953','Af karting'),('osm-w290666067','Circuit de Bresse'),('osm-w174793828','Circuit du Parc'),('osm-w286651335','Circuito “Valle del Liri”'),('osm-n2788019640','Dutch Racing Series'),('osm-w108437660','East Belgium Action'),('osm-w212080356','Garden Karting'),('osm-w22569302','Go Kart Center'),('osm-n10778138835','Indoor karting center Celje'),('osm-w187360772','Kart Sensation Auvergne Bourg Lastic'),('osm-w70550465','Kartbahn Oberlandring'),('osm-w290670811','karting 2 noiron'),('osm-w340722939','Karting Angel Burgueño'),('osm-w290722219','Karting Caudecoste'),('osm-w540452449','Karting Haute Picardie'),('osm-w913615011','Karting North East'),('osm-w460829208','Kartodrom AL'),('osm-w312151662','Kartódromo de Vila Nova de Poiares LDA'),('txmv6rmxw9f20ov','Lakeside Karting'),('osm-w290677287','Prestige Karting'),('osm-w175688514','RACB Karting de Spa-Francorchamps'),('osm-w290679920','RACING KART BEAUCAIRE Circuit Julie Tonelli'),('osm-w1122917968','Speedkart Hyères'),('osm-w1208351126','Whilton Mill LTD'))
 update public.tracks t set data = t.data || jsonb_build_object('sws', true, 'swsName', coalesce(t.data->>'swsName', v.n), 'updatedAt', (extract(epoch from now()) * 1000)::bigint)
   || case when lower(v.n) = lower(coalesce(t.data->>'name', '')) or position(lower(v.n) in lower(coalesce(t.data->>'aka', ''))) > 0 then '{}'::jsonb
@@ -433,3 +435,4 @@ from public.tracks t where t.data->>'source' = 'sws' and not exists (select 1 fr
 
 update public.tracks set data = data || '{"country": "AW"}'::jsonb, updated_at = now() where id = 'osm-w453542213' and data->>'country' = 'NL';
 update public.tracks set data = data || '{"country": "NC"}'::jsonb, updated_at = now() where id = 'osm-w1018920024' and data->>'country' = 'FR';
+select set_config('request.jwt.claims', '', false);
