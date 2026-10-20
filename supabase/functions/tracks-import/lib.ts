@@ -201,6 +201,8 @@ export function lineFor(c: { pos: LL; bounds?: El["bounds"] }, loops: Loop[]): L
 }
 
 // ---- the area's elements → venues
+const LATIN = /[A-Za-z]/;
+const latinName = (pl: El) => { const en = tag(pl.tags, "name:en"), nm = tag(pl.tags, "name"); return LATIN.test(en) ? en : (LATIN.test(nm) ? nm : ""); };
 export function venuesOf(elements: El[]): Venue[] {
   const venues = elements.filter(e => e.type !== "way" || !(e.tags && e.tags.highway === "raceway" && !e.tags.sport) ).filter(isVenue);
   const raceways = elements.filter(e => e.type === "way" && e.tags && e.tags.highway === "raceway" && Array.isArray(e.geometry));
@@ -231,8 +233,14 @@ export function venuesOf(elements: El[]): Venue[] {
     const all = c.els, t = (k: string[]) => { for (const e of all) { const v = tag(e.tags, ...k); if (v) return v; } return ""; };
     const site = t(["website", "contact:website", "url"]), web = site ? (/^https?:\/\//i.test(site) ? site : "https://" + site) : "";
     const street = [t(["addr:street"]), t(["addr:housenumber"])].filter(Boolean).join(" ");
+    // the town: the address's; none, or written in a script most readers cannot read (Greek, Cyrillic, Arabic …) — the English name
+    // the map gives that town, else the nearest town within 30 km with a name in Latin letters, else the nearest town as the map writes it
     let city = t(["addr:city", "addr:town", "addr:village", "addr:municipality", "addr:suburb"]);
-    if (!city && places.length) { let bp: El | null = null, bd = Infinity; for (const pl of places) { const d = distM(c.pos, { lat: pl.lat!, lon: pl.lon! }); if (d < bd) { bd = d; bp = pl; } } if (bp && bd < 30000) city = tag(bp.tags, "name:en", "name"); }
+    if ((!city || !LATIN.test(city)) && places.length) {
+      const near = places.map(pl => ({ pl, d: distM(c.pos, { lat: pl.lat!, lon: pl.lon! }) })).filter(x => x.d < 30000).sort((a, b) => a.d - b.d);
+      const pick = (city ? near.find(x => tag(x.pl.tags, "name") === city && latinName(x.pl)) : undefined) || near.find(x => latinName(x.pl));
+      if (pick) city = latinName(pick.pl); else if (!city && near.length) city = tag(near[0].pl.tags, "name:en", "name");
+    }
     const indoor = all.some(e => { const g = e.tags || {}; return g.indoor === "yes" || g.covered === "yes" || (g.building && g.building !== "no") || g.location === "indoor"; }) || /\bindoor|\bhalle\b|kart ?hall/i.test(c.name);
     // the venue's own track drawn as a closed shape (leisure=track: its middle, or its asphalt) — when it looks like a track, not a site
     const outl: El[] = []; let oid = -1;

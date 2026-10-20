@@ -101,7 +101,8 @@ Deno.serve(async (req) => {
     const vEls = venueEls(await sparql(qVenueTags(area), left(50000)), await sparql(qVenueGeom(area), left(50000))); els = vEls;
     if (vEls.length) {
       els = els.concat(racewayEls(await sparql(qRacewayGeom(area), left(50000)), await sparql(qRacewayTags(area), left(40000))));
-      const needTowns = vEls.some(e => e.tags && !(e.tags["addr:city"] || e.tags["addr:town"] || e.tags["addr:village"]));
+      // the towns: for a venue with no town in its address, or one written in another script (the English name is looked up)
+      const needTowns = vEls.some(e => e.tags && !/[A-Za-z]/.test(e.tags["addr:city"] || e.tags["addr:town"] || e.tags["addr:village"] || ""));
       if (needTowns && deadline - Date.now() > 20000) { try { els = els.concat(townEls(await sparql(qTowns(area), left(40000)))); } catch { /* no towns: the venues keep the address they have */ } }
     }
   } catch (e) {   // QLever down (5xx, no connection): Overpass instead; both down — the area waits in the queue (pending, "down")

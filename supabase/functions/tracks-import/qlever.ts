@@ -18,7 +18,8 @@ export const qVenueTags = (area: string) => PRE + `SELECT ?el ?key ?val WHERE { 
 export const qVenueGeom = (area: string) => PRE + `SELECT ?el ?wkt WHERE { ${areaOf(area)}${VENUE}?el geo:hasGeometry/geo:asWKT ?wkt . }`;
 export const qRacewayGeom = (area: string) => PRE + `SELECT ?el ?wkt WHERE { ${areaOf(area)}?el osmkey:highway "raceway" . ?el geo:hasGeometry/geo:asWKT ?wkt . }`;
 export const qRacewayTags = (area: string) => PRE + `SELECT ?el ?key ?val WHERE { ${areaOf(area)}?el osmkey:highway "raceway" . ?el ?key ?val . FILTER(?key IN (osmkey:sport, osmkey:oneway, osmkey:width, osmkey:name)) }`;
-export const qTowns = (area: string) => PRE + `SELECT ?el ?wkt ?name ?place WHERE { ${areaOf(area)}?el osmkey:place ?place . FILTER(?place = "city" || ?place = "town") ?el osmkey:name ?name . ?el geo:hasGeometry/geo:asWKT ?wkt . }`;
+// the towns, with the English name where the map has one (a town written in Greek, Cyrillic or Arabic is shown by it: lib.ts)
+export const qTowns = (area: string) => PRE + `SELECT ?el ?wkt ?name ?en ?place WHERE { ${areaOf(area)}?el osmkey:place ?place . FILTER(?place = "city" || ?place = "town") ?el osmkey:name ?name . OPTIONAL { ?el <${KEY}name:en> ?en . } ?el geo:hasGeometry/geo:asWKT ?wkt . }`;
 
 // looking things up by hand (index.ts "find"): every tag of the elements of an area whose name (any of its names) matches, or of the
 // elements given by id ("way/832870199") with their geometry
@@ -77,6 +78,6 @@ export function racewayEls(geomRows: Row[], tagRows: Row[]): El[] {
 }
 export function townEls(rows: Row[]): El[] {
   const out: El[] = [];
-  for (const r of rows) { const k = r.el && idOf(r.el.value), c = coords(r.wkt ? r.wkt.value : "")[0]; if (!k || !c || !r.name) continue; out.push({ type: "node", id: k.id, lat: c.lat, lon: c.lon, tags: { place: (r.place && r.place.value) || "town", name: r.name.value } }); }
+  for (const r of rows) { const k = r.el && idOf(r.el.value), c = coords(r.wkt ? r.wkt.value : "")[0]; if (!k || !c || !r.name) continue; out.push({ type: "node", id: k.id, lat: c.lat, lon: c.lon, tags: Object.assign({ place: (r.place && r.place.value) || "town", name: r.name.value }, r.en && r.en.value ? { "name:en": r.en.value } : {}) as Record<string, string> }); }
   return out;
 }
