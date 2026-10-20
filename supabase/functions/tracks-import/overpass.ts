@@ -4,18 +4,24 @@
 import { kartName, type El } from "./lib.ts";
 
 export const OVERPASS = ["https://maps.mail.ru/osm/tools/overpass/api/interpreter"];
-const KN = "kart|картинг|картодром|motok[aá]r|mikroauto";
+const KN = "kart|картинг|картодром|motok[aá]r|mikroauto|كارت";
 const areaSel = (area: string) => /^US-[A-Z]{2}$/.test(area) ? `area["ISO3166-2"="${area}"]` : `area["ISO3166-1"="${area}"]["admin_level"="2"]`;
 // three light questions an area (VK's gateway gives up after about a minute): the venues with their outlines, the raceways, the towns
 const head = (area: string, t: number) => `[out:json][timeout:${t}][maxsize:536870912];\n${areaSel(area)}->.a;\n`;
-// the venues by their sport only (the tag index answers at once; the names-only branches of qlever.ts are left to QLever — on VK's busy
-// server a scan of every named leisure place in a country does not finish in a minute)
-export const qVenues = (area: string) => head(area, 50) + `nwr["sport"~"karting"](area.a)->.v;
+// the venues by their sport (the tag index answers at once); in a small country also by name — kart-named raceways and leisure places,
+// the name or its English form (the Gulf's tracks are often only named so). In a big country the names-only branches of qlever.ts are
+// left to QLever: on VK's busy server a scan of every named leisure place in a country does not finish in a minute.
+export const SMALL = new Set(["AE", "BH", "QA", "LB", "SA", "KW", "OM", "JO", "CY", "MT", "LU", "LI", "AD", "MC", "SM"]);
+const byName = `  way["highway"="raceway"]["name"~"${KN}",i](area.a); way["highway"="raceway"]["name:en"~"${KN}",i](area.a);
+  nwr["leisure"~"^(track|sports_centre|sports_hall|amusement_arcade)$"]["name"~"${KN}",i](area.a);
+  nwr["leisure"~"^(track|sports_centre|sports_hall|amusement_arcade)$"]["name:en"~"${KN}",i](area.a);`;
+const venueSet = (area: string) => SMALL.has(area) ? `( nwr["sport"~"karting"](area.a);\n${byName} )->.v;` : `nwr["sport"~"karting"](area.a)->.v;`;
+export const qVenues = (area: string) => head(area, 50) + `${venueSet(area)}
 .v out center bb;
 way.v["leisure"="track"]; out ids geom;`;
 export const qRaceways = (area: string) => head(area, 50) + `way["highway"="raceway"](area.a); out geom;`;
 // the towns near the venues (not every town of the country: Russia's do not come back within a minute)
-export const qTownsO = (area: string) => head(area, 40) + `nwr["sport"~"karting"](area.a)->.v;
+export const qTownsO = (area: string) => head(area, 40) + `${venueSet(area)}
 node(around.v:30000)["place"~"^(city|town)$"]["name"]; out;`;
 // the old single question, kept for the tests
 export const qArea = (area: string) => head(area, 110) + `( nwr["sport"~"karting",i](area.a);
@@ -50,11 +56,11 @@ export function overpassEls(rows: OEl[]): El[] {
   const out: El[] = [], seen = new Set<string>();
   for (const r of rows) {
     const t = r.tags || {};
-    if (r.type === "node" && /^(city|town)$/.test(t.place || "")) { out.push({ type: "node", id: r.id, lat: r.lat, lon: r.lon, tags: { place: t.place, name: t.name || "" } }); continue; }
+    if (r.type === "node" && /^(city|town)$/.test(t.place || "")) { out.push({ type: "node", id: r.id, lat: r.lat, lon: r.lon, tags: Object.assign({ place: t.place, name: t.name || "" }, t["name:en"] ? { "name:en": t["name:en"] } : {}) }); continue; }
     if (r.type === "way" && r.geometry && t.highway === "raceway") { if (r.nodes && r.nodes.length === r.geometry.length) out.push({ type: "way", id: r.id, tags: Object.assign({ highway: "raceway" }, t), geometry: r.geometry, nodes: r.nodes }); continue; }
     if (!r.tags || (!r.center && r.type !== "node")) continue;
     const key = r.type + r.id; if (seen.has(key)) continue; seen.add(key);
-    const tags = t.sport ? Object.assign({}, t) : Object.assign({ sport: kartName(t.name || t["name:en"] || "") ? "karting" : "" }, t);
+    const tags = t.sport ? Object.assign({}, t) : Object.assign({ sport: kartName(t.name || "") || kartName(t["name:en"] || "") ? "karting" : "" }, t);
     if (r.type === "node") { out.push({ type: "node", id: r.id, lat: r.lat, lon: r.lon, tags }); continue; }
     const ring = rings.get(r.id), closed = !!ring && ring.length >= 10 && ring[0].lat === ring[ring.length - 1].lat && ring[0].lon === ring[ring.length - 1].lon;
     out.push({ type: r.type, id: r.id, center: r.center, bounds: r.bounds, tags, ...(closed ? { ring } : {}) });
