@@ -43,10 +43,10 @@ export async function geocodeAll(asks: Ask[], until: number): Promise<{ out: Rec
     const ph = a.src === "photon", ask = ph ? photon : nominatim;
     try { out[a.k] = await ask(a); }
     catch (e) {   // refused (too many questions): a longer pause, one more try
-      await wait(ph ? 8000 : 3000);
+      await wait(ph ? 6000 : 3000);
       try { out[a.k] = await ask(a); } catch (e2) { out[a.k] = { error: String((e2 as Error).message || e2).slice(0, 120) }; }
     }
-    await wait(ph ? 2500 : 1100);
+    await wait(ph ? 1700 : 1100);
   }
   return { out, left };
 }
