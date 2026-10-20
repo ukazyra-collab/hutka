@@ -1,6 +1,6 @@
-// Hutka — the track import's writes: a venue's page as rows (namesOf, lineMeta, mediaRow), and "update" — the import's own tracks get
-// what the rules give now: a line where they had none, the corners of the line they have, their other names, the town they lack (index.ts,
-// mode "update").
+// Hutka — the track import's writes: a venue's page as rows (namesOf, lineMeta, mediaRow), "update" — the import's own tracks (and the
+// SWS tracks made from the map) get what the rules give now: a line where they had none, the corners of the line they have, their other
+// names, the town they lack (index.ts, mode "update") — and "upgrade": a town-only SWS track completed by its venue.
 import { distM, nameKey, type Venue } from "./lib.ts";
 import { cornerCount } from "./corners.ts";
 // ---- what goes into the database
@@ -48,11 +48,12 @@ export async function upgrade(db: Db, ups: { v: Venue; k: { id: string } }[], dr
   return { upgraded: tOut.length, upgradedLines: lOut.length, upgradedSample: done.slice(0, 20) };
 }
 export async function update(db: Db, venues: Venue[], known: { id: string; osm: string; name: string; lat: number; lon: number; len: number }[], cc: string, dry: boolean) {
-  // the import's own track for each venue: the same map element, or the same name within 1 km, or 150 m away
+  // the import's own track for each venue: the same map element, or the same name within 1 km, or 150 m away; an SWS track made
+  // from the map (sws-…: the SWS list's track found on it, or completed by the import) — by its element only
   const pairs: { v: Venue; k: typeof known[number] }[] = [];
   for (const v of venues) {
     const k = known.find(k => k.osm && k.osm === v.osm) || known.find(k => isFinite(k.lat) && isFinite(k.lon) && (distM(k, v) < 150 || (distM(k, v) < 1000 && nameKey(k.name) && nameKey(k.name) === nameKey(v.name))));
-    if (k && k.id.startsWith("osm-")) pairs.push({ v, k });
+    if (k && (k.id.startsWith("osm-") || (k.id.startsWith("sws-") && k.osm === v.osm))) pairs.push({ v, k });
   }
   if (!pairs.length) return { matched: 0, linesAdded: 0, cornersAdded: 0, namesAdded: 0, citiesAdded: 0 };
   const ids = [...new Set(pairs.map(p => p.k.id))];
@@ -62,7 +63,7 @@ export async function update(db: Db, venues: Venue[], known: { id: string; osm: 
   let namesAdded = 0, citiesAdded = 0;
   for (const { v, k } of pairs) {
     if (seen.has(k.id)) continue; seen.add(k.id);
-    const tr = trows.get(k.id), lo = lrows.get(k.id); if (!tr || !lo || (tr.data && tr.data.source !== "osm")) continue;
+    const tr = trows.get(k.id), lo = lrows.get(k.id); if (!tr || !lo || (tr.data && tr.data.source !== "osm" && !(tr.data.source === "sws" && tr.data.osm === v.osm))) continue;
     const td = Object.assign({}, tr.data), ld = Object.assign({}, lo.data); let tCh = false;
     const nm = namesOf(v); if (nm.aka && !td.aka) { td.aka = nm.aka; tCh = true; } if (nm.names && !(td.names && td.names.ru)) { td.names = Object.assign({}, td.names || {}, nm.names); tCh = true; } if (tCh) namesAdded++;
     if (!td.city && v.city) { td.city = v.city; tCh = true; citiesAdded++; }   // a town it was imported without (the towns' question went unanswered)
