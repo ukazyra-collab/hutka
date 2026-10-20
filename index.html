@@ -459,8 +459,7 @@ body.onboarding #toast{z-index:90}
 .map-ctl>*{pointer-events:auto}
 .map-ctl .mc-grp{display:flex;flex-direction:column;border-radius:12px;overflow:hidden;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);box-shadow:0 1px 6px rgba(0,0,0,.08);background:color-mix(in srgb,var(--surface) 58%,transparent);backdrop-filter:blur(6px)}
 .map-ctl .mc{display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:0;background:transparent;color:var(--fg);cursor:pointer;font:inherit}
-.map-ctl .mc-row{display:flex;gap:8px;align-items:center}
-.map-ctl>.mc,.map-ctl .mc-row>.mc{border-radius:12px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);box-shadow:0 1px 6px rgba(0,0,0,.08);background:color-mix(in srgb,var(--surface) 58%,transparent);backdrop-filter:blur(6px)}
+.map-ctl>.mc{border-radius:12px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);box-shadow:0 1px 6px rgba(0,0,0,.08);background:color-mix(in srgb,var(--surface) 58%,transparent);backdrop-filter:blur(6px)}
 .map-ctl .mc-grp .mc+.mc{border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
 .map-ctl .mc svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .map-ctl .mc.mc-lyr svg{width:18px;height:18px}
@@ -471,7 +470,11 @@ body.onboarding #toast{z-index:90}
 @media (pointer:coarse){.map-ctl .mc{width:44px;height:44px}}
 /* the notes at the bottom of the map keep clear of the controls on the right */
 body:not(.cockpit) #mapBox .sat-pill,body:not(.cockpit) #mapBox .mapnote{right:64px}
-.hero.fs-fallback .map-ctl .mc-full{display:none}   /* full screen: its own header has the way out */
+/* full screen: the map's bottom right corner — on a phone the screen's main action (filled), on a computer one of the map's controls */
+.map-full{position:absolute;right:10px;bottom:10px;z-index:4;display:grid;place-items:center;width:36px;height:36px;padding:0;border-radius:12px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);background:color-mix(in srgb,var(--surface) 58%,transparent);backdrop-filter:blur(6px);box-shadow:0 1px 6px rgba(0,0,0,.08);color:var(--fg);cursor:pointer}
+.map-full svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.map-full:hover{background:color-mix(in srgb,var(--surface) 92%,transparent)}
+.hero.fs-fallback .map-full,body.cockpit .map-full{display:none}   /* full screen: its own header (or the cockpit's back) is the way out */
 .map-ctl .mc.mc-lyr{display:flex;width:auto;gap:6px;padding:0 12px 0 10px;font-size:13px;font-weight:600}
 /* the layers: one switch a row, a line under each saying what it shows */
 .lyr-sheet .lyr-list{display:flex;flex-direction:column;gap:8px;padding:2px 0 6px}
@@ -975,8 +978,9 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .map-bar{padding:6px 8px;gap:6px}
   .map-bar .seg{flex:1 1 auto}.map-bar .seg .btn{flex:1 1 0;padding:0 8px;font-size:12.5px}
   .map-ctl{top:46px;right:8px}   /* under the map's title, which runs the width of a phone */
-  .map-ctl .mc-full{display:none}   /* the phone's header has the full-screen button */
-  .lab-mob #lmMap span{display:none}.lab-mob #lmMap{width:48px;padding:0;justify-content:center}.lab-mob #lmMap svg{width:20px;height:20px}
+  .map-full{width:48px;height:48px;right:8px;bottom:8px;border:0;border-radius:14px;background:var(--btn);color:var(--btn-ink);box-shadow:0 4px 14px rgba(0,0,0,.22);backdrop-filter:none}
+  .map-full svg{width:22px;height:22px}
+  .map-full:hover{background:var(--btn)}
   .charts.under{padding:4px 6px 6px}
   .hero{gap:10px}
   .hero .inspector{position:fixed;left:0;right:0;bottom:calc(58px + var(--sa-bottom));max-height:50vh;overflow:auto;border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);z-index:25;transform:translateY(115%);transition:transform .25s ease;padding:14px 16px 18px}
@@ -1055,11 +1059,11 @@ body.cockpit.ck-tools #hero .map-bar:not([hidden]){display:flex}
 body.cockpit .map-ctl{display:none}
 body.cockpit.ck-tools .map-ctl{display:flex;flex-direction:row;align-items:center;top:auto;right:auto;left:var(--sl);bottom:calc(var(--sb) + 116px)}
 body.cockpit.ck-tools .map-ctl .mc-grp{flex-direction:row}
-body.cockpit .map-ctl .mc-row>.mc{background:rgba(10,14,24,.8);border-color:rgba(255,255,255,.16)}
+
 body.cockpit.ck-tools .map-ctl .mc-grp .mc+.mc{border-top:0;border-left:1px solid rgba(255,255,255,.16)}
 body.cockpit .map-ctl .mc-grp,body.cockpit .map-ctl>.mc{background:rgba(10,14,24,.8);border-color:rgba(255,255,255,.16)}
 body.cockpit .map-ctl .mc{color:#fff}
-body.cockpit .map-ctl .mc-full{display:none}
+
 body.cockpit #hero .map-bar .btn{height:30px;padding:0 9px;font-size:12px;background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.16);flex:none}
 body.cockpit #hero .map-bar .seg,body.cockpit .align-bar .seg{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16)}   /* the button groups keep the light theme's white box otherwise: white text on white */
 body.cockpit #hero .map-bar .seg .btn,body.cockpit .align-bar .seg .btn{border-right-color:rgba(255,255,255,.16)}
@@ -1218,7 +1222,7 @@ body.cockpit.lab-land .insp-close,body.cockpit.lab-land .hero.fs-fallback > #pic
 /* on a phone the pill sits above the tab bar and its raised Upload button (the rule comes after the base one, so it wins) */
 @media (max-width:700px), (max-height:520px) and (orientation:landscape) and (pointer:coarse){.dev-pill{bottom:calc(100px + var(--sa-bottom))}}
 /* the narrowest phones: the Lab's bar keeps the lap time — Compare and Map lose their words; the tab labels shrink to fit Russian */
-@media (max-width:360px){.lab-mob #lmCompare span,.lab-mob #lmMap span{display:none}.lab-mob #lmCompare,.lab-mob #lmMap{padding:0 10px}.tabbar a>span,.tabbar button>span:not(.circ){font-size:9.5px;letter-spacing:-.2px}}
+@media (max-width:360px){.lab-mob #lmCompare span{display:none}.lab-mob #lmCompare{padding:0 10px}.tabbar a>span,.tabbar button>span:not(.circ){font-size:9.5px;letter-spacing:-.2px}}
 .dev-read.done .dr-eyebrow{visibility:hidden}
 
 .hint.warn{color:var(--warn)}
@@ -2008,7 +2012,7 @@ input.sw:checked::after{transform:translateX(18px)}
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
         <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><div class="row" style="margin-top:10px"><button class="btn primary" id="labUpload2" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#help"><span data-t="How to get the file — step by step">How to get the file — step by step</span></a></div></div>
       </div>
-      <div class="lab-mob mobile-only" id="labMob" hidden><button class="lm-name" id="lmPick" type="button" aria-label="Choose a session" data-ta="Choose a session"><b id="lmName"></b><span id="lmNameSub"></span><svg><use href="#i-chev"/></svg></button><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back" data-ta="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner" data-ta="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner" data-ta="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" data-ta="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button" aria-label="Compare" data-ta="Compare"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button" aria-label="Full screen" data-ta="Full screen"><svg><use href="#i-full"/></svg><span data-t="Full screen">Full screen</span></button></div>
+      <div class="lab-mob mobile-only" id="labMob" hidden><button class="lm-name" id="lmPick" type="button" aria-label="Choose a session" data-ta="Choose a session"><b id="lmName"></b><span id="lmNameSub"></span><svg><use href="#i-chev"/></svg></button><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back" data-ta="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner" data-ta="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner" data-ta="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" data-ta="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button" aria-label="Compare" data-ta="Compare"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button></div>
       <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close" data-ta="Close">×</button></div>
       <!-- a session just uploaded (a private draft): the layout when it was not recognised for sure, the session type and the result
            (for the feed), publish or keep private — everything else is already filled in -->
@@ -2056,8 +2060,10 @@ input.sw:checked::after{transform:translateX(18px)}
           <div class="sat-note" id="satNote" hidden><span id="satNoteText"></span> <button class="btn xs" id="satNoteAlign" type="button" data-t="Align">Align</button></div>
           <div class="align-bar" id="alignBar" hidden><span class="hint" id="alignHint"></span><div class="seg"><button class="btn xs" id="alL" type="button" title="0.5 m">←</button><button class="btn xs" id="alU" type="button" title="0.5 m">↑</button><button class="btn xs" id="alD" type="button" title="0.5 m">↓</button><button class="btn xs" id="alR" type="button" title="0.5 m">→</button></div><span class="hint" id="alignOff"></span><button class="btn xs" id="alReset" type="button" data-t="Reset">Reset</button><button class="btn xs primary" id="alSave" type="button" hidden data-t="Save for everyone">Save for everyone</button><button class="btn xs" id="alDone" type="button" data-t="Done">Done</button></div>
           <div style="position:relative" id="mapBox"><canvas id="map"></canvas>
+          <!-- full screen: the map's bottom right corner (Uladzislau: "там ему и место"); the phone's cockpit, a computer's full screen -->
+          <button class="map-full" id="btnFull" type="button" title="Full screen" data-tt="Full screen" aria-label="Full screen" data-ta="Full screen"><svg><use href="#i-full"/></svg></button>
           <div class="map-ctl" id="mapCtl">
-            <div class="mc-row"><button class="mc mc-lyr" id="mapLayersBtn" type="button" aria-label="Map layers" data-ta="Map layers"><svg><use href="#i-layers"/></svg><span data-t="Layers">Layers</span></button><button class="mc mc-full" id="btnFull" type="button" title="Full screen" data-tt="Full screen" aria-label="Full screen" data-ta="Full screen"><svg><use href="#i-full"/></svg></button></div>
+            <button class="mc mc-lyr" id="mapLayersBtn" type="button" aria-label="Map layers" data-ta="Map layers"><svg><use href="#i-layers"/></svg><span data-t="Layers">Layers</span></button>
             <div class="mc-grp"><button class="mc" id="zoomIn" type="button" title="Zoom in" data-tt="Zoom in" aria-label="Zoom in" data-ta="Zoom in"><svg><use href="#i-plus"/></svg></button><button class="mc" id="zoomOut" type="button" title="Zoom out" data-tt="Zoom out" aria-label="Zoom out" data-ta="Zoom out"><svg><use href="#i-minus"/></svg></button><button class="mc" id="zoomFit" type="button" title="The whole track" data-tt="The whole track" aria-label="The whole track" data-ta="The whole track"><svg><use href="#i-fit"/></svg></button></div>
             <div class="mc-grp"><button class="mc" id="rotL" type="button" title="Turn the map left" data-tt="Turn the map left" aria-label="Turn the map left" data-ta="Turn the map left"><svg><use href="#i-rotl"/></svg></button><button class="mc" id="rotR" type="button" title="Turn the map right" data-tt="Turn the map right" aria-label="Turn the map right" data-ta="Turn the map right"><svg><use href="#i-rotr"/></svg></button></div>
           </div>
@@ -7704,7 +7710,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.49';
+const APP_VERSION = 'v34.50';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -9338,7 +9344,6 @@ function labEnsureMap() {
     pb.addEventListener('focusout', () => { if (want()) hide(); }); }
   $('fsCompare').onclick = () => { const pb = $('pickbar'); document.documentElement.style.setProperty('--fsHeadH', ($('fsHead').offsetHeight || 54) + 'px'); pb.classList.toggle('open'); if (pb.classList.contains('open')) pb.classList.add('peek'); else pb.classList.remove('peek'); };
   const fsFallbackOn = (on) => { const h = $('hero'); h.classList.toggle('fs-fallback', on); placePickbar(on); document.body.style.overflow = on ? 'hidden' : ''; $('fsHead').hidden = !on; $('btnFull').classList.toggle('active', on); LAB.map.setTouchFree(on); syncLand(); applyMobTab(); setTimeout(() => { if (LAB.map && LAB.G) { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); drawDataCharts(); if (isCockpit()) { renderHud(); renderCkStep(); drawScrub(); } } }, 60); };
-  $('lmMap').onclick = () => fsFallbackOn(true);
   $('lmCompare').onclick = () => { $('pickbar').classList.toggle('open'); };
   $('pickClose').onclick = () => $('pickbar').classList.remove('open', 'peek');
   for (const b of $('labTabs').querySelectorAll('button[data-tab]')) b.onclick = () => { LAB.tab = b.dataset.tab; applyMobTab(); if (LAB.tab === 'chart') drawDataCharts(); };
@@ -9350,7 +9355,8 @@ function labEnsureMap() {
   const fsExit = () => { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); if ($('hero').classList.contains('fs-fallback')) fsFallbackOn(false); };
   const fsEnter = () => { fsFallbackOn(true); if (browserFs()) document.documentElement.requestFullscreen().catch(() => {}); };
   LAB.fsExit = fsExit;
-  $('btnFull').onclick = () => { if (fsOn()) fsExit(); else fsEnter(); };
+  // the map's full-screen button (its bottom right corner): on a phone the cockpit, as the header's button opened it; elsewhere the browser's full screen too
+  $('btnFull').onclick = () => { if (fsOn()) fsExit(); else if (isPhone()) fsFallbackOn(true); else fsEnter(); };
   $('btnFullExit').onclick = fsExit;
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('hero').classList.contains('fs-fallback')) fsExit(); });
   // the browser left its full screen (Esc, the system back): the layout follows; an element that still ends up in the top layer (older code paths) is laid out as before
