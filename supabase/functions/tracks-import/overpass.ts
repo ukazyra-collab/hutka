@@ -8,10 +8,9 @@ const KN = "kart|картинг|картодром|motok[aá]r|mikroauto";
 const areaSel = (area: string) => /^US-[A-Z]{2}$/.test(area) ? `area["ISO3166-2"="${area}"]` : `area["ISO3166-1"="${area}"]["admin_level"="2"]`;
 // three light questions an area (VK's gateway gives up after about a minute): the venues with their outlines, the raceways, the towns
 const head = (area: string, t: number) => `[out:json][timeout:${t}][maxsize:536870912];\n${areaSel(area)}->.a;\n`;
-export const qVenues = (area: string) => head(area, 50) + `( nwr["sport"~"karting",i](area.a);
-  way["highway"="raceway"]["name"~"${KN}",i][!"sport"](area.a);
-  nwr["leisure"~"^(track|sports_centre|sports_hall|amusement_arcade)$"]["name"~"${KN}",i][!"sport"](area.a);
-  nwr["sport"~"^(motor|motorsport)$"]["name"~"${KN}",i](area.a); )->.v;
+// the venues by their sport only (the tag index answers at once; the names-only branches of qlever.ts are left to QLever — on VK's busy
+// server a scan of every named leisure place in a country does not finish in a minute)
+export const qVenues = (area: string) => head(area, 50) + `nwr["sport"~"karting"](area.a)->.v;
 .v out center bb;
 way.v["leisure"="track"]; out ids geom;`;
 export const qRaceways = (area: string) => head(area, 50) + `way["highway"="raceway"](area.a); out geom;`;
