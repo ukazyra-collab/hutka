@@ -448,10 +448,43 @@ body.onboarding #toast{z-index:90}
 .map-wrap{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .map-wrap canvas{display:block;width:100%;touch-action:none;cursor:grab}
 .map-wrap canvas.panning{cursor:grabbing}.map-wrap canvas.edit{cursor:crosshair}.map-wrap canvas.pick{cursor:cell}
-.map-bar{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
-.map-bar .btn{height:32px;font-size:12.5px;padding:0 9px;border-radius:8px}
-@media (min-width:901px) and (max-width:1600px){.map-bar #btnFull span{display:none}.map-bar #btnFull{padding:0 8px}}
-.map-bar .seg{border-radius:8px}.map-bar .seg .btn{height:30px;border-radius:0}
+/* v34.49: the bar above the map is one row — which lap the points are of, when comparing (hidden otherwise); the layers, zoom, turn and
+   full screen are on the map itself (.map-ctl) */
+.map-bar{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
+.map-bar[hidden]{display:none}
+.map-bar .btn{height:36px;font-size:13px;padding:0 12px;border-radius:9px}
+.map-bar .seg{border-radius:9px;display:flex;min-width:0;flex:0 1 auto}.map-bar .seg .btn{height:34px;border-radius:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* the map's own controls: translucent, on the map, out of the way of the title (top left) and the notes (bottom) */
+.map-ctl{position:absolute;right:10px;top:10px;z-index:4;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none}
+.map-ctl>*{pointer-events:auto}
+.map-ctl .mc-grp{display:flex;flex-direction:column;border-radius:12px;overflow:hidden;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);box-shadow:0 1px 6px rgba(0,0,0,.08);background:color-mix(in srgb,var(--surface) 58%,transparent);backdrop-filter:blur(6px)}
+.map-ctl .mc{display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:0;background:transparent;color:var(--fg);cursor:pointer;font:inherit}
+.map-ctl .mc-row{display:flex;gap:8px;align-items:center}
+.map-ctl>.mc,.map-ctl .mc-row>.mc{border-radius:12px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);box-shadow:0 1px 6px rgba(0,0,0,.08);background:color-mix(in srgb,var(--surface) 58%,transparent);backdrop-filter:blur(6px)}
+.map-ctl .mc-grp .mc+.mc{border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.map-ctl .mc svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.map-ctl .mc.mc-lyr svg{width:18px;height:18px}
+.map-ctl .mc:hover{background:color-mix(in srgb,var(--surface) 92%,transparent)}
+.map-ctl .mc:active{background:var(--surface-3)}
+.map-ctl .mc.on{color:var(--accent)}
+@media (pointer:fine){.map-ctl .mc{width:36px;height:36px}.map-ctl .mc svg{width:18px;height:18px}}   /* a mouse: smaller, the map short on a laptop */
+@media (pointer:coarse){.map-ctl .mc{width:44px;height:44px}}
+/* the notes at the bottom of the map keep clear of the controls on the right */
+body:not(.cockpit) #mapBox .sat-pill,body:not(.cockpit) #mapBox .mapnote{right:64px}
+.hero.fs-fallback .map-ctl .mc-full{display:none}   /* full screen: its own header has the way out */
+.map-ctl .mc.mc-lyr{display:flex;width:auto;gap:6px;padding:0 12px 0 10px;font-size:13px;font-weight:600}
+/* the layers: one switch a row, a line under each saying what it shows */
+.lyr-sheet .lyr-list{display:flex;flex-direction:column;gap:8px;padding:2px 0 6px}
+.lyr{display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.lyr[hidden]{display:none}
+.lyr-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lyr-tx b{font-size:15px;font-weight:600}
+.lyr-tx small{font-size:12.5px;color:var(--muted);line-height:1.35}
+.lyr-tx small:empty{display:none}
+.lyr .sw{flex:none;position:relative;width:46px;height:28px;border-radius:14px;background:var(--surface-3);border:1px solid var(--line);transition:background .15s,border-color .15s}
+.lyr .sw::after{content:'';position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.28);transition:transform .15s}
+.lyr.active .sw{background:var(--accent);border-color:var(--accent)}
+.lyr.active .sw::after{transform:translateX(18px)}
 .brand{color:#1f2b48}
 .map-tools{position:absolute;top:10px;right:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100% - 20px)}
 .map-tools .btn{height:32px;font-size:12.5px;padding:0 10px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(4px);border-radius:8px}
@@ -939,10 +972,11 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .pickbar{gap:10px}
   .pickbar .field,.pickbar .field.auto{flex:1 1 100%;max-width:none}
   .lapline .big{font-size:32px}
-  .map-bar{padding:6px 8px;gap:4px;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
-  .map-bar>*,.map-bar .seg .btn{flex:0 0 auto}
-  .map-bar::-webkit-scrollbar{display:none}
-  .map-bar .btn{flex:none}
+  .map-bar{padding:6px 8px;gap:6px}
+  .map-bar .seg{flex:1 1 auto}.map-bar .seg .btn{flex:1 1 0;padding:0 8px;font-size:12.5px}
+  .map-ctl{top:46px;right:8px}   /* under the map's title, which runs the width of a phone */
+  .map-ctl .mc-full{display:none}   /* the phone's header has the full-screen button */
+  .lab-mob #lmMap span{display:none}.lab-mob #lmMap{width:48px;padding:0;justify-content:center}.lab-mob #lmMap svg{width:20px;height:20px}
   .charts.under{padding:4px 6px 6px}
   .hero{gap:10px}
   .hero .inspector{position:fixed;left:0;right:0;bottom:calc(58px + var(--sa-bottom));max-height:50vh;overflow:auto;border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);z-index:25;transform:translateY(115%);transition:transform .25s ease;padding:14px 16px 18px}
@@ -960,13 +994,11 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .hero.fs-fallback .fs-head .chips{display:none}
   .hero.fs-fallback .map-wrap{border:0;border-radius:0;min-height:0}
   .hero.fs-fallback .map-bar{padding:4px 8px;justify-content:space-between}
-  .hero.fs-fallback .map-bar #btnFull,.hero.fs-fallback .map-bar #optBand,.hero.fs-fallback .map-bar #tglSat{display:none}
   .hero.fs-fallback .fs-head{display:flex;align-items:center;gap:10px}
   .hero.fs-fallback .fs-head .lapline{flex:1;min-width:0;gap:8px}
   .hero.fs-fallback .fs-head .lapline .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55vw}
   #pg-lab.has .ph{display:none}
   #pg-lab.has .lab-mob{top:56px}
-  .map-bar #optBand{display:none}
   .hero.fs-fallback .legend{display:none}
   .hero.fs-fallback .charts.under{padding:2px 4px 4px}
   .hero.fs-fallback .inspector{bottom:0;max-height:55vh}
@@ -1018,12 +1050,20 @@ body.cockpit #mapBox{flex:1;min-height:0;overflow:hidden}
 body.cockpit .legend,body.cockpit .map-title,body.cockpit .readout,body.cockpit .mapnote,body.cockpit .replay{display:none!important}
 /* the toolbar (markers, labels, rotate, zoom, imagery) is a strip above the scrub bar, shown by the ⋯ button */
 body.cockpit #hero .map-bar{display:none;position:absolute;left:var(--sl);right:calc(var(--sr) + 48px);bottom:calc(var(--sb) + 68px);z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);backdrop-filter:blur(10px);padding:5px 6px;gap:4px;overflow-x:auto;justify-content:flex-start;flex-wrap:nowrap;scrollbar-width:none}
-body.cockpit.ck-tools #hero .map-bar{display:flex}
+body.cockpit.ck-tools #hero .map-bar:not([hidden]){display:flex}
+/* the cockpit: the map's controls with the other tools ("More"), a row above the bar; pinch and twist work as always */
+body.cockpit .map-ctl{display:none}
+body.cockpit.ck-tools .map-ctl{display:flex;flex-direction:row;align-items:center;top:auto;right:auto;left:var(--sl);bottom:calc(var(--sb) + 116px)}
+body.cockpit.ck-tools .map-ctl .mc-grp{flex-direction:row}
+body.cockpit .map-ctl .mc-row>.mc{background:rgba(10,14,24,.8);border-color:rgba(255,255,255,.16)}
+body.cockpit.ck-tools .map-ctl .mc-grp .mc+.mc{border-top:0;border-left:1px solid rgba(255,255,255,.16)}
+body.cockpit .map-ctl .mc-grp,body.cockpit .map-ctl>.mc{background:rgba(10,14,24,.8);border-color:rgba(255,255,255,.16)}
+body.cockpit .map-ctl .mc{color:#fff}
+body.cockpit .map-ctl .mc-full{display:none}
 body.cockpit #hero .map-bar .btn{height:30px;padding:0 9px;font-size:12px;background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.16);flex:none}
 body.cockpit #hero .map-bar .seg,body.cockpit .align-bar .seg{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16)}   /* the button groups keep the light theme's white box otherwise: white text on white */
 body.cockpit #hero .map-bar .seg .btn,body.cockpit .align-bar .seg .btn{border-right-color:rgba(255,255,255,.16)}
 body.cockpit #hero .map-bar .btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-body.cockpit #hero .map-bar #btnFull,body.cockpit #hero .map-bar #tglTiles{display:none}
 body.cockpit .align-bar{position:absolute;left:var(--sl);right:calc(var(--sr) + 48px);top:calc(var(--st) + 62px);z-index:5;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,24,.8);color:#fff;backdrop-filter:blur(10px);font-size:12px}
 body.cockpit .align-bar .hint{color:rgba(255,255,255,.8)}
 body.cockpit .align-bar .btn.xs{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.18)}
@@ -1768,6 +1808,11 @@ input.sw:checked::after{transform:translateX(18px)}
     <symbol id="i-up" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></symbol><symbol id="i-down" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></symbol><symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></symbol>
     <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="M3 12.5l9 5 9-5"/><path d="M3 17l9 5 9-5"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-fit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.6"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></symbol>
+    <symbol id="i-rotl" viewBox="0 0 24 24"><path d="M4.5 13a7.5 7.5 0 1 0 2.2-6.3"/><path d="M5 3.5v4.5h4.5"/></symbol>
+    <symbol id="i-rotr" viewBox="0 0 24 24"><path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19 3.5v4.5h-4.5"/></symbol>
     <symbol id="i-rotate" viewBox="0 0 24 24"><rect x="3" y="7" width="14" height="10" rx="2"/><path d="M20 10v4M17 20l-2-2 2-2M15 18h3a2 2 0 002-2"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
@@ -1963,7 +2008,7 @@ input.sw:checked::after{transform:translateX(18px)}
         <div class="card" id="labFeedCard" hidden><h2><svg><use href="#i-users"/></svg><span data-t="New from drivers you follow">New from drivers you follow</span><span class="sub" id="labFeedSub"></span></h2><div id="labFeed"></div></div>
         <div class="card"><h2><svg><use href="#i-lab"/></svg><span data-t="What the Lab does">What the Lab does</span></h2><p class="hint" id="labEmptyText" style="max-width:80ch;line-height:1.6"></p><div class="row" style="margin-top:10px"><button class="btn primary" id="labUpload2" type="button"><svg><use href="#i-upload"/></svg><span data-t="Upload session">Upload session</span></button><a class="btn" href="#help"><span data-t="How to get the file — step by step">How to get the file — step by step</span></a></div></div>
       </div>
-      <div class="lab-mob mobile-only" id="labMob" hidden><button class="lm-name" id="lmPick" type="button" aria-label="Choose a session" data-ta="Choose a session"><b id="lmName"></b><span id="lmNameSub"></span><svg><use href="#i-chev"/></svg></button><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back" data-ta="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner" data-ta="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner" data-ta="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" data-ta="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button" aria-label="Compare" data-ta="Compare"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button" aria-label="Map" data-ta="Map"><svg><use href="#i-full"/></svg><span data-t="Map">Map</span></button></div>
+      <div class="lab-mob mobile-only" id="labMob" hidden><button class="lm-name" id="lmPick" type="button" aria-label="Choose a session" data-ta="Choose a session"><b id="lmName"></b><span id="lmNameSub"></span><svg><use href="#i-chev"/></svg></button><button class="btn sm land-only" id="lmBack" type="button" aria-label="Back" data-ta="Back">‹</button><div class="lm-t"><span class="lbl" id="lmLbl"></span><b id="lmBig">—</b></div><div class="seg land-only" id="lmStep"><button class="btn" id="lmPrev" type="button" aria-label="Previous corner" data-ta="Previous corner">‹</button><button class="btn" id="lmCorner" type="button">T1</button><button class="btn" id="lmNext" type="button" aria-label="Next corner" data-ta="Next corner">›</button></div><button class="btn sm" id="lmShare" type="button" aria-label="Share" data-ta="Share" title="Share"><svg><use href="#i-share"/></svg></button><button class="btn sm" id="lmCompare" type="button" aria-label="Compare" data-ta="Compare"><svg><use href="#i-layouts"/></svg><span data-t="Compare">Compare</span></button><button class="btn sm primary" id="lmMap" type="button" aria-label="Full screen" data-ta="Full screen"><svg><use href="#i-full"/></svg><span data-t="Full screen">Full screen</span></button></div>
       <div class="land-hint mobile-only" id="landHint" hidden><svg><use href="#i-rotate"/></svg><span id="landHintText"></span><button class="btn xs" id="landHintClose" type="button" aria-label="Close" data-ta="Close">×</button></div>
       <!-- a session just uploaded (a private draft): the layout when it was not recognised for sure, the session type and the result
            (for the feed), publish or keep private — everything else is already filled in -->
@@ -2004,20 +2049,18 @@ input.sw:checked::after{transform:translateX(18px)}
       <div class="hero" id="hero" hidden>
         <div class="map-wrap" id="mapWrap1">
           <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn mobile-only" id="fsCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Session &amp; compare">Session &amp; compare</span></button><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
+          <!-- v34.49: which lap the points are of, when comparing (hidden otherwise); the layers, zoom, turn and full screen are on the map -->
           <div class="map-bar" id="mapBar">
             <div class="seg" id="lapSegField" title="Show on map" hidden><button class="btn active" id="lapYou" type="button">Reference</button><button class="btn" id="lapCmp" type="button">Comparison</button><button class="btn" id="lapThird" type="button" hidden>Third lap</button></div>
-            <div class="seg" id="viewSeg"><button class="btn" id="tglTiles" type="button" hidden data-t="Satellite">Satellite</button><button class="btn" id="tglAlign" type="button" hidden data-t="Align">Align</button><button class="btn" id="tglSat" type="button" data-t="Aerial">Aerial</button></div>
-            <button class="btn" id="optBand" type="button" data-t="Track edges">Track edges</button>
-            <button class="btn" id="optTicks" type="button" data-t="Markers">Markers</button>
-            <button class="btn" id="optLabels" type="button" data-t="Labels">Labels</button>
-            <button class="btn" id="optPedals" type="button" data-t="Pedals" data-tt="Colour the lap by what the kart is doing: accelerating, decelerating, coasting">Accel / decel</button>
-            <div class="seg"><button class="btn" id="rotL" type="button" title="Rotate">↺</button><button class="btn" id="rotR" type="button" title="Rotate">↻</button></div>
-            <div class="seg"><button class="btn" id="zoomOut" type="button">−</button><button class="btn" id="zoomIn" type="button">+</button><button class="btn" id="zoomFit" type="button">⌂</button></div>
-            <button class="btn" id="btnFull" type="button" title="Full screen"><svg><use href="#i-full"/></svg><span data-t="Full screen">Full screen</span></button>
           </div>
           <div class="sat-note" id="satNote" hidden><span id="satNoteText"></span> <button class="btn xs" id="satNoteAlign" type="button" data-t="Align">Align</button></div>
           <div class="align-bar" id="alignBar" hidden><span class="hint" id="alignHint"></span><div class="seg"><button class="btn xs" id="alL" type="button" title="0.5 m">←</button><button class="btn xs" id="alU" type="button" title="0.5 m">↑</button><button class="btn xs" id="alD" type="button" title="0.5 m">↓</button><button class="btn xs" id="alR" type="button" title="0.5 m">→</button></div><span class="hint" id="alignOff"></span><button class="btn xs" id="alReset" type="button" data-t="Reset">Reset</button><button class="btn xs primary" id="alSave" type="button" hidden data-t="Save for everyone">Save for everyone</button><button class="btn xs" id="alDone" type="button" data-t="Done">Done</button></div>
           <div style="position:relative" id="mapBox"><canvas id="map"></canvas>
+          <div class="map-ctl" id="mapCtl">
+            <div class="mc-row"><button class="mc mc-lyr" id="mapLayersBtn" type="button" aria-label="Map layers" data-ta="Map layers"><svg><use href="#i-layers"/></svg><span data-t="Layers">Layers</span></button><button class="mc mc-full" id="btnFull" type="button" title="Full screen" data-tt="Full screen" aria-label="Full screen" data-ta="Full screen"><svg><use href="#i-full"/></svg></button></div>
+            <div class="mc-grp"><button class="mc" id="zoomIn" type="button" title="Zoom in" data-tt="Zoom in" aria-label="Zoom in" data-ta="Zoom in"><svg><use href="#i-plus"/></svg></button><button class="mc" id="zoomOut" type="button" title="Zoom out" data-tt="Zoom out" aria-label="Zoom out" data-ta="Zoom out"><svg><use href="#i-minus"/></svg></button><button class="mc" id="zoomFit" type="button" title="The whole track" data-tt="The whole track" aria-label="The whole track" data-ta="The whole track"><svg><use href="#i-fit"/></svg></button></div>
+            <div class="mc-grp"><button class="mc" id="rotL" type="button" title="Turn the map left" data-tt="Turn the map left" aria-label="Turn the map left" data-ta="Turn the map left"><svg><use href="#i-rotl"/></svg></button><button class="mc" id="rotR" type="button" title="Turn the map right" data-tt="Turn the map right" aria-label="Turn the map right" data-ta="Turn the map right"><svg><use href="#i-rotr"/></svg></button></div>
+          </div>
           <div class="map-title" id="map1Title" hidden></div>
           <div class="readout" id="readout" hidden></div>
           <div class="sat-pill" id="satPill" hidden><span id="satPillText"></span><button class="btn xs primary" id="satPillBtn" type="button"></button><button class="x" id="satPillClose" type="button" aria-label="Close" data-ta="Close">×</button></div>
@@ -2363,6 +2406,20 @@ input.sw:checked::after{transform:translateX(18px)}
 </div></div>
 <!-- a layout read from a picture, added to Hutka (Hutka AI → New track → a photo): the name the AI read (or typed), the layout, the place;
      the picture and its line become the track's page -->
+<!-- v34.49: the map's layers (they were a row of buttons to scroll sideways): each a switch with one line saying what it shows -->
+<div class="modal" id="lyrSheet" hidden><div class="box sheet lyr-sheet">
+  <div class="sheet-head"><h3 data-t="Map layers">Map layers</h3><button class="sheet-x" id="lyrX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="lyr-list">
+    <button class="lyr" id="optPedals" type="button"><span class="lyr-tx"><b>Accel / decel</b><small data-t="The lap in colour: green accelerating, red decelerating, yellow coasting">The lap in colour: green accelerating, red decelerating, yellow coasting</small></span><i class="sw" aria-hidden="true"></i></button>
+    <button class="lyr" id="tglTiles" type="button" hidden><span class="lyr-tx"><b data-t="Satellite">Satellite</b><small data-t="Satellite imagery under the line">Satellite imagery under the line</small></span><i class="sw" aria-hidden="true"></i></button>
+    <button class="lyr" id="tglAlign" type="button" hidden><span class="lyr-tx"><b data-t="Move imagery">Move imagery</b><small data-t="When the picture sits off the line: drag it into place">When the picture sits off the line: drag it into place</small></span><i class="sw" aria-hidden="true"></i></button>
+    <button class="lyr" id="tglSat" type="button"><span class="lyr-tx"><b>Lap traces</b><small></small></span><i class="sw" aria-hidden="true"></i></button>
+    <button class="lyr" id="optBand" type="button"><span class="lyr-tx"><b data-t="Track edges">Track edges</b><small data-t="The edges of the asphalt">The edges of the asphalt</small></span><i class="sw" aria-hidden="true"></i></button>
+    <button class="lyr" id="optTicks" type="button"><span class="lyr-tx"><b data-t="Markers">Markers</b><small data-t="The distance every 50 m along the lap">The distance every 50 m along the lap</small></span><i class="sw" aria-hidden="true"></i></button>
+    <button class="lyr" id="optLabels" type="button"><span class="lyr-tx"><b data-t="Labels">Labels</b><small data-t="The points of every corner, not only the one you pick">The points of every corner, not only the one you pick</small></span><i class="sw" aria-hidden="true"></i></button>
+  </div>
+  <div class="sheet-foot"><button class="btn primary" id="lyrDone" type="button" data-t="Done">Done</button></div>
+</div></div>
 <div class="modal" id="addTrk" hidden><div class="box sheet add-trk">
   <div class="sheet-head"><h3 id="addTrkH" data-t="Add the track to Hutka">Add the track to Hutka</h3><button class="sheet-x" id="addTrkX" type="button" data-tt="Close" title="Close" aria-label="Close" data-ta="Close"><svg><use href="#i-x"/></svg></button></div>
   <div class="sheet-body">
@@ -2374,7 +2431,7 @@ input.sw:checked::after{transform:translateX(18px)}
       <div class="field wide" id="addTrkPlaceF"><label for="addTrkPlace" data-t="City and country">City and country</label><input type="text" id="addTrkPlace" maxlength="120" autocomplete="off" data-tp="e.g. Dubai, UAE" placeholder="e.g. Dubai, UAE"></div>
     </div>
     <div class="hint at-hint" data-t="The picture and its line become the track’s page. The first session uploaded there makes the line exact.">The picture and its line become the track’s page. The first session uploaded there makes the line exact.</div>
-    <div class="at-near" id="addTrkNear" hidden><span id="addTrkNearT"></span><a class="btn" id="addTrkNearGo" href="#tracks"></a></div>
+    <div class="at-near" id="addTrkNear" hidden><span id="addTrkNearT"></span><button class="btn primary" id="addTrkNearLay" type="button" hidden></button><a class="btn" id="addTrkNearGo" href="#tracks"></a></div>
     <span class="status" id="addTrkStatus"></span>
   </div>
   <div class="sheet-foot"><button class="btn primary" id="addTrkGo" type="button" data-t="Add the track">Add the track</button></div>
@@ -5707,6 +5764,28 @@ Object.assign(I18N.RU, {
   "{name} is already on Hutka, {d} km from there. Is it the same track?": "{name} уже есть в Hutka, в {d} км отсюда. Это она?",
   "Yes — open {name}": "Да — открыть {name}",
   "No, it is another track — add it": "Нет, это другая — добавить",
+  "Add as a layout of {name}": "Добавить как конфигурацию {name}",
+  "Another layout · {track}": "Другая конфигурация · {track}",
+  "Not this one: the picture read as a new layout": "Не эта — схема как новая конфигурация",
+  "A new layout · {track}": "Новая конфигурация · {track}",
+  "Read from the picture: this layout is not on Hutka yet": "По схеме: такой конфигурации на Hutka ещё нет",
+  "A track of its own": "Отдельная трасса",
+  "Not {track}: the picture read as another track": "Не {track} — схема как другая трасса",
+  "Layers": "Слои",
+  "Map layers": "Слои карты",
+  "Zoom in": "Приблизить",
+  "Zoom out": "Отдалить",
+  "The whole track": "Вся трасса",
+  "Turn the map left": "Повернуть карту влево",
+  "Turn the map right": "Повернуть карту вправо",
+  "The lap in colour: green accelerating, red decelerating, yellow coasting": "Круг цветом: зелёный — разгон, красный — замедление, жёлтый — накат",
+  "Satellite imagery under the line": "Спутниковый снимок под линией",
+  "When the picture sits off the line: drag it into place": "Если снимок лёг мимо линии — подвиньте его",
+  "The edges of the asphalt": "Края асфальта",
+  "The distance every 50 m along the lap": "Дистанция через каждые 50 м",
+  "The points of every corner, not only the one you pick": "Точки всех поворотов, а не только выбранного",
+  "The track's aerial picture under the line": "Снимок трассы под линией",
+  "Every lap of the session under the line": "Все круги сессии под линией",
   "Track added to Hutka": "Трасса добавлена в Hutka",
   "Layout added to Hutka": "Конфигурация добавлена в Hutka",
   "Added from a picture of its layout. The first session uploaded here makes the line exact. Know this track? Add the website, hours and a photo on the track page.": "Добавлена по схеме конфигурации. Первая загруженная здесь сессия сделает линию точной. Знаешь эту трассу? Добавь сайт, часы работы и фото на странице трассы."
@@ -7625,7 +7704,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.48';
+const APP_VERSION = 'v34.49';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -8734,7 +8813,7 @@ const BRAIN = (() => {
 // One session is the reference; a comparison (another lap, the session average, or another session on the same layout) is optional.
 const LAB = {
   tid: '', lid: '', G: null, sessions: [], ref: null, cmp: 'none', cmp2: 'none', mapLap: 'you', selN: 0, hoverIdx: -1, scrubT: 0, playing: false, chat: [], dcmp: null, coach: null, map: null, loaded: false, social: null, pickerOpen: false,
-  opts: { band: false, ticks: true, labelsAll: false, pedals: false, aerial: true, tiles: SAT.pref() }
+  opts: { band: false, ticks: true, labelsAll: false, pedals: true, aerial: true, tiles: SAT.pref() }   // v34.49: accel / decel on for everyone
 };
 const lapKey = (sess, L) => sess.id + '|' + L.n;
 const isAvgKey = (k) => String(k || '').startsWith('avg:');
@@ -9234,6 +9313,11 @@ function labEnsureMap() {
   $('zoomIn').onclick = () => LAB.map.zoomCenter(1.3); $('zoomOut').onclick = () => LAB.map.zoomCenter(1 / 1.3); $('zoomFit').onclick = () => { LAB.map.fit(); LAB.map.draw(); };
   $('optBand').onclick = () => { LAB.opts.band = !LAB.opts.band; syncOpts(); }; $('optTicks').onclick = () => { LAB.opts.ticks = !LAB.opts.ticks; syncOpts(); }; $('optLabels').onclick = () => { LAB.opts.labelsAll = !LAB.opts.labelsAll; syncOpts(); }; $('optPedals').onclick = () => { LAB.opts.pedals = !LAB.opts.pedals; if (LAB.opts.pedals) STORE.track('pedals', {}); syncOpts(); renderLegend(); };
   $('tglSat').onclick = () => { LAB.opts.aerial = !LAB.opts.aerial; syncOpts(); };
+  // the map's layers: a sheet of switches (on the phone from the bottom), opened from the button on the map
+  { const sh = $('lyrSheet'), close = () => { sh.hidden = true; };
+    $('mapLayersBtn').onclick = () => { syncOpts(); sh.hidden = false; NATIVE.haptic('light'); };
+    $('lyrX').onclick = close; $('lyrDone').onclick = close; sh.addEventListener('click', (e) => { if (e.target === sh) close(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sh.hidden) close(); }); }
   $('tglTiles').onclick = () => { LAB.opts.tiles = !LAB.opts.tiles; SAT.setPref(LAB.opts.tiles); if (!LAB.opts.tiles) setAligning(false); syncOpts(); };
   // moving the picture under the line: for this device, or saved on the layout by whoever may edit the track
   $('tglAlign').onclick = () => setAligning(!LAB.aligning); $('satNoteAlign').onclick = () => setAligning(true);
@@ -9372,11 +9456,13 @@ function renderAlignBar() {
   $('alignOff').textContent = (Math.abs(LAB.satAdj.dx) > 0.01 || Math.abs(LAB.satAdj.dy) > 0.01) ? t('{x} m east, {y} m north', { x: LAB.satAdj.dx.toFixed(1), y: LAB.satAdj.dy.toFixed(1) }) : t('no shift'); renderSatPill();
   $('alSave').hidden = !canSave;
 }
+// a layer's switch: its name (and the line under it) — the row keeps its switch
+function lyrName(id, name, line) { const b = $(id) && $(id).querySelector('b'); if (!b) { if ($(id)) $(id).textContent = name; return; } b.textContent = name; if (line !== undefined) { const sm = $(id).querySelector('small'); if (sm) sm.textContent = line; } }
 function syncOpts() {
   const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles); $('ckSat').hidden = !sat; $('ckSat').classList.toggle('active', sat && LAB.opts.tiles); $('tglAlign').hidden = !(sat && LAB.opts.tiles); if (!(sat && LAB.opts.tiles) && LAB.aligning) setAligning(false);
-  $('satNote').hidden = true; $('tglAlign').textContent = t('Move imagery'); renderSatPill();
+  $('satNote').hidden = true; lyrName('tglAlign', t('Move imagery')); renderSatPill();
   if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; $('ckSat').hidden = true; LAB.map.draw(); } });
-  $('tglSat').textContent = LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'); $('optBand').hidden = !!(sat && LAB.opts.tiles); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('optPedals').classList.toggle('active', LAB.opts.pedals); $('optPedals').textContent = t('Pedals'); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))) || !!(sat && LAB.opts.tiles && !(LAB.G && LAB.G.aerial)); LAB.map.draw(); }
+  lyrName('tglSat', LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'), LAB.G && LAB.G.aerial ? t('The track\'s aerial picture under the line') : t('Every lap of the session under the line')); $('optBand').hidden = !!(sat && LAB.opts.tiles); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('optPedals').classList.toggle('active', LAB.opts.pedals); lyrName('optPedals', t('Pedals')); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))) || !!(sat && LAB.opts.tiles && !(LAB.G && LAB.G.aerial)); LAB.map.draw(); }
 function selectCorner(n, scroll) { NATIVE.haptic('light'); LAB.selN = (LAB.selN === n) ? 0 : n; LAB.ckInsp = !!LAB.selN; if (isCockpit() && LAB.side && LAB.selN) setSide(false); afterSelect(true); if (scroll && LAB.selN && !isCockpit()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 
 // ----- the start screen: my sessions and what the drivers I follow have published -----
@@ -9513,7 +9599,7 @@ function labRender() {
   if (cmp !== 'none' && isIdealKey(cmp) && !(cs === sess && !refIsAvg && sessIdeal(cs, R, apexes))) cmp = 'none';   // the ideal lap is measured against a real lap of the same session
   LAB.cmp = cmp;
   const cmpOn = cmp !== 'none';
-  $('cmpField').hidden = !cmpOn; $('lapSegField').hidden = !cmpOn;
+  $('cmpField').hidden = !cmpOn; $('lapSegField').hidden = !cmpOn; $('mapBar').hidden = !cmpOn;
   if (cmpOn) { const laps = cs.laps.filter(x => x.px), av = sessAvg(cs), ide = cs === sess && !refIsAvg ? sessIdeal(cs, R, apexes) : null; const o = []; if (av) o.push(['avg:' + cs.id, `${t('average clean lap')} · ${fmtLap(av.T)} (${laps.filter(x => x.clean).length})`]); if (ide) o.push(['ideal:' + cs.id, `${t('ideal lap')} · ${fmtLap(ide.T)} (${t('best corners, approximate')})`]); for (const x of laps) o.push([lapKey(cs, x), lapLabel(cs, x)]); LAB.cmp = fillSelect($('cmpSel'), o.filter(x => x[0] !== LAB.ref), cmp); $('cmpLbl').textContent = (cs === sess ? t('Compare with — this session') : t('Compare with · {s}', { s: shortSess(cs) })) + (LAB.cmpAuto && LAB.cmp === LAB.cmpAuto.key ? ' · ' + (LAB.cmpAuto.why === 'followed' ? t('fastest among the drivers you follow') : t('fastest on this layout')) : ''); }
   // the third lap: a visual comparison (map, charts, replay, a Δt column) — any lap or average of a loaded session; the field shows once a comparison is on
   let c2 = String(LAB.cmp2 || 'none'); if (c2 === LAB.ref || c2 === LAB.cmp || isIdealKey(c2)) c2 = 'none';
@@ -12056,6 +12142,8 @@ const TRACKFIND = (() => {
     return null;
   }
   const words = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').split(/[^a-zа-яё0-9]+/i).filter(w => w.length >= 3 && !/^(the|kart|karting|track|circuit|club|park|and|international|картинг|трасса|клуб)$/.test(w));
+  // a name read (from a picture) names this track: every telling word of it is in the track's own names — its town alone is not its name
+  const namedBy = (name, tr) => { const qw = words(name), tw = words([tr.name, tr.name0, tr.aka, tr.swsName].filter(Boolean).join(' ')); return qw.length > 0 && qw.every(w => tw.some(x => x.startsWith(w) || w.startsWith(x))); };
   // Hutka's tracks that match the words typed, or lie near the place
   function onHutka(q, at) {
     const qw = words(q), out = [];
@@ -12374,7 +12462,7 @@ const TRACKFIND = (() => {
     const ls = (h.ls || []).filter(l => !h.linedIds || h.linedIds.has(l.id)).sort((a, b) => (+a.order || 0) - (+b.order || 0));
     return ls.find(l => /international|classic|full|main|standard|grand prix|\bgp\b|классик|основн/i.test(l.name || '') && !/reverse|реверс|обратн/i.test(l.name || '')) || ls[0] || null;
   }
-  return { coords, onHutka, geocode, geocodeAny, variants, raceways, loopsOf, clockwise, geometry, find, fromPhoto, fromImage, fromImageAt, layoutByName, linedIds, registerLoop, venueFit, loopFit, mainLayout };
+  return { coords, onHutka, namedBy, geocode, geocodeAny, variants, raceways, loopsOf, clockwise, geometry, find, fromPhoto, fromImage, fromImageAt, layoutByName, linedIds, registerLoop, venueFit, loopFit, mainLayout };
 })();
 // ---------- home: the feed of published sessions, where people drive, who is fastest ----------
 // the analysis card from the session meta (LAB.cardOf): the lap line, the Lab's points, the corner numbers — y grows downwards
@@ -13375,7 +13463,7 @@ async function idealFromPlan(body, sub, res, ph) {
     thumb.onclick = wrong.onclick; row.append(thumb, words); head.appendChild(row);
     requestAnimationFrame(() => drawPick(thumb, ph, 72));
     const dirs = el('div', 'seg ai2-dir'), bCw = aiBtn(t('Clockwise'), '', () => draw(true)), bCcw = aiBtn(t('Anticlockwise'), '', () => draw(false)); bCw.classList.toggle('active', !!cw); bCcw.classList.toggle('active', !cw); dirs.append(bCw, bCcw); head.appendChild(dirs);
-    if (!res.lid) { const ab = addBlock({ ph, G: r.G, cw: !!cw, fit, how, tid: res.tid || null, lay: res.lay || '' }); if (ab) head.appendChild(ab); }
+    if (!res.lid) { const ab = addBlock({ ph, G: r.G, cw: !!cw, fit, how, tid: res.tid || null, lay: res.lay || '', another: !!res.another }); if (ab) head.appendChild(ab); }
     if (canSave) { const sv = aiBtn(t('Save to this layout'), 'ghost', async () => { sv.disabled = true; try { const l = STORE.getLayout(res.tid, res.lid); await STORE.saveLayout(res.tid, Object.assign({}, l, { photoLine: Object.assign(BRAINS.photoLineOf(r.G, how), { dir: cw ? 'cw' : 'ccw' }, fit ? { ref: fit.ref.lid } : {}) })); sv.textContent = t('Saved — everyone sees this line now'); } catch (e) { sv.disabled = false; toast(t('Could not save: {e}', { e: e && e.message || e })); } }); head.appendChild(sv); }
     body.insertBefore(head, body.firstChild);
   };
@@ -13414,11 +13502,12 @@ function tapTrack(ph, onDone) {
   };
 }
 // a venue's plan of a layout the venue has no page for: the card of its ideal, the picture read at the venue's size
-async function actPlan(tid, ph, name) {
+// another: the picture is not the layout Hutka took it for — a new layout of the venue, its name typed when it is added
+async function actPlan(tid, ph, name, another) {
   const trk = tid ? STORE.getTrack(tid) : null, card = aiCard(t('Ideal lap'), ''), sub = card.querySelector('[data-sub]'), nm = el('div', 'ai2-cardlay');
   nm.append(el('b', '', name || t('Layout from the photo'))); card.querySelector('.hd .tt').insertBefore(nm, sub);
   const body = el('div', 'ai2-body'); card.appendChild(body); pushCard(card);
-  await idealFromPlan(body, sub, { tid, lid: null, cls: aiCls(), name: (trk ? trk.name + ' · ' : '') + (name || t('Layout from the photo')), lay: name || '' }, ph);
+  await idealFromPlan(body, sub, { tid, lid: null, cls: aiCls(), name: (trk ? trk.name + ' · ' : '') + (name || t('Layout from the photo')), lay: another ? '' : (name || ''), another: !!another }, ph);
 }
 
 // ---- a layout read from a picture, added to Hutka. A venue Hutka does not have becomes a track with this layout (anyone signed in: the
@@ -13432,7 +13521,7 @@ function addBlock(o) {
   const paint = () => {
     box.innerHTML = ''; const a = o.ph._added;
     if (a) {
-      box.appendChild(el('div', 'ok', t('{name} is on Hutka now — anyone can find it.', { name: a.lay && a.tid === o.tid ? a.name + ' · ' + a.lay : a.name })));
+      box.appendChild(el('div', 'ok', t('{name} is on Hutka now — anyone can find it.', { name: a.lay && a.venue ? a.name + ' · ' + a.lay : a.name })));   // a layout added to a venue (from this card, or the "already on Hutka" question): the venue and the layout
       const go = el('a', 'btn primary', t('Open the track page')); go.href = `#track~${a.tid}~${a.lid}`; box.appendChild(go);
       return;
     }
@@ -13451,7 +13540,7 @@ const ADDTRK = (() => {
     const g = (o.ph && o.ph.guess) || {}, trk = o.tid ? STORE.getTrack(o.tid) : null;
     $('addTrkH').textContent = trk ? t('New layout · {track}', { track: trk.name }) : t('Add the track to Hutka');
     $('addTrkNameF').hidden = $('addTrkPlaceF').hidden = !!trk;
-    const lay0 = trk ? (o.lay && o.lay !== t('Layout from the photo') ? o.lay : g.layout) : g.layout;   // the title the plan prints; a new venue's only layout: "Main"
+    const lay0 = trk ? (o.another ? '' : (o.lay && o.lay !== t('Layout from the photo') ? o.lay : g.layout)) : g.layout;   // the title the plan prints (another layout: typed); a new venue's only layout: "Main"
     $('addTrkName').value = trk ? '' : titled(g.name); $('addTrkLay').value = titled(lay0) || (trk ? '' : t('Main'));
     $('addTrkPlace').value = [clean(g.city), clean(g.country)].filter(Boolean).join(', ') || (o.ph && o.ph._place) || '';
     st = { name0: $('addTrkName').value, place0: $('addTrkPlace').value, near: null };
@@ -13507,7 +13596,11 @@ const ADDTRK = (() => {
         if (near && st.near !== near.x.id) {
           st.near = near.x.id; setStatus('addTrkStatus', '');
           $('addTrkNearT').textContent = t('{name} is already on Hutka, {d} km from there. Is it the same track?', { name: near.x.name, d: near.d < 0.1 ? '0.1' : near.d.toFixed(1) });
-          const a = $('addTrkNearGo'); a.href = '#track~' + near.x.id; a.textContent = t('Yes — open {name}', { name: near.x.name }); a.classList.add('primary'); $('addTrkNear').hidden = false;
+          // the same venue, another layout (Speedway at the Kartdrome): its editors add the picture to it as a layout — the bright answer then
+          const lay = $('addTrkNearLay'), asLayout = STORE.canEditTrack(near.x);
+          lay.hidden = !asLayout; lay.textContent = t('Add as a layout of {name}', { name: near.x.name });
+          lay.onclick = () => { const o2 = Object.assign({}, o, { tid: near.x.id, another: true, lay: '' }); open(o2, done); };
+          const a = $('addTrkNearGo'); a.href = '#track~' + near.x.id; a.textContent = t('Yes — open {name}', { name: near.x.name }); a.classList.toggle('primary', !asLayout); a.classList.toggle('ghost', asLayout); $('addTrkNear').hidden = false;
           go.textContent = t('No, it is another track — add it'); go.classList.remove('primary'); return;   // the likely answer is the bright one
         }
         // the venue's details from the map around it: its own pin (when the place was a search), the town, the country, the address
@@ -13523,7 +13616,7 @@ const ADDTRK = (() => {
         : await STORE.saveLayout(tid, Object.assign({ name: lay, order, cornerR: 110, widthM: 8, direction: o.cw ? 'cw' : 'ccw', trace: D.trace }, known ? { lengthM: D.lengthM } : {}));
       try { await STORE.setMedia(`tracks/${tid}/layouts/${lid}/media/trace`, D.url); } catch (e) {}   // the picture under the line; the line stands without it
       GEOM.invalidate(); STORE.track('track_from_photo', { tid, lid, venue: !!trk });
-      o.ph._added = { tid, lid, name: trk ? trk.name : name, lay: old ? old.name : lay };
+      o.ph._added = { tid, lid, name: trk ? trk.name : name, lay: old ? old.name : lay, venue: !!trk };
       close(); setStatus('addTrkStatus', ''); NATIVE.haptic('success'); toast(trk ? t('Layout added to Hutka') : t('Track added to Hutka'));
       if (done) done();
     } catch (e) { setStatus('addTrkStatus', quotaOr(e, t('Could not save: {e}', { e: e && e.message || e })), 'warn'); }
@@ -13612,26 +13705,38 @@ function actTrack(q0) {
     let res = null; if (q) { try { res = await TRACKFIND.find(q); } catch (e) { res = { error: String(e && e.message || e) }; } } else res = { hutka: [], loops: [] };
     go.classList.remove('busy'); out.innerHTML = '';
     if (ph) { const a = res && !res.error && res.at; ph._at = a && isFinite(a.lat) && isFinite(a.lon) ? { lat: +a.lat, lon: +a.lon, broad: !!a.broad } : null; ph._place = (res && res.place) || ''; }   // where the AI's name is on the map: the place of the track, if it is added to Hutka
+    const hit = (title, line, fn) => { const b = el('button', 'ai2-hit'); b.type = 'button'; b.innerHTML = `<b>${esc(title)}</b><span>${esc(line)}</span>`; b.onclick = fn; out.appendChild(b); };
+    let venueNew = null;   // the venue is on Hutka, the picture lies on none of its layouts: a layout of it Hutka does not have yet
     if (ph && res && !res.error && res.hutka.length) {
       // the venue: the one with a layout of the name the picture prints ("Dubai Kartdrome" may be the outdoor or the indoor one), else the
       // one with driven layouts to lay the picture onto
       const g = ph.guess || {}; let h = null, lay = null;
       for (const x of res.hutka) { const l = TRACKFIND.layoutByName(x.ls, g.layout, x.tr.name); if (l) { h = x; lay = l; break; } }
       if (!h) h = res.hutka.find(x => x.lined) || res.hutka[0];
-      const hit = (title, line, fn) => { const b = el('button', 'ai2-hit'); b.type = 'button'; b.innerHTML = `<b>${esc(title)}</b><span>${esc(line)}</span>`; b.onclick = fn; out.appendChild(b); };
-      if (lay) { hit(lay.name + ' · ' + h.tr.name, t('Read from the picture'), () => actIdeal(h.tr.id, lay.id, aiCls(), ph)); listHutka(res); await actIdeal(h.tr.id, lay.id, aiCls(), ph); return; }
+      // the venue right, the layout not: the picture read as a new layout of it (its editors add it to Hutka) — Hutka is never the last word
+      const another = () => hit(t('Another layout · {track}', { track: h.tr.name }), t('Not this one: the picture read as a new layout'), () => actPlan(h.tr.id, ph, t('Layout from the photo'), true));
+      if (lay) { hit(lay.name + ' · ' + h.tr.name, t('Read from the picture'), () => actIdeal(h.tr.id, lay.id, aiCls(), ph)); another(); listHutka(res); await actIdeal(h.tr.id, lay.id, aiCls(), ph); return; }
       out.appendChild(el('div', 'hint', t('Laying the picture onto the layouts driven here…')));
       const fit = await planFit(ph, h.tr.id); out.innerHTML = '';
       const same = fit && fit.same ? h.ls.find(l => l.id === fit.same) : null;
-      if (same) { hit(same.name + ' · ' + h.tr.name, t('Read from the picture: its shape is this layout'), () => actIdeal(h.tr.id, same.id, aiCls(), ph)); listHutka(res); await actIdeal(h.tr.id, same.id, aiCls(), ph); return; }
+      if (same) { hit(same.name + ' · ' + h.tr.name, t('Read from the picture: its shape is this layout'), () => actIdeal(h.tr.id, same.id, aiCls(), ph)); another(); listHutka(res); await actIdeal(h.tr.id, same.id, aiCls(), ph); return; }
       if (fit) { const nm = g.layout || t('Layout from the photo'); hit(nm + ' · ' + h.tr.name, t('Not a layout of the venue on Hutka yet: read from the picture at the venue\'s size'), () => actPlan(h.tr.id, ph, nm)); listHutka(res); await actPlan(h.tr.id, ph, nm); return; }
+      // on none of its layouts (or it has no line to lay the picture on): a new layout of the venue, read at the picture's own size —
+      // opened when the picture names this venue; one found only near the place the picture names may be another venue: the picture as
+      // a track of its own opened then, the new layout of the venue one tap away
+      venueNew = { h, nm: g.layout || t('Layout from the photo'), open: !!g.name && TRACKFIND.namedBy(g.name, h.tr) };
     }
-    if (ph) { ph._loops = (res && res.loops) || []; const b = el('button', 'ai2-hit'); b.type = 'button'; b.innerHTML = `<b>${esc(t('This layout, read from the photo'))}</b><span>${esc(t('The corners as the picture draws them, the points from similar corners on Hutka'))}</span>`; b.onclick = () => idealFromPhoto(ph); out.appendChild(b); }
+    if (ph) {
+      ph._loops = (res && res.loops) || [];
+      const asVenue = () => hit(t('A new layout · {track}', { track: venueNew.h.tr.name }), t('Read from the picture: this layout is not on Hutka yet'), () => actPlan(venueNew.h.tr.id, ph, venueNew.nm));
+      if (venueNew && venueNew.open) { asVenue(); hit(t('A track of its own'), t('Not {track}: the picture read as another track', { track: venueNew.h.tr.name }), () => idealFromPhoto(ph)); }
+      else { hit(t('This layout, read from the photo'), t('The corners as the picture draws them, the points from similar corners on Hutka'), () => idealFromPhoto(ph)); if (venueNew) asVenue(); }
+    }
     if (!res || res.error) { if (ph) { await idealFromPhoto(ph); return; } out.appendChild(el('div', 'hint warn', res && res.error === 'offline' ? t('No connection to the map — try again online.') : t('Could not search the map just now — try again in a minute.'))); return; }
     listHutka(res);
     // raceways on the map: every closed loop found, longest first
     for (const lp of res.loops) { const b = el('button', 'ai2-hit'); b.type = 'button'; b.innerHTML = `<b>${esc(lp.name || t('Raceway on the map'))}</b><span>${esc(t('OpenStreetMap · loop of {m} m', { m: Math.round(lp.lengthM) }))}</span>`; b.onclick = () => idealFromLoop(lp); out.appendChild(b); }
-    if (ph) { await idealFromPhoto(ph); return; }   // a photo: its own layout opened, what the search found listed under it
+    if (ph) { if (venueNew && venueNew.open) await actPlan(venueNew.h.tr.id, ph, venueNew.nm); else await idealFromPhoto(ph); return; }   // a photo: its own layout opened (of the venue found, when there is one), what the search found listed under it
     if (!res.hutka.some(h => h.lined) && !res.loops.length) {
       out.appendChild(el('div', 'hint', res.place ? t('Found {p}, but no karting raceway is drawn there on the map. Send a photo of its layout — Hutka reads the corners from it.', { p: res.place }) : t('Not on the map. Send a photo of its layout — Hutka reads the corners from it.')));
       return;

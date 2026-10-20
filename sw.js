@@ -1,6 +1,6 @@
 // Hutka service worker: offline app shell + "share to Hutka" from the Alfano app (Web Share Target). Since v34.27 it runs inside the
 // Android app too: the app opened at the track with no signal starts from this cache, reads the lap timer and keeps the sessions for later.
-const V = 'hutka-shell-v111';
+const V = 'hutka-shell-v112';
 const SHELL = ['./', './index.html', './config.js', './geo.txt', './supabase.js', './manifest.webmanifest', './logo.png', './logo-dark.png', './icon-192.png'];
 self.addEventListener('install', (e) => { e.waitUntil((async () => { const c = await caches.open(V); for (const u of SHELL) { try { await c.add(new Request(u, { cache: 'reload' })); } catch (err) {} } self.skipWaiting(); })()); });
 self.addEventListener('activate', (e) => { e.waitUntil((async () => { for (const k of await caches.keys()) if (k !== V && k !== 'hutka-share') await caches.delete(k); await self.clients.claim(); })()); });
