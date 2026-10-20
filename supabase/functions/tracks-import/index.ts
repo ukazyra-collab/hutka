@@ -8,7 +8,7 @@
 // Deploy as `tracks-import` with "Verify JWT" OFF (checked here).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { venuesOf, distM, nameKey, type El, type Venue } from "./lib.ts";
-import { QLEVER, qVenueTags, qVenueGeom, qRacewayGeom, qRacewayTags, qTowns, sparql, venueEls, racewayEls, townEls } from "./qlever.ts";
+import { QLEVER, qVenueTags, qVenueGeom, qRacewayGeom, qRacewayTags, qTowns, qFind, qIdTags, qIdGeom, sparql, venueEls, racewayEls, townEls } from "./qlever.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-import-token", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
@@ -29,9 +29,19 @@ Deno.serve(async (req) => {
     const { data: { user } } = await sb.auth.getUser(); if (user) { const { data: adm } = await sb.rpc("is_admin"); allowed = adm === true; }
   }
   if (!allowed) return json({ error: "forbidden" }, 403);
-  let body: { area?: string; dry?: boolean } = {};
+  let body: { area?: string; dry?: boolean; find?: string; ids?: string[] } = {};
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
   const area = String(body.area || "").toUpperCase(), dry = !!body.dry;
+  // by hand: what the map has under a name in an area ({area:"BY", find:"Стайк|Staik"}), or the given elements ({ids:["way/1"]})
+  if (body.find || body.ids) {
+    const byEl = (rows: Record<string, { value: string } | undefined>[]) => { const o: Record<string, Record<string, string>> = {}; for (const r of rows) { if (!r.el || !r.key || !r.val) continue; const k = r.el.value.replace("https://www.openstreetmap.org/", ""); (o[k] = o[k] || {})[r.key.value.replace(/^.*\/Key:/, "")] = r.val.value; } return o; };
+    try {
+      if (body.ids) { const ids = body.ids.filter(i => /^(node|way|relation)\/\d+$/.test(i)).slice(0, 50); const tags = byEl(await sparql(qIdTags(ids), 60000)), geom = await sparql(qIdGeom(ids), 60000); return json({ tags, geom: geom.map(r => ({ el: r.el && r.el.value.replace("https://www.openstreetmap.org/", ""), wkt: r.wkt && r.wkt.value.slice(0, 20000) })) }); }
+      const re = String(body.find).replace(/[^\p{L}\p{N} |\-.]/gu, "").slice(0, 120);
+      if (!/^([A-Z]{2}|US-[A-Z]{2})$/.test(area) || !re) return json({ error: "find needs an area and a name" }, 400);
+      return json({ area, find: re, els: byEl(await sparql(qFind(area, re), 110000)) });
+    } catch (e) { return json({ error: String((e as Error).message || e).slice(0, 300) }, 502); }
+  }
   if (area === "PING") {   // how fast the map database answers the import's five questions from here (Belgium; a queue run: "PING")
     const out: Record<string, unknown> = {};
     for (const [k, q] of [["venueTags", qVenueTags("BE")], ["venueGeom", qVenueGeom("BE")], ["racewayGeom", qRacewayGeom("BE")], ["racewayTags", qRacewayTags("BE")], ["towns", qTowns("BE")]] as [string, string][]) { const t1 = Date.now(); try { const rows = await sparql(q, 30000); out[k] = { ms: Date.now() - t1, rows: rows.length, kb: Math.round(JSON.stringify(rows).length / 1024) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }

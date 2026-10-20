@@ -20,6 +20,13 @@ export const qRacewayGeom = (area: string) => PRE + `SELECT ?el ?wkt WHERE { ${a
 export const qRacewayTags = (area: string) => PRE + `SELECT ?el ?key ?val WHERE { ${areaOf(area)}?el osmkey:highway "raceway" . ?el ?key ?val . FILTER(?key IN (osmkey:sport, osmkey:oneway, osmkey:width, osmkey:name)) }`;
 export const qTowns = (area: string) => PRE + `SELECT ?el ?wkt ?name ?place WHERE { ${areaOf(area)}?el osmkey:place ?place . FILTER(?place = "city" || ?place = "town") ?el osmkey:name ?name . ?el geo:hasGeometry/geo:asWKT ?wkt . }`;
 
+// looking things up by hand (index.ts "find"): every tag of the elements of an area whose name (any of its names) matches, or of the
+// elements given by id ("way/832870199") with their geometry
+const NAMEKEYS = ["name", "alt_name", "loc_name", "old_name", "short_name", "official_name", "name:ru", "name:be", "name:uk", "name:en", "name:ar", "brand"].map(k => `<${KEY}${k}>`).join(" ");
+export const qFind = (area: string, re: string) => PRE + `SELECT ?el ?key ?val WHERE { ${areaOf(area)}VALUES ?nk { ${NAMEKEYS} } ?el ?nk ?nm . FILTER(REGEX(?nm, "${re}", "i")) ?el ?key ?val . FILTER(STRSTARTS(STR(?key), "${KEY}")) } LIMIT 3000`;
+export const qIdTags = (ids: string[]) => PRE + `SELECT ?el ?key ?val WHERE { VALUES ?el { ${ids.map(i => `<https://www.openstreetmap.org/${i}>`).join(" ")} } ?el ?key ?val . FILTER(STRSTARTS(STR(?key), "${KEY}")) }`;
+export const qIdGeom = (ids: string[]) => PRE + `SELECT ?el ?wkt WHERE { VALUES ?el { ${ids.map(i => `<https://www.openstreetmap.org/${i}>`).join(" ")} } ?el geo:hasGeometry/geo:asWKT ?wkt . }`;
+
 type Row = Record<string, { value: string } | undefined>;
 export async function sparql(q: string, ms: number): Promise<Row[]> {
   const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), ms);
