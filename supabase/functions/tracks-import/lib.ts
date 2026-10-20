@@ -97,6 +97,8 @@ export const kartName = (s: string) => KART_NAME.test(String(s || "")) && !/orie
 export const KIDS = /mini[- ]?auto|mini[- ]?kart|(^|[^\p{L}])mini[- ]?cars?(?![\p{L}])|verkeerspark|verkehrsgarten|kinder[- ]?\p{L}*(kart|quad|auto|verkehr|bahn)|(^|[^\p{L}])(kids?|enfants?)(?![\p{L}])|per bambini|para niños|p[ée]dal|trapauto|tretauto|автогородок|детск/iu;
 // a name saying the place is gone: "Ex Kartdromo", "Kartodromo (Abbandonato)", "ehemalige Kartbahn", "former karting"
 export const CLOSED = /(^|[^\p{L}])(ex|former|ehemalige?[rns]?|stillgelegte?[rns]?|abbandonat[oaie]|abandonn?ed|abandonn[ée]e?s?|disused|closed|chiuso|ferm[ée]e?|cerrad[oa]|desaparecid[oa]|zamknięty)(?![\p{L}])/iu;
+// not karting at all, whatever the map's tag says: soap-box derby hills, driving schools' practice grounds ("Учебный автодром")
+export const NOT_KARTING = /soap ?box|seifenkist|caisses? [àa] savon|учебн\p{L}*\s+(автодром|площадк)|автошкол|driving school|fahrschul/iu;
 // which elements are venues: something with karting among its sports, or named for karts (a raceway, a track or a hall with no sport
 // given, a motor-sport venue), not a shop, an office or a closed place
 function isVenue(e: El): boolean {
@@ -105,8 +107,15 @@ function isVenue(e: El): boolean {
   if (t.shop || t.office || t.craft) return false;
   if (Object.keys(t).some(k => /^(disused|abandoned|demolished|razed|was|removed):/.test(k))) return false;
   if (/^(no|closed)$/i.test(t.opening_hours || "") || t["end_date"]) return false;
-  if (KIDS.test(tag(t, "name")) || CLOSED.test(tag(t, "name"))) return false;
+  if (KIDS.test(tag(t, "name")) || CLOSED.test(tag(t, "name")) || NOT_KARTING.test(tag(t, "name"))) return false;
   return true;
+}
+// a children's ride, not a circuit: every piece of the venue drawn (a pin alone says nothing of its size), none a hall or a sports centre,
+// all of it within 70 m (a karting circuit is 300 m round at the least: DriftCar 26 m, a mall's mini track 60 m)
+export function tinyVenue(els: El[]): boolean {
+  let a = 90, b = 180, c = -90, d = -180;
+  for (const e of els) { const g = e.tags || {}; if (!e.bounds || (g.building && g.building !== "no") || g.leisure === "sports_centre" || g.indoor === "yes") return false; a = Math.min(a, e.bounds.minlat); b = Math.min(b, e.bounds.minlon); c = Math.max(c, e.bounds.maxlat); d = Math.max(d, e.bounds.maxlon); }
+  return els.length > 0 && distM({ lat: a, lon: b }, { lat: c, lon: d }) < 70;
 }
 // a venue's pieces ranked: the venue itself (sports centre), its track, a raceway drawn with a name, a pin
 const rank = (e: El) => { const t = e.tags || {}; return t.leisure === "sports_centre" ? 4 : t.leisure === "track" ? 3 : t.highway === "raceway" ? 2 : t.building ? 2 : 1; };
@@ -258,6 +267,7 @@ export function venuesOf(elements: El[]): Venue[] {
       outl.push({ type: "way", id: e.id, tags: Object.assign({ sport: "karting" }, g, { oneway: "", "hutka:outline": "1" }), nodes: ids, geometry: ring }); }
     const loops = loopsOf((near.get(c) || []).concat(outl));
     const line = indoor && !loops.length ? null : lineFor(c, loops);
+    if (!line && tinyVenue(all)) continue;   // a children's ride
     const m = c.main, osm = (m.type === "node" ? "n" : m.type === "way" ? "w" : "r") + m.id;
     const aka = new Set<string>(); for (const e of all) for (const k of NAMEKEYS) { const v = tag(e.tags, k); if (v) for (const x of v.split(";")) { const y = x.trim().slice(0, 80); if (y && y !== c.name) aka.add(y); } }
     out.push({ id: "osm-" + osm, osm, name: c.name.slice(0, 80), lat: Math.round(c.pos.lat * 1e5) / 1e5, lon: Math.round(c.pos.lon * 1e5) / 1e5, city: city.slice(0, 60), address: street.slice(0, 120), website: web.slice(0, 200), phone: t(["phone", "contact:phone"]).slice(0, 40), indoor, line, parts: all.length, nameRu: t(["name:ru"]).slice(0, 80), aka: [...aka].slice(0, 8) });
