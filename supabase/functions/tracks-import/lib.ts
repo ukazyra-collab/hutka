@@ -21,6 +21,7 @@ export type Venue = {
   indoor: boolean; line: Line | null; parts: number;
   nameRu: string;   // the Russian name when the map has one (shown in the app's Russian)
   aka: string[];    // every other name the map knows it by (local, official, alternative, old, short, the brand) — for the search
+  kinds?: string[]; // its pieces, for a dry run's look ("w123 leisure=track 58 m", "n456 pin 12 m off"): never stored
 };
 const NAMEKEYS = ["name", "name:en", "name:ru", "name:be", "name:uk", "name:de", "name:fr", "name:es", "name:it", "name:ar", "name:tr", "official_name", "alt_name", "loc_name", "short_name", "old_name", "brand"];
 
@@ -310,7 +311,11 @@ export function venuesOf(elements: El[]): Venue[] {
     }
     const m = c.main, osm = (m.type === "node" ? "n" : m.type === "way" ? "w" : "r") + m.id;
     const aka = new Set<string>(); for (const e of all) for (const k of NAMEKEYS) { const v = tag(e.tags, k); if (v) for (const x of v.split(";")) { const y = x.trim().slice(0, 80); if (y && y !== c.name) aka.add(y); } }
-    out.push({ id: "osm-" + osm, osm, name: c.name.slice(0, 80), lat: Math.round(c.pos.lat * 1e5) / 1e5, lon: Math.round(c.pos.lon * 1e5) / 1e5, city: city.slice(0, 60), address: street.slice(0, 120), website: web.slice(0, 200), phone: t(["phone", "contact:phone"]).slice(0, 40), indoor, line, parts: all.length, nameRu: t(["name:ru"]).slice(0, 80), aka: [...aka].slice(0, 8) });
+    const bx = all.filter(e => e.bounds).reduce((q: { minlat: number; minlon: number; maxlat: number; maxlon: number } | null, e) => !q ? Object.assign({}, e.bounds!) : { minlat: Math.min(q.minlat, e.bounds!.minlat), minlon: Math.min(q.minlon, e.bounds!.minlon), maxlat: Math.max(q.maxlat, e.bounds!.maxlat), maxlon: Math.max(q.maxlon, e.bounds!.maxlon) }, null);
+    const kinds = all.map(e => { const g = e.tags || {}, k = g.leisure ? "leisure=" + g.leisure : g.highway ? "highway=" + g.highway : g.landuse ? "landuse=" + g.landuse : g.amenity ? "amenity=" + g.amenity : g.building ? "building" : e.bounds ? "area" : "pin";
+      const size = e.bounds ? Math.round(distM({ lat: e.bounds.minlat, lon: e.bounds.minlon }, { lat: e.bounds.maxlat, lon: e.bounds.maxlon })) + " m" : (() => { const p = posOf(e); if (!p || !bx) return ""; const q = { lat: Math.min(Math.max(p.lat, bx.minlat), bx.maxlat), lon: Math.min(Math.max(p.lon, bx.minlon), bx.maxlon) }; return Math.round(distM(p, q)) + " m off"; })();
+      return `${e.type[0]}${e.id} ${k} ${size}`.trim(); });
+    out.push({ id: "osm-" + osm, osm, name: c.name.slice(0, 80), kinds, lat: Math.round(c.pos.lat * 1e5) / 1e5, lon: Math.round(c.pos.lon * 1e5) / 1e5, city: city.slice(0, 60), address: street.slice(0, 120), website: web.slice(0, 200), phone: t(["phone", "contact:phone"]).slice(0, 40), indoor, line, parts: all.length, nameRu: t(["name:ru"]).slice(0, 80), aka: [...aka].slice(0, 8) });
   }
   return out;
 }

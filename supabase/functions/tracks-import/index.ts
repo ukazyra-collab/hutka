@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
   // which venues are new, which Hutka has, which complete a track it knows by its town only (lib.ts placeVenues)
   const { fresh, skipped, upgrades, maybe } = placeVenues(venues, known);
   const withLine = fresh.filter(v => v.line).length;
-  const summary = { area, mirror, elements: els.length, venues: venues.length, fresh: fresh.length, withLine, indoor: fresh.filter(v => v.indoor).length, skipped: skipped.length, sample: fresh.slice(0, 12).map(v => ({ name: v.name, city: v.city, osm: v.osm, parts: v.parts, line: v.line ? v.line.lengthM : 0, indoor: v.indoor })), skippedSample: skipped.slice(0, 8), toUpgrade: upgrades.length, maybe: maybe.slice(0, 12), dry, ms: 0 };
+  const summary = { area, mirror, elements: els.length, venues: venues.length, fresh: fresh.length, withLine, indoor: fresh.filter(v => v.indoor).length, skipped: skipped.length, sample: fresh.slice(0, 12).map(v => ({ name: v.name, city: v.city, osm: v.osm, parts: v.parts, kinds: v.kinds, line: v.line ? v.line.lengthM : 0, indoor: v.indoor })), skippedSample: skipped.slice(0, 8), toUpgrade: upgrades.length, maybe: maybe.slice(0, 12), dry, ms: 0 };
   if (dry) {
     try { Object.assign(summary, await upgrade(db, upgrades, true)); } catch (e) { Object.assign(summary, { error: "upgrade: " + String((e as Error).message || e).slice(0, 280) }); }
     if (body.mode === "update") { try { Object.assign(summary, await update(db, venues, known, cc, true)); } catch (e) { Object.assign(summary, { error: "update: " + String((e as Error).message || e).slice(0, 280) }); } }
