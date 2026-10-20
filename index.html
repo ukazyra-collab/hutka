@@ -1606,6 +1606,8 @@ input.sw:checked::after{transform:translateX(18px)}
 .trk-row:first-child{border-top:0}
 .trk-row .logo{width:38px;height:38px;border-radius:10px;font-size:12px}
 .trk-row .nl{flex:none;font-size:12px;color:var(--muted);background:var(--surface-2);border-radius:999px;padding:3px 9px;white-space:nowrap}
+.trk-row .tx .nm,.trk-head .tx .nm{display:flex;align-items:center;gap:7px;min-width:0}.tx .nm b{min-width:0}
+.tx .nm .sws{flex:none;font-style:normal;font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 5px;line-height:1.3}
 .trk-empty{color:var(--muted);font-size:14px;padding:6px 2px}
 .trk-add{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 14px;align-items:center}
 .trk-add .ic{width:44px;height:44px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
@@ -5709,6 +5711,10 @@ Object.assign(I18N.RU, {
   "{n} corner|{n} corners": "{n} поворот|{n} поворота|{n} поворотов", "indoor": "крытая", "forecast by Hutka AI": "прогноз Hutka AI",
   "Nobody has driven here on Hutka yet: the line and the points come from similar corners of {n} driven layouts — check them on track. Your first session makes the guide real.": "Здесь на Hutka ещё никто не ездил: линия и точки — из похожих поворотов {n} конфигураций, где катаются. Проверь на треке. Первая твоя сессия сделает гид настоящим."
 });
+// v34.46 — the Sodi World Series' tracks marked; tracks known by their town only
+Object.assign(I18N.RU, {
+  "Sodi World Series track": "Трек Sodi World Series", "pin on the town, not on the track": "точка на городе, не на самом треке"
+});
 // ---------- terms: GPS measures speed, not pedals (v34.20) ----------
 // The points of the Lab come from the GPS speed: where the kart starts slowing (deceleration), slows gently (soft / slight decel),
 // stops slowing (decel ends) and starts gaining speed (acceleration) — not where a pedal is pressed: the same pedal slows different
@@ -7607,7 +7613,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.45';
+const APP_VERSION = 'v34.46';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -7964,7 +7970,7 @@ function trkRender() {
     rows.push({ tr, all: lays, lays, n, drivers: owners.size, home: !!(D.home && D.home.id === tr.id), li: trkLine(tr, lays) });
   }
   // the country chips count what the search leaves
-  const found = rows.filter(r => { if (!words.length || hit([r.tr.name, r.tr.name0 || '', r.tr.aka || '', r.tr.city, countryName(r.tr.country), countryLocal(r.tr.country)].join(' ').toLowerCase())) return true; r.lays = r.all.filter(x => hit((r.tr.name + ' ' + x.l.name).toLowerCase())); return r.lays.length > 0; });
+  const found = rows.filter(r => { if (!words.length || hit([r.tr.name, r.tr.name0 || '', r.tr.aka || '', r.tr.city, countryName(r.tr.country), countryLocal(r.tr.country), r.tr.sws ? 'sws ' + (r.tr.swsName || '') : ''].join(' ').toLowerCase())) return true; r.lays = r.all.filter(x => hit((r.tr.name + ' ' + x.l.name).toLowerCase())); return r.lays.length > 0; });
   trkCountries(found);
   const shown = found.filter(r => !TRK.cc || r.tr.country === TRK.cc);
   const driven = shown.filter(r => r.n > 0).sort((a, b) => (b.home - a.home) || (b.n - a.n));
@@ -7998,7 +8004,7 @@ function trkCountries(rows) {
 function trkCard(r, searching) {
   const c = el('div', 'card trk-card'), hd = el('a', 'trk-head'); hd.href = '#track~' + r.tr.id;
   const lg = el('div', 'logo'); logoInto(lg, r.tr);
-  const tx = el('div', 'tx'); tx.append(el('b', '', r.tr.name), el('span', '', [[r.tr.city, flag(r.tr.country)].filter(Boolean).join(' '), tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n), tn(r.drivers, '{n} driver', '{n} drivers').replace('{n}', r.drivers)].filter(Boolean).join(' · ')));
+  const tx = el('div', 'tx'); tx.append(trkName(r.tr), el('span', '', [[r.tr.city, flag(r.tr.country)].filter(Boolean).join(' '), tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n), tn(r.drivers, '{n} driver', '{n} drivers').replace('{n}', r.drivers)].filter(Boolean).join(' · ')));
   hd.append(lg, tx, svgUse('i-chev', 'go')); c.appendChild(hd);
   const withS = r.lays.filter(x => x.a).sort((a, b) => b.a.n - a.a.n), without = r.lays.filter(x => !x.a);
   for (const x of withS) c.appendChild(trkLay(r.tr, x));
@@ -8029,8 +8035,14 @@ function trkRow(r) {
   const a = el('a', 'trk-row'); a.href = '#track~' + r.tr.id; const lg = el('div', 'logo'); logoInto(lg, r.tr);
   const li = r.li || trkLine(r.tr, r.all);
   const facts = [[r.tr.city, flag(r.tr.country)].filter(Boolean).join(' '), li.len ? `${li.len} ${t('m')}` : '', li.crn ? tn(li.crn, '{n} corner', '{n} corners').replace('{n}', li.crn) : '', li.n > 1 ? tn(li.n, '{n} layout', '{n} layouts').replace('{n}', li.n) : li.n ? '' : t('no layouts yet'), !li.has && r.tr.indoor ? t('indoor') : ''];
-  const tx = el('div', 'tx'); tx.append(el('b', '', r.tr.name), el('span', '', facts.filter(Boolean).join(' · ')));
+  const tx = el('div', 'tx'); tx.append(trkName(r.tr), el('span', '', facts.filter(Boolean).join(' · ')));
   a.append(lg, tx, svgUse('i-chev', 'go')); return a;
+}
+// the track's name; a track of the Sodi World Series (their list of tracks, matched to Hutka's) gets a quiet "SWS" tag after it (the
+// name gives way, the tag stays); "sws" in the search finds them all
+function trkName(tr) {
+  const b = el('b', '', tr.name); if (!tr.sws) return b;
+  const line = el('div', 'nm'), i = el('i', 'sws', 'SWS'); i.title = t('Sodi World Series track'); line.append(b, i); return line;
 }
 // a layout's shape from a published lap: a card (y down) or a preview (y up)
 function trkShape(cv, pic) {
@@ -8073,7 +8085,8 @@ async function renderTrackPage(tid, lid) {
   $('tEdit').hidden = !STORE.canEditTrack(tr); $('tEdit').onclick = () => go('admin~' + tid);
   const meta = $('tMeta'); meta.innerHTML = '';
   const add = (icon, html) => { const s = el('span'); s.appendChild(svgUse(icon)); const b = el('span'); b.innerHTML = html; s.appendChild(b); meta.appendChild(s); };
-  add('i-pin', esc([tr.city, tr.country ? countryName(tr.country) : ''].filter(Boolean).join(', ')) + (tr.address ? ' · ' + esc(tr.address) : ''));
+  add('i-pin', esc([tr.city, tr.country ? countryName(tr.country) : ''].filter(Boolean).join(', ')) + (tr.address ? ' · ' + esc(tr.address) : '') + (tr.approx ? ' · ' + esc(t('pin on the town, not on the track')) : ''));
+  if (tr.sws) add('i-flag', esc(t('Sodi World Series track')) + (tr.swsName && tr.swsName.toLowerCase() !== String(tr.name || '').toLowerCase() ? ' · ' + esc(tr.swsName) : ''));
   if (tr.phone) add('i-phone', esc(tr.phone));
   if (tr.website) add('i-globe', `<a href="${esc(tr.website)}" target="_blank" rel="noopener">${t('Website')}</a>`);
   if (open) add('i-clock', open.open === false && open.opens ? t('Opens at {t}', { t: open.opens }) : t('Closes at {t}', { t: open.closes }));
