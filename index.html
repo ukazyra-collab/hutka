@@ -7955,7 +7955,9 @@ function trkRender() {
   trkCountries(found);
   const shown = found.filter(r => !TRK.cc || r.tr.country === TRK.cc);
   const driven = shown.filter(r => r.n > 0).sort((a, b) => (b.home - a.home) || (b.n - a.n));
-  const fresh = shown.filter(r => !r.n).sort((a, b) => (b.li.has - a.li.has) || (b.li.len - a.li.len) || a.tr.name.localeCompare(b.tr.name));
+  // longer is bigger racing (an international circuit 1–1.7 km, an indoor hall 300–600 m): the length first (so the list reads in order of
+  // the metres it shows), the corners when the length is the same, then the name
+  const fresh = shown.filter(r => !r.n).sort((a, b) => (b.li.has - a.li.has) || (b.li.len - a.li.len) || (b.li.crn - a.li.crn) || a.tr.name.localeCompare(b.tr.name));
   const box = $('trList'); box.innerHTML = '';
   const sec = (title, hint) => { const h = el('div', 'trk-sec'); h.appendChild(el('b', '', title)); if (hint) h.appendChild(el('span', 'hint', hint)); return h; };
   if (driven.length) { box.appendChild(sec(t('Where people drive'))); const g = el('div', 'trk-grid'); for (const r of driven) g.appendChild(trkCard(r, words.length > 0)); box.appendChild(g); }
