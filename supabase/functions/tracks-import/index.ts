@@ -4,7 +4,8 @@
 // (osm-w123); a venue Hutka has already (the same element, a track within 300 m, or within 1 km under the same name) is left alone; one
 // Hutka knows by its town only (an SWS track the map did not have then: approx) under the same name within 30 km completes that track.
 // Who may run it: the import queue (a cron job sends one area at a time with the token kept in the Vault: x-import-token), or an
-// admin (his own session token). Body: { area: "FR", dry?: true } — dry: nothing written, the counts and a sample returned.
+// admin (his own session token). Body: { area: "FR", dry?: true, quiet?: true } — dry: nothing written, the counts and a sample
+// returned; quiet (with dry): not even the queue's record of the area (a look by hand).
 // Data © OpenStreetMap contributors (ODbL): the track pages say so.
 // Deploy as `tracks-import` with "Verify JWT" OFF (checked here).
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -85,8 +86,10 @@ Deno.serve(async (req) => {
   }
   if (!/^([A-Z]{2}|[A-Z]{2}-[A-Z0-9]{1,3})$/.test(area)) return json({ error: "bad_area" }, 400);   // a country, or a region of one ("US-CA", "FR-IDF")
   const t0 = Date.now(), cc = area.slice(0, 2); deadline = t0 + 125000;   // the writes need the rest of the function's 150 s
-  const done = async (result: Record<string, unknown>, status = "done") => { await db.from("import_queue").update({ status, result, finished_at: new Date().toISOString() }).eq("area", area); return json(result, status === "done" ? 200 : 502); };
-  await db.from("import_queue").update({ status: "running", started_at: new Date().toISOString() }).eq("area", area);
+  // a look by hand ({dry:true, quiet:true}): the queue's record of the area left as it is (its status, its last result)
+  const quiet = dry && (body as { quiet?: boolean }).quiet === true;
+  const done = async (result: Record<string, unknown>, status = "done") => { if (!quiet) await db.from("import_queue").update({ status, result, finished_at: new Date().toISOString() }).eq("area", area); return json(result, status === "done" ? 200 : 502); };
+  if (!quiet) await db.from("import_queue").update({ status: "running", started_at: new Date().toISOString() }).eq("area", area);
   let els: El[] = [], mirror = "qlever";
   const left = (cap: number) => Math.max(5000, Math.min(cap, deadline - Date.now()));
   // the map through Overpass (VK's server): when QLever is down, or asked for ({src:"overpass"})
@@ -123,7 +126,7 @@ Deno.serve(async (req) => {
   // which venues are new, which Hutka has, which complete a track it knows by its town only (lib.ts placeVenues)
   const { fresh, skipped, upgrades, maybe } = placeVenues(venues, known);
   const withLine = fresh.filter(v => v.line).length;
-  const summary = { area, mirror, elements: els.length, venues: venues.length, fresh: fresh.length, withLine, indoor: fresh.filter(v => v.indoor).length, skipped: skipped.length, sample: fresh.slice(0, 12).map(v => ({ name: v.name, city: v.city, line: v.line ? v.line.lengthM : 0, indoor: v.indoor })), skippedSample: skipped.slice(0, 8), toUpgrade: upgrades.length, maybe: maybe.slice(0, 12), dry, ms: 0 };
+  const summary = { area, mirror, elements: els.length, venues: venues.length, fresh: fresh.length, withLine, indoor: fresh.filter(v => v.indoor).length, skipped: skipped.length, sample: fresh.slice(0, 12).map(v => ({ name: v.name, city: v.city, osm: v.osm, parts: v.parts, line: v.line ? v.line.lengthM : 0, indoor: v.indoor })), skippedSample: skipped.slice(0, 8), toUpgrade: upgrades.length, maybe: maybe.slice(0, 12), dry, ms: 0 };
   if (dry) {
     try { Object.assign(summary, await upgrade(db, upgrades, true)); } catch (e) { Object.assign(summary, { error: "upgrade: " + String((e as Error).message || e).slice(0, 280) }); }
     if (body.mode === "update") { try { Object.assign(summary, await update(db, venues, known, cc, true)); } catch (e) { Object.assign(summary, { error: "update: " + String((e as Error).message || e).slice(0, 280) }); } }
