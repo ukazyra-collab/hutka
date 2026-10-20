@@ -1,0 +1,57 @@
+// Hutka — the track import's writes: a venue's page as rows (namesOf, lineMeta, mediaRow), and "update" — the import's own tracks get
+// what the rules give now: a line where they had none, the corners of the line they have, their other names (index.ts, mode "update").
+import { distM, nameKey, type Venue } from "./lib.ts";
+import { cornerCount } from "./corners.ts";
+// ---- what goes into the database
+export const namesOf = (v: Venue) => Object.assign({}, v.aka.length ? { aka: v.aka.join(" · ").slice(0, 400) } : {}, v.nameRu && v.nameRu !== v.name ? { names: { ru: v.nameRu } } : {});
+export const lineMeta = (v: Venue) => ({ lengthM: v.line!.lengthM, line: { src: "osm", n: v.line!.pts.length, lengthM: v.line!.lengthM, driven: v.line!.driven, corners: v.line!.corners, from: v.line!.from }, ...(v.line!.driven ? { direction: v.line!.dir } : {}) });
+export const mediaRow = (v: Venue, now: string) => ({ path: `tracks/${v.id}/layouts/main/media/line`, data: JSON.stringify({ v: 1, src: "osm", pts: v.line!.pts, ways: v.line!.ways, dir: v.line!.dir, driven: v.line!.driven, from: v.line!.from }), updated_at: now });
+// deno-lint-ignore no-explicit-any
+type Db = any;
+export async function putRows(db: Db, table: string, rows: Record<string, unknown>[]) { for (let i = 0; i < rows.length; i += 200) { const { error } = await db.from(table).upsert(rows.slice(i, i + 200)); if (error) throw new Error(`${table}: ${error.message}`); } }
+async function rowsIn(db: Db, table: string, cols: string, key: string, vals: string[], extra?: (q: any) => any) {
+  const out: Record<string, any>[] = [];
+  for (let i = 0; i < vals.length; i += 100) { let q: any = db.from(table).select(cols).in(key, vals.slice(i, i + 100)); if (extra) q = extra(q); const { data, error } = await q; if (error) throw new Error(`${table}: ${error.message}`); out.push(...((data || []) as Record<string, any>[])); }
+  return out;
+}
+export async function update(db: Db, venues: Venue[], known: { id: string; osm: string; name: string; lat: number; lon: number; len: number }[], cc: string, dry: boolean) {
+  // the import's own track for each venue: the same map element, or the same name within 1 km, or 150 m away
+  const pairs: { v: Venue; k: typeof known[number] }[] = [];
+  for (const v of venues) {
+    const k = known.find(k => k.osm && k.osm === v.osm) || known.find(k => isFinite(k.lat) && isFinite(k.lon) && (distM(k, v) < 150 || (distM(k, v) < 1000 && nameKey(k.name) && nameKey(k.name) === nameKey(v.name))));
+    if (k && k.id.startsWith("osm-")) pairs.push({ v, k });
+  }
+  if (!pairs.length) return { matched: 0, linesAdded: 0, cornersAdded: 0, namesAdded: 0 };
+  const ids = [...new Set(pairs.map(p => p.k.id))];
+  const trows = new Map((await rowsIn(db, "tracks", "id, data", "id", ids)).map(r => [r.id as string, r]));
+  const lrows = new Map((await rowsIn(db, "layouts", "track_id, id, data", "track_id", ids, q => q.eq("id", "main"))).map(r => [r.track_id as string, r]));
+  const now = new Date().toISOString(), tOut: Record<string, any>[] = [], lOut: Record<string, any>[] = [], mOut: Record<string, any>[] = [], added: string[] = [], seen = new Set<string>();
+  let namesAdded = 0;
+  for (const { v, k } of pairs) {
+    if (seen.has(k.id)) continue; seen.add(k.id);
+    const tr = trows.get(k.id), lo = lrows.get(k.id); if (!tr || !lo || (tr.data && tr.data.source !== "osm")) continue;
+    const td = Object.assign({}, tr.data), ld = Object.assign({}, lo.data); let tCh = false;
+    const nm = namesOf(v); if (nm.aka && !td.aka) { td.aka = nm.aka; tCh = true; } if (nm.names && !(td.names && td.names.ru)) { td.names = Object.assign({}, td.names || {}, nm.names); tCh = true; } if (tCh) namesAdded++;
+    if (v.line && !ld.line && !ld.trace && !ld.refSess && !ld.photo && !td.lengthM) {
+      // the line it never had: the layout's line (clockwise unless one-way pieces say otherwise), its length on the track too
+      const vv = Object.assign({}, v, { id: k.id });
+      Object.assign(ld, lineMeta(vv), { widthM: v.line.widthM, updatedAt: Date.now() }); td.lengthM = v.line.lengthM; tCh = true;
+      lOut.push({ track_id: k.id, id: "main", data: ld, updated_at: now }); mOut.push(mediaRow(vv, now)); added.push(`${td.name} · ${v.line.lengthM} m · ${v.line.corners} T · ${v.line.from}`);
+    }
+    if (tCh) tOut.push({ id: k.id, data: Object.assign(td, { updatedAt: Date.now() }), updated_at: now });
+  }
+  // the corners of the lines they have (made before corners were counted at import): from the line itself
+  const need = [...lrows.values()].filter(r => r.data && r.data.line && r.data.line.src === "osm" && typeof r.data.line.corners !== "number" && !lOut.some(x => x.track_id === r.track_id));
+  let cornersAdded = 0;
+  if (need.length) {
+    const med = new Map((await rowsIn(db, "media", "path, data", "path", need.map(r => `tracks/${r.track_id}/layouts/main/media/line`))).map(r => [r.path as string, r.data]));
+    for (const r of need) {
+      let j: any = null; try { const raw = med.get(`tracks/${r.track_id}/layouts/main/media/line`); j = typeof raw === "string" ? JSON.parse(raw) : raw; } catch { j = null; }
+      if (!j || !Array.isArray(j.pts)) continue;
+      const n = cornerCount(j.pts, +r.data.cornerR || 110); if (!n) continue;
+      lOut.push({ track_id: r.track_id, id: "main", data: Object.assign({}, r.data, { line: Object.assign({}, r.data.line, { corners: n }) }), updated_at: now }); cornersAdded++;
+    }
+  }
+  if (!dry) { await putRows(db, "layouts", lOut); await putRows(db, "media", mOut); await putRows(db, "tracks", tOut); }
+  return { matched: pairs.length, linesAdded: added.length, cornersAdded, namesAdded, linesSample: added.slice(0, 40), cc };
+}

@@ -58,7 +58,8 @@ export function venueEls(tagRows: Row[], geomRows: Row[]): El[] {
     const own = tags.get(iri) || {}, t = own.sport ? Object.assign({}, own) : Object.assign({ sport: kartName(own.name || own["name:en"] || "") ? "karting" : "" }, own);
     if (k.type === "node" || pts.length === 1) { out.push({ type: k.type, id: k.id, lat: pts[0].lat, lon: pts[0].lon, tags: t }); continue; }
     const ring = coords(r.wkt.value, true), c = { lat: ring.reduce((a, p) => a + p.lat, 0) / ring.length, lon: ring.reduce((a, p) => a + p.lon, 0) / ring.length };
-    out.push({ type: k.type, id: k.id, center: c, bounds: { minlat: Math.min(...pts.map(p => p.lat)), minlon: Math.min(...pts.map(p => p.lon)), maxlat: Math.max(...pts.map(p => p.lat)), maxlon: Math.max(...pts.map(p => p.lon)) }, tags: t });
+    const closed = /^\s*(MULTI)?POLYGON/i.test(r.wkt.value) || (ring.length >= 4 && ring[0].lat === ring[ring.length - 1].lat && ring[0].lon === ring[ring.length - 1].lon);
+    out.push({ type: k.type, id: k.id, center: c, bounds: { minlat: Math.min(...pts.map(p => p.lat)), minlon: Math.min(...pts.map(p => p.lon)), maxlat: Math.max(...pts.map(p => p.lat)), maxlon: Math.max(...pts.map(p => p.lon)) }, tags: t, ...(closed && ring.length >= 10 ? { ring } : {}) });
   }
   return out;
 }

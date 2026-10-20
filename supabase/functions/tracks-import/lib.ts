@@ -8,12 +8,20 @@ export type El = {
   type: string; id: number; lat?: number; lon?: number; center?: LL;
   bounds?: { minlat: number; minlon: number; maxlat: number; maxlon: number };
   tags?: Record<string, string>; nodes?: number[]; geometry?: LL[];
+  ring?: LL[];   // a venue piece drawn as a closed shape (its outer ring): a track drawn as its middle or its asphalt, or a whole site
 };
-export type Line = { pts: [number, number][]; lengthM: number; ways: number[]; driven: boolean; dir: "cw" | "ccw"; widthM: number };
+// from: "raceway" (the raceways drawn), "joined" (raceways whose loose ends were 25 m apart or less), "outline" (the venue's track
+// drawn as a closed shape: its middle, or the edge of its asphalt — a few metres off the middle)
+export type Line = { pts: [number, number][]; lengthM: number; ways: number[]; driven: boolean; dir: "cw" | "ccw"; widthM: number; corners: number; from: "raceway" | "joined" | "outline" };
 export type Venue = {
   id: string; osm: string; name: string; lat: number; lon: number; city: string; address: string; website: string; phone: string;
   indoor: boolean; line: Line | null; parts: number;
+  nameRu: string;   // the Russian name when the map has one (shown in the app's Russian)
+  aka: string[];    // every other name the map knows it by (local, official, alternative, old, short, the brand) — for the search
 };
+const NAMEKEYS = ["name", "name:en", "name:ru", "name:be", "name:uk", "name:de", "name:fr", "name:es", "name:it", "name:ar", "name:tr", "official_name", "alt_name", "loc_name", "short_name", "old_name", "brand"];
+
+import { cornerCount } from "./corners.ts";
 
 const RE = 6371008.8, rad = Math.PI / 180;
 export function distM(a: LL, b: LL): number {
@@ -78,6 +86,14 @@ export function loopsOf(ways0: El[]): Loop[] {
     for (let k = 1; k < cuts.length; k++) { const a = cuts[k - 1], b = cuts[k]; if (b <= a) continue; pieces.push({ id: pieces.length, a: n[a], b: n[b], g: w.geometry!.slice(a, b + 1), way: w }); }
   }
   const at = new Map<number, Piece[]>(); for (const p of pieces) for (const v of [p.a, p.b]) { if (!at.has(v)) at.set(v, []); at.get(v)!.push(p); }
+  // loose ends 25 m apart or less (a raceway drawn almost round, two pieces not joined on the map): joined by a straight
+  { const ends: { v: number; p: LL; way: El }[] = [];
+    for (const [v, ps] of at) if (ps.length === 1) { const q = ps[0], g = q.a === v ? q.g[0] : q.g[q.g.length - 1]; ends.push({ v, p: g, way: q.way }); }
+    if (ends.length <= 40) for (let i = 0; i < ends.length; i++) for (let j = i + 1; j < ends.length; j++) {
+      const a = ends[i], b = ends[j], d = distM(a.p, b.p); if (d > 25 || d < 0.01) continue;
+      const way: El = { type: "way", id: a.way.id, tags: Object.assign({}, a.way.tags || {}, { oneway: "", "hutka:joined": "1" }) };
+      const piece = { id: pieces.length, a: a.v, b: b.v, g: [a.p, b.p], way }; pieces.push(piece); at.get(a.v)!.push(piece); at.get(b.v)!.push(piece);
+    } }
   let budget = 20000;
   for (const p0 of pieces) {
     const stack: { v: number; path: { p: Piece; fwd: boolean }[]; used: Set<number> }[] = [{ v: p0.b, path: [{ p: p0, fwd: true }], used: new Set([p0.id]) }];
@@ -98,6 +114,19 @@ export function loopsOf(ways0: El[]): Loop[] {
 // which way round on the map (true: clockwise)
 export function clockwise(pts: LL[]): boolean { let s = 0; for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length]; s += (b.lon - a.lon) * (b.lat + a.lat); } return s > 0; }
 
+// a closed shape that is a track, not a site: twisty (compactness 4πA/L² of a kart track's middle ≈ 0.07–0.2, a rectangle 0.74) or
+// full of bays (area / convex hull ≈ 0.4–0.65 for a track, 1 for a box); at least 10 corners of the drawing
+export function trackLike(ring: LL[]): boolean {
+  if (!ring || ring.length < 10) return false;
+  let la = 0; for (const p of ring) la += p.lat; la /= ring.length;
+  const kx = 111320 * Math.cos(la * rad), P = ring.map(p => [p.lon * kx, p.lat * 110574]);
+  const area = (Q: number[][]) => { let s = 0; for (let i = 0; i < Q.length; i++) { const a = Q[i], b = Q[(i + 1) % Q.length]; s += a[0] * b[1] - b[0] * a[1]; } return Math.abs(s) / 2; };
+  let L = 0; for (let i = 0; i < P.length; i++) { const a = P[i], b = P[(i + 1) % P.length]; L += Math.hypot(b[0] - a[0], b[1] - a[1]); }
+  const srt = P.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o: number[], a: number[], b: number[]) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo: number[][] = [], up: number[][] = []; for (const q of srt) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); } for (const q of srt.slice().reverse()) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+  const A = area(P), H = area(lo.slice(0, -1).concat(up.slice(0, -1))), q = 4 * Math.PI * A / (L * L), cvx = H > 0 ? A / H : 1;
+  return q < 0.3 || (q < 0.45 && cvx < 0.8);
+}
 // the venue's line among the loops near it: the loops of karting ways and the loops inside the venue first; a motor circuit's piece
 // never (a way of another sport); then the longest. Driven direction from one-way tags when every one-way piece agrees, else clockwise
 export function lineFor(c: { pos: LL; bounds?: El["bounds"] }, loops: Loop[]): Line | null {
@@ -110,7 +139,8 @@ export function lineFor(c: { pos: LL; bounds?: El["bounds"] }, loops: Loop[]): L
     const mid = { lat: lp.pts.reduce((a, p) => a + p.lat, 0) / lp.pts.length, lon: lp.pts.reduce((a, p) => a + p.lon, 0) / lp.pts.length };
     const dMid = distM(c.pos, mid);
     if (!(inside > 0.5) && dMid > 450) continue;   // somebody else's raceway
-    const score = (kart > 0.5 ? 2 : 0) + (inside > 0.8 ? 2 : inside > 0.5 ? 1 : 0) + (dMid < 250 ? 1 : 0) + lp.lengthM / 10000;
+    const outline = lp.ways.some(w => w.tags && w.tags["hutka:outline"]), joined = lp.ways.some(w => w.tags && w.tags["hutka:joined"]);
+    const score = (kart > 0.5 ? 2 : 0) + (inside > 0.8 ? 2 : inside > 0.5 ? 1 : 0) + (dMid < 250 ? 1 : 0) + lp.lengthM / 10000 - (outline ? 0.6 : 0) - (joined ? 0.3 : 0);
     if (!best || score > best.score) best = { lp, score };
   }
   if (!best) return null;
@@ -124,7 +154,9 @@ export function lineFor(c: { pos: LL; bounds?: El["bounds"] }, loops: Loop[]): L
   const out: LL[] = []; for (const p of pts) { const q = out[out.length - 1]; if (!q || distM(q, p) > 0.3) out.push(p); }
   let thin = out; if (out.length > 600) { const k = Math.ceil(out.length / 600); thin = out.filter((_, i) => i % k === 0); }
   const widths = lp.ways.map(w => parseFloat((w.tags && w.tags.width) || "")).filter(x => isFinite(x) && x >= 4 && x <= 20).sort((a, b) => a - b);
-  return { pts: thin.map(p => [Math.round(p.lat * 1e6) / 1e6, Math.round(p.lon * 1e6) / 1e6]), lengthM: Math.round(lp.lengthM), ways: lp.ways.map(w => w.id), driven, dir: clockwise(thin) ? "cw" : "ccw", widthM: widths.length ? widths[Math.floor(widths.length / 2)] : 8 };
+  const pts6 = thin.map(p => [Math.round(p.lat * 1e6) / 1e6, Math.round(p.lon * 1e6) / 1e6] as [number, number]);
+  const from = lp.ways.some(w => w.tags && w.tags["hutka:outline"]) ? "outline" : lp.ways.some(w => w.tags && w.tags["hutka:joined"]) ? "joined" : "raceway";
+  return { pts: pts6, lengthM: Math.round(lp.lengthM), ways: [...new Set(lp.ways.map(w => w.id))], driven, dir: clockwise(thin) ? "cw" : "ccw", widthM: widths.length ? widths[Math.floor(widths.length / 2)] : 8, corners: cornerCount(pts6), from };
 }
 
 // ---- the area's elements → venues
@@ -161,10 +193,17 @@ export function venuesOf(elements: El[]): Venue[] {
     let city = t(["addr:city", "addr:town", "addr:village", "addr:municipality", "addr:suburb"]);
     if (!city && places.length) { let bp: El | null = null, bd = Infinity; for (const pl of places) { const d = distM(c.pos, { lat: pl.lat!, lon: pl.lon! }); if (d < bd) { bd = d; bp = pl; } } if (bp && bd < 30000) city = tag(bp.tags, "name:en", "name"); }
     const indoor = all.some(e => { const g = e.tags || {}; return g.indoor === "yes" || g.covered === "yes" || (g.building && g.building !== "no") || g.location === "indoor"; }) || /\bindoor|\bhalle\b|kart ?hall/i.test(c.name);
-    const loops = loopsOf(near.get(c) || []);
+    // the venue's own track drawn as a closed shape (leisure=track: its middle, or its asphalt) — when it looks like a track, not a site
+    const outl: El[] = []; let oid = -1;
+    for (const e of all) { const g = e.tags || {}; if (g.leisure !== "track" || g.highway === "raceway" || (g.building && g.building !== "no") || !e.ring || !trackLike(e.ring)) continue;
+      const ring = e.ring.slice(); if (ring[0].lat !== ring[ring.length - 1].lat || ring[0].lon !== ring[ring.length - 1].lon) ring.push(ring[0]);
+      const ids = ring.map(() => oid--); ids[ids.length - 1] = ids[0];
+      outl.push({ type: "way", id: e.id, tags: Object.assign({ sport: "karting" }, g, { oneway: "", "hutka:outline": "1" }), nodes: ids, geometry: ring }); }
+    const loops = loopsOf((near.get(c) || []).concat(outl));
     const line = indoor && !loops.length ? null : lineFor(c, loops);
     const m = c.main, osm = (m.type === "node" ? "n" : m.type === "way" ? "w" : "r") + m.id;
-    out.push({ id: "osm-" + osm, osm, name: c.name.slice(0, 80), lat: Math.round(c.pos.lat * 1e5) / 1e5, lon: Math.round(c.pos.lon * 1e5) / 1e5, city: city.slice(0, 60), address: street.slice(0, 120), website: web.slice(0, 200), phone: t(["phone", "contact:phone"]).slice(0, 40), indoor, line, parts: all.length });
+    const aka = new Set<string>(); for (const e of all) for (const k of NAMEKEYS) { const v = tag(e.tags, k); if (v) for (const x of v.split(";")) { const y = x.trim().slice(0, 80); if (y && y !== c.name) aka.add(y); } }
+    out.push({ id: "osm-" + osm, osm, name: c.name.slice(0, 80), lat: Math.round(c.pos.lat * 1e5) / 1e5, lon: Math.round(c.pos.lon * 1e5) / 1e5, city: city.slice(0, 60), address: street.slice(0, 120), website: web.slice(0, 200), phone: t(["phone", "contact:phone"]).slice(0, 40), indoor, line, parts: all.length, nameRu: t(["name:ru"]).slice(0, 80), aka: [...aka].slice(0, 8) });
   }
   return out;
 }

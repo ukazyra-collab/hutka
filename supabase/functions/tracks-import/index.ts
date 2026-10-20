@@ -8,6 +8,7 @@
 // Deploy as `tracks-import` with "Verify JWT" OFF (checked here).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { venuesOf, distM, nameKey, type El, type Venue } from "./lib.ts";
+import { update, putRows, namesOf, lineMeta, mediaRow } from "./update.ts";
 import { QLEVER, qVenueTags, qVenueGeom, qRacewayGeom, qRacewayTags, qTowns, qFind, qIdTags, qIdGeom, sparql, venueEls, racewayEls, townEls } from "./qlever.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-import-token", "Access-Control-Allow-Methods": "POST, OPTIONS" };
@@ -29,7 +30,7 @@ Deno.serve(async (req) => {
     const { data: { user } } = await sb.auth.getUser(); if (user) { const { data: adm } = await sb.rpc("is_admin"); allowed = adm === true; }
   }
   if (!allowed) return json({ error: "forbidden" }, 403);
-  let body: { area?: string; dry?: boolean; find?: string; ids?: string[] } = {};
+  let body: { area?: string; dry?: boolean; find?: string; ids?: string[]; mode?: string } = {};
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
   const area = String(body.area || "").toUpperCase(), dry = !!body.dry;
   // by hand: what the map has under a name in an area ({area:"BY", find:"Стайк|Staik"}), or the given elements ({ids:["way/1"]})
@@ -60,35 +61,49 @@ Deno.serve(async (req) => {
       const needTowns = vEls.some(e => e.tags && !(e.tags["addr:city"] || e.tags["addr:town"] || e.tags["addr:village"]));
       if (needTowns && deadline - Date.now() > 20000) { try { els = els.concat(townEls(await sparql(qTowns(area), left(40000)))); } catch { /* no towns: the venues keep the address they have */ } }
     }
-  } catch (e) { return done({ area, error: String((e as Error).message || e).slice(0, 300), ms: Date.now() - t0 }, "error"); }
+  } catch (e) {   // the map database down (5xx, no connection): the area waits in the queue (pending, "down"), the queue asks again later
+    const msg = String((e as Error).message || e), down = /^qlever 5\d\d|error sending request|connection (refused|reset|closed)|dns error/i.test(msg);
+    return done(Object.assign({ area, error: msg.slice(0, 300), ms: Date.now() - t0 }, down ? { down: true } : {}), down ? "pending" : "error");
+  }
   const venues = venuesOf(els);
   // what Hutka has: the same element, a track within 300 m, or within 1 km under the same name
   // (in pages: the API answers 1000 rows at most)
-  const known: { id: string; osm: string; name: string; lat: number; lon: number }[] = [];
+  const known: { id: string; osm: string; name: string; lat: number; lon: number; len: number }[] = [];
   for (let from = 0; from < 200000; from += 1000) {
-    const { data, error } = await db.from("tracks").select("id, name:data->>name, osm:data->>osm, lat:data->lat, lon:data->lon").order("id").range(from, from + 999);
+    const { data, error } = await db.from("tracks").select("id, name:data->>name, osm:data->>osm, lat:data->lat, lon:data->lon, len:data->lengthM").order("id").range(from, from + 999);
     if (error) return done({ area, error: "tracks: " + error.message, ms: Date.now() - t0 }, "error");
-    for (const r of (data || []) as Record<string, unknown>[]) known.push({ id: String(r.id), osm: String(r.osm || ""), name: String(r.name || ""), lat: Number(r.lat), lon: Number(r.lon) });
+    for (const r of (data || []) as Record<string, unknown>[]) known.push({ id: String(r.id), osm: String(r.osm || ""), name: String(r.name || ""), lat: Number(r.lat), lon: Number(r.lon), len: Number(r.len) || 0 });
     if (!data || data.length < 1000) break;
   }
   const fresh: Venue[] = [], skipped: string[] = [];
   for (const v of venues) {
-    const dup = known.find(k => k.id === v.id || (k.osm && k.osm === v.osm) || (isFinite(k.lat) && isFinite(k.lon) && (distM(k, v) < 300 || (distM(k, v) < 1000 && nameKey(k.name) && nameKey(k.name) === nameKey(v.name)))));
+    // a track made by hand (Hutka's own, a driver's) keeps a wider berth: its pin may sit at the gate or the car park, not on the map's spot
+    const dup = known.find(k => k.id === v.id || (k.osm && k.osm === v.osm) || (isFinite(k.lat) && isFinite(k.lon) && (distM(k, v) < (k.id.startsWith("osm-") ? 300 : 1500) || (distM(k, v) < 1000 && nameKey(k.name) && nameKey(k.name) === nameKey(v.name)))));
     if (dup) { skipped.push(`${v.name} → ${dup.id}`); continue; }
     if (fresh.some(f => distM(f, v) < 120)) { skipped.push(`${v.name} (same place)`); continue; }
     fresh.push(v);
   }
   const withLine = fresh.filter(v => v.line).length;
   const summary = { area, mirror, elements: els.length, venues: venues.length, fresh: fresh.length, withLine, indoor: fresh.filter(v => v.indoor).length, skipped: skipped.length, sample: fresh.slice(0, 12).map(v => ({ name: v.name, city: v.city, line: v.line ? v.line.lengthM : 0, indoor: v.indoor })), skippedSample: skipped.slice(0, 8), dry, ms: 0 };
-  if (dry) { summary.ms = Date.now() - t0; return done(Object.assign(summary, { names: fresh.map(v => `${v.name} · ${v.city}${v.line ? " · " + v.line.lengthM + " m" : ""}`) })); }
+  if (dry) {
+    if (body.mode === "update") { try { Object.assign(summary, await update(db, venues, known, cc, true)); } catch (e) { Object.assign(summary, { error: "update: " + String((e as Error).message || e).slice(0, 280) }); } }
+    summary.ms = Date.now() - t0; return done(Object.assign(summary, { names: fresh.map(v => `${v.name} · ${v.city}${v.line ? " · " + v.line.lengthM + " m" : ""}`) }));
+  }
   // the pages: the track (light: the catalogue loads them all), its "Main" layout, the line in media
   const now = new Date().toISOString(), ts = Date.now();
-  const tracks = fresh.map(v => ({ id: v.id, data: Object.assign({ name: v.name, city: v.city, country: cc, lat: v.lat, lon: v.lon, address: v.address, website: v.website, phone: v.phone, indoor: v.indoor, osm: v.osm, source: "osm", createdAt: ts, updatedAt: ts }, v.line ? { lengthM: v.line.lengthM } : {}), updated_at: now }));
-  const layouts = fresh.map(v => ({ track_id: v.id, id: "main", data: Object.assign({ name: "Main", order: 0, cornerR: 110, widthM: v.line ? v.line.widthM : 8, createdAt: ts, updatedAt: ts }, v.line ? { lengthM: v.line.lengthM, line: { src: "osm", n: v.line.pts.length, lengthM: v.line.lengthM, driven: v.line.driven }, ...(v.line.driven ? { direction: v.line.dir } : {}) } : {}), updated_at: now }));
-  const media = fresh.filter(v => v.line).map(v => ({ path: `tracks/${v.id}/layouts/main/media/line`, data: JSON.stringify({ v: 1, src: "osm", pts: v.line!.pts, ways: v.line!.ways, dir: v.line!.dir, driven: v.line!.driven }), updated_at: now }));
-  const put = async (table: string, rows: Record<string, unknown>[]) => { for (let i = 0; i < rows.length; i += 200) { const { error } = await db.from(table).upsert(rows.slice(i, i + 200)); if (error) throw new Error(`${table}: ${error.message}`); } };
-  try { await put("tracks", tracks); await put("layouts", layouts); await put("media", media); }
+  const tracks = fresh.map(v => ({ id: v.id, data: Object.assign({ name: v.name, city: v.city, country: cc, lat: v.lat, lon: v.lon, address: v.address, website: v.website, phone: v.phone, indoor: v.indoor, osm: v.osm, source: "osm", createdAt: ts, updatedAt: ts }, v.line ? { lengthM: v.line.lengthM } : {}, namesOf(v)), updated_at: now }));
+  const layouts = fresh.map(v => ({ track_id: v.id, id: "main", data: Object.assign({ name: "Main", order: 0, cornerR: 110, widthM: v.line ? v.line.widthM : 8, createdAt: ts, updatedAt: ts }, v.line ? lineMeta(v) : {}), updated_at: now }));
+  const media = fresh.filter(v => v.line).map(v => mediaRow(v, now));
+  try { await putRows(db, "tracks", tracks); await putRows(db, "layouts", layouts); await putRows(db, "media", media); }
   catch (e) { summary.ms = Date.now() - t0; return done(Object.assign(summary, { error: String((e as Error).message || e).slice(0, 300) }), "error"); }
+  // "update": the tracks this import made before get what the rules give now — a line where they had none (the venue's track drawn
+  // as a closed shape, raceways joined at their loose ends), the corners of the line they have, their other names (for the search).
+  // Only the import's own pages (osm-…), only the "Main" layout, never one with a line, a drawing or sessions' geometry of its own.
+  if (body.mode === "update") {
+    try { Object.assign(summary, await update(db, venues, known, cc, dry)); }
+    catch (e) { summary.ms = Date.now() - t0; return done(Object.assign(summary, { added: tracks.length, error: "update: " + String((e as Error).message || e).slice(0, 280) }), "error"); }
+  }
   summary.ms = Date.now() - t0;
   return done(Object.assign(summary, { added: tracks.length }));
 });
+
