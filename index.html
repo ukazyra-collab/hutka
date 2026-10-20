@@ -10324,8 +10324,9 @@ const DRAFTS = (() => {
     const fileTrack = p.data.source && p.data.source.app !== 'alfano' ? ((p.data.device && p.data.device.track) || '') : (p.meta.track || '');
     const town = GEO.nearestCity(c.lat, c.lon), named = sameTrackName.key(fileTrack, town && town.km < 60 ? town.name : '');
     if (named) { const hits = all.filter(o => o.d < 30 && sameTrackName(named, o.x.name)); if (hits.length === 1 || (hits.length > 1 && hits[0].d < 3)) return { tid: hits[0].x.id }; }
-    // 3. the nearest within 3 km
-    const near = all[0];
+    // 3. the nearest within 3 km (not a track known by its town only — its pin is the town's centre, not the track: an SWS track Hutka
+    //    could not place; the name above still finds it)
+    const near = all.find(o => !o.x.approx);
     if (near && near.d < 3) return { tid: near.x.id };
     const canAdd = STORE.canWrite() && (STORE.isAdmin() || await STORE.communityAvailable()); if (!canAdd) return { tid: '' };
     // a track Hutka does not know yet: its page and a first layout, named from the map (OSM) — the name can be changed on the track page

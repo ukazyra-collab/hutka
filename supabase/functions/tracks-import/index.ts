@@ -111,17 +111,18 @@ Deno.serve(async (req) => {
   const venues = venuesOf(els);
   // what Hutka has: the same element, a track within 300 m, or within 1 km under the same name
   // (in pages: the API answers 1000 rows at most)
-  const known: { id: string; osm: string; name: string; lat: number; lon: number; len: number }[] = [];
+  const known: { id: string; osm: string; name: string; lat: number; lon: number; len: number; approx?: boolean }[] = [];
   for (let from = 0; from < 200000; from += 1000) {
-    const { data, error } = await db.from("tracks").select("id, name:data->>name, osm:data->>osm, lat:data->lat, lon:data->lon, len:data->lengthM").order("id").range(from, from + 999);
+    const { data, error } = await db.from("tracks").select("id, name:data->>name, osm:data->>osm, lat:data->lat, lon:data->lon, len:data->lengthM, approx:data->approx").order("id").range(from, from + 999);
     if (error) return done({ area, error: "tracks: " + error.message, ms: Date.now() - t0 }, "error");
-    for (const r of (data || []) as Record<string, unknown>[]) known.push({ id: String(r.id), osm: String(r.osm || ""), name: String(r.name || ""), lat: Number(r.lat), lon: Number(r.lon), len: Number(r.len) || 0 });
+    for (const r of (data || []) as Record<string, unknown>[]) known.push({ id: String(r.id), osm: String(r.osm || ""), name: String(r.name || ""), lat: Number(r.lat), lon: Number(r.lon), len: Number(r.len) || 0, approx: r.approx === true });
     if (!data || data.length < 1000) break;
   }
   const fresh: Venue[] = [], skipped: string[] = [];
   for (const v of venues) {
     // a track made by hand (Hutka's own, a driver's) keeps a wider berth: its pin may sit at the gate or the car park, not on the map's spot
-    const dup = known.find(k => k.id === v.id || (k.osm && k.osm === v.osm) || (isFinite(k.lat) && isFinite(k.lon) && (distM(k, v) < (k.id.startsWith("osm-") ? 300 : 1500) || (distM(k, v) < 1000 && nameKey(k.name) && nameKey(k.name) === nameKey(v.name)))));
+    // a track known by its town only (an SWS track not found on the map, approx): its pin is the town's centre — the same name within 30 km
+    const dup = known.find(k => k.id === v.id || (k.osm && k.osm === v.osm) || (isFinite(k.lat) && isFinite(k.lon) && (k.approx ? (distM(k, v) < 30000 && !!nameKey(k.name) && nameKey(k.name) === nameKey(v.name)) : (distM(k, v) < (k.id.startsWith("osm-") ? 300 : 1500) || (distM(k, v) < 1000 && nameKey(k.name) && nameKey(k.name) === nameKey(v.name))))));
     if (dup) { skipped.push(`${v.name} → ${dup.id}`); continue; }
     if (fresh.some(f => distM(f, v) < 120)) { skipped.push(`${v.name} (same place)`); continue; }
     fresh.push(v);
