@@ -280,7 +280,7 @@ export function venuesOf(elements: El[]): Venue[] {
     if (tiny) continue;   // a children's ride
     // nothing drawn round: a second, looser look (never for a hall) — the venue's track drawn as an open line (leisure=track not
     // closed: its middle), loose ends up to 50 m apart joined by a straight, a loop from 150 m (a small outdoor track), only near the
-    // venue's pin (250 m) or inside its outline. The drawing as it is, its gap closed
+    // venue's pin (250 m) or inside its outline, only a track's shape. The drawing as it is, its gap closed
     if (!line && !indoor && looseMs < 400) {
       const tL = Date.now(), rw = near.get(c) || [], key = (p: LL) => p.lat.toFixed(7) + "," + p.lon.toFixed(7), ids = new Map<string, number>();
       for (const w of rw) if (w.nodes && w.geometry) w.geometry.forEach((p, i) => ids.set(key(p), w.nodes![i]));
@@ -289,8 +289,12 @@ export function venuesOf(elements: El[]): Venue[] {
         const nodes = e.path.map(p => { const k = key(p); let n = ids.get(k); if (n === undefined) { n = oid--; ids.set(k, n); } return n; });
         opens.push({ type: "way", id: e.id, tags: Object.assign({ sport: "karting" }, g, { oneway: "" }), nodes, geometry: e.path.slice() }); }
       if ((rw.length || outl.length || opens.length) && rw.length <= 40) {
-        const loose = lineFor(c, loopsOf(rw.concat(outl, opens), { gap: 50, min: 150, budget: 6000 }), 250);
-        if (loose) line = Object.assign(loose, { loose: true });
+        // only a loop shaped like a track (twisty: not the box of a paved pad, an oval or a car park drawn as a raceway), and only when
+        // it is most of what is drawn there (a small loop beside a bigger track drawn in pieces is not that track)
+        const pool = rw.concat(outl, opens), loops2 = loopsOf(pool, { gap: 50, min: 150, budget: 6000 }).filter(lp => trackLike(lp.pts));
+        const loose = lineFor(c, loops2, 250);
+        const drawn = pool.filter(w => !(w.tags && w.tags.sport && !/karting/i.test(w.tags.sport))).reduce((a, w) => a + lenOf(w.geometry || []), 0);
+        if (loose && drawn <= 2 * loose.lengthM + 200) line = Object.assign(loose, { loose: true });
       }
       looseMs += Date.now() - tL;
     }
