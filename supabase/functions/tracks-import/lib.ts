@@ -113,12 +113,19 @@ function isVenue(e: El): boolean {
   if (KIDS.test(tag(t, "name")) || CLOSED.test(tag(t, "name")) || NOT_KARTING.test(tag(t, "name"))) return false;
   return true;
 }
-// a children's ride, not a circuit: every piece of the venue drawn (a pin alone says nothing of its size), none a hall or a sports centre,
-// all of it within 70 m (a karting circuit is 300 m round at the least: DriftCar 26 m, a mall's mini track 60 m)
+// a children's ride, not a circuit: what is drawn of the venue all within 70 m (a karting circuit is 300 m round at the least:
+// DriftCar 26 m, a mall's mini track 60 m, a 175 m loop in a Perm yard 58 m), none of it a hall or a sports centre, and its pins (a pin
+// alone says nothing of its size) on the drawing — a pin 30 m or more off it: the place is bigger than what is drawn
+export const TINY_M = 70;
 export function tinyVenue(els: El[]): boolean {
-  let a = 90, b = 180, c = -90, d = -180;
-  for (const e of els) { const g = e.tags || {}; if (!e.bounds || (g.building && g.building !== "no") || g.leisure === "sports_centre" || g.indoor === "yes") return false; a = Math.min(a, e.bounds.minlat); b = Math.min(b, e.bounds.minlon); c = Math.max(c, e.bounds.maxlat); d = Math.max(d, e.bounds.maxlon); }
-  return els.length > 0 && distM({ lat: a, lon: b }, { lat: c, lon: d }) < 70;
+  let a = 90, b = 180, c = -90, d = -180, drawn = 0; const pins: LL[] = [];
+  for (const e of els) { const g = e.tags || {}; if ((g.building && g.building !== "no") || g.leisure === "sports_centre" || g.indoor === "yes") return false;
+    if (!e.bounds) { const p = posOf(e); if (p) pins.push(p); continue; }
+    drawn++; a = Math.min(a, e.bounds.minlat); b = Math.min(b, e.bounds.minlon); c = Math.max(c, e.bounds.maxlat); d = Math.max(d, e.bounds.maxlon); }
+  if (!drawn) return false;
+  const box = { minlat: a, minlon: b, maxlat: c, maxlon: d };
+  if (pins.some(p => !inBounds(p, box, 30))) return false;
+  return distM({ lat: a, lon: b }, { lat: c, lon: d }) < TINY_M;
 }
 // a venue's pieces ranked: the venue itself (sports centre), its track, a raceway drawn with a name, a pin
 const rank = (e: El) => { const t = e.tags || {}; return t.leisure === "sports_centre" ? 4 : t.leisure === "track" ? 3 : t.highway === "raceway" ? 2 : t.building ? 2 : 1; };
@@ -133,6 +140,8 @@ type Cluster = { main: El; pos: LL; bounds: El["bounds"] | undefined; els: El[];
 // node and searched for cycles (14 pieces at most, each once); every loop with the ways it runs on and which way round each is used
 type Loop = { pts: LL[]; lengthM: number; ways: El[]; fwd: boolean[] };
 function lenOf(g: LL[]): number { let s = 0; for (let i = 1; i < g.length; i++) s += distM(g[i - 1], g[i]); return s; }
+// across a drawing: its box's diagonal
+function spanM(g: LL[]): number { let a = 90, b = 180, c = -90, d = -180; for (const p of g) { a = Math.min(a, p.lat); b = Math.min(b, p.lon); c = Math.max(c, p.lat); d = Math.max(d, p.lon); } return g.length ? distM({ lat: a, lon: b }, { lat: c, lon: d }) : 0; }
 // how loosely: loose ends joined up to gap m apart, loops min–max m round (the first look: 25 m, 300 m – 3.5 km); budget: steps of
 // the search for loops
 export type LoopOpts = { gap?: number; min?: number; max?: number; budget?: number };
@@ -289,9 +298,10 @@ export function venuesOf(elements: El[]): Venue[] {
         const nodes = e.path.map(p => { const k = key(p); let n = ids.get(k); if (n === undefined) { n = oid--; ids.set(k, n); } return n; });
         opens.push({ type: "way", id: e.id, tags: Object.assign({ sport: "karting" }, g, { oneway: "" }), nodes, geometry: e.path.slice() }); }
       if ((rw.length || outl.length || opens.length) && rw.length <= 40) {
-        // only a loop shaped like a track (twisty: not the box of a paved pad, an oval or a car park drawn as a raceway), and only when
-        // it is most of what is drawn there (a small loop beside a bigger track drawn in pieces is not that track)
-        const pool = rw.concat(outl, opens), loops2 = loopsOf(pool, { gap: 50, min: 150, budget: 6000 }).filter(lp => trackLike(lp.pts));
+        // only a loop shaped like a track (twisty: not the box of a paved pad, an oval or a car park drawn as a raceway), not a children's
+        // ride's (all of it within 70 m, as tinyVenue), and only when it is most of what is drawn there (a small loop beside a bigger
+        // track drawn in pieces is not that track)
+        const pool = rw.concat(outl, opens), loops2 = loopsOf(pool, { gap: 50, min: 150, budget: 6000 }).filter(lp => trackLike(lp.pts) && spanM(lp.pts) >= TINY_M);
         const loose = lineFor(c, loops2, 250);
         const drawn = pool.filter(w => !(w.tags && w.tags.sport && !/karting/i.test(w.tags.sport))).reduce((a, w) => a + lenOf(w.geometry || []), 0);
         if (loose && drawn <= 2 * loose.lengthM + 200) line = Object.assign(loose, { loose: true });
