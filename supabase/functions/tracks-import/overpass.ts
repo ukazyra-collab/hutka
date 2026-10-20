@@ -5,7 +5,7 @@ import { kartName, type El } from "./lib.ts";
 
 export const OVERPASS = ["https://maps.mail.ru/osm/tools/overpass/api/interpreter"];
 const KN = "kart|картинг|картодром|motok[aá]r|mikroauto|كارت";
-const areaSel = (area: string) => /^US-[A-Z]{2}$/.test(area) ? `area["ISO3166-2"="${area}"]` : `area["ISO3166-1"="${area}"]["admin_level"="2"]`;
+const areaSel = (area: string) => /^[A-Z]{2}-[A-Z0-9]{1,3}$/.test(area) ? `area["ISO3166-2"="${area}"]` : `area["ISO3166-1"="${area}"]["admin_level"="2"]`;
 // three light questions an area (VK's gateway gives up after about a minute): the venues with their outlines, the raceways, the towns
 const head = (area: string, t: number) => `[out:json][timeout:${t}][maxsize:536870912];\n${areaSel(area)}->.a;\n`;
 // the venues by their sport (the tag index answers at once); in a small country also by name — kart-named raceways and leisure places,

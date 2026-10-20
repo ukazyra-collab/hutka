@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
     try {
       if (body.ids) { const ids = body.ids.filter(i => /^(node|way|relation)\/\d+$/.test(i)).slice(0, 50); const tags = byEl(await sparql(qIdTags(ids), 60000)), geom = await sparql(qIdGeom(ids), 60000); return json({ tags, geom: geom.map(r => ({ el: r.el && r.el.value.replace("https://www.openstreetmap.org/", ""), wkt: r.wkt && r.wkt.value.slice(0, 20000) })) }); }
       const re = String(body.find).replace(/[^\p{L}\p{N} |\-.]/gu, "").slice(0, 120);
-      if (!/^([A-Z]{2}|US-[A-Z]{2})$/.test(area) || !re) return json({ error: "find needs an area and a name" }, 400);
+      if (!/^([A-Z]{2}|[A-Z]{2}-[A-Z0-9]{1,3})$/.test(area) || !re) return json({ error: "find needs an area and a name" }, 400);
       return json({ area, find: re, els: byEl(await sparql(qFind(area, re), 110000)) });
     } catch (e) { return json({ error: String((e as Error).message || e).slice(0, 300) }, 502); }
   }
@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     for (const [k, q] of [["venueTags", qVenueTags("BE")], ["venueGeom", qVenueGeom("BE")], ["racewayGeom", qRacewayGeom("BE")], ["racewayTags", qRacewayTags("BE")], ["towns", qTowns("BE")]] as [string, string][]) { const t1 = Date.now(); try { const rows = await sparql(q, 30000); out[k] = { ms: Date.now() - t1, rows: rows.length, kb: Math.round(JSON.stringify(rows).length / 1024) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }
     await db.from("import_queue").update({ status: "done", result: out, finished_at: new Date().toISOString() }).eq("area", area); return json(out);
   }
-  if (!/^([A-Z]{2}|US-[A-Z]{2})$/.test(area)) return json({ error: "bad_area" }, 400);
+  if (!/^([A-Z]{2}|[A-Z]{2}-[A-Z0-9]{1,3})$/.test(area)) return json({ error: "bad_area" }, 400);   // a country, or a region of one ("US-CA", "FR-IDF")
   const t0 = Date.now(), cc = area.slice(0, 2); deadline = t0 + 125000;   // the writes need the rest of the function's 150 s
   const done = async (result: Record<string, unknown>, status = "done") => { await db.from("import_queue").update({ status, result, finished_at: new Date().toISOString() }).eq("area", area); return json(result, status === "done" ? 200 : 502); };
   await db.from("import_queue").update({ status: "running", started_at: new Date().toISOString() }).eq("area", area);

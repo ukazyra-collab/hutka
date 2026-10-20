@@ -6,7 +6,8 @@ import { kartName, type El } from "./lib.ts";
 export const QLEVER = "https://qlever.cs.uni-freiburg.de/api/osm-planet";
 const PRE = `PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:> PREFIX ogc: <http://www.opengis.net/rdf#> PREFIX geo: <http://www.opengis.net/ont/geosparql#> `;
 // the area: the relation tagged with its ISO code (a country's or a US state's; the label node carrying the same code left out)
-const areaOf = (area: string) => `?area osmkey:${/^US-[A-Z]{2}$/.test(area) ? "ISO3166-2" : "ISO3166-1"} "${area}" . FILTER(STRSTARTS(STR(?area), "https://www.openstreetmap.org/relation/")) ?area ogc:sfContains ?el . `;
+// a region of a big country ("FR-IDF": France runs out of the function's CPU time whole) or a US state: its ISO 3166-2 code
+const areaOf = (area: string) => `?area osmkey:${/^[A-Z]{2}-[A-Z0-9]{1,3}$/.test(area) ? "ISO3166-2" : "ISO3166-1"} "${area}" . FILTER(STRSTARTS(STR(?area), "https://www.openstreetmap.org/relation/")) ?area ogc:sfContains ?el . `;
 const KEY = "https://www.openstreetmap.org/wiki/Key:";
 // the tags a venue is read by (lib.ts): its name, contacts, address, what kind of place it is, whether it is closed — all its tags,
 // one row a tag (a row per venue with thirty optional columns is what makes the database slow)
