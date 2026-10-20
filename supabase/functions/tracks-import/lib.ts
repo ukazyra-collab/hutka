@@ -56,13 +56,21 @@ export type Known = { id: string; osm: string; name: string; lat: number; lon: n
 //  · fresh: a new track; "maybe" notes one with a town-only track nearby whose name is inside its own (or the same, taken by the
 //    nearer venue) — for a person to look at, nothing done
 export function placeVenues(venues: Venue[], known: Known[]) {
+  // cheap enough for France (400 venues against 2 600 tracks) inside the function's CPU time: each name squashed once, a distance only
+  // for tracks within a third of a degree of latitude, a name only for tracks near enough
   const ok = (k: Known) => isFinite(k.lat) && isFinite(k.lon);
+  const keys = new Map<string, string>(), sq = (s: string) => { let x = keys.get(s); if (x === undefined) { x = nameSquash(s); keys.set(s, x); } return x; };
+  const same = (a: string, b: string) => { const x = sq(a); return !!x && x === sq(b); };
+  const inside = (a: string, b: string) => { const x = sq(a), y = sq(b); return !!x && !!y && x !== y && ((x.length >= 4 && y.includes(x)) || (y.length >= 4 && x.includes(y))); };
+  const near = (k: Known, v: Venue, m: number) => Math.abs(k.lat - v.lat) * 111000 < m && distM(k, v) < m;
+  const byId = new Map(known.map(k => [k.id, k])), byOsm = new Map(known.filter(k => k.osm).map(k => [k.osm, k]));
+  const placed = known.filter(k => !k.approx && ok(k)), approx = known.filter(k => k.approx && ok(k));
   const skipped: string[] = [], maybe: string[] = [], rest = new Set<Venue>(), claim = new Map<string, { v: Venue; k: Known; d: number }>();
   for (const v of venues) {
-    const dup = known.find(k => k.id === v.id || (k.osm && k.osm === v.osm) || (!k.approx && ok(k) && (distM(k, v) < (k.id.startsWith("osm-") ? 300 : 1500) || (distM(k, v) < 1000 && sameName(k.name, v.name)))));
+    const dup = byId.get(v.id) || (v.osm ? byOsm.get(v.osm) : undefined) || placed.find(k => near(k, v, k.id.startsWith("osm-") ? 300 : 1500) || (near(k, v, 1000) && same(k.name, v.name)));
     if (dup) { skipped.push(`${v.name} → ${dup.id}`); continue; }
     let best: Known | null = null, bd = 30000;
-    for (const k of known) if (k.approx && ok(k) && sameName(k.name, v.name)) { const d = distM(k, v); if (d < bd) { best = k; bd = d; } }
+    for (const k of approx) { if (Math.abs(k.lat - v.lat) * 111000 >= bd) continue; const d = distM(k, v); if (d < bd && same(k.name, v.name)) { best = k; bd = d; } }
     if (!best) { rest.add(v); continue; }
     const c = claim.get(best.id);   // two venues for it: the one with a line, then the nearer
     if (c && ((c.v.line && !v.line) || (!!c.v.line === !!v.line && c.d <= bd))) { rest.add(v); continue; }
@@ -73,8 +81,8 @@ export function placeVenues(venues: Venue[], known: Known[]) {
   for (const v of venues) {
     if (!rest.has(v)) continue;
     if (upgrades.some(u => distM(u.v, v) < 120) || fresh.some(f => distM(f, v) < 120)) { skipped.push(`${v.name} (same place)`); continue; }
-    const near = known.find(k => k.approx && ok(k) && distM(k, v) < 30000 && (sameName(k.name, v.name) || nameInside(k.name, v.name)));
-    if (near) maybe.push(`${v.name} ~ ${near.id} (${Math.round(distM(near, v) / 100) / 10} km)`);
+    const hint = approx.find(k => near(k, v, 30000) && (same(k.name, v.name) || inside(k.name, v.name)));
+    if (hint) maybe.push(`${v.name} ~ ${hint.id} (${Math.round(distM(hint, v) / 100) / 10} km)`);
     fresh.push(v);
   }
   return { fresh, skipped, upgrades, maybe };
