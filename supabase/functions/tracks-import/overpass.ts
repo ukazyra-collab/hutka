@@ -14,7 +14,9 @@ export const qVenues = (area: string) => head(area, 50) + `nwr["sport"~"karting"
 .v out center bb;
 way.v["leisure"="track"]; out ids geom;`;
 export const qRaceways = (area: string) => head(area, 50) + `way["highway"="raceway"](area.a); out geom;`;
-export const qTownsO = (area: string) => head(area, 40) + `node["place"~"^(city|town)$"]["name"](area.a); out;`;
+// the towns near the venues (not every town of the country: Russia's do not come back within a minute)
+export const qTownsO = (area: string) => head(area, 40) + `nwr["sport"~"karting"](area.a)->.v;
+node(around.v:30000)["place"~"^(city|town)$"]["name"]; out;`;
 // the old single question, kept for the tests
 export const qArea = (area: string) => head(area, 110) + `( nwr["sport"~"karting",i](area.a);
   way["highway"="raceway"]["name"~"${KN}",i][!"sport"](area.a);

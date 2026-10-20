@@ -1,5 +1,6 @@
 // Hutka — the track import's writes: a venue's page as rows (namesOf, lineMeta, mediaRow), and "update" — the import's own tracks get
-// what the rules give now: a line where they had none, the corners of the line they have, their other names (index.ts, mode "update").
+// what the rules give now: a line where they had none, the corners of the line they have, their other names, the town they lack (index.ts,
+// mode "update").
 import { distM, nameKey, type Venue } from "./lib.ts";
 import { cornerCount } from "./corners.ts";
 // ---- what goes into the database
@@ -21,17 +22,18 @@ export async function update(db: Db, venues: Venue[], known: { id: string; osm: 
     const k = known.find(k => k.osm && k.osm === v.osm) || known.find(k => isFinite(k.lat) && isFinite(k.lon) && (distM(k, v) < 150 || (distM(k, v) < 1000 && nameKey(k.name) && nameKey(k.name) === nameKey(v.name))));
     if (k && k.id.startsWith("osm-")) pairs.push({ v, k });
   }
-  if (!pairs.length) return { matched: 0, linesAdded: 0, cornersAdded: 0, namesAdded: 0 };
+  if (!pairs.length) return { matched: 0, linesAdded: 0, cornersAdded: 0, namesAdded: 0, citiesAdded: 0 };
   const ids = [...new Set(pairs.map(p => p.k.id))];
   const trows = new Map((await rowsIn(db, "tracks", "id, data", "id", ids)).map(r => [r.id as string, r]));
   const lrows = new Map((await rowsIn(db, "layouts", "track_id, id, data", "track_id", ids, q => q.eq("id", "main"))).map(r => [r.track_id as string, r]));
   const now = new Date().toISOString(), tOut: Record<string, any>[] = [], lOut: Record<string, any>[] = [], mOut: Record<string, any>[] = [], added: string[] = [], seen = new Set<string>();
-  let namesAdded = 0;
+  let namesAdded = 0, citiesAdded = 0;
   for (const { v, k } of pairs) {
     if (seen.has(k.id)) continue; seen.add(k.id);
     const tr = trows.get(k.id), lo = lrows.get(k.id); if (!tr || !lo || (tr.data && tr.data.source !== "osm")) continue;
     const td = Object.assign({}, tr.data), ld = Object.assign({}, lo.data); let tCh = false;
     const nm = namesOf(v); if (nm.aka && !td.aka) { td.aka = nm.aka; tCh = true; } if (nm.names && !(td.names && td.names.ru)) { td.names = Object.assign({}, td.names || {}, nm.names); tCh = true; } if (tCh) namesAdded++;
+    if (!td.city && v.city) { td.city = v.city; tCh = true; citiesAdded++; }   // a town it was imported without (the towns' question went unanswered)
     if (v.line && !ld.line && !ld.trace && !ld.refSess && !ld.photo && !td.lengthM) {
       // the line it never had: the layout's line (clockwise unless one-way pieces say otherwise), its length on the track too
       const vv = Object.assign({}, v, { id: k.id });
@@ -53,5 +55,5 @@ export async function update(db: Db, venues: Venue[], known: { id: string; osm: 
     }
   }
   if (!dry) { await putRows(db, "layouts", lOut); await putRows(db, "media", mOut); await putRows(db, "tracks", tOut); }
-  return { matched: pairs.length, linesAdded: added.length, cornersAdded, namesAdded, linesSample: added.slice(0, 40), cc };
+  return { matched: pairs.length, linesAdded: added.length, cornersAdded, namesAdded, citiesAdded, linesSample: added.slice(0, 40), cc };
 }
