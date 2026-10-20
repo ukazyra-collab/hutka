@@ -63,7 +63,8 @@ export function overpassEls(rows: OEl[]): El[] {
     const tags = t.sport ? Object.assign({}, t) : Object.assign({ sport: kartName(t.name || "") || kartName(t["name:en"] || "") ? "karting" : "" }, t);
     if (r.type === "node") { out.push({ type: "node", id: r.id, lat: r.lat, lon: r.lon, tags }); continue; }
     const ring = rings.get(r.id), closed = !!ring && ring.length >= 10 && ring[0].lat === ring[ring.length - 1].lat && ring[0].lon === ring[ring.length - 1].lon;
-    out.push({ type: r.type, id: r.id, center: r.center, bounds: r.bounds, tags, ...(closed ? { ring } : {}) });
+    const open = !!ring && ring.length >= 2 && !(ring[0].lat === ring[ring.length - 1].lat && ring[0].lon === ring[ring.length - 1].lon);   // a track drawn as an open line
+    out.push({ type: r.type, id: r.id, center: r.center, bounds: r.bounds, tags, ...(closed ? { ring } : {}), ...(open ? { path: ring } : {}) });
   }
   return out;
 }

@@ -50,7 +50,8 @@ export function coords(wkt: string, ring = false): { lat: number; lon: number }[
 const idOf = (iri: string) => { const m = /\/(node|way|relation)\/(\d+)$/.exec(iri || ""); return m ? { type: m[1], id: +m[2] } : null; };
 
 const tagsOf = (rows: Row[]) => { const by = new Map<string, Record<string, string>>(); for (const r of rows) { if (!r.el || !r.key || !r.val) continue; const k = r.key.value.slice(KEY.length); let t = by.get(r.el.value); if (!t) { t = {}; by.set(r.el.value, t); } if (!t[k]) t[k] = r.val.value; } return by; };
-// venues: tags from one question, the outline (a point for a pin) from the other; a centre and a box for an outline
+// venues: tags from one question, the outline (a point for a pin) from the other; a centre and a box for an outline; an open way's points
+// (a track drawn as its middle and not closed: lib.ts takes it as a line on its second look)
 export function venueEls(tagRows: Row[], geomRows: Row[]): El[] {
   const tags = tagsOf(tagRows), out: El[] = [], seen = new Set<string>();
   for (const r of geomRows) {
@@ -61,7 +62,7 @@ export function venueEls(tagRows: Row[], geomRows: Row[]): El[] {
     if (k.type === "node" || pts.length === 1) { out.push({ type: k.type, id: k.id, lat: pts[0].lat, lon: pts[0].lon, tags: t }); continue; }
     const ring = coords(r.wkt.value, true), c = { lat: ring.reduce((a, p) => a + p.lat, 0) / ring.length, lon: ring.reduce((a, p) => a + p.lon, 0) / ring.length };
     const closed = /^\s*(MULTI)?POLYGON/i.test(r.wkt.value) || (ring.length >= 4 && ring[0].lat === ring[ring.length - 1].lat && ring[0].lon === ring[ring.length - 1].lon);
-    out.push({ type: k.type, id: k.id, center: c, bounds: { minlat: Math.min(...pts.map(p => p.lat)), minlon: Math.min(...pts.map(p => p.lon)), maxlat: Math.max(...pts.map(p => p.lat)), maxlon: Math.max(...pts.map(p => p.lon)) }, tags: t, ...(closed && ring.length >= 10 ? { ring } : {}) });
+    out.push({ type: k.type, id: k.id, center: c, bounds: { minlat: Math.min(...pts.map(p => p.lat)), minlon: Math.min(...pts.map(p => p.lon)), maxlat: Math.max(...pts.map(p => p.lat)), maxlon: Math.max(...pts.map(p => p.lon)) }, tags: t, ...(closed && ring.length >= 10 ? { ring } : {}), ...(!closed && k.type === "way" && /^\s*LINESTRING/i.test(r.wkt.value) && pts.length >= 2 ? { path: pts } : {}) });
   }
   return out;
 }

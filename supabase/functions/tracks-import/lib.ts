@@ -9,10 +9,13 @@ export type El = {
   bounds?: { minlat: number; minlon: number; maxlat: number; maxlon: number };
   tags?: Record<string, string>; nodes?: number[]; geometry?: LL[];
   ring?: LL[];   // a venue piece drawn as a closed shape (its outer ring): a track drawn as its middle or its asphalt, or a whole site
+  path?: LL[];   // a venue piece drawn as an open line (its points): a track drawn as its middle and not closed on the map
 };
 // from: "raceway" (the raceways drawn), "joined" (raceways whose loose ends were 25 m apart or less), "outline" (the venue's track
 // drawn as a closed shape: its middle, or the edge of its asphalt — a few metres off the middle)
-export type Line = { pts: [number, number][]; lengthM: number; ways: number[]; driven: boolean; dir: "cw" | "ccw"; widthM: number; corners: number; from: "raceway" | "joined" | "outline" };
+// loose: found only by the second, looser look (nothing drawn round otherwise): loose ends up to 50 m apart, a loop from 150 m, the
+// venue's track drawn as an open line — the drawing as it is, its gap closed by a straight
+export type Line = { pts: [number, number][]; lengthM: number; ways: number[]; driven: boolean; dir: "cw" | "ccw"; widthM: number; corners: number; from: "raceway" | "joined" | "outline"; loose?: boolean };
 export type Venue = {
   id: string; osm: string; name: string; lat: number; lon: number; city: string; address: string; website: string; phone: string;
   indoor: boolean; line: Line | null; parts: number;
@@ -130,10 +133,14 @@ type Cluster = { main: El; pos: LL; bounds: El["bounds"] | undefined; els: El[];
 // node and searched for cycles (14 pieces at most, each once); every loop with the ways it runs on and which way round each is used
 type Loop = { pts: LL[]; lengthM: number; ways: El[]; fwd: boolean[] };
 function lenOf(g: LL[]): number { let s = 0; for (let i = 1; i < g.length; i++) s += distM(g[i - 1], g[i]); return s; }
-export function loopsOf(ways0: El[]): Loop[] {
+// how loosely: loose ends joined up to gap m apart, loops min–max m round (the first look: 25 m, 300 m – 3.5 km); budget: steps of
+// the search for loops
+export type LoopOpts = { gap?: number; min?: number; max?: number; budget?: number };
+export function loopsOf(ways0: El[], o: LoopOpts = {}): Loop[] {
+  const GAP = o.gap ?? 25, MIN = o.min ?? 300, MAX = o.max ?? 3500;
   const ways = ways0.filter(w => w.type === "way" && Array.isArray(w.nodes) && Array.isArray(w.geometry) && w.nodes.length === w.geometry.length && w.nodes.length >= 2);
   const loops: Loop[] = [], seen = new Set<string>();
-  const push = (g: LL[], ws: El[], fwd: boolean[], key: string) => { const L = lenOf(g); if (L < 300 || L > 3500 || seen.has(key)) return; seen.add(key); loops.push({ pts: g.map(p => ({ lat: p.lat, lon: p.lon })), lengthM: L, ways: ws, fwd }); };
+  const push = (g: LL[], ws: El[], fwd: boolean[], key: string) => { const L = lenOf(g); if (L < MIN || L > MAX || seen.has(key)) return; seen.add(key); loops.push({ pts: g.map(p => ({ lat: p.lat, lon: p.lon })), lengthM: L, ways: ws, fwd }); };
   const use = new Map<number, number>(); for (const w of ways) w.nodes!.forEach(id => use.set(id, (use.get(id) || 0) + 1));
   type Piece = { id: number; a: number; b: number; g: LL[]; way: El };
   const pieces: Piece[] = [];
@@ -148,11 +155,11 @@ export function loopsOf(ways0: El[]): Loop[] {
   { const ends: { v: number; p: LL; way: El }[] = [];
     for (const [v, ps] of at) if (ps.length === 1) { const q = ps[0], g = q.a === v ? q.g[0] : q.g[q.g.length - 1]; ends.push({ v, p: g, way: q.way }); }
     if (ends.length <= 40) for (let i = 0; i < ends.length; i++) for (let j = i + 1; j < ends.length; j++) {
-      const a = ends[i], b = ends[j], d = distM(a.p, b.p); if (d > 25 || d < 0.01) continue;
+      const a = ends[i], b = ends[j], d = distM(a.p, b.p); if (d > GAP || d < 0.01) continue;
       const way: El = { type: "way", id: a.way.id, tags: Object.assign({}, a.way.tags || {}, { oneway: "", "hutka:joined": "1" }) };
       const piece = { id: pieces.length, a: a.v, b: b.v, g: [a.p, b.p], way }; pieces.push(piece); at.get(a.v)!.push(piece); at.get(b.v)!.push(piece);
     } }
-  let budget = 20000;
+  let budget = o.budget ?? 20000;
   for (const p0 of pieces) {
     const stack: { v: number; path: { p: Piece; fwd: boolean }[]; used: Set<number> }[] = [{ v: p0.b, path: [{ p: p0, fwd: true }], used: new Set([p0.id]) }];
     while (stack.length && budget-- > 0) {
@@ -187,7 +194,8 @@ export function trackLike(ring: LL[]): boolean {
 }
 // the venue's line among the loops near it: the loops of karting ways and the loops inside the venue first; a motor circuit's piece
 // never (a way of another sport); then the longest. Driven direction from one-way tags when every one-way piece agrees, else clockwise
-export function lineFor(c: { pos: LL; bounds?: El["bounds"] }, loops: Loop[]): Line | null {
+// reach: how far from the venue's pin a loop outside its outline may lie (the looser look: 250 m — only the venue's own)
+export function lineFor(c: { pos: LL; bounds?: El["bounds"] }, loops: Loop[], reach = 450): Line | null {
   let best: { lp: Loop; score: number } | null = null;
   for (const lp of loops) {
     const sports = lp.ways.map(w => (w.tags && w.tags.sport) || "");
@@ -196,7 +204,7 @@ export function lineFor(c: { pos: LL; bounds?: El["bounds"] }, loops: Loop[]): L
     const inside = c.bounds ? lp.pts.filter(p => inBounds(p, c.bounds, 40)).length / lp.pts.length : 0;
     const mid = { lat: lp.pts.reduce((a, p) => a + p.lat, 0) / lp.pts.length, lon: lp.pts.reduce((a, p) => a + p.lon, 0) / lp.pts.length };
     const dMid = distM(c.pos, mid);
-    if (!(inside > 0.5) && dMid > 450) continue;   // somebody else's raceway
+    if (!(inside > 0.5) && dMid > reach) continue;   // somebody else's raceway
     const outline = lp.ways.some(w => w.tags && w.tags["hutka:outline"]), joined = lp.ways.some(w => w.tags && w.tags["hutka:joined"]);
     const score = (kart > 0.5 ? 2 : 0) + (inside > 0.8 ? 2 : inside > 0.5 ? 1 : 0) + (dMid < 250 ? 1 : 0) + lp.lengthM / 10000 - (outline ? 0.6 : 0) - (joined ? 0.3 : 0);
     if (!best || score > best.score) best = { lp, score };
@@ -245,6 +253,7 @@ export function venuesOf(elements: El[]): Venue[] {
     if (best && bd <= 500) { if (!near.has(best)) near.set(best, []); near.get(best)!.push(w); }
   }
   const out: Venue[] = [];
+  let looseMs = 0;   // the second look's time (CPU: nothing here waits): 400 ms an area at most — the function has 2 s
   for (const c of clusters) {
     if (!c.name) continue;
     const all = c.els, t = (k: string[]) => { for (const e of all) { const v = tag(e.tags, ...k); if (v) return v; } return ""; };
@@ -266,8 +275,25 @@ export function venuesOf(elements: El[]): Venue[] {
       const ids = ring.map(() => oid--); ids[ids.length - 1] = ids[0];
       outl.push({ type: "way", id: e.id, tags: Object.assign({ sport: "karting" }, g, { oneway: "", "hutka:outline": "1" }), nodes: ids, geometry: ring }); }
     const loops = loopsOf((near.get(c) || []).concat(outl));
-    const line = indoor && !loops.length ? null : lineFor(c, loops);
-    if (!line && tinyVenue(all)) continue;   // a children's ride
+    let line = indoor && !loops.length ? null : lineFor(c, loops);
+    const tiny = !line && tinyVenue(all);
+    if (tiny) continue;   // a children's ride
+    // nothing drawn round: a second, looser look (never for a hall) — the venue's track drawn as an open line (leisure=track not
+    // closed: its middle), loose ends up to 50 m apart joined by a straight, a loop from 150 m (a small outdoor track), only near the
+    // venue's pin (250 m) or inside its outline. The drawing as it is, its gap closed
+    if (!line && !indoor && looseMs < 400) {
+      const tL = Date.now(), rw = near.get(c) || [], key = (p: LL) => p.lat.toFixed(7) + "," + p.lon.toFixed(7), ids = new Map<string, number>();
+      for (const w of rw) if (w.nodes && w.geometry) w.geometry.forEach((p, i) => ids.set(key(p), w.nodes![i]));
+      const opens: El[] = [];
+      for (const e of all) { const g = e.tags || {}; if (e.type !== "way" || g.leisure !== "track" || g.highway === "raceway" || (g.building && g.building !== "no") || !e.path || e.path.length < 2 || e.ring) continue;
+        const nodes = e.path.map(p => { const k = key(p); let n = ids.get(k); if (n === undefined) { n = oid--; ids.set(k, n); } return n; });
+        opens.push({ type: "way", id: e.id, tags: Object.assign({ sport: "karting" }, g, { oneway: "" }), nodes, geometry: e.path.slice() }); }
+      if ((rw.length || outl.length || opens.length) && rw.length <= 40) {
+        const loose = lineFor(c, loopsOf(rw.concat(outl, opens), { gap: 50, min: 150, budget: 6000 }), 250);
+        if (loose) line = Object.assign(loose, { loose: true });
+      }
+      looseMs += Date.now() - tL;
+    }
     const m = c.main, osm = (m.type === "node" ? "n" : m.type === "way" ? "w" : "r") + m.id;
     const aka = new Set<string>(); for (const e of all) for (const k of NAMEKEYS) { const v = tag(e.tags, k); if (v) for (const x of v.split(";")) { const y = x.trim().slice(0, 80); if (y && y !== c.name) aka.add(y); } }
     out.push({ id: "osm-" + osm, osm, name: c.name.slice(0, 80), lat: Math.round(c.pos.lat * 1e5) / 1e5, lon: Math.round(c.pos.lon * 1e5) / 1e5, city: city.slice(0, 60), address: street.slice(0, 120), website: web.slice(0, 200), phone: t(["phone", "contact:phone"]).slice(0, 40), indoor, line, parts: all.length, nameRu: t(["name:ru"]).slice(0, 80), aka: [...aka].slice(0, 8) });

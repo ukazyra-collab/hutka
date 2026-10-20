@@ -5,8 +5,10 @@ import { distM, nameKey, type Venue } from "./lib.ts";
 import { cornerCount } from "./corners.ts";
 // ---- what goes into the database
 export const namesOf = (v: Venue) => Object.assign({}, v.aka.length ? { aka: v.aka.join(" · ").slice(0, 400) } : {}, v.nameRu && v.nameRu !== v.name ? { names: { ru: v.nameRu } } : {});
-export const lineMeta = (v: Venue) => ({ lengthM: v.line!.lengthM, line: { src: "osm", n: v.line!.pts.length, lengthM: v.line!.lengthM, driven: v.line!.driven, corners: v.line!.corners, from: v.line!.from }, ...(v.line!.driven ? { direction: v.line!.dir } : {}) });
-export const mediaRow = (v: Venue, now: string) => ({ path: `tracks/${v.id}/layouts/main/media/line`, data: JSON.stringify({ v: 1, src: "osm", pts: v.line!.pts, ways: v.line!.ways, dir: v.line!.dir, driven: v.line!.driven, from: v.line!.from }), updated_at: now });
+export const lineMeta = (v: Venue) => ({ lengthM: v.line!.lengthM, line: Object.assign({ src: "osm", n: v.line!.pts.length, lengthM: v.line!.lengthM, driven: v.line!.driven, corners: v.line!.corners, from: v.line!.from }, v.line!.loose ? { loose: true } : {}), ...(v.line!.driven ? { direction: v.line!.dir } : {}) });
+export const mediaRow = (v: Venue, now: string) => ({ path: `tracks/${v.id}/layouts/main/media/line`, data: JSON.stringify(Object.assign({ v: 1, src: "osm", pts: v.line!.pts, ways: v.line!.ways, dir: v.line!.dir, driven: v.line!.driven, from: v.line!.from }, v.line!.loose ? { loose: true } : {})), updated_at: now });
+// a line in a few numbers (a dry run's look at it): metres east and north of its first point, 48 points at most
+const small = (pts: [number, number][]) => { const k = Math.max(1, Math.ceil(pts.length / 48)), a = pts[0], cx = 111320 * Math.cos(a[0] * Math.PI / 180), out: number[] = []; for (let i = 0; i < pts.length; i += k) out.push(Math.round((pts[i][1] - a[1]) * cx), Math.round((pts[i][0] - a[0]) * 110574)); return out; };
 // deno-lint-ignore no-explicit-any
 type Db = any;
 export async function putRows(db: Db, table: string, rows: Record<string, unknown>[]) { for (let i = 0; i < rows.length; i += 200) { const { error } = await db.from(table).upsert(rows.slice(i, i + 200)); if (error) throw new Error(`${table}: ${error.message}`); } }
@@ -60,6 +62,7 @@ export async function update(db: Db, venues: Venue[], known: { id: string; osm: 
   const trows = new Map((await rowsIn(db, "tracks", "id, data", "id", ids)).map(r => [r.id as string, r]));
   const lrows = new Map((await rowsIn(db, "layouts", "track_id, id, data", "track_id", ids, q => q.eq("id", "main"))).map(r => [r.track_id as string, r]));
   const now = new Date().toISOString(), tOut: Record<string, any>[] = [], lOut: Record<string, any>[] = [], mOut: Record<string, any>[] = [], added: string[] = [], seen = new Set<string>();
+  const shapes: { id: string; name: string; m: number[] }[] = [];   // a dry run: the looser look's lines, small (metres from the first point, 48 points at most)
   let namesAdded = 0, citiesAdded = 0;
   for (const { v, k } of pairs) {
     if (seen.has(k.id)) continue; seen.add(k.id);
@@ -71,7 +74,8 @@ export async function update(db: Db, venues: Venue[], known: { id: string; osm: 
       // the line it never had: the layout's line (clockwise unless one-way pieces say otherwise), its length on the track too
       const vv = Object.assign({}, v, { id: k.id });
       Object.assign(ld, lineMeta(vv), { widthM: v.line.widthM, updatedAt: Date.now() }); td.lengthM = v.line.lengthM; tCh = true;
-      lOut.push({ track_id: k.id, id: "main", data: ld, updated_at: now }); mOut.push(mediaRow(vv, now)); added.push(`${td.name} · ${v.line.lengthM} m · ${v.line.corners} T · ${v.line.from}`);
+      lOut.push({ track_id: k.id, id: "main", data: ld, updated_at: now }); mOut.push(mediaRow(vv, now)); added.push(`${td.name} · ${v.line.lengthM} m · ${v.line.corners} T · ${v.line.from}${v.line.loose ? " · loose" : ""}`);
+      if (dry && v.line.loose && shapes.length < 60) shapes.push({ id: k.id, name: String(td.name || "").slice(0, 40), m: small(v.line.pts) });
     }
     if (tCh) tOut.push({ id: k.id, data: Object.assign(td, { updatedAt: Date.now() }), updated_at: now });
   }
@@ -88,5 +92,5 @@ export async function update(db: Db, venues: Venue[], known: { id: string; osm: 
     }
   }
   if (!dry) { await putRows(db, "layouts", lOut); await putRows(db, "media", mOut); await putRows(db, "tracks", tOut); }
-  return { matched: pairs.length, linesAdded: added.length, cornersAdded, namesAdded, citiesAdded, linesSample: added.slice(0, 40), cc };
+  return { matched: pairs.length, linesAdded: added.length, linesLoose: added.filter(x => x.endsWith(" · loose")).length, cornersAdded, namesAdded, citiesAdded, linesSample: added.slice(0, 40), cc, ...(dry ? { shapes } : {}) };
 }
