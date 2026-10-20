@@ -11,6 +11,7 @@ import { venuesOf, distM, nameKey, type El, type Venue } from "./lib.ts";
 import { update, putRows, namesOf, lineMeta, mediaRow } from "./update.ts";
 import { QLEVER, qVenueTags, qVenueGeom, qRacewayGeom, qRacewayTags, qTowns, qFind, qIdTags, qIdGeom, sparql, venueEls, racewayEls, townEls } from "./qlever.ts";
 import { overpass, overpassEls, qVenues, qRaceways, qTownsO } from "./overpass.ts";
+import { geocodeAll, type Ask } from "./geocode.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-import-token", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
@@ -60,6 +61,11 @@ Deno.serve(async (req) => {
     ];
     await Promise.all(tries.map(async ([k, f]) => { const t1 = Date.now(); try { const r = await Promise.race([f(), new Promise<Response>((_, rej) => setTimeout(() => rej(new Error("no answer in 25 s")), 25000))]); out[k] = { status: r.status, ms: Date.now() - t1, type: r.headers.get("content-type"), cors: r.headers.get("access-control-allow-origin"), body: /image|octet|pbf/.test(r.headers.get("content-type") || "") ? `(${(await r.arrayBuffer()).byteLength} bytes)` : (await r.text()).slice(0, 160) }; } catch (e) { out[k] = { error: String((e as Error).message || e).slice(0, 160), ms: Date.now() - t1 }; } }));
     return json(out);
+  }
+  // by hand: where named places are (Photon; geocode.ts) — nothing written, the answers returned
+  if (Array.isArray((body as { geocode?: Ask[] }).geocode)) {
+    const asks = ((body as { geocode: Ask[] }).geocode).filter(a => a && typeof a.k === "string" && typeof a.q === "string" && a.q.trim());
+    return json(await geocodeAll(asks, Date.now() + 110000));
   }
   // by hand: what the map has under a name in an area ({area:"BY", find:"Стайк|Staik"}), or the given elements ({ids:["way/1"]})
   if (body.find || body.ids) {
