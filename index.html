@@ -1523,7 +1523,10 @@ html.native body.cockpit .ck-rb{background:rgba(14,18,30,.55);-webkit-backdrop-f
 .ai2-hist .wallet{border-top:1px solid var(--line);padding-top:14px}
 .site-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 18px;margin:28px 2px 6px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.site-foot nav{display:flex;flex-wrap:wrap;gap:6px 16px}.site-foot a{color:inherit;text-decoration:none}.site-foot a:hover{color:var(--fg);text-decoration:underline}
 .ai2-legend i.r{background:var(--accent);height:3px}.ai2-photohd{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}.ai2-photohd .btn.ghost{align-self:flex-start}
-.ai2-readrow{display:flex;gap:10px;align-items:flex-start}.ai2-readrow .tx{display:flex;flex-direction:column;gap:6px;min-width:0}.ai2-thumb{flex:none;border-radius:8px;border:1px solid var(--line);cursor:pointer;background:var(--surface-2)}
+.ai2-readrow{display:flex;gap:10px;align-items:flex-start}
+.ai2-kept{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;background:var(--accent-soft)}
+.ai2-kept .ok{font-size:14px;line-height:1.45;color:var(--fg)}
+.ai2-kept a.linkbtn{text-decoration:none}.ai2-readrow .tx{display:flex;flex-direction:column;gap:6px;min-width:0}.ai2-thumb{flex:none;border-radius:8px;border:1px solid var(--line);cursor:pointer;background:var(--surface-2)}
 .linkbtn{background:none;border:0;padding:4px 0;color:var(--accent);font:600 14px/1.3 inherit;cursor:pointer;text-align:left;align-self:flex-start}
 .ai2-tapsheet{position:fixed;inset:0;z-index:1200;background:rgba(10,14,25,.55);display:flex;align-items:flex-end;justify-content:center}
 .ai2-tapsheet .box{background:var(--surface);color:var(--fg);width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:var(--shadow)}
@@ -5645,6 +5648,8 @@ Object.assign(I18N.RU, {
   "Reading the picture…": "Читаю картинку…",
   "Could not read the corners of this picture.": "Не получилось прочитать повороты на этой картинке.",
   "Save to this layout": "Сохранить в конфигурацию",
+  "Saved to {layout} for everyone: its page shows this line until the first session is uploaded there.": "Сохранено в {layout} для всех: на странице конфигурации эта линия видна, пока туда не загрузят первую сессию.",
+  "Sign in and this line is kept on {layout} for everyone.": "Войдите, и эта линия сохранится в {layout} для всех.",
   "Saved — everyone sees this line now": "Сохранено — теперь эту линию видят все"
 });
 // v34.36 — a reverse layout: the layout it reverses, driven the other way
@@ -6332,6 +6337,8 @@ const STORE = (() => {
       deleteLayout: async (tid, id) => must(await sb.from('layouts').delete().eq('track_id', tid).eq('id', id)),
       async getMedia(path) { const rows = must(await sb.from('media').select('data').eq('path', path).limit(1)); return rows.length ? rows[0].data : null; },
       async setMedia(path, dataUrl) { if (dataUrl) must(await sb.from('media').upsert({ path, data: dataUrl, updated_at: new Date().toISOString() })); else must(await sb.from('media').delete().eq('path', path)); },
+      // a plan kept on a layout nobody has driven or drawn (any signed-in driver; the function checks it is empty): the layout's data as saved, or null
+      async layoutFromPlan(tid, lid, o) { return must(await sb.rpc('hutka_layout_from_plan', { p_tid: tid, p_lid: lid, p_trace: o.trace, p_direction: o.direction || null, p_length_m: o.lengthM ? Math.round(o.lengthM) : null, p_photo_line: o.photoLine || null, p_picture: o.picture || null })) || null; },
       async mySessions(id) { return must(await sb.from('sessions').select('id,meta').eq('owner', id)).map(r => Object.assign({ id: r.id }, r.meta)); },
       async sessionsFor(tid, lid) { let q = sb.from('sessions').select('id,meta').eq('track_id', tid).eq('published', true); if (lid) q = q.eq('layout_id', lid); return must(await q.limit(500)).map(r => Object.assign({ id: r.id }, r.meta)); },
       async myOnTrack(id, tid) { return must(await sb.from('sessions').select('id,meta').eq('owner', id).eq('track_id', tid)).map(r => Object.assign({ id: r.id }, r.meta)); },
@@ -6479,6 +6486,23 @@ const STORE = (() => {
     const id = l.id || ('l' + uid()); const body = Object.assign({}, l); delete body.id; body.updatedAt = Date.now(); if (!body.createdAt) body.createdAt = Date.now(); if (!body.createdBy && me.id && !getLayout(tid, id)) body.createdBy = me.id;
     if (adapter) await adapter.saveLayout(tid, id, body);
     const list = (layouts.get(tid) || []).filter(x => x.id !== id); list.push(Object.assign({ id }, body)); list.sort(sortLayouts); layouts.set(tid, list); notify('layouts'); return id;
+  }
+  // a plan read for a layout nobody has driven or drawn, kept on it for everyone: the drawing (o.trace), the way round, the size when known,
+  // the line the AI read, the picture under it. The venue's editors save it as any change; any other signed-in driver through the database
+  // function, which keeps it only on an empty layout (or one he filled himself). true when kept
+  async function planToLayout(tid, lid, o) {
+    const l = getLayout(tid, lid); if (!l || !adapter || !me.id) return false;
+    const path = `tracks/${tid}/layouts/${lid}/media/trace`, tr = getTrack(tid);
+    if (me.canEdit || (tr && tr.createdBy === me.id)) {
+      await saveLayout(tid, Object.assign({}, l, { trace: Object.assign({}, o.trace, { from: 'photo', by: me.id, at: new Date().toISOString() }), direction: o.direction }, o.lengthM && !l.lengthM ? { lengthM: Math.round(o.lengthM) } : {}, o.photoLine ? { photoLine: o.photoLine } : {}));
+      if (o.picture) { try { await setMedia(path, o.picture); } catch (e) { /* the line stands without the picture */ } }
+      return true;
+    }
+    if (!adapter.layoutFromPlan) return false;
+    const d = await adapter.layoutFromPlan(tid, lid, o); if (!d) return false;
+    const list = (layouts.get(tid) || []).filter(x => x.id !== lid); list.push(Object.assign({}, d, { id: lid })); list.sort(sortLayouts); layouts.set(tid, list);
+    if (o.picture) media.set(path, o.picture);
+    notify('layouts'); return true;
   }
   async function deleteLayout(tid, lid) { if (adapter) await adapter.deleteLayout(tid, lid); layouts.set(tid, (layouts.get(tid) || []).filter(x => x.id !== lid)); notify('layouts'); }
   async function getMedia(path) { if (media.has(path)) return media.get(path); let v = null; if (adapter) { try { v = await adapter.getMedia(path); } catch (e) { v = null; } } media.set(path, v); return v; }
@@ -6784,7 +6808,7 @@ const STORE = (() => {
     mySessions, mySessionsStrict, mySessionsKnown, hasData, ensureTracks, live, myOnTrack, sessionsFor, getSessionMeta, loadSession, saveSession, updateSession, deleteSession, outboxAdd, outboxAll, outboxDel, outboxPut, sessionMeta, channelsMeta, sessionLoaded: (sid) => { const c = sessCache.get(sid); return c && c.laps ? c : null; }, setCardAdmin, setShareAdmin, setPublishedAdmin, moderatedList, transferSession, setDriverName, trimSessions, get adminCards() { return adminCardsOk; }, get adminShare() { return adminShareOk; }, sharePage, uploadCard, removeCard, marks, markOf, setMark, removeMark, get marksOn() { return marksOk !== false && !!(adapter && adapter.marksOf && me.id); }, visit, adminVisits, track, adminAnalytics,
     profile, profileStrict, saveProfile, refreshProfile, localProfile, names, searchDrivers, claim, claims, deleteClaim, uid, sessionsByOwner, adminStats: async () => { if (!adapter || !adapter.adminStats) throw new Error('no db'); return adapter.adminStats(); },
     sessionSocial, toggleLike, vote, lowRated, addComment, deleteComment, followInfo, toggleFollow, followingIds, feed, recentPublished, allLayouts, layoutActivity, siteCounts, pushToken, pushForget, activity, activitySeen, kickNotify, socialCounts, previewOf, socialAvailable, communityAvailable, get socialOn() { return socialOn === true; },
-    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, identifyTrack, brainRows, brainSave, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); }, deviceLog: async (o) => { if (!adapter || !adapter.deviceLog) throw new Error('not configured'); if (!me.id) throw new Error('sign in'); return adapter.deviceLog(o); } };
+    get aiOn() { return !!aiCfg(); }, wallet, aiUsage, chats, chatMessages, deleteChat, renameChat, ask, identifyTrack, planToLayout, brainRows, brainSave, checkout, portal, report, profileSync, listReports, setReport, deleteReport, blocked, isBlocked, block, unblock, flag, myFlags, hasFlagged, adminFlags, flagDone, deleteAccount, isQuota, snapshots: async () => { if (!adapter || !adapter.snapshots) return []; return adapter.snapshots(); }, deviceLog: async (o) => { if (!adapter || !adapter.deviceLog) throw new Error('not configured'); if (!me.id) throw new Error('sign in'); return adapter.deviceLog(o); } };
 })();
 // ---------- track map view: image/grid background, track band, S/F, logged laps with action points and numbered corner badges, the
 // optional model line, and (for the admin editor) the traced control points. Pan, smooth zoom, rotation, hover and click. ----------
@@ -7732,7 +7756,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.53';
+const APP_VERSION = 'v34.54';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -13530,6 +13554,7 @@ function renderIdeal(body, sub, res) {
   sub.textContent = res.mode === 'real' ? trName + t('Real laps here: {n} · drivers: {d} · best {b}', { n: res.info.laps, d: res.info.drivers, b: fmtMs(res.info.best * 1000) }) : res.tid ? trName + t('Too few laps here yet: built from similar corners of other layouts ({n}) — a forecast, check it on track', { n: res.info.books }) : t('A forecast from similar corners of {n} layouts on Hutka — check it on track', { n: res.info.books });   // a track off the map or a photo: nobody drove it here
   if (res.G && res.G.reverseOf) body.appendChild(el('div', 'hint', t('Nobody has driven this layout on Hutka yet: it is {name} driven the other way — the line from there, the points from similar corners.', { name: res.G.reverseOf.name })));
   else if (res.G && res.G.photo) body.appendChild(el('div', 'hint', t('From the layout map · {m} m', { m: res.G.photo.lengthM })));   // a picture saved to the layout
+  else if (res.G && res.G.layout && res.G.layout.trace && res.G.layout.trace.from === 'photo' && /^trace/.test(res.G.source || '') && res.mode !== 'real') body.appendChild(el('div', 'hint', t('From the layout map · {m} m', { m: Math.round(res.L || res.G.layout.trace.lengthM || 0) })));   // a plan kept on the layout (v34.54) — nobody has driven it yet
   const cv = el('canvas', 'ai2-map'); body.appendChild(cv);
   const lg = el('div', 'ai2-legend'); lg.innerHTML = (res.G && res.G.band ? `<span><i class="r"></i>${esc(t('Racing line'))}</span>` : '') + `<span><i class="b"></i>${esc(t('Braking zone'))}</span><span><i class="l"></i>${esc(t('Lift zone'))}</span><span><i class="g"></i>${esc(t('back on the gas'))}</span><span><i class="f"></i>${esc(t('Flat-out corner'))}</span>`; body.appendChild(lg);
   const list = el('div', 'ai2-crn'); body.appendChild(list);
@@ -13599,6 +13624,21 @@ async function idealFromPlan(body, sub, res, ph) {
   // (a plan traced through its numbered corners goes round as it is driven: the way its points go)
   let dir0 = T.order ? (cwOf(lp.xy) ? 'cw' : 'ccw') : g.direction === 'cw' || g.direction === 'ccw' ? g.direction : (lay.direction === 'cw' || lay.direction === 'ccw' ? lay.direction : null);
   if (!dir0 && fit && Math.abs(fit.ref.same) > 0.5) { const along = (fit.ref.same > 0) !== /reverse|реверс|обратн/i.test(lay.name || res.name || ''); dir0 = (along ? cwOf(fit.xy) : !cwOf(fit.xy)) ? 'cw' : 'ccw'; }
+  // the plan kept on the layout while nobody has driven or drawn it (or it is this driver's own plan, read again or turned round): true
+  // kept, false not (not empty, or the save failed), null not tried (no layout, signed out)
+  const keepPlan = async (G, cw, how, fit) => {
+    if (!res.tid || !res.lid || !STORE.hasDb) return null; if (!STORE.hasIdentity) return null;
+    const l = STORE.getLayout(res.tid, res.lid); if (!l || (l.line && typeof l.line === 'object')) return false;
+    if (l.trace && l.trace.closed && !(l.trace.from === 'photo' && l.trace.by === STORE.me.id)) return false;
+    let n = 1; try { n = (await STORE.sessionsFor(res.tid, res.lid)).length; } catch (e) { n = 1; } if (n) return false;
+    const D = ADDTRK.drawing({ ph, G, cw }); if (!D) return false;
+    const pl = BRAINS.photoLineOf(G, how), known = how !== 'guess';
+    try {
+      const ok = await STORE.planToLayout(res.tid, res.lid, { trace: D.trace, direction: cw ? 'cw' : 'ccw', lengthM: known ? D.lengthM : 0, photoLine: pl ? Object.assign(pl, { dir: cw ? 'cw' : 'ccw' }, fit && fit.ref && fit.ref.lid ? { ref: fit.ref.lid } : {}) : null, picture: D.url });
+      if (ok) { GEOM.invalidate(); STORE.track('plan_kept', { tid: res.tid, lid: res.lid }); }
+      return !!ok;
+    } catch (e) { return false; }
+  };
   const draw = async (cw) => {
     body.innerHTML = ''; body.appendChild(el('div', 'hint', t('Reading the corners…')));
     const G = TRACKFIND.geometry(lp, cw, fit ? fit.ref.start : null);
@@ -13615,7 +13655,11 @@ async function idealFromPlan(body, sub, res, ph) {
     requestAnimationFrame(() => drawPick(thumb, ph, 72));
     const dirs = el('div', 'seg ai2-dir'), bCw = aiBtn(t('Clockwise'), '', () => draw(true)), bCcw = aiBtn(t('Anticlockwise'), '', () => draw(false)); bCw.classList.toggle('active', !!cw); bCcw.classList.toggle('active', !cw); dirs.append(bCw, bCcw); head.appendChild(dirs);
     if (!res.lid) { const ab = addBlock({ ph, G: r.G, cw: !!cw, fit, how, tid: res.tid || null, lay: res.lay || '', another: !!res.another }); if (ab) head.appendChild(ab); }
-    if (canSave) { const sv = aiBtn(t('Save to this layout'), 'ghost', async () => { sv.disabled = true; try { const l = STORE.getLayout(res.tid, res.lid); await STORE.saveLayout(res.tid, Object.assign({}, l, { photoLine: Object.assign(BRAINS.photoLineOf(r.G, how), { dir: cw ? 'cw' : 'ccw' }, fit ? { ref: fit.ref.lid } : {}) })); sv.textContent = t('Saved — everyone sees this line now'); } catch (e) { sv.disabled = false; toast(t('Could not save: {e}', { e: e && e.message || e })); } }); head.appendChild(sv); }
+    // a layout nobody has driven or drawn: the plan is kept on it at once, for everyone (its page shows it until the first session)
+    const kept = await keepPlan(r.G, cw, how, fit);
+    if (kept) { const k = el('div', 'ai2-kept'); k.appendChild(el('div', 'ok', t('Saved to {layout} for everyone: its page shows this line until the first session is uploaded there.', { layout: lay.name || res.name }))); const go = el('a', 'linkbtn', t('Open the track page')); go.href = `#track~${res.tid}~${res.lid}`; k.appendChild(go); head.appendChild(k); }
+    else if (kept === null && res.lid && !STORE.hasIdentity && STORE.hasAuth) head.appendChild(el('div', 'hint', t('Sign in and this line is kept on {layout} for everyone.', { layout: lay.name || res.name })));
+    if (canSave && !kept) { const sv = aiBtn(t('Save to this layout'), 'ghost', async () => { sv.disabled = true; try { const l = STORE.getLayout(res.tid, res.lid); await STORE.saveLayout(res.tid, Object.assign({}, l, { photoLine: Object.assign(BRAINS.photoLineOf(r.G, how), { dir: cw ? 'cw' : 'ccw' }, fit ? { ref: fit.ref.lid } : {}) })); sv.textContent = t('Saved — everyone sees this line now'); } catch (e) { sv.disabled = false; toast(t('Could not save: {e}', { e: e && e.message || e })); } }); head.appendChild(sv); }
     body.insertBefore(head, body.firstChild);
   };
   await draw(dir0 !== 'ccw');
@@ -13706,12 +13750,12 @@ const ADDTRK = (() => {
   const close = () => { $('addTrk').hidden = true; };
   // the picture's line in its own pixels — the drawing the track's page shows the picture under — the way round and the start/finish as
   // read; the picture itself, at most 1200 px (a JPEG on white: a screenshot's transparency)
-  function drawing() {
-    const ph = o.ph, img = ph && ph.img, T = ph && ph._T, G = o.G, tr = G && (G.band ? G.band.track : G.track);
+  function drawing(oo) {
+    oo = oo || o; const ph = oo.ph, img = ph && ph.img, T = ph && ph._T, G = oo.G, tr = G && (G.band ? G.band.track : G.track);
     if (!img || !T || !T.px || T.px.length < 8 || !tr) return null;
     const W = img.naturalWidth || img.width, H = img.naturalHeight || img.height, k = Math.min(1, 1200 / Math.max(W, H)), w = Math.max(1, Math.round(W * k)), h = Math.max(1, Math.round(H * k));
     let pts = T.px.map(p => ({ x: p.x * k, y: p.y * k }));
-    if (TRACKFIND.clockwise({ pts: pts.map(p => ({ lat: -p.y, lon: p.x })) }) !== !!o.cw) pts.reverse();   // as TRACKFIND.geometry turned it
+    if (TRACKFIND.clockwise({ pts: pts.map(p => ({ lat: -p.y, lon: p.x })) }) !== !!oo.cw) pts.reverse();   // as TRACKFIND.geometry turned it
     const step = Math.ceil(pts.length / 400); if (step > 1) pts = pts.filter((_, i) => i % step === 0);
     const c = document.createElement('canvas'); c.width = w; c.height = h; const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
     let url = c.toDataURL('image/jpeg', 0.8); if (url.length > 900000) url = c.toDataURL('image/jpeg', 0.6);
@@ -13778,7 +13822,7 @@ const ADDTRK = (() => {
   $('addTrkWhich').onchange = () => { $('addTrkLayF').hidden = !!$('addTrkWhich').value; };   // the venue's own layout: its name stays
   for (const id of ['addTrkName', 'addTrkPlace']) $(id).addEventListener('input', () => { if (st.near) { st.near = null; $('addTrkNear').hidden = true; $('addTrkGo').textContent = t('Add the track'); $('addTrkGo').classList.add('primary'); } });   // another name or place: asked again
   for (const id of ['addTrkName', 'addTrkLay', 'addTrkPlace']) $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); save(); } });
-  return { open, close };
+  return { open, close, drawing };
 })();
 
 // ---- 2. the last session: where the time goes, then the AI on it
