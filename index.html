@@ -6141,6 +6141,33 @@ const GEO = (() => {
 // One STORE API over three backends: the claude.ai artifact runtime (db + user capabilities), a Supabase project (standalone
 // hosting: window.HUTKA_CONFIG with supabaseUrl/supabaseAnonKey), or nothing (guest: sessions stay in this browser's IndexedDB).
 // Session data is packed, deflated and base64'd; the artifact backend splits it into ≤180k-character chunk documents.
+// ---------- the connection: is there any? ----------
+// v34.56: the browser's "offline" is not the last word. An iPhone's web view (the app, Safari, a home-screen app) can say offline while the
+// network works — after a switch between Wi-Fi and mobile data, with a VPN — and the app then said "No internet" and sent nothing while
+// every other site loaded (Uladzislau, 22 Oct). So while the browser says offline, one small request to this site checks it (at once,
+// then every 15 s and whenever the app comes to the front): one that gets through means online, whatever the browser says. NET.off():
+// offline by the browser and nothing got through since; the 'hutka-net' event when that changes
+const NET = (() => {
+  let ok = false, busy = false, timer = 0;
+  const said = () => navigator.onLine === false;
+  const set = (v) => { if (v === ok) return; ok = v; try { dispatchEvent(new Event('hutka-net')); } catch (e) {} };
+  async function probe() {
+    if (busy || !said()) return; busy = true;
+    const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 5000); let got = false;
+    try { const r = await fetch('version.txt?net=' + Date.now(), { cache: 'no-store', signal: ctl.signal }); got = !!(r && (r.ok || r.status === 404)); } catch (e) { got = false; } finally { clearTimeout(tm); busy = false; }
+    if (said()) set(got);
+  }
+  const watch = () => { clearInterval(timer); timer = 0; if (said()) { probe(); timer = setInterval(probe, 15000); } else set(false); };
+  try { addEventListener('offline', () => { ok = false; watch(); }); addEventListener('online', watch); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && said()) probe(); }); } catch (e) {}
+  watch();
+  return {
+    off: () => said() && !ok,
+    // what the app's own requests learn: one got through (online after all), or failed for want of a network (offline indeed)
+    reached() { if (said()) set(true); },
+    failed() { if (said()) set(false); },
+    probe,
+  };
+})();
 const STORE = (() => {
   let adapter = null, mode = 'local', ready = null;
   const me = { id: null, name: '', avatarUrl: '', color: '', canEdit: false, isOwner: false, canWrite: null, email: '' };
@@ -6282,13 +6309,13 @@ const STORE = (() => {
     // the client: no blind retries of failed reads (supabase-js would wait 1 + 2 + 4 s on each — the app keeps and retries what failed
     // itself), a time limit on every request (a hung connection is a failed one), and with no connection at all no request leaves: the
     // database calls answer "Failed to fetch" at once, so an app opened at the track with no signal starts in a moment, not a minute
-    const offline = () => navigator.onLine === false;
+    const offline = () => NET.off();
     const timedFetch = (url, opts) => {
       if (offline()) return Promise.reject(new TypeError('Failed to fetch (offline)'));
       const o = Object.assign({}, opts || {}), ctl = new AbortController(), ms = !o.method || o.method === 'GET' || o.method === 'HEAD' ? 20000 : 90000;
       if (o.signal) { if (o.signal.aborted) ctl.abort(); else o.signal.addEventListener('abort', () => ctl.abort(), { once: true }); }
       const timer = setTimeout(() => ctl.abort(), ms); o.signal = ctl.signal;
-      return fetch(url, o).catch((e) => { throw ctl.signal.aborted && !(opts && opts.signal && opts.signal.aborted) ? new TypeError('Failed to fetch (timed out)') : e; }).finally(() => clearTimeout(timer));
+      return fetch(url, o).then((r) => { NET.reached(); return r; }, (e) => { const mine = ctl.signal.aborted && !(opts && opts.signal && opts.signal.aborted); if (!(opts && opts.signal && opts.signal.aborted)) NET.failed(); throw mine ? new TypeError('Failed to fetch (timed out)') : e; }).finally(() => clearTimeout(timer));
     };
     const sb0 = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, { db: { retry: false }, global: { fetch: timedFetch } });
     // database calls with no connection: an answer at once ("Failed to fetch"), without waiting for the sign-in to refresh a token it cannot
@@ -6316,7 +6343,7 @@ const STORE = (() => {
         // no connection and the access token has run out: supabase-js cannot refresh it, so getSession() gives nothing — yet the session is
         // still on this device and refreshes by itself once the connection is back. Meanwhile the driver stays signed in: the app opened at
         // the track with no signal reads the lap timer and keeps the sessions for later instead of asking to sign in.
-        if (!session && (navigator.onLine === false || (s.error && /fetch|network|retryable|timed? ?out/i.test((s.error.name || '') + ' ' + (s.error.message || ''))))) {
+        if (!session && (NET.off() || (s.error && /fetch|network|retryable|timed? ?out/i.test((s.error.name || '') + ' ' + (s.error.message || ''))))) {
           try { const v = JSON.parse(localStorage.getItem(sb.auth.storageKey || authKey) || 'null'); if (v && v.user && v.user.id && v.refresh_token) { session = v; kept = true; } } catch (e) {}
         }
         sb.auth.onAuthStateChange((ev, s2) => {
@@ -7763,16 +7790,16 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.55';
+const APP_VERSION = 'v34.56';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
-  const off = navigator.onLine === false, b = $('offBar'); if (b) b.hidden = !off;
+  const off = NET.off(), b = $('offBar'); if (b) b.hidden = !off;
   // back online: once the driver's token is live again (a session kept with no connection refreshes by itself), the lists of the page in view load
-  if (wasOffline && !off) (async () => { if (STORE.hasIdentity) for (let i = 0; i < 35 && !(await STORE.live()); i++) await new Promise(r => setTimeout(r, 2000));   /* a guest has no token to wait for */ if (navigator.onLine === false) return; try { await STORE.ensureTracks(); } catch (e) {} try { if (APP.route === 'home') await renderHomePage(); else if (APP.route === 'lab' && !LAB.current) await renderLabStart(); } catch (e) {} })();
+  if (wasOffline && !off) (async () => { if (STORE.hasIdentity) for (let i = 0; i < 35 && !(await STORE.live()); i++) await new Promise(r => setTimeout(r, 2000));   /* a guest has no token to wait for */ if (NET.off()) return; try { await STORE.ensureTracks(); } catch (e) {} try { if (APP.route === 'home') await renderHomePage(); else if (APP.route === 'lab' && !LAB.current) await renderLabStart(); } catch (e) {} })();
   wasOffline = off;
 }
-addEventListener('online', () => syncOffline()); addEventListener('offline', () => syncOffline()); syncOffline();
+addEventListener('online', () => syncOffline()); addEventListener('offline', () => syncOffline()); addEventListener('hutka-net', () => syncOffline()); syncOffline();
 // a heartbeat once a minute while the tab is visible and was touched in the last five minutes: visit length for the analytics
 (() => { let lastTouch = Date.now(); const touch = () => { lastTouch = Date.now(); }; for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, touch, { passive: true }); addEventListener('scroll', touch, { passive: true });
   setInterval(() => { if (document.visibilityState !== 'visible' || Date.now() - lastTouch > 5 * 60000) return; if (typeof STORE !== 'undefined' && STORE.track) STORE.track('hb', { route: APP.route || '' }); }, 60000); })();
@@ -10741,7 +10768,7 @@ const UPLOAD = (() => {
 // fingerprints keep a half-done batch from being saved twice.
 const OUTBOX = (() => {
   let busy = false, timer = null, count = 0, fails = 0, lastErr = null, nextAt = 0;
-  const offline = (e) => (navigator.onLine === false) || !!(e && e.offline) || /failed to fetch|networkerror|network request failed|load failed|internet connection|err_internet|err_network|timed? ?out|offline|abort/i.test(String((e && (e.message || e)) || ''));
+  const offline = (e) => (NET.off()) || !!(e && e.offline) || /failed to fetch|networkerror|network request failed|load failed|internet connection|err_internet|err_network|timed? ?out|offline|abort/i.test(String((e && (e.message || e)) || ''));
   async function keep(parsed, refusal) {
     if (refusal) { fails = Math.max(fails, 1); lastErr = refusal; }
     // the browser may clear a site's storage when the phone runs low on space: ask it to keep Hutka's (the only copy until the upload)
@@ -10774,7 +10801,7 @@ const OUTBOX = (() => {
     let list = [], up = 0, offl = false, err = null, ran = false;
     try {
       list = await items(); count = list.length; if (!count) { banner(list); return; }
-      if (navigator.onLine === false && !manual) { arm(); return; }
+      if (NET.off() && !manual) { arm(); return; }
       // a session kept on this device with no connection: the token refreshes by itself once the connection is back ('auth' below); until
       // then a request would go out without the driver — wait for it rather than be refused
       if (!(await STORE.live())) { if (manual) toast(t('Still no connection — the sessions stay on this device and upload by themselves later.'), 4000); arm(); return; }
@@ -12421,7 +12448,7 @@ const TRACKFIND = (() => {
   // one) and, when none of them has a line, the raceways on the map around the place (6 km: a catalogue point is often the venue's gate,
   // not the track)
   async function find(q) {
-    if (navigator.onLine === false) return { error: 'offline' };
+    if (NET.off()) return { error: 'offline' };
     let at = coords(q), place = null;
     // Hutka's own tracks by the whole of what was typed, else by its shorter forms ("Dubai Kartdrome, Dubai, United Arab Emirates" → Dubai
     // Kartdrome): a venue on Hutka is found without the map
@@ -12891,7 +12918,7 @@ async function renderHomePage(mode) {
   // site-wide totals from hutka_counts; without the function (older database) — what the feed slice shows
   { const st = $('homeStats'); st.innerHTML = ''; const drivers = C ? C.drivers : new Set(pubs.map(s => s.owner)).size, laps = C ? C.laps : pubs.reduce((a, s) => a + (s.nLaps || 0), 0), nSess = C ? C.sessions : pubs.length; for (const [k, v] of [[t('Tracks'), C ? C.tracks : STORE.getTracks().length], [t('Sessions'), nSess], [t('Drivers'), drivers], [t('Laps'), laps]]) { const d = el('div', 'tile'); d.innerHTML = `<div class="v">${v}</div><div class="k">${esc(k)}</div>`; st.appendChild(d); } }
   feed.innerHTML = ''; $('feedSub').textContent = pubs.length ? t('{n} published', { n: C && C.published ? C.published : pubs.length }) : '';
-  if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); const off = navigator.onLine === false; e.appendChild(el('div', 't', off ? t('No connection') : (STORE.hasDb ? t('No sessions published yet') : t('Sign in to see the feed')))); e.appendChild(el('div', '', off ? t('The latest sessions show when the connection is back.') : (STORE.hasDb ? t('Be the first: upload your session and publish it on the track page.') : t('The shared library needs a connection. Browse tracks meanwhile.')))); feed.appendChild(e); }
+  if (!pubs.length) { const e = el('div', 'empty'); e.appendChild(svgUse('i-timer')); const off = NET.off(); e.appendChild(el('div', 't', off ? t('No connection') : (STORE.hasDb ? t('No sessions published yet') : t('Sign in to see the feed')))); e.appendChild(el('div', '', off ? t('The latest sessions show when the connection is back.') : (STORE.hasDb ? t('Be the first: upload your session and publish it on the track page.') : t('The shared library needs a connection. Browse tracks meanwhile.')))); feed.appendChild(e); }
   // sessions several drivers marked as not helpful sink to the bottom of the feed
   const order = pubs.slice().sort((a, b) => (STORE.lowRated(counts[a.id]) - STORE.lowRated(counts[b.id])) || (b.createdAt || 0) - (a.createdAt || 0));
   // several uploads in a row by one driver fold into a single post: the fastest session with its card, the others as a short list (no flood)
@@ -12903,14 +12930,14 @@ async function renderHomePage(mode) {
   // where people drive: layouts by number of sessions in the last 60 days
   { const box = $('homeActive'); box.innerHTML = ''; const by = new Map(); const cut = Date.now() - 60 * 86400000; for (const s of pubs) { if (!s.track) continue; const k = s.track + '~' + (s.layout || 'custom'); const o = by.get(k) || { track: s.track, layout: s.layout, n: 0, recent: 0, best: Infinity }; o.n++; if ((s.createdAt || 0) > cut) o.recent++; o.best = Math.min(o.best, s.bestMs || Infinity); by.set(k, o); }
     const rows = [...by.values()].sort((a, b) => b.recent - a.recent || b.n - a.n).slice(0, 6);
-    if (!rows.length) box.appendChild(el('div', 'hint', navigator.onLine === false ? t('No connection — this fills in when it is back.') : t('Nothing yet — the first published session opens the board.')));
+    if (!rows.length) box.appendChild(el('div', 'hint', NET.off() ? t('No connection — this fills in when it is back.') : t('Nothing yet — the first published session opens the board.')));
     for (const r of rows) { const tr = STORE.getTrack(r.track); const ls = await STORE.getLayouts(r.track); const l = ls.find(x => x.id === r.layout); const a = el('a', 'item'); a.href = r.layout && r.layout !== 'custom' ? `#track~${r.track}~${r.layout}` : `#track~${r.track}`; a.append(el('span', 'name', `${tr ? tr.name : r.track}${l ? ' · ' + l.name : ''}`), el('span', 'meta', `${tn(r.n, '{n} session', '{n} sessions').replace('{n}', r.n)} · ${t('best')} ${fmtMs(r.best)}`)); box.appendChild(a); }
   }
   // active drivers: who published in the last 30 days, how much, and where they drove last (tracks differ, so no cross-track times)
   { const box = $('homeTop'); box.innerHTML = ''; const cut = Date.now() - 30 * 86400000; const by = new Map();
     for (const s of pubs) { if ((s.createdAt || 0) < cut) continue; const o = by.get(s.owner) || { owner: s.owner, n: 0, laps: 0, last: null, tracks: new Set() }; o.n++; o.laps += s.nLaps || 0; if (s.track) o.tracks.add(s.track); if (!o.last || (s.createdAt || 0) > (o.last.createdAt || 0)) o.last = s; by.set(s.owner, o); }
     const rows = [...by.values()].sort((a, b) => b.n - a.n || (b.last.createdAt || 0) - (a.last.createdAt || 0)).slice(0, 8);
-    if (!rows.length) box.appendChild(el('div', 'hint', navigator.onLine === false ? t('No connection — this fills in when it is back.') : t('Nobody published a session in the last 30 days yet.')));
+    if (!rows.length) box.appendChild(el('div', 'hint', NET.off() ? t('No connection — this fills in when it is back.') : t('Nobody published a session in the last 30 days yet.')));
     rows.forEach((o, i) => { const s = o.last, tr = STORE.getTrack(s.track); const d = el('div', 'rank'); const im = new Image(); im.src = (names[o.owner] && names[o.owner].avatar) || GENERIC_AVATAR; im.alt = ''; const w = el('div', 'w'); w.innerHTML = `<a href="#driver~${esc(o.owner)}">${esc((names[o.owner] || {}).name || t('Driver'))}</a>${names[o.owner] && names[o.owner].country ? ' ' + flag(names[o.owner].country) : ''}<span>${esc(tn(o.n, '{n} session', '{n} sessions').replace('{n}', o.n))} · ${esc(tn(o.laps, '{n} lap', '{n} laps').replace('{n}', o.laps))}${o.tracks.size > 1 ? ' · ' + esc(tn(o.tracks.size, '{n} track', '{n} tracks').replace('{n}', o.tracks.size)) : ''} · ${esc(tr ? tr.name : (s.trackName || t('Custom')))}</span>`; const tm = el('a', 'tm', fmtDate(s.date)); tm.href = '#lab~' + s.id; tm.style.cssText = 'font-size:12px;color:var(--muted);text-decoration:none'; d.append(el('span', 'n', String(i + 1)), im, w, tm); box.appendChild(d); });
   }
   // the drivers I follow
@@ -14206,7 +14233,7 @@ $('profEditSheet').addEventListener('click', (e) => { if (e.target === $('profEd
 async function renderMySessionsTable(box, opts) {
   opts = opts || {}; const list = await STORE.mySessions(); box.innerHTML = '';
   if (opts.sub) opts.sub.textContent = list.length ? String(list.length) : '';
-  if (opts.hint) opts.hint.textContent = list.length ? (opts.compact ? t('Tap a session to analyse it; ⋯ edits, publishes or deletes it.') : t('Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.')) : (navigator.onLine === false ? t('No connection — your sessions show when it is back.') : t('No sessions yet. Upload a session to start.'));
+  if (opts.hint) opts.hint.textContent = list.length ? (opts.compact ? t('Tap a session to analyse it; ⋯ edits, publishes or deletes it.') : t('Published sessions appear on the track page and can be compared by other drivers. Private ones are only yours.')) : (NET.off() ? t('No connection — your sessions show when it is back.') : t('No sessions yet. Upload a session to start.'));
   if (!list.length) return;
   const wrap = el('div', 'ms-list'), again = () => renderMySessionsTable(box, opts);
   for (const m of list) {
