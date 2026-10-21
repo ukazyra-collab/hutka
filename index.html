@@ -6748,9 +6748,10 @@ const STORE = (() => {
   async function brainSave(row) { if (!adapter || !adapter.sb || !me.canEdit) return false; try { const r = await adapter.sb.from('brain_atlas').upsert(row); return !r.error; } catch (e) { return false; } }
   // a photo of a track map → which track it is ({ name, city, country, sure }): the ask function's vision lane — not kept as a chat message
   // which track a photo shows — for a signed-out visitor too (the function counts those by network address)
-  async function identifyTrack(b64, mime) {
+  // (w, h: the picture's size, for corner places the AI gives in pixels)
+  async function identifyTrack(b64, mime, w, h) {
     const c = aiCfg(); if (!c) { const e = new Error('ai off'); e.code = 'not_configured'; throw e; }
-    const r = await fetch(c.base + '/ask', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': c.key, 'Authorization': 'Bearer ' + ((adapter && adapter.token && adapter.token()) || c.key) }, body: JSON.stringify({ purpose: 'identify_track', image: b64, media_type: mime || 'image/jpeg', lang: I18N.lang }) });
+    const r = await fetch(c.base + '/ask', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': c.key, 'Authorization': 'Bearer ' + ((adapter && adapter.token && adapter.token()) || c.key) }, body: JSON.stringify({ purpose: 'identify_track', image: b64, media_type: mime || 'image/jpeg', lang: I18N.lang, w: w || 0, h: h || 0 }) });
     if (!r.ok) throw await errOf(r); const j = await r.json(); return j && j.track ? j.track : null;
   }
   // admin: what the coach costs — per day and per driver (the SQL functions return nothing for non-admins)
@@ -7731,7 +7732,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.52';
+const APP_VERSION = 'v34.53';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -12148,7 +12149,120 @@ const AT = (() => {
     if (top) return top;
     return all.find(r => r.pts) || { error: (all.find(r => r.error && r.error !== 'no band') || {}).error || 'Не нашёл кольцо трассы: нет замкнутого полотна с внутренней областью.' };
   }
-  return { run, candidates, best, at, trackness };
+  // a venue's plan that draws every road of the venue alike and shows the layout only by its corner numbers (T1…T22) and arrows — the
+  // Dubai Kartdrome endurance maps: the whole complex in grey, the bridge, the pit lane. The corners, read off the picture by the AI in
+  // driving order (x, y as shares of the picture), each put onto the nearest road; the layout is the shortest way along the roads from
+  // each corner to the next, and from the last back to the first. { pts (driving order), widthPx, lengthPx, mode: 'turns', placed } or
+  // { error }
+  function route(src, w0, h0, turns) {
+    const T = (turns || []).filter(t => t && isFinite(t.x) && isFinite(t.y) && t.x >= 0 && t.x <= 1 && t.y >= 0 && t.y <= 1);
+    if (T.length < 4) return { error: 'few turns' };
+    const img = prepare(src, w0, h0, 800), { data, w, h, k } = img, N = w * h;
+    // the roads: the picture's greys that are not its paper — every layout's band, light or dark, its shine and its shadow
+    const bg = borderColor(img); let m = new Uint8Array(N);
+    for (let i = 0, p = 0; i < N; i++, p += 4) {
+      if (data[p + 3] < 128) continue; const r = data[p], g = data[p + 1], b = data[p + 2];
+      const sat = Math.max(r, g, b) - Math.min(r, g, b), L = 0.299 * r + 0.587 * g + 0.114 * b;
+      if (sat > 34 || L < 55 || L > 214 || Math.hypot(r - bg[0], g - bg[1], b - bg[2]) < 18) continue;
+      m[i] = 1;
+    }
+    // the arrows and the numbers painted on the band are holes in it: small holes filled (two legs of a hairpin stay apart)
+    { const cc = components(m, w, h, 0), small = 0.004 * N; for (let i = 0; i < N; i++) if (!m[i] && !cc.border[cc.label[i]] && cc.sizes[cc.label[i]] < small) m[i] = 1; }
+    m = dropSpecks(m, w, h, Math.max(40, 0.002 * N));
+    const dist = distTransform(m, w, h), s = prune(thin(m, w, h), w, h), offs = N8(w);
+    // only the venue's one road network: the biggest piece of the skeleton (a stray ring of a label or the pit lane's own loop out)
+    { const lab = new Int32Array(N).fill(-1), size = []; const st = [];
+      for (let i = 0; i < N; i++) { if (!s[i] || lab[i] >= 0) continue; const id = size.length; let n = 0; st.push(i); lab[i] = id;
+        while (st.length) { const c = st.pop(); n++; for (const o of offs) { const j = c + o; if (j >= 0 && j < N && s[j] && lab[j] < 0) { lab[j] = id; st.push(j); } } }
+        size.push(n); }
+      if (!size.length) return { error: 'no roads' }; let big = 0; for (let q = 1; q < size.length; q++) if (size[q] > size[big]) big = q;
+      for (let i = 0; i < N; i++) if (s[i] && lab[i] !== big) s[i] = 0; }
+    const sk = []; for (let i = 0; i < N; i++) if (s[i]) sk.push(i);
+    if (sk.length < 50) return { error: 'no roads' };
+    const bandW = (() => { const v = sk.map(i => 2 * dist[i]).sort((x, y) => x - y); return v[v.length >> 1] || 6; })();
+    // each corner's candidates: the nearest points of the roads around it (a number sits between two roads as often as not), up to four
+    const tol = 0.09 * Math.max(w, h), cands = [];
+    for (const t of T) {
+      const x = t.x * w, y = t.y * h, near = [];
+      for (const i of sk) { const d = Math.hypot(i % w - x, (i / w | 0) - y); if (d <= tol) near.push([d, i]); }
+      near.sort((p, q) => p[0] - q[0]); const pick = [];
+      for (const [d, i] of near) { if (pick.length >= 4) break; if (pick.every(([, j]) => Math.hypot(i % w - j % w, (i / w | 0) - (j / w | 0)) > 1.5 * bandW)) pick.push([d, i]); }
+      if (pick.length) cands.push(pick);
+    }
+    if (cands.length < Math.max(4, 0.75 * T.length)) return { error: 'corners off the roads' };
+    // the way along the roads (8 neighbours): from one point to every point, and back along the way found
+    const dd = new Float64Array(N), from = new Int32Array(N);
+    const sweep = (a, stopAt) => {
+      dd.fill(Infinity); from.fill(-1); dd[a] = 0; const heap = [[0, a]], done = new Uint8Array(N); let left = stopAt ? stopAt.size : -1;
+      const push = (d, i) => { heap.push([d, i]); let c = heap.length - 1; while (c > 0) { const q = (c - 1) >> 1; if (heap[q][0] <= heap[c][0]) break; [heap[q], heap[c]] = [heap[c], heap[q]]; c = q; } };
+      const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let c = 0; for (;;) { const l = 2 * c + 1, r = l + 1; let m2 = c; if (l < heap.length && heap[l][0] < heap[m2][0]) m2 = l; if (r < heap.length && heap[r][0] < heap[m2][0]) m2 = r; if (m2 === c) break; [heap[m2], heap[c]] = [heap[c], heap[m2]]; c = m2; } } return top; };
+      while (heap.length) {
+        const [d, i] = pop(); if (done[i]) continue; done[i] = 1; if (stopAt && stopAt.has(i) && --left <= 0) break;
+        for (const o of offs) { const j = i + o; if (j < 0 || j >= N || !s[j] || done[j]) continue; const step = (o === 1 || o === -1 || o === w || o === -w) ? 1 : Math.SQRT2; if (d + step < dd[j]) { dd[j] = d + step; from[j] = i; push(d + step, j); } }
+      }
+    };
+    // the lengths along the roads between every two candidates (one sweep from each)
+    const uniq = [...new Set(cands.flat().map(c => c[1]))], idx = new Map(uniq.map((i, q) => [i, q])), all = new Set(uniq);
+    const M = uniq.map(a => { sweep(a, all); return uniq.map(b => dd[b]); }), L = (a, b) => M[idx.get(a)][idx.get(b)];
+    // the candidates that make the shortest lap, each a little dearer the farther it is from its number (the lap is a ring: the first
+    // corner's candidate is tried in turn)
+    const pen = (d) => 2 * d;
+    const solve = (cs) => {
+      const K = cs.length; if (K < 4) return null; let bestCost = Infinity, bestSeq = null;
+      for (let c0 = 0; c0 < cs[0].length; c0++) {
+        let cost = cs[0].map((_, c) => c === c0 ? pen(cs[0][c][0]) : Infinity); const back = [];
+        for (let t = 1; t < K; t++) {
+          const nc = cs[t].map(() => Infinity), bk = cs[t].map(() => -1);
+          for (let p = 0; p < cs[t - 1].length; p++) { if (!isFinite(cost[p])) continue; for (let c = 0; c < cs[t].length; c++) { const v = cost[p] + L(cs[t - 1][p][1], cs[t][c][1]) + pen(cs[t][c][0]); if (v < nc[c]) { nc[c] = v; bk[c] = p; } } }
+          cost = nc; back.push(bk);
+        }
+        for (let c = 0; c < cs[K - 1].length; c++) { const v = cost[c] + L(cs[K - 1][c][1], cs[0][c0][1]); if (v < bestCost) { bestCost = v; const seq = [c]; for (let t = K - 1; t >= 1; t--) seq.unshift(back[t - 1][seq[0]]); bestSeq = seq; } }
+      }
+      return bestSeq && isFinite(bestCost) ? bestSeq.map((c, t) => cs[t][c]) : null;
+    };
+    const walk = (at) => {
+      const path = [];
+      for (let t = 0; t < at.length; t++) {
+        const a = at[t], b = at[(t + 1) % at.length]; if (a === b) continue;
+        sweep(a, new Set([b])); if (!isFinite(dd[b])) return null;
+        const p = []; for (let i = b; i !== -1; i = from[i]) p.push(i); p.reverse();
+        for (let q = path.length ? 1 : 0; q < p.length; q++) path.push(p[q]);
+      }
+      return path;
+    };
+    // the dead ends cut off: a corner snapped to a road beside the right one sends the way out along it and back the same way — dropped
+    // (twice, the second time from the middle of the lap, for a dead end across the lap's first point)
+    const near8 = (a, b) => Math.abs(a % w - b % w) <= 1 && Math.abs((a / w | 0) - (b / w | 0)) <= 1;
+    const unspur = (q) => { const st = []; for (const i of q) { while (st.length >= 2 && near8(i, st[st.length - 2])) st.pop(); if (st[st.length - 1] !== i) st.push(i); } return st; };
+    const dupOf = (q) => 1 - new Set(q).size / q.length;
+    const lenOf = (q) => { let l = 0; for (let i = 0; i < q.length; i++) { const a = q[i], b = q[(i + 1) % q.length]; l += Math.hypot(a % w - b % w, (a / w | 0) - (b / w | 0)); } return l; };
+    // a lap along the roads through the corners is never much shorter than the straight lines from number to number: shorter, it skipped
+    // a part of the lap (a corner's number snapped onto a road of another part)
+    let chord = 0; for (let q = 0; q < T.length; q++) { const a = T[q], b = T[(q + 1) % T.length]; chord += Math.hypot((b.x - a.x) * w, (b.y - a.y) * h); }
+    // a corner left at the tip of a dead end was snapped to the wrong road: that candidate out, and the lap found again (a few times)
+    let cs = cands.map(c => c.slice()), path = null, dup0 = 0;
+    for (let it = 0; it < 5; it++) {
+      const live = cs.filter(c => c.length), pick = solve(live); if (!pick) break;
+      const raw = walk(pick.map(c => c[1])); if (!raw) break;
+      let q = unspur(raw); q = unspur(q.slice(q.length >> 1).concat(q.slice(0, q.length >> 1)));
+      const keep = new Set(q), lost = [];
+      live.forEach((c, t) => { const i = pick[t][1]; let on = keep.has(i); for (const o of offs) if (!on && keep.has(i + o)) on = true; if (!on) lost.push([c, pick[t]]); });
+      const ok = lenOf(q) >= 0.85 * chord;
+      if (ok && (!lost.length || dupOf(raw) < 0.06)) { path = q; dup0 = dupOf(raw); break; }
+      if (!lost.length) break;
+      for (const [c, chosen] of lost) c.splice(c.indexOf(chosen), 1);
+    }
+    if (!path) return { error: 'corners not joined' };
+    if (path.length < 60) return { error: 'too short' };
+    if (path[path.length - 1] === path[0]) path.pop();
+    let pts = path.map(i => [i % w + 0.5, (i / w | 0) + 0.5]); pts = smoothLoop(pts, 3);
+    const ws = path.map(i => 2 * dist[i]).sort((a, b) => a - b), halfW = ws[ws.length >> 1] / 2;
+    let len = 0; for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length]; len += Math.hypot(b[0] - a[0], b[1] - a[1]); }
+    // how much of the way still runs twice over the same road: a lap only meets itself at a crossing
+    const dup = dupOf(path);
+    return { pts: pts.map(q => ({ x: q[0] / k, y: q[1] / k })), widthPx: 2 * halfW / k, lengthPx: len / k, mode: 'turns', placed: cands.length / T.length, dup, dup0 };
+  }
+  return { run, candidates, best, at, trackness, route };
 })();
 
 // Alfano 7 import: .alf2 is a zip of per-lap CSVs (10 Hz: GPS speed, lat/lon, heading, accelerometer) plus a session summary.
@@ -12302,7 +12416,7 @@ const TRACKFIND = (() => {
   const loadImg = (file) => new Promise((res, rej) => { const img = new Image(), u = URL.createObjectURL(file); img.onload = () => { URL.revokeObjectURL(u); res(img); }; img.onerror = () => { URL.revokeObjectURL(u); rej(new Error('image')); }; img.src = u; });
   async function fromPhoto(file) {
     const img = await loadImg(file), s = Math.min(1, 1400 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-    let g = null; try { g = await STORE.identifyTrack(c.toDataURL('image/jpeg', 0.85).split(',')[1], 'image/jpeg'); } catch (e) { g = null; }
+    let g = null; try { g = await STORE.identifyTrack(c.toDataURL('image/jpeg', 0.85).split(',')[1], 'image/jpeg', c.width, c.height); } catch (e) { g = null; }
     return { query: g && g.name ? [g.name, g.city, g.country].filter(Boolean).join(', ') : '', guess: g || {}, img };
   }
   // the picture traced (AT.best): the band of the track — a band on a plain background, or a venue's plan with the layout in its own colour
@@ -12310,9 +12424,18 @@ const TRACKFIND = (() => {
   // length the picture or the AI gives; else a guess between the band's width (a kart track is about 8 m wide, but a drawing paints it one
   // and a half to two times as wide) and a usual kart track's kilometre; else 1 km. { lp, lengthM, how, px, widthPx } or null — px: the
   // traced points in the picture's pixels, for laying the picture onto a venue's driven layouts (venueFit), which gives the real metres
+  // A plan that numbers its corners (the AI reads where: hint.turns, in order): the roads followed from number to number (AT.route) —
+  // the venue's every layout drawn alike, bridges and all (Dubai Kartdrome's Reverse Links), the lap is the one through the numbers, in
+  // the way it is driven: order true, dir the way round the points go
   function fromImage(img, hint) {
     if (typeof AT === 'undefined' || !img) return null;
     const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height; let r = null;
+    const turns = hint && Array.isArray(hint.turns) ? hint.turns.filter(q => q && isFinite(q.x) && isFinite(q.y)).sort((a, b) => (a.n || 0) - (b.n || 0)) : [];
+    if (turns.length >= 6 && AT.route) {
+      try { r = AT.route(img, w, h, turns); } catch (e) { r = null; }
+      if (r && !r.error && r.pts && r.pts.length >= 8) { const o = sized(r, hint); o.order = true; o.dir = clockwise({ pts: o.lp.xy.map(p => ({ lat: -p.y, lon: p.x })) }) ? 'cw' : 'ccw'; return o; }
+      r = null;
+    }
     try { r = AT.best ? AT.best(img, w, h) : AT.run(img, w, h, 'auto', null, 60); } catch (e) { r = null; }
     if (!r || r.error || !r.pts || r.pts.length < 8 || (AT.trackness && !AT.trackness(r))) return null;
     return sized(r, hint);
@@ -13473,7 +13596,8 @@ async function idealFromPlan(body, sub, res, ph) {
   // which way round: the picture's arrows, the layout's own setting, the way the venue's layouts are driven where this one runs on them
   // (the other way for a reverse), else clockwise
   const cwOf = (xy) => TRACKFIND.clockwise({ pts: xy.map(p => ({ lat: -p.y, lon: p.x })) });
-  let dir0 = g.direction === 'cw' || g.direction === 'ccw' ? g.direction : (lay.direction === 'cw' || lay.direction === 'ccw' ? lay.direction : null);
+  // (a plan traced through its numbered corners goes round as it is driven: the way its points go)
+  let dir0 = T.order ? (cwOf(lp.xy) ? 'cw' : 'ccw') : g.direction === 'cw' || g.direction === 'ccw' ? g.direction : (lay.direction === 'cw' || lay.direction === 'ccw' ? lay.direction : null);
   if (!dir0 && fit && Math.abs(fit.ref.same) > 0.5) { const along = (fit.ref.same > 0) !== /reverse|реверс|обратн/i.test(lay.name || res.name || ''); dir0 = (along ? cwOf(fit.xy) : !cwOf(fit.xy)) ? 'cw' : 'ccw'; }
   const draw = async (cw) => {
     body.innerHTML = ''; body.appendChild(el('div', 'hint', t('Reading the corners…')));
@@ -14407,7 +14531,7 @@ const ADMIN = (() => {
   try { GA.identify(); GA.bar(); } catch (e) {}   // Google Analytics: the user (signed in or not) and, in Europe, the consent bar (ga.js)
   try { await ONBOARD.check(); } catch (e) {}
   try { AUTH.gate(); } catch (e) {}   // the app: sign in first
-  window.__hutka = { GEOM, LAB, STORE, APP, NAV, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, sameTrackName, lineOf, BRAIN, BRAINS, TRACKFIND, fitsLayout, DATA, KLL, readAnyLogger, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
+  window.__hutka = { GEOM, AT, LAB, STORE, APP, NAV, LP, ADMIN, SWS, UPLOAD, DRAFTS, FINISH, OUTBOX, sameTrackName, lineOf, BRAIN, BRAINS, TRACKFIND, fitsLayout, DATA, KLL, readAnyLogger, SAT, ONBOARD, CARDS, SHARE, LANDING, shareUrl, sharePageSync, aiContext, labMarks, SHARE_OG: async () => { const b = await SHARE.ogBlob(); if (!b) return ''; const buf = await b.arrayBuffer(); let s = ''; for (const x of new Uint8Array(buf)) s += String.fromCharCode(x); return btoa(s); }, KARTS: { kartKeyOf, kartLabel, groupByKart, kartFromValue, matchSport, kartCompatible } };
   STORE.onChange((k) => { if (k === 'tracks' && APP.route === 'tracks') renderTracksPage(); });
   await route();
   try { if (typeof INTRO !== 'undefined') INTRO.ready(); } catch (e) {}   // the opening may finish: the app is up

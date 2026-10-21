@@ -10,7 +10,9 @@
 // cached; purpose='identify_track' with a photo (image: base64, media_type) asks which karting track it shows and answers {track} without
 // keeping a chat (LIMIT_VISION_DAY=10 photos a day per driver, table ai_vision). v34.37: {track} also says which layout a venue's plan
 // is about (its printed title). v34.38: signed-out visitors too — LIMIT_VISION_IP_DAY=5 per network address, LIMIT_VISION_ANON_DAY=200
-// for all of them together.
+// for all of them together. v34.53: {track} also lists where the picture prints the corner numbers, in driving order (turns: [{n, x, y}],
+// shares of the picture) — the app follows the roads from number to number on a venue's plan that draws every layout; the reply's JSON
+// read even when the model wraps it in words or fences, and a short line logged for every read (what came back, never the picture).
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const cors = {
@@ -47,6 +49,46 @@ async function knowledge(db: any) {
   try { const { data } = await db.from("ai_knowledge").select("body").eq("id", "course").maybeSingle(); text = data && data.body ? String(data.body) : ""; } catch (_) { text = ""; }
   kbCache = { at: Date.now(), text }; return text;
 }
+// the JSON object in a model's reply: the reply may wrap it in words or a code fence, or leave a trailing comma or a comment in it. The
+// first object that parses and says something about the track (an object of the corner list alone is not it); null when none does
+// deno-lint-ignore no-explicit-any
+function replyObject(out: string): any {
+  const s = String(out || "").replace(/```(?:json)?/gi, "");
+  for (let i = s.indexOf("{"); i >= 0; i = s.indexOf("{", i + 1)) {
+    let d = 0, q = false, esc = false;
+    for (let k = i; k < s.length; k++) {
+      const c = s[k];
+      if (q) { if (esc) esc = false; else if (c === "\\") esc = true; else if (c === '"') q = false; continue; }
+      if (c === '"') q = true; else if (c === "{") d++;
+      else if (c === "}" && --d === 0) {
+        const t = s.slice(i, k + 1);
+        for (const v of [t, t.replace(/\/\/[^\n]*/g, "").replace(/,\s*([}\]])/g, "$1")]) {
+          try { const o = JSON.parse(v); if (o && typeof o === "object" && ("name" in o || "layout" in o || "turns" in o && !("n" in o))) return o; } catch (_) { /* the next way */ }
+        }
+        break;
+      }
+    }
+  }
+  // nothing parses: the fields one by one
+  const f = (k: string) => { const m = s.match(new RegExp('"' + k + '"\\s*:\\s*"([^"]*)"')); return m ? m[1] : null; };
+  const o = { name: f("name"), city: f("city"), country: f("country"), layout: f("layout"), direction: f("direction") };
+  return o.name || o.layout ? o : null;
+}
+// the corner numbers' places as the model gives them: shares of the picture (percent or pixels of the picture sent turned into shares),
+// in order of their numbers, one per number, forty at most
+// deno-lint-ignore no-explicit-any
+function turnsOf(v: any, w: number, h: number) {
+  if (!Array.isArray(v)) return [];
+  let t = v.slice(0, 60).map((o, i) => ({ n: Number(o && o.n) || i + 1, x: Number(o && o.x), y: Number(o && o.y) })).filter((o) => isFinite(o.x) && isFinite(o.y) && o.x >= 0 && o.y >= 0);
+  const mx = Math.max(0, ...t.map((o) => Math.max(o.x, o.y)));
+  if (mx > 1.001) {
+    if (mx <= 100) t = t.map((o) => ({ n: o.n, x: o.x / 100, y: o.y / 100 }));
+    else if (w > 0 && h > 0) t = t.map((o) => ({ n: o.n, x: o.x / w, y: o.y / h }));
+    else return [];
+  }
+  const seen = new Set<number>();
+  return t.filter((o) => o.x <= 1 && o.y <= 1).sort((a, b) => a.n - b.n).filter((o) => !seen.has(o.n) && seen.add(o.n)).slice(0, 40).map((o) => ({ n: o.n, x: Math.round(o.x * 1e4) / 1e4, y: Math.round(o.y * 1e4) / 1e4 }));
+}
 // a photo of a track → which venue it is: {name, city, country, sure, layout, length_m, direction} or null. Not a chat message; counted
 // per driver per day
 // deno-lint-ignore no-explicit-any
@@ -69,26 +111,27 @@ async function identifyTrack(db: any, uid: string | null, body: any, key: string
   // besides the venue: the layout the picture is about when it names one (a venue's plan prints its title: "SPEEDWAY CIRCUIT" — the app
   // opens that layout), the lap length when the picture prints it (the app traces the drawing itself and needs its size) and which way
   // round it is driven when arrows or the corner numbers show it
-  const prompt = 'This picture shows a karting track: a layout diagram, a map, a screenshot or a photo. Which venue is it? Read every name, logo, sign or caption in it. A venue often has several layouts (configurations) and a plan of one of them prints its name as a title, e.g. "SPEEDWAY CIRCUIT" or "INTERNATIONAL WITH BUS STOP", and draws that layout highlighted among the others. Reply with JSON only, nothing else: {"name": "<the venue, or null if you cannot tell>", "city": "<city or null>", "country": "<country or null>", "sure": true or false, "layout": "<the name of the layout this picture is about, as printed, if it prints one, else null>", "length_m": <the lap length in metres if the picture states it, else null>, "direction": "cw" or "ccw" if arrows or the order of the corner numbers show which way round the highlighted layout is driven as seen in the picture, else null}.';
+  const prompt = 'This picture shows a karting track: a layout diagram, a map, a screenshot or a photo. Which venue is it? Read every name, logo, sign or caption in it. A venue often has several layouts (configurations) and a plan of one of them prints its name as a title, e.g. "SPEEDWAY CIRCUIT" or "INTERNATIONAL WITH BUS STOP", and draws that layout highlighted among the others. Plans often number the corners along the layout (T1, T2, … or 1, 2, …). Reply with one JSON object only — no words before or after it, no code fences: {"name": "<the venue, or null if you cannot tell>", "city": "<city or null>", "country": "<country or null>", "sure": true or false, "layout": "<the name of the layout this picture is about, as printed, if it prints one, else null>", "length_m": <the lap length in metres if the picture states it, else null>, "direction": "cw" or "ccw" if arrows or the order of the corner numbers show which way round the highlighted layout is driven as seen in the picture, else null, "turns": [{"n": 1, "x": 0.48, "y": 0.86}, …] — every corner number printed on the layout, in order (n: the number; x: the centre of its label as a share of the picture\'s width from the left edge, 0 to 1; y: as a share of the height from the top edge, 0 to 1), or [] if the corners are not numbered}.';
   const up = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: 300, messages: [{ role: "user", content: [{ type: "image", source: { type: "base64", media_type: mt, data: img } }, { type: "text", text: prompt }] }] }),
+    body: JSON.stringify({ model: MODEL, max_tokens: 1800, messages: [{ role: "user", content: [{ type: "image", source: { type: "base64", media_type: mt, data: img } }, { type: "text", text: prompt }] }] }),
   });
-  if (!up.ok) { const t = await up.text(); return json({ error: "upstream", status: up.status, detail: t.slice(0, 300) }, 502); }
+  if (!up.ok) { const t = await up.text(); console.log(JSON.stringify({ identify: "upstream", status: up.status, detail: t.slice(0, 300) })); return json({ error: "upstream", status: up.status, detail: t.slice(0, 300) }, 502); }
   const j = await up.json();
   const out = Array.isArray(j.content) ? j.content.filter((c: { type: string }) => c.type === "text").map((c: { text: string }) => c.text).join("") : "";
   try { await db.from("ai_vision").insert(uid ? { user_id: uid } : { user_id: null, ip }); } catch (_) { /* best effort */ }
   let track = null;
   try {
-    const m = out.match(/\{[\s\S]*\}/); const p = m ? JSON.parse(m[0]) : null;
+    const p = replyObject(out);
     if (p) {
       const len = Number(p.length_m), dir = p.direction === "cw" || p.direction === "ccw" ? p.direction : null;
-      const lay = p.layout && String(p.layout).trim().toLowerCase() !== "null" ? String(p.layout).trim().slice(0, 80) : "";
-      track = { name: p.name ? String(p.name).slice(0, 120) : "", city: p.city ? String(p.city).slice(0, 80) : "", country: p.country ? String(p.country).slice(0, 60) : "", sure: !!p.sure, layout: lay, length_m: isFinite(len) && len >= 200 && len <= 6000 ? Math.round(len) : null, direction: dir };
-      if (!track.name && !track.layout && !track.length_m && !track.direction) track = null;
+      const str = (v: unknown, n: number) => v && String(v).trim().toLowerCase() !== "null" ? String(v).trim().slice(0, n) : "";
+      track = { name: str(p.name, 120), city: str(p.city, 80), country: str(p.country, 60), sure: p.sure === true || p.sure === "true", layout: str(p.layout, 80), length_m: isFinite(len) && len >= 200 && len <= 6000 ? Math.round(len) : null, direction: dir, turns: turnsOf(p.turns, Number(body.w) || 0, Number(body.h) || 0) };
+      if (!track.name && !track.layout && !track.length_m && !track.direction && track.turns.length < 4) track = null;
     }
   } catch (_) { track = null; }
+  console.log(JSON.stringify({ identify: track ? "ok" : "none", stop: j.stop_reason || "", blocks: Array.isArray(j.content) ? j.content.map((c: { type: string }) => c.type).join(",") : "", out: track ? "" : out.slice(0, 400), name: track ? track.name : "", layout: track ? track.layout : "", turns: track ? track.turns.length : 0 }));
   return json({ track });
 }
 
