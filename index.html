@@ -453,6 +453,11 @@ body.onboarding #toast{z-index:90}
 .map-bar{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
 .map-bar[hidden]{display:none}
 .map-bar .btn{height:36px;font-size:13px;padding:0 12px;border-radius:9px}
+.map-bar .map-move{flex:none;margin-left:auto;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.map-bar .map-move svg{width:16px;height:16px;flex:none}
+@media (max-width:370px){.map-bar:has(#lapSegField:not([hidden])) .map-move span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.map-bar .map-move{padding:0 10px}}
+/* the cockpit's strip is narrower (the round buttons on the right): next to the laps the icon alone, its name the tooltip; alone, the words too */
+body.cockpit #hero .map-bar:has(#lapSegField:not([hidden])) .map-move span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+body.cockpit #hero .map-bar .seg{flex:none}
 .map-bar .seg{border-radius:9px;display:flex;min-width:0;flex:0 1 auto}.map-bar .seg .btn{height:34px;border-radius:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* the map's own controls: translucent, on the map, out of the way of the title (top left) and the notes (bottom) */
 .map-ctl{position:absolute;right:10px;top:10px;z-index:4;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none}
@@ -978,7 +983,8 @@ body.cockpit .bugbtn,#hero:fullscreen~.bugbtn,body.onboarding .bugbtn{display:no
   .pickbar .field,.pickbar .field.auto{flex:1 1 100%;max-width:none}
   .lapline .big{font-size:32px}
   .map-bar{padding:6px 8px;gap:6px}
-  .map-bar .seg{flex:1 1 auto}.map-bar .seg .btn{flex:1 1 0;padding:0 8px;font-size:12.5px}
+  .map-bar .seg{flex:1 1 auto}.map-bar .seg .btn{flex:1 1 auto;padding:0 5px;font-size:12.5px}
+  .map-bar .map-move{padding:0 8px;gap:4px;font-size:12.5px}
   .map-ctl{top:46px;right:8px}   /* under the map's title, which runs the width of a phone */
   .map-full{width:46px;height:46px;right:8px;bottom:8px}   /* in line with the controls above it, as wide as their group */
   .map-full svg{width:20px;height:20px}
@@ -1818,7 +1824,7 @@ input.sw:checked::after{transform:translateX(18px)}
     <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></symbol>
     <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="M3 12.5l9 5 9-5"/><path d="M3 17l9 5 9-5"/></symbol>
     <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
-    <symbol id="i-fit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.6"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></symbol>
+    <symbol id="i-move" viewBox="0 0 24 24"><path d="M12 3.5v17M3.5 12h17"/><path d="M9 6.5l3-3 3 3M9 17.5l3 3 3-3M6.5 9l-3 3 3 3M17.5 9l3 3-3 3"/></symbol><symbol id="i-fit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.6"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></symbol>
     <symbol id="i-rotl" viewBox="0 0 24 24"><path d="M4.5 13a7.5 7.5 0 1 0 2.2-6.3"/><path d="M5 3.5v4.5h4.5"/></symbol>
     <symbol id="i-rotr" viewBox="0 0 24 24"><path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19 3.5v4.5h-4.5"/></symbol>
     <symbol id="i-rotate" viewBox="0 0 24 24"><rect x="3" y="7" width="14" height="10" rx="2"/><path d="M20 10v4M17 20l-2-2 2-2M15 18h3a2 2 0 002-2"/></symbol>
@@ -2057,9 +2063,11 @@ input.sw:checked::after{transform:translateX(18px)}
       <div class="hero" id="hero" hidden>
         <div class="map-wrap" id="mapWrap1">
           <div class="fs-head" id="fsHead" hidden><div class="lapline"><span class="lbl" id="fsLbl"></span><span class="big" id="fsBig">—</span><div class="chips" id="fsChips"></div></div><button class="btn mobile-only" id="fsCompare" type="button"><svg><use href="#i-layouts"/></svg><span data-t="Session &amp; compare">Session &amp; compare</span></button><button class="btn" id="btnFullExit" type="button" data-t="Exit full screen">Exit full screen</button></div>
-          <!-- v34.49: which lap the points are of, when comparing (hidden otherwise); the layers, zoom, turn and full screen are on the map -->
+          <!-- v34.49: which lap the points are of, when comparing (hidden otherwise); the layers, zoom, turn and full screen are on the map.
+               v34.55: "Move image" back in this row (Uladzislau: it is needed often, a switch in Layers hid it) — over satellite imagery -->
           <div class="map-bar" id="mapBar">
             <div class="seg" id="lapSegField" title="Show on map" hidden><button class="btn active" id="lapYou" type="button">Reference</button><button class="btn" id="lapCmp" type="button">Comparison</button><button class="btn" id="lapThird" type="button" hidden>Third lap</button></div>
+            <button class="btn map-move" id="tglAlign" type="button" hidden aria-pressed="false" title="Move image" data-tt="Move image"><svg><use href="#i-move"/></svg><span data-t="Move image">Move image</span></button>
           </div>
           <div class="sat-note" id="satNote" hidden><span id="satNoteText"></span> <button class="btn xs" id="satNoteAlign" type="button" data-t="Align">Align</button></div>
           <div class="align-bar" id="alignBar" hidden><span class="hint" id="alignHint"></span><div class="seg"><button class="btn xs" id="alL" type="button" title="0.5 m">←</button><button class="btn xs" id="alU" type="button" title="0.5 m">↑</button><button class="btn xs" id="alD" type="button" title="0.5 m">↓</button><button class="btn xs" id="alR" type="button" title="0.5 m">→</button></div><span class="hint" id="alignOff"></span><button class="btn xs" id="alReset" type="button" data-t="Reset">Reset</button><button class="btn xs primary" id="alSave" type="button" hidden data-t="Save for everyone">Save for everyone</button><button class="btn xs" id="alDone" type="button" data-t="Done">Done</button></div>
@@ -2422,7 +2430,6 @@ input.sw:checked::after{transform:translateX(18px)}
   <div class="lyr-list">
     <button class="lyr" id="optPedals" type="button"><span class="lyr-tx"><b>Accel / decel</b><small data-t="The lap in colour: green accelerating, red decelerating, yellow coasting">The lap in colour: green accelerating, red decelerating, yellow coasting</small></span><i class="sw" aria-hidden="true"></i></button>
     <button class="lyr" id="tglTiles" type="button" hidden><span class="lyr-tx"><b data-t="Satellite">Satellite</b><small data-t="Satellite imagery under the line">Satellite imagery under the line</small></span><i class="sw" aria-hidden="true"></i></button>
-    <button class="lyr" id="tglAlign" type="button" hidden><span class="lyr-tx"><b data-t="Move imagery">Move imagery</b><small data-t="When the picture sits off the line: drag it into place">When the picture sits off the line: drag it into place</small></span><i class="sw" aria-hidden="true"></i></button>
     <button class="lyr" id="tglSat" type="button"><span class="lyr-tx"><b>Lap traces</b><small></small></span><i class="sw" aria-hidden="true"></i></button>
     <button class="lyr" id="optBand" type="button"><span class="lyr-tx"><b data-t="Track edges">Track edges</b><small data-t="The edges of the asphalt">The edges of the asphalt</small></span><i class="sw" aria-hidden="true"></i></button>
     <button class="lyr" id="optTicks" type="button"><span class="lyr-tx"><b data-t="Markers">Markers</b><small data-t="The distance every 50 m along the lap">The distance every 50 m along the lap</small></span><i class="sw" aria-hidden="true"></i></button>
@@ -5084,7 +5091,7 @@ Object.assign(I18N.RU, {
   'Digest': 'Разбор',
   'Chart': 'График',
   'Asking OpenStreetMap… (server {k} of {n}, up to a minute)': 'Спрашиваю OpenStreetMap… (сервер {k} из {n}, до минуты)', 'OpenStreetMap servers are busy — try again in a minute (big countries sometimes need two attempts).': 'Серверы OpenStreetMap заняты — попробуйте через минуту (большим странам иногда нужна вторая попытка).',
-  'Move imagery': 'Подвинуть снимок', 'Move the photo': 'Подвинуть снимок', 'Move again': 'Подвинуть ещё', 'Photo shifted by hand. ': 'Снимок сдвинут вручную. ', 'The photo is a guide: GPS and the image can be a few metres apart.': 'Снимок — ориентир: GPS и фото могут расходиться на несколько метров.', 'The satellite photo is a guide: GPS and the image can be a few metres apart, so the line may seem to clip a wall.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров, поэтому линия может «задевать стену».', 'Drag the photo with one finger until the track sits under the line.': 'Тяни снимок одним пальцем, пока трасса не ляжет под линию.', 'Drag the photo until the track sits under the line (or use the arrows above).': 'Тяни снимок, пока трасса не ляжет под линию (или стрелками выше).',
+  'Move imagery': 'Подвинуть снимок', 'Move image': 'Подвинуть снимок', 'Move the photo': 'Подвинуть снимок', 'Move again': 'Подвинуть ещё', 'Photo shifted by hand. ': 'Снимок сдвинут вручную. ', 'The photo is a guide: GPS and the image can be a few metres apart.': 'Снимок — ориентир: GPS и фото могут расходиться на несколько метров.', 'The satellite photo is a guide: GPS and the image can be a few metres apart, so the line may seem to clip a wall.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров, поэтому линия может «задевать стену».', 'Drag the photo with one finger until the track sits under the line.': 'Тяни снимок одним пальцем, пока трасса не ляжет под линию.', 'Drag the photo until the track sits under the line (or use the arrows above).': 'Тяни снимок, пока трасса не ляжет под линию (или стрелками выше).',
   'Satellite imagery is approximate: GPS and the photo can be a few metres apart.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров.', 'Satellite imagery is approximate: GPS and the photo can be a few metres apart. If the line runs through a wall, move the picture.': 'Спутниковый снимок — ориентир: GPS и фото могут расходиться на несколько метров. Если линия идёт сквозь стену — подвиньте картинку.',
   'Align': 'Совместить', 'Save for everyone': 'Сохранить для всех', 'Done': 'Готово', 'Drag the picture until it sits under the line': 'Тяните картинку, пока она не ляжет под линию', 'Drag the picture (or use the arrows, 0.5 m) until it sits under the line': 'Тяните картинку (или стрелками по 0,5 м), пока она не ляжет под линию', '{x} m east, {y} m north': '{x} м на восток, {y} м на север', 'no shift': 'без сдвига', 'Imagery alignment saved for this layout.': 'Совмещение снимка сохранено для этой конфигурации.',
   'Upload a session — every braking point, apex and throttle point, and a comparison with drivers on the same layout.': 'Загрузи сессию — каждая точка торможения, апекса и газа и сравнение с гонщиками на той же конфигурации.',
@@ -7756,7 +7763,7 @@ function renderHelpPage() {
   const f = card(t('Stuck?'), ''); f.innerHTML += `<p>${esc(t('Send the file to the person who invited you — uploading it for you takes a minute. Or press the bug button (at the top of the screen on a phone, in the corner on a computer) and describe what happened.'))}</p>`; box.appendChild(f);
 }
 // ---------- bug reports: the small button in the corner; the last few script errors travel with the report ----------
-const APP_VERSION = 'v34.54';
+const APP_VERSION = 'v34.55';
 // no connection: the line under the header on every page (v34.27 — the app opened at the track with no signal still reads the lap timer)
 let wasOffline = false;
 function syncOffline() {
@@ -9501,7 +9508,9 @@ function renderSatPill() {
   else { $('satPillText').textContent = (shifted ? t('Photo shifted by hand. ') : '') + (isCockpit() ? t('The photo can sit a few metres off the GPS line.') : (isPhone() ? t('The photo is a guide: GPS and the image can be a few metres apart.') : t('The satellite photo is a guide: GPS and the image can be a few metres apart, so the line may seem to clip a wall.'))); $('satPillBtn').textContent = shifted ? t('Move again') : (isCockpit() ? t('Move') : t('Move the photo')); }
 }
 $('satPillBtn').onclick = () => setAligning(!LAB.aligning);
-function setAligning(on) { LAB.aligning = !!on && LAB.opts.tiles; $('tglAlign').classList.toggle('active', LAB.aligning); $('alignBar').hidden = !LAB.aligning; $('satNote').hidden = true; renderSatPill(); LAB.map.setTool(LAB.aligning ? 'sat' : 'pan'); if (LAB.aligning) renderAlignBar(); if (LAB.map && LAB.G) { setTimeout(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); }, 30); } }
+function setAligning(on) { LAB.aligning = !!on && LAB.opts.tiles; $('tglAlign').classList.toggle('active', LAB.aligning); $('tglAlign').setAttribute('aria-pressed', LAB.aligning ? 'true' : 'false'); $('alignBar').hidden = !LAB.aligning; $('satNote').hidden = true; renderSatPill(); LAB.map.setTool(LAB.aligning ? 'sat' : 'pan'); if (LAB.aligning) renderAlignBar(); if (LAB.map && LAB.G) { setTimeout(() => { if (LAB.map.V.auto) LAB.map.fit(true); LAB.map.draw(); }, 30); } }
+// the row above the map: which lap the points are of (comparing) and "Move image" (over satellite imagery); gone when it holds neither
+function syncMapBar() { $('mapBar').hidden = $('lapSegField').hidden && $('tglAlign').hidden; }
 function renderAlignBar() {
   const tr = LAB.tid ? STORE.getTrack(LAB.tid) : null, canSave = !!(tr && STORE.canEditTrack(tr) && LAB.lid && LAB.lid !== 'custom' && STORE.getLayout(LAB.tid, LAB.lid));
   $('alignHint').textContent = isPhone() ? t('Drag the picture until it sits under the line') : t('Drag the picture (or use the arrows, 0.5 m) until it sits under the line');
@@ -9511,9 +9520,9 @@ function renderAlignBar() {
 // a layer's switch: its name (and the line under it) — the row keeps its switch
 function lyrName(id, name, line) { const b = $(id) && $(id).querySelector('b'); if (!b) { if ($(id)) $(id).textContent = name; return; } b.textContent = name; if (line !== undefined) { const sm = $(id).querySelector('small'); if (sm) sm.textContent = line; } }
 function syncOpts() {
-  const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles); $('ckSat').hidden = !sat; $('ckSat').classList.toggle('active', sat && LAB.opts.tiles); $('tglAlign').hidden = !(sat && LAB.opts.tiles); if (!(sat && LAB.opts.tiles) && LAB.aligning) setAligning(false);
-  $('satNote').hidden = true; lyrName('tglAlign', t('Move imagery')); renderSatPill();
-  if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; $('ckSat').hidden = true; LAB.map.draw(); } });
+  const sat = SAT.can(LAB.G); $('tglTiles').hidden = !sat; $('tglTiles').classList.toggle('active', sat && LAB.opts.tiles); $('ckSat').hidden = !sat; $('ckSat').classList.toggle('active', sat && LAB.opts.tiles); $('tglAlign').hidden = !(sat && LAB.opts.tiles); syncMapBar(); if (!(sat && LAB.opts.tiles) && LAB.aligning) setAligning(false);
+  $('satNote').hidden = true; renderSatPill();
+  if (sat && LAB.opts.tiles && SAT.available === null) SAT.probe(LAB.G).then(ok => { if (!ok) { $('tglTiles').hidden = true; $('ckSat').hidden = true; $('tglAlign').hidden = true; syncMapBar(); if (LAB.aligning) setAligning(false); LAB.map.draw(); } });
   lyrName('tglSat', LAB.G && LAB.G.aerial ? t('Aerial') : t('Lap traces'), LAB.G && LAB.G.aerial ? t('The track\'s aerial picture under the line') : t('Every lap of the session under the line')); $('optBand').hidden = !!(sat && LAB.opts.tiles); $('optBand').classList.toggle('active', LAB.opts.band); $('optTicks').classList.toggle('active', LAB.opts.ticks); $('optLabels').classList.toggle('active', LAB.opts.labelsAll); $('optPedals').classList.toggle('active', LAB.opts.pedals); lyrName('optPedals', t('Pedals')); $('tglSat').classList.toggle('active', LAB.opts.aerial); $('tglSat').hidden = !(LAB.G && (LAB.G.aerial || (LAB.G.image && LAB.G.source === 'gps'))) || !!(sat && LAB.opts.tiles && !(LAB.G && LAB.G.aerial)); LAB.map.draw(); }
 function selectCorner(n, scroll) { NATIVE.haptic('light'); LAB.selN = (LAB.selN === n) ? 0 : n; LAB.ckInsp = !!LAB.selN; if (isCockpit() && LAB.side && LAB.selN) setSide(false); afterSelect(true); if (scroll && LAB.selN && !isCockpit()) $('hero').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 
@@ -9651,7 +9660,7 @@ function labRender() {
   if (cmp !== 'none' && isIdealKey(cmp) && !(cs === sess && !refIsAvg && sessIdeal(cs, R, apexes))) cmp = 'none';   // the ideal lap is measured against a real lap of the same session
   LAB.cmp = cmp;
   const cmpOn = cmp !== 'none';
-  $('cmpField').hidden = !cmpOn; $('lapSegField').hidden = !cmpOn; $('mapBar').hidden = !cmpOn;
+  $('cmpField').hidden = !cmpOn; $('lapSegField').hidden = !cmpOn; syncMapBar();
   if (cmpOn) { const laps = cs.laps.filter(x => x.px), av = sessAvg(cs), ide = cs === sess && !refIsAvg ? sessIdeal(cs, R, apexes) : null; const o = []; if (av) o.push(['avg:' + cs.id, `${t('average clean lap')} · ${fmtLap(av.T)} (${laps.filter(x => x.clean).length})`]); if (ide) o.push(['ideal:' + cs.id, `${t('ideal lap')} · ${fmtLap(ide.T)} (${t('best corners, approximate')})`]); for (const x of laps) o.push([lapKey(cs, x), lapLabel(cs, x)]); LAB.cmp = fillSelect($('cmpSel'), o.filter(x => x[0] !== LAB.ref), cmp); $('cmpLbl').textContent = (cs === sess ? t('Compare with — this session') : t('Compare with · {s}', { s: shortSess(cs) })) + (LAB.cmpAuto && LAB.cmp === LAB.cmpAuto.key ? ' · ' + (LAB.cmpAuto.why === 'followed' ? t('fastest among the drivers you follow') : t('fastest on this layout')) : ''); }
   // the third lap: a visual comparison (map, charts, replay, a Δt column) — any lap or average of a loaded session; the field shows once a comparison is on
   let c2 = String(LAB.cmp2 || 'none'); if (c2 === LAB.ref || c2 === LAB.cmp || isIdealKey(c2)) c2 = 'none';
