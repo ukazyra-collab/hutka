@@ -4,7 +4,7 @@
 // signal, and download the whole page again on every open); the network refreshes the copy in the background, and when that brings a
 // new version the page is told ("shell-updated") — it reloads itself if the person has not started anything yet, else next time.
 // A copy older than 12 hours goes the old way: the network first, the copy after 3.5 s.
-const V = 'hutka-shell-v121';
+const V = 'hutka-shell-v122';
 const SHELL = ['./', './index.html', './config.js', './geo.txt', './supabase.js', './manifest.webmanifest', './logo.png', './logo-dark.png', './icon-192.png'];
 const FRESH_MS = 12 * 3600 * 1000;
 self.addEventListener('install', (e) => { e.waitUntil((async () => { const c = await caches.open(V); for (const u of SHELL) { try { const r = await fetch(new Request(u, { cache: 'reload' })); if (r && r.ok) await c.put(u === './' || u === './index.html' ? new URL('./', self.registration.scope).href : new URL(u, self.registration.scope).href, await stamped(r)); } catch (err) {} } self.skipWaiting(); })()); });

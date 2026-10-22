@@ -76,6 +76,8 @@
 	<string>Read your recorded outings straight out of your lap timer (RaceBox, Alfano) over Bluetooth.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Read your recorded outings straight out of your lap timer (RaceBox, Alfano) over Bluetooth.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Record from kart: the phone on the wheel times your laps with its own GPS.</string>
 	<key>WKAppBoundDomains</key>
 	<array>
 		<string>hutka.ai</string>
