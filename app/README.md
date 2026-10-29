@@ -75,6 +75,35 @@ npx cap open ios     # откроется Xcode (первый раз он мин
 ### TestFlight (не обязательно, но удобно)
 Тот же загруженный билд → вкладка **TestFlight** → Internal Testing → добавь себя и друзей по Apple ID → они ставят приложение TestFlight и получают сборку за 5 минут. Для фокус-группы из 20–30 человек это самый быстрый путь — без App Store вообще.
 
+## 3a. App Store, автоматом (29 окт 2026, версия 1.4 / build 5)
+
+Аккаунт разработчика Kozyra Media одобрен — путь до ревью теперь скриптами, руками остаются три вещи, которые Apple не даёт сделать через API:
+
+| Руками (один раз) | Где |
+|---|---|
+| Ключ App Store Connect API (роль **Admin**) → скачать `.p8` → положить в `~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8`; запомнить Key ID и Issuer ID | App Store Connect → Users and Access → Integrations → App Store Connect API |
+| Создать запись приложения: My Apps → **+ → New App**: iOS, Name **Hutka**, Primary Language English (U.S.), Bundle ID `ai.hutka.app` (появится после `asc.py bundle`), SKU `hutka`, Full Access | App Store Connect → My Apps |
+| **App Privacy** — опросник (ответы ниже) | App Store Connect → приложение → App Privacy |
+
+Дальше на Маке (Xcode стоит, `git pull` сделан):
+```bash
+cd hutka/app
+export ASC_KEY_ID=XXXXXXXXXX ASC_ISSUER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+python3 asc.py bundle                    # регистрирует ai.hutka.app с Push Notifications, печатает TEAM_ID
+export TEAM_ID=XXXXXXXXXX HUTKA_REVIEW_EMAIL='твоя почта' HUTKA_REVIEW_PHONE='+971...' HUTKA_REVIEW_ACCOUNT='почта демо-аккаунта' HUTKA_REVIEW_PASSWORD='его пароль'   # контакт и демо-аккаунт — только в окружении, не в репозитории (он публичный)
+sh ios_release.sh                        # cap sync → archive (автоподпись) → export → upload; ~10 минут
+python3 asc.py metadata                  # категории, возраст 4+, тексты версии 1.4 (listing.json), контакт и демо-аккаунт для ревью
+python3 asc.py screenshots store/appstore   # iPhone 6.7" и iPad 12.9" из store/appstore/
+python3 asc.py build --wait              # ждёт, пока Apple обработает билд, и прикрепляет его к версии
+python3 asc.py submit                    # в ревью
+python3 asc.py status
+```
+`asc.py` — без сторонних пакетов (JWT подписывает системный `openssl`), ключ читает только с диска. `ExportOptions.plist` — метод `app-store-connect`, подпись автоматическая. В проект добавлен `PrivacyInfo.xcprivacy` (манифест приватности: трекинга нет; собираем e-mail, имя, user ID, фото, контент, точную геолокацию для Record from kart — всё привязано к аккаунту, только для функций приложения).
+
+**App Privacy — ответы** (Data Types): Contact Info → Email Address, Name; User Content → Photos or Videos (аватар), Other User Content (сессии, комментарии); Identifiers → User ID; Location → Precise Location (Record from kart); Usage Data → Product Interaction (события в приложении, не привязаны к пользователю). Для всех: Linked to the user — Yes (кроме Product Interaction — No), Used for tracking — **No**, цель — App Functionality (Product Interaction — Analytics). Diagnostics, Purchases, Financial, Health, Contacts, Browsing/Search History, Sensitive Info — не собираем.
+
+Демо-аккаунт для ревью: тот же, что в Play Console → App access, в нём две приватные сессии «Demo · Ironman 14 Oct 2026» и «Demo · Ironman 10 Oct 2026» (Dubai Kartdrome). Вход: Continue with email → «I have a password».
+
 ## 4. Android — Google Play
 
 ```bash
