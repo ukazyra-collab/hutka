@@ -45,7 +45,7 @@ def api(method, path, body=None, raw=False):
     try:
         with urllib.request.urlopen(req, timeout=120) as r: t = r.read(); return json.loads(t) if t and not raw else t
     except urllib.error.HTTPError as e:
-        msg = e.read().decode(errors='replace'); sys.exit(f'{method} {path} → {e.code}: {msg[:1200]}')
+        msg = e.read().decode(errors='replace'); sys.exit(f'{method} {path} → {e.code}: {msg[:6000]}')
 def get_all(path):
     out = []; url = path
     while url:
@@ -174,7 +174,7 @@ def cmd_submit():
         try:
             api('PATCH', f"/v1/reviewSubmissions/{sub['id']}", {'data': {'type': 'reviewSubmissions', 'id': sub['id'], 'attributes': {'submitted': True}}}); break
         except SystemExit as e:
-            if 'ASSET_IN_POST_PROCESSING' in str(e) and attempt < 19: print('assets still processing — waiting a minute'); time.sleep(60)
+            if ('ASSET_IN_POST_PROCESSING' in str(e) or 'being processed' in str(e)) and attempt < 19: print('assets still processing — waiting a minute'); time.sleep(60)
             else: raise
     print('submitted for review:', VERSION)
 
