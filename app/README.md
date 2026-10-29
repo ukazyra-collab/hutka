@@ -34,6 +34,7 @@
    - Keys → новый ключ с Sign in with Apple → скачай `.p8`, запомни Key ID и Team ID.
    - Supabase → Authentication → Providers → **Apple** → Services ID, Team ID, Key ID, содержимое `.p8` → Save.
    - В `config.js` на сайте поставь `appleAuth: true` — появится кнопка  Apple (и в приложении вернётся Google).
+   - **Сделано 29 окт 2026:** App ID `ai.hutka.app` — capability Sign in with Apple (primary); Services ID **`ai.hutka.web`** («Hutka Web», домен `tqixfqrludqpxqxypiia.supabase.co`, return URL `https://tqixfqrludqpxqxypiia.supabase.co/auth/v1/callback`); ключ **S22F73Y8XY** («Hutka Sign in with Apple», `.p8` на Маке в `~/.appstoreconnect/private_keys/`); в Supabase → Apple: Client IDs `ai.hutka.web,ai.hutka.app`, Secret Key — JWT (ES256, iss = Team ID F3P87X2A7L, sub = `ai.hutka.web`, aud `https://appleid.apple.com`), сгенерирован на Маке, **истекает 27 апр 2027** — Apple не даёт дольше 6 месяцев: до этой даты сгенерировать новый тем же ключом и вставить в Supabase (скрипт — `_release/job.sh` от 29 окт, Key ID и Team ID те же). `appleAuth: true` в `config.js` с v34.61.
 4. **Аккаунт для ревью Apple.** Проверяющим нужен вход без почты: Supabase → Authentication → Users → **Add user** → почта `review@hutka.ai` (любая), пароль, «Auto confirm». В приложении в окне входа есть «У меня есть пароль». Эту пару укажешь в App Store Connect → App Review Information.
 
 ## 2. Сборка на Mac
