@@ -62,6 +62,12 @@ def version(create=True):
     a = app(); vs = api('GET', f"/v1/apps/{a['id']}/appStoreVersions?filter[platform]=IOS&filter[versionString]={VERSION}&limit=1").get('data') or []
     if vs: return a, vs[0]
     if not create: return a, None
+    # App Store Connect makes a first version (1.0) together with the app record; a second one cannot be added while it is unreleased — rename it instead
+    allv = api('GET', f"/v1/apps/{a['id']}/appStoreVersions?filter[platform]=IOS&limit=10").get('data') or []
+    ed = [x for x in allv if (x['attributes'].get('appStoreState') or x['attributes'].get('appVersionState')) in ('PREPARE_FOR_SUBMISSION', 'DEVELOPER_REJECTED', 'REJECTED', 'METADATA_REJECTED', 'INVALID_BINARY')]
+    if ed:
+        v = api('PATCH', f"/v1/appStoreVersions/{ed[0]['id']}", {'data': {'type': 'appStoreVersions', 'id': ed[0]['id'], 'attributes': {'versionString': VERSION}}})['data']
+        print('version', ed[0]['attributes'].get('versionString'), 'renamed to', VERSION); return a, v
     v = api('POST', '/v1/appStoreVersions', {'data': {'type': 'appStoreVersions', 'attributes': {'platform': 'IOS', 'versionString': VERSION, 'releaseType': 'AFTER_APPROVAL'}, 'relationships': {'app': rel('apps', a['id'])}}})['data']
     print('version', VERSION, 'created'); return a, v
 
@@ -97,15 +103,19 @@ def cmd_metadata():
     else: api('POST', '/v1/appInfoLocalizations', {'data': {'type': 'appInfoLocalizations', 'attributes': dict(attrs, locale=LOCALE), 'relationships': {'appInfo': rel('appInfos', info['id'])}}})
     # age rating: nothing in it → 4+
     ar = api('GET', f"/v1/appInfos/{info['id']}/ageRatingDeclaration")['data']
-    api('PATCH', f"/v1/ageRatingDeclarations/{ar['id']}", {'data': {'type': 'ageRatingDeclarations', 'id': ar['id'], 'attributes': {'alcoholTobaccoOrDrugUseOrReferences': 'NONE', 'contests': 'NONE', 'gamblingSimulated': 'NONE', 'horrorOrFearThemes': 'NONE', 'matureOrSuggestiveThemes': 'NONE', 'medicalOrTreatmentInformation': 'NONE', 'profanityOrCrudeHumor': 'NONE', 'sexualContentGraphicAndNudity': 'NONE', 'sexualContentOrNudity': 'NONE', 'violenceCartoonOrFantasy': 'NONE', 'violenceRealistic': 'NONE', 'violenceRealisticProlongedGraphicOrSadistic': 'NONE', 'gambling': False, 'unrestrictedWebAccess': False, 'kidsAgeBand': None}}})
+    api('PATCH', f"/v1/ageRatingDeclarations/{ar['id']}", {'data': {'type': 'ageRatingDeclarations', 'id': ar['id'], 'attributes': {'alcoholTobaccoOrDrugUseOrReferences': 'NONE', 'contests': 'NONE', 'gamblingSimulated': 'NONE', 'horrorOrFearThemes': 'NONE', 'matureOrSuggestiveThemes': 'NONE', 'medicalOrTreatmentInformation': 'NONE', 'profanityOrCrudeHumor': 'NONE', 'sexualContentGraphicAndNudity': 'NONE', 'sexualContentOrNudity': 'NONE', 'violenceCartoonOrFantasy': 'NONE', 'violenceRealistic': 'NONE', 'violenceRealisticProlongedGraphicOrSadistic': 'NONE', 'gunsOrOtherWeapons': 'NONE', 'gambling': False, 'unrestrictedWebAccess': False, 'kidsAgeBand': None, 'lootBox': False, 'advertising': False, 'healthOrWellnessTopics': False, 'parentalControls': False, 'ageAssurance': False, 'messagingAndChat': False, 'userGeneratedContent': True, 'socialMedia': True, 'socialMediaAgeRestricted': False}}})
     print('app info: Sports / Utilities, name, subtitle, privacy policy, age rating 4+')
     # the version's English texts
     vl = api('GET', f"/v1/appStoreVersions/{v['id']}/appStoreVersionLocalizations").get('data') or []
     loc = next((l for l in vl if l['attributes']['locale'] == LOCALE), None)
     attrs = {'description': L['description'], 'keywords': L['keywords'], 'supportUrl': L['supportUrl'], 'marketingUrl': L['marketingUrl'], 'promotionalText': L['promotionalText'], 'whatsNew': L['whatsNew']}
+    # the first version of an app has no "What's New" — Apple refuses the attribute, so it goes in from the second version on
+    rel_before = [x for x in (api('GET', f"/v1/apps/{a['id']}/appStoreVersions?filter[platform]=IOS&limit=20").get('data') or []) if x['id'] != v['id'] and (x['attributes'].get('appStoreState') or x['attributes'].get('appVersionState')) in ('READY_FOR_SALE', 'READY_FOR_DISTRIBUTION', 'REPLACED_WITH_NEW_VERSION', 'PROCESSING_FOR_APP_STORE', 'PENDING_DEVELOPER_RELEASE')]
+    if not rel_before: attrs.pop('whatsNew'); print('first release: no What\'s New')
     if loc: api('PATCH', f"/v1/appStoreVersionLocalizations/{loc['id']}", {'data': {'type': 'appStoreVersionLocalizations', 'id': loc['id'], 'attributes': attrs}})
     else: api('POST', '/v1/appStoreVersionLocalizations', {'data': {'type': 'appStoreVersionLocalizations', 'attributes': dict(attrs, locale=LOCALE), 'relationships': {'appStoreVersion': rel('appStoreVersions', v['id'])}}})
-    print('version texts: description, keywords, urls, what\'s new')
+    api('PATCH', f"/v1/appStoreVersions/{v['id']}", {'data': {'type': 'appStoreVersions', 'id': v['id'], 'attributes': {'copyright': L.get('copyright', '2026 Kozyra Media Group')}}})
+    print('version texts: description, keywords, urls, what\'s new, copyright')
     # the review details: contact, demo account, notes
     R = L['review']; pw = os.environ.get('HUTKA_REVIEW_PASSWORD') or sys.exit('HUTKA_REVIEW_PASSWORD (the demo account\'s password) is not set')
     rd = api('GET', f"/v1/appStoreVersions/{v['id']}/appStoreReviewDetail").get('data')
@@ -159,7 +169,13 @@ def cmd_submit():
     sub = subs[0] if subs else api('POST', '/v1/reviewSubmissions', {'data': {'type': 'reviewSubmissions', 'attributes': {'platform': 'IOS'}, 'relationships': {'app': rel('apps', a['id'])}}})['data']
     items = api('GET', f"/v1/reviewSubmissions/{sub['id']}/items").get('data') or []
     if not items: api('POST', '/v1/reviewSubmissionItems', {'data': {'type': 'reviewSubmissionItems', 'relationships': {'reviewSubmission': rel('reviewSubmissions', sub['id']), 'appStoreVersion': rel('appStoreVersions', v['id'])}}})
-    api('PATCH', f"/v1/reviewSubmissions/{sub['id']}", {'data': {'type': 'reviewSubmissions', 'id': sub['id'], 'attributes': {'submitted': True}}})
+    # screenshots are post-processed for a few minutes after the upload; the submission is refused until they are done — wait and retry
+    for attempt in range(20):
+        try:
+            api('PATCH', f"/v1/reviewSubmissions/{sub['id']}", {'data': {'type': 'reviewSubmissions', 'id': sub['id'], 'attributes': {'submitted': True}}}); break
+        except SystemExit as e:
+            if 'ASSET_IN_POST_PROCESSING' in str(e) and attempt < 19: print('assets still processing — waiting a minute'); time.sleep(60)
+            else: raise
     print('submitted for review:', VERSION)
 
 def cmd_status():

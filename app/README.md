@@ -104,6 +104,15 @@ python3 asc.py status
 
 Демо-аккаунт для ревью: тот же, что в Play Console → App access, в нём две приватные сессии «Demo · Ironman 14 Oct 2026» и «Demo · Ironman 10 Oct 2026» (Dubai Kartdrome). Вход: Continue with email → «I have a password».
 
+### Что было на деле при первой подаче (29 окт 2026) — учтено в `asc.py`
+- Запись приложения App Store Connect создаёт вместе с версией **1.0**; вторую версию добавить нельзя, пока первая не вышла — `asc.py` переименовывает её в нужный номер.
+- Возрастной опросник 2025 года требует новые поля (`socialMedia`, `userGeneratedContent`, `messagingAndChat`, `parentalControls`, `gunsOrOtherWeapons`, …) — заполнены: UGC и соцфункции — да, остальное — нет.
+- У первой версии нет поля «What's New» — Apple отвергает атрибут; `asc.py` ставит его начиная со второй версии.
+- Для подачи обязательны **copyright** у версии (ставится из `listing.json`, по умолчанию «2026 Kozyra Media Group»), **цена** (Pricing and Availability → $0.00) и **доступность** (все страны) — цена и доступность задаются только на сайте.
+- Скриншоты после загрузки обрабатываются несколько минут; `asc.py submit` ждёт и повторяет.
+- Подпись с чистого аккаунта: у команды не было устройств, и автоподпись архива падала («Your team has no devices») — iPhone регистрируется через API (`xcrun devicectl list devices` → `POST /v1/devices`), после этого архив собирается.
+- Trader status (DSA, для ЕС): Business → Agreements → Compliance — заполнено 29 окт 2026 (trader; контакты для показа в ЕС — телефон и u.kazyra@kozyramedia.com).
+
 ## 4. Android — Google Play
 
 ```bash
