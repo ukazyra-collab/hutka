@@ -20,3 +20,5 @@ verify_jwt = false
 verify_jwt = false
 [functions.tracks-import]
 verify_jwt = false
+[functions.merge-apple]
+verify_jwt = false
