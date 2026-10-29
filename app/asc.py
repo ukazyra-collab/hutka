@@ -167,14 +167,14 @@ def cmd_submit():
     a, v = version(create=False) ; v or sys.exit('no version')
     subs = api('GET', f"/v1/reviewSubmissions?filter[app]={a['id']}&filter[state]=READY_FOR_REVIEW,WAITING_FOR_REVIEW,IN_REVIEW&limit=5").get('data') or []
     sub = subs[0] if subs else api('POST', '/v1/reviewSubmissions', {'data': {'type': 'reviewSubmissions', 'attributes': {'platform': 'IOS'}, 'relationships': {'app': rel('apps', a['id'])}}})['data']
-    items = api('GET', f"/v1/reviewSubmissions/{sub['id']}/items").get('data') or []
-    if not items: api('POST', '/v1/reviewSubmissionItems', {'data': {'type': 'reviewSubmissionItems', 'relationships': {'reviewSubmission': rel('reviewSubmissions', sub['id']), 'appStoreVersion': rel('appStoreVersions', v['id'])}}})
-    # screenshots are post-processed for a few minutes after the upload; the submission is refused until they are done — wait and retry
-    for attempt in range(20):
+    # screenshots are post-processed for a few minutes after the upload; adding the version and submitting are refused until they are done — wait and retry
+    for attempt in range(30):
         try:
+            items = api('GET', f"/v1/reviewSubmissions/{sub['id']}/items").get('data') or []
+            if not items: api('POST', '/v1/reviewSubmissionItems', {'data': {'type': 'reviewSubmissionItems', 'relationships': {'reviewSubmission': rel('reviewSubmissions', sub['id']), 'appStoreVersion': rel('appStoreVersions', v['id'])}}})
             api('PATCH', f"/v1/reviewSubmissions/{sub['id']}", {'data': {'type': 'reviewSubmissions', 'id': sub['id'], 'attributes': {'submitted': True}}}); break
         except SystemExit as e:
-            if ('ASSET_IN_POST_PROCESSING' in str(e) or 'being processed' in str(e)) and attempt < 19: print('assets still processing — waiting a minute'); time.sleep(60)
+            if ('ASSET_IN_POST_PROCESSING' in str(e) or 'being processed' in str(e)) and attempt < 29: print('assets still processing — waiting a minute'); time.sleep(60)
             else: raise
     print('submitted for review:', VERSION)
 
