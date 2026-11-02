@@ -44,9 +44,21 @@ def publish(slug):
     d = f"promo/ig/{slug}"
     if os.path.exists(f"{d}/published.json"):
         print(f"{slug}: already published, skip"); return
+    caption = open(f"{d}/caption.txt", encoding="utf-8").read().strip()
+    if os.path.exists(f"{d}/reel.mp4"):
+        url = f"{SITE}/{d}/reel.mp4"; wait_live(url); uid = IG_USER_ID; me = call("GET", uid, fields="username")
+        cid = call("POST", f"{uid}/media", media_type="REELS", video_url=url, caption=caption, share_to_feed="true")["id"]
+        for _ in range(60):   # video processing takes longer than images
+            st = call("GET", cid, fields="status_code").get("status_code")
+            if st == "FINISHED": break
+            if st in ("ERROR", "EXPIRED"): sys.exit(f"reel container {cid}: {st}")
+            time.sleep(10)
+        mid = call("POST", f"{uid}/media_publish", creation_id=cid)["id"]; link = call("GET", mid, fields="permalink").get("permalink", "")
+        json.dump({"media_id": mid, "permalink": link, "account": me.get("username"), "type": "reel",
+                   "published_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, open(f"{d}/published.json", "w"), indent=1)
+        print(f"{slug}: reel published {link}"); return
     imgs = sorted(os.path.basename(p) for p in glob.glob(f"{d}/[0-9][0-9].jpg"))
     if not 2 <= len(imgs) <= 10: sys.exit(f"{slug}: need 2–10 slides, found {len(imgs)}")
-    caption = open(f"{d}/caption.txt", encoding="utf-8").read().strip()
     urls = [f"{SITE}/{d}/{n}" for n in imgs]
     for u in urls: wait_live(u)
     uid = IG_USER_ID
