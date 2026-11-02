@@ -1,7 +1,7 @@
 {
-  "name": "Hutka — karting sessions",
+  "name": "Hutka — kart telemetry",
   "short_name": "Hutka",
-  "description": "Rental karting tracks, Alfano session analysis, hot laps and drivers",
+  "description": "Kart telemetry, corner by corner: every braking point, apex and exit of your lap, compared with the fastest drivers on the same layout",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
