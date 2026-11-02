@@ -1,8 +1,0 @@
-https://api.openai.com/v1/images/generations: 400 {
-  "error": {
-    "message": "The model 'gpt-image-1' does not exist.",
-    "type": "image_generation_user_error",
-    "param": "model",
-    "code": "invalid_value"
-  }
-}
