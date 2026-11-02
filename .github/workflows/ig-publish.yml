@@ -1,0 +1,35 @@
+# Publishes a carousel to Instagram when promo/ig/<slug>/approved is pushed.
+name: ig-publish
+on:
+  push:
+    branches: [main]
+    paths: ["promo/ig/*/approved"]
+  workflow_dispatch:
+    inputs:
+      slug: {description: "folder in promo/ig", required: true}
+permissions:
+  contents: write
+concurrency: ig-publish
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 2}
+      - name: Which carousels
+        id: slugs
+        run: |
+          if [ -n "${{ github.event.inputs.slug }}" ]; then echo "list=${{ github.event.inputs.slug }}" >> "$GITHUB_OUTPUT"; exit 0; fi
+          list=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'promo/ig/*/approved' | cut -d/ -f3 | tr '\n' ' ')
+          echo "list=$list" >> "$GITHUB_OUTPUT"
+      - name: Publish
+        if: steps.slugs.outputs.list != ''
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: python3 tools/ig/publish.py ${{ steps.slugs.outputs.list }}
+      - name: Record result
+        if: steps.slugs.outputs.list != ''
+        run: |
+          git config user.name "hutka-bot"; git config user.email "bot@hutka.ai"
+          git add promo/ig/*/published.json
+          git diff --cached --quiet || (git commit -m "ig: published ${{ steps.slugs.outputs.list }}" && git push)
