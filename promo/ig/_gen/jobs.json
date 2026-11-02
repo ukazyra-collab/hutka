@@ -12,5 +12,11 @@
   "quality": "high",
   "prompt": "Photorealistic first-person view from the driver's seat of a rental go-kart, driver's gloved hands on a small round kart steering wheel turned hard to the left, front tyres visible and turned, entering a fast left-hand corner on an outdoor kart track in daylight. Red-and-white kerb on the inside of the corner, dark asphalt, slight motion blur at the edges conveying speed. No logos, no brand names, no text, no numbers. Natural colours, sharp focus on the wheel and front tyres, editorial sports photography.",
   "rev": 3
+ },
+ {
+  "id": "hairpin-aerial",
+  "size": "1024x1536",
+  "quality": "high",
+  "prompt": "Photorealistic drone photo looking straight down at a tight 180-degree hairpin on an outdoor go-kart track in Dubai at golden hour. Dark asphalt with a darker rubbered racing line, red-and-white painted kerbs on the inside of the hairpin, white track edge lines, sandy beige run-off and a few palm shadows outside the track. One modern rental go-kart (generic, no logos, no text, no numbers) with a helmeted driver is at the outside of the hairpin, mid-rotation, slightly sideways, small puff of tyre smoke. The top third of the frame is calm empty asphalt and sand, leaving clear space for a headline. Natural colours, crisp detail, editorial sports photography, no text, no watermark."
  }
 ]
