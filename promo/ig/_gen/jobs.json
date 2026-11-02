@@ -63,10 +63,9 @@
   "prompt": "This is a real satellite image of a hairpin at Dubai Kartdrome (outdoor rental go-kart track). Create a photorealistic photo of THIS exact hairpin, close up: a low drone shot about 15 metres up, looking down at about 60 degrees, the hairpin fills most of the frame. Keep the real layout exactly (same hairpin shape, same red-and-white kerbs, same surroundings), do not invent new track sections. One modern rental go-kart (generic, no logos, no text, no numbers) with a helmeted driver at the outside of the hairpin, starting to rotate. Golden hour, editorial sports photography, natural colours, no text, no watermark. Leave the top quarter of the frame calm for a headline."
  },
  {
-  "id": "kart-topdown",
+  "id": "kart-topdown-green",
   "size": "1024x1024",
   "quality": "high",
-  "background": "transparent",
-  "prompt": "Photorealistic straight-down top view (orthographic, from directly above) of a modern rental go-kart with a driver in a dark helmet and dark race suit, the kart pointing straight up (nose at the top of the image), centred, filling about 70% of the frame. Black bodywork with subtle red accents, four black slick tyres, front bumper and side pods visible. No logos, no text, no numbers. Isolated on a fully transparent background, no shadow on the ground, no track."
+  "prompt": "Photorealistic straight-down top view (orthographic, camera directly above) of a modern rental go-kart with a driver in a dark helmet and dark race suit, the kart pointing straight up (nose at the top), centred, filling about 70% of the frame. Black bodywork with subtle red accents, four black slick tyres, front bumper and side pods visible. No logos, no text, no numbers. The background is a perfectly flat, uniform pure chroma-key green (#00FF00) with no shadow, no gradient, no floor texture."
  }
 ]

@@ -27,7 +27,7 @@ def multipart(fields, files):
     return out + f"--{b}--\r\n".encode(), f"multipart/form-data; boundary={b}"
 
 def openai(j):
-    model = os.environ.get("IMG_MODEL", "gpt-image-2")
+    model = j.get("model") or os.environ.get("IMG_MODEL", "gpt-image-2")
     h = {"Authorization": f"Bearer {OA}"}
     f = {"model": model, "prompt": j["prompt"], "size": j.get("size", "1024x1536"), "quality": j.get("quality", "high"), "n": "1"}
     if j.get("background"): f["background"] = j["background"]
