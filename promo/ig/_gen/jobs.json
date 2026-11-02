@@ -204,5 +204,12 @@
   "size": "1024x1536",
   "quality": "high",
   "prompt": "Photorealistic photo of a rental go-kart on an outdoor kart track in Dubai, daylight, no logos, no text, no numbers, editorial sports photography. First-person driver's view. Steering wheel turned LEFT. Both front wheels steered LEFT, parallel, about 30 degrees, exaggerated so it is obvious: the leading edge of each front tyre points to the upper-left of the image. Straight track ahead with white edge lines. Leave the top third calm (sky) for a headline."
+ },
+ {
+  "id": "f1-kerb",
+  "model": "gpt-image-2.5-sunburst",
+  "size": "1536x1024",
+  "quality": "high",
+  "prompt": "Photorealistic motorsport photo, low trackside angle, of a modern generic open-wheel single-seater racing car (Formula-style, plain dark grey and red livery, NO team names, NO sponsor logos, NO numbers, NO text) attacking a chicane at an outdoor circuit in Dubai, daylight. The car rides hard over a tall yellow sausage kerb and red-and-white kerbs: the inside front wheel and rear wheel are lifted in the air, sparks under the floor, a little dust. Sharp car, background slightly motion blurred. Editorial sports photography."
  }
 ]
