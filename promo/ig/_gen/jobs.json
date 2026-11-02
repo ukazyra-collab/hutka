@@ -167,5 +167,21 @@
   "size": "1024x1536",
   "quality": "high",
   "prompt": "Photorealistic first-person view from the driver's seat of a rental go-kart on an outdoor kart track in Dubai, daylight, camera at the driver's eye height looking forward and slightly down. The small round steering wheel is rotated COUNTER-CLOCKWISE (turned to the LEFT) by about 90 degrees: the driver's right gloved hand is now at the top of the wheel near 12 o'clock and the left gloved hand is low at about 8 o'clock. BOTH front wheels are fully visible at the bottom-left and bottom-right of the frame and BOTH are steered to the LEFT by exactly the same angle, about 25 degrees: the front edge of each tyre points to the left. The kart is still going straight down the track: the white edge lines ahead run straight. A little dust scrubs off the front tyres. No logos, no brand names, no text, no numbers. Editorial sports photography, sharp focus on the wheel and both front tyres. Leave the top third calm (sky) for a headline."
+ },
+ {
+  "id": "pov-fix-s",
+  "model": "gpt-image-2.5-sunburst",
+  "size": "1024x1536",
+  "quality": "high",
+  "ref": "promo/ig/_gen/refs/pov-v4.png",
+  "prompt": "Edit this photo. Keep everything exactly the same (driver, gloves, steering wheel, track, sky, framing) EXCEPT the RIGHT front wheel. Right now the right front wheel is steered to the right. Change it so the right front wheel is steered to the LEFT by the same angle as the left front wheel: its front edge must point to the left, toward the centre of the kart, so the outside face of the right tyre (its sidewall on the right) becomes visible and the inner rim is hidden. Both front wheels must be parallel and both pointing left. No text."
+ },
+ {
+  "id": "pov-fix-g",
+  "model": "gpt-image-2",
+  "size": "1024x1536",
+  "quality": "high",
+  "ref": "promo/ig/_gen/refs/pov-v4.png",
+  "prompt": "Edit this photo. Keep everything exactly the same (driver, gloves, steering wheel, track, sky, framing) EXCEPT the RIGHT front wheel. Right now the right front wheel is steered to the right. Change it so the right front wheel is steered to the LEFT by the same angle as the left front wheel: its front edge must point to the left, toward the centre of the kart, so the outside face of the right tyre (its sidewall on the right) becomes visible and the inner rim is hidden. Both front wheels must be parallel and both pointing left. No text."
  }
 ]
