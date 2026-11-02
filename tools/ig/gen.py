@@ -27,7 +27,7 @@ def multipart(fields, files):
     return out + f"--{b}--\r\n".encode(), f"multipart/form-data; boundary={b}"
 
 def openai(j):
-    model = os.environ.get("IMG_MODEL", "gpt-image-1")
+    model = os.environ.get("IMG_MODEL", "gpt-image-2")
     h = {"Authorization": f"Bearer {OA}"}
     f = {"model": model, "prompt": j["prompt"], "size": j.get("size", "1024x1536"), "quality": j.get("quality", "high"), "n": "1"}
     if j.get("ref"):
@@ -54,7 +54,14 @@ for j in jobs:
     try:
         img, model = (openai if OA else gemini)(j)
     except SystemExit as e:
-        open(f"{OUT}/{j['id']}.error.txt", "w").write(str(e)); print("error", j["id"], e); continue
+        msg = str(e)
+        if OA:
+            try:
+                req = urllib.request.Request("https://api.openai.com/v1/models", headers={"Authorization": f"Bearer {OA}"})
+                ms = [m["id"] for m in json.load(urllib.request.urlopen(req, timeout=60))["data"]]
+                msg += "\nimage models: " + ", ".join(sorted(m for m in ms if "image" in m or "dall" in m))
+            except Exception as e2: msg += f"\nmodels list failed: {e2}"
+        open(f"{OUT}/{j['id']}.error.txt", "w").write(msg); print("error", j["id"], msg); continue
     open(png, "wb").write(img)
     if os.path.exists(f"{OUT}/{j['id']}.error.txt"): os.remove(f"{OUT}/{j['id']}.error.txt")
     json.dump({"prompt": j["prompt"], "model": model, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, open(f"{OUT}/{j['id']}.json", "w"), indent=1)
