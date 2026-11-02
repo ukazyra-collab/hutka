@@ -218,5 +218,13 @@
   "size": "1024x1536",
   "quality": "high",
   "prompt": "Photorealistic straight-down top view (orthographic, camera directly above) of a modern generic open-wheel single-seater racing car, Formula-style, nose pointing straight up, centred, filling about 80% of the frame height. Plain dark grey and red livery, NO team names, NO sponsor logos, NO numbers, NO text. Four wide black slick tyres, front and rear wings, halo visible. The background is a perfectly flat, uniform pure chroma-key green (#00FF00), no shadow, no gradient."
+ },
+ {
+  "id": "kart-kerb",
+  "model": "gpt-image-2.5-sunburst",
+  "size": "1536x1024",
+  "quality": "high",
+  "ref": "promo/ig/_gen/out/f1-kerb.png",
+  "prompt": "Edit this photo: replace the Formula-style racing car with a modern rental go-kart and a driver in a dark helmet and race suit, in exactly the same pose, the same position in the frame and the same moment: riding hard over the same yellow sausage kerb, inside wheels lifted in the air, a little dust. Keep the location, background, kerbs, light and camera angle exactly the same. No logos, no text, no numbers."
  }
 ]
