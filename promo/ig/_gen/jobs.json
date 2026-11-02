@@ -132,5 +132,19 @@
   "size": "1024x1536",
   "quality": "high",
   "prompt": "Photorealistic first-person view from the driver's seat of a rental go-kart on an outdoor track in daylight. Both gloved hands turn the small round steering wheel hard to the LEFT, about 90 degrees, so the wheel's spokes are clearly rotated. BOTH front tyres are clearly visible at the bottom left and bottom right of the frame and are turned fully to the LEFT. The kart is still travelling straight ahead: the track and the white edge lines ahead run straight, with a little dust scrubbing off the front tyres. No logos, no brand names, no text, no numbers. Editorial sports photography, natural colours, sharp focus on the wheel and both front tyres. Leave the top third of the frame calm (sky and distant track) for a headline."
+ },
+ {
+  "id": "pov-understeer-v3s",
+  "model": "gpt-image-2.5-sunburst",
+  "size": "1024x1536",
+  "quality": "high",
+  "prompt": "Photorealistic first-person view from the driver's seat of a rental go-kart on an outdoor kart track in Dubai, daylight, camera at the driver's eye height looking forward and slightly down. Both gloved hands hold the small round steering wheel turned hard to the LEFT by about 90 degrees (the top of the wheel now points to the left). BOTH front wheels are fully visible, one at the bottom-left and one at the bottom-right of the frame, and BOTH are steered hard to the LEFT at the same angle. Yet the kart is still going straight down the track: the white edge lines and the kerbs ahead run straight. A little dust scrubs off the front tyres. No logos, no brand names, no text, no numbers. Editorial sports photography, sharp focus on the wheel and both front tyres. Leave the top third calm (sky) for a headline."
+ },
+ {
+  "id": "pov-understeer-v3f",
+  "model": "gpt-image-2.5-flare",
+  "size": "1024x1536",
+  "quality": "high",
+  "prompt": "Photorealistic first-person view from the driver's seat of a rental go-kart on an outdoor kart track in Dubai, daylight, camera at the driver's eye height looking forward and slightly down. Both gloved hands hold the small round steering wheel turned hard to the LEFT by about 90 degrees (the top of the wheel now points to the left). BOTH front wheels are fully visible, one at the bottom-left and one at the bottom-right of the frame, and BOTH are steered hard to the LEFT at the same angle. Yet the kart is still going straight down the track: the white edge lines and the kerbs ahead run straight. A little dust scrubs off the front tyres. No logos, no brand names, no text, no numbers. Editorial sports photography, sharp focus on the wheel and both front tyres. Leave the top third calm (sky) for a headline."
  }
 ]
