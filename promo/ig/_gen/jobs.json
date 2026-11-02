@@ -1,0 +1,8 @@
+[
+ {"id": "test-cover-aerial",
+  "size": "1024x1536", "quality": "high",
+  "prompt": "Photorealistic aerial drone shot looking straight down at an outdoor go-kart track at golden hour. One modern rental go-kart (generic, no logos, no text, no numbers) exits a 90-degree corner, slight motion blur on the tyres. Dark grey asphalt with visible darker rubber racing line, red-and-white painted kerbs on the inside of the corner, clean white track edge lines, short dry grass outside the track. Long soft shadows. The upper third of the frame is calm empty asphalt and grass, leaving clear space for a headline. Natural colours, crisp detail, editorial sports photography, no people visible except the helmeted driver in the kart, no watermark, no text anywhere."},
+ {"id": "test-pov-wheel",
+  "size": "1024x1536", "quality": "high",
+  "prompt": "Photorealistic first-person view from the driver's seat of a rental go-kart, driver's gloved hands on a small round kart steering wheel turned hard to the left, front tyres visible and turned, entering a fast left-hand corner on an outdoor kart track in daylight. Red-and-white kerb on the inside of the corner, dark asphalt, slight motion blur at the edges conveying speed. No logos, no brand names, no text, no numbers. Natural colours, sharp focus on the wheel and front tyres, editorial sports photography."}
+]
