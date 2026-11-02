@@ -1,12 +1,14 @@
 """Publish an approved carousel from promo/ig/<slug>/ to Instagram (@hutkaai).
 
 Images must already be live at https://hutka.ai/promo/ig/<slug>/NN.jpg (GitHub Pages).
-Env: IG_TOKEN (Instagram API with Instagram Login, long-lived, scope instagram_business_content_publish).
+Env: IG_TOKEN (system-user token of the Meta app "Hutka Publisher", never expires; scope instagram_content_publish).
 Writes promo/ig/<slug>/published.json; a slug that already has it is skipped.
 """
 import json, os, sys, time, glob, urllib.request, urllib.parse, urllib.error
 
-API = "https://graph.instagram.com/" + (os.environ.get("IG_API_VERSION", "").strip("/") + "/" if os.environ.get("IG_API_VERSION") else "")
+# System-user token from the "Instagram API with Unified login" setup (Facebook Login for Business) → Facebook Graph host.
+API = os.environ.get("IG_API", "https://graph.facebook.com/")
+IG_USER_ID = os.environ.get("IG_USER_ID", "17841480760751955")  # @hutkaai
 SITE = os.environ.get("IG_SITE", "https://hutka.ai")
 TOKEN = os.environ.get("IG_TOKEN", "")
 
@@ -47,8 +49,8 @@ def publish(slug):
     caption = open(f"{d}/caption.txt", encoding="utf-8").read().strip()
     urls = [f"{SITE}/{d}/{n}" for n in imgs]
     for u in urls: wait_live(u)
-    me = call("GET", "me", fields="user_id,username")
-    uid = me.get("user_id") or me.get("id")
+    uid = IG_USER_ID
+    me = call("GET", uid, fields="username")
     kids = []
     for u in urls:
         cid = call("POST", f"{uid}/media", image_url=u, is_carousel_item="true")["id"]
