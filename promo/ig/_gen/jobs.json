@@ -183,5 +183,26 @@
   "quality": "high",
   "ref": "promo/ig/_gen/refs/pov-v4.png",
   "prompt": "Edit this photo. Keep everything exactly the same (driver, gloves, steering wheel, track, sky, framing) EXCEPT the RIGHT front wheel. Right now the right front wheel is steered to the right. Change it so the right front wheel is steered to the LEFT by the same angle as the left front wheel: its front edge must point to the left, toward the centre of the kart, so the outside face of the right tyre (its sidewall on the right) becomes visible and the inner rim is hidden. Both front wheels must be parallel and both pointing left. No text."
+ },
+ {
+  "id": "pov-a",
+  "model": "gpt-image-2.5-sunburst",
+  "size": "1024x1536",
+  "quality": "high",
+  "prompt": "Photorealistic photo of a rental go-kart on an outdoor kart track in Dubai, daylight, no logos, no text, no numbers, editorial sports photography. Camera mounted on the driver's helmet, first-person, looking forward and down so the steering wheel and the whole front of the kart are visible. The steering wheel is turned to the LEFT by 90 degrees, the driver's right hand is at the top. The front axle is in view: BOTH front wheels are steered sharply to the LEFT, about 35 degrees, so the LEFT wheel shows its inner rim and the RIGHT wheel shows the front of its tread angled toward the left; the two front wheels are parallel to each other. The track ahead runs straight. Leave the top third calm (sky) for a headline."
+ },
+ {
+  "id": "pov-b",
+  "model": "gpt-image-2.5-sunburst",
+  "size": "1024x1536",
+  "quality": "high",
+  "prompt": "Photorealistic photo of a rental go-kart on an outdoor kart track in Dubai, daylight, no logos, no text, no numbers, editorial sports photography. Camera just above and behind the driver's helmet, looking forward over the driver's shoulders at the steering wheel and the front of the kart. Steering wheel turned hard LEFT. Both front wheels, clearly visible on each side of the nose, are steered LEFT by the same angle and are exactly parallel, like the front wheels of a car turning left. The kart is still travelling straight; a little tyre dust. Leave the top third calm for a headline."
+ },
+ {
+  "id": "pov-c",
+  "model": "gpt-image-2.5-sunburst",
+  "size": "1024x1536",
+  "quality": "high",
+  "prompt": "Photorealistic photo of a rental go-kart on an outdoor kart track in Dubai, daylight, no logos, no text, no numbers, editorial sports photography. First-person driver's view. Steering wheel turned LEFT. Both front wheels steered LEFT, parallel, about 30 degrees, exaggerated so it is obvious: the leading edge of each front tyre points to the upper-left of the image. Straight track ahead with white edge lines. Leave the top third calm (sky) for a headline."
  }
 ]
