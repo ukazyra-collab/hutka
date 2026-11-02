@@ -1,0 +1,5 @@
+{
+ "prompt": "Turn this rough sketch into a photorealistic first-person photo from the driver's seat of a rental go-kart on an outdoor kart track in Dubai, daylight. Keep EXACTLY the geometry of the sketch: the two front tyres are rotated exactly as drawn, both with their front ends pointing to the upper-left of the image (both steered left, parallel). The steering wheel is rotated exactly as drawn: turned 90 degrees to the left (counter-clockwise), gloved hands on it at the top and bottom of the rim as drawn. The track ahead runs straight with white edge lines. Dark kart bodywork with a red nose. No logos, no text, no numbers. Editorial sports photography.",
+ "model": "gpt-image-2.5-flare",
+ "at": "2026-11-02T14:57:02Z"
+}
