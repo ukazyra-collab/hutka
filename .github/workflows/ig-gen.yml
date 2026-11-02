@@ -20,5 +20,5 @@ jobs:
       - if: always()
         run: |
           git config user.name "hutka-bot"; git config user.email "bot@hutka.ai"
-          git add promo/ig/_gen/out || true
+          git add -A promo/ig/_gen/out || true
           git diff --cached --quiet || (git commit -m "ig: generated images" && git pull --rebase -q && git push)

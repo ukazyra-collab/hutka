@@ -34,7 +34,7 @@ def openai(j):
         body, ct = multipart(f, [("image[]", r) for r in ([j["ref"]] if isinstance(j["ref"], str) else j["ref"])])
         r = post("https://api.openai.com/v1/images/edits", body, h, ct)
     else:
-        r = post("https://api.openai.com/v1/images/generations", json.dumps(f).encode(), h)
+        r = post("https://api.openai.com/v1/images/generations", json.dumps({**f, "n": 1}).encode(), h)
     return base64.b64decode(r["data"][0]["b64_json"]), model
 
 def gemini(j):
@@ -56,5 +56,6 @@ for j in jobs:
     except SystemExit as e:
         open(f"{OUT}/{j['id']}.error.txt", "w").write(str(e)); print("error", j["id"], e); continue
     open(png, "wb").write(img)
+    if os.path.exists(f"{OUT}/{j['id']}.error.txt"): os.remove(f"{OUT}/{j['id']}.error.txt")
     json.dump({"prompt": j["prompt"], "model": model, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, open(f"{OUT}/{j['id']}.json", "w"), indent=1)
     print("ok", j["id"], len(img))
