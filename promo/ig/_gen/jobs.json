@@ -67,5 +67,51 @@
   "size": "1024x1024",
   "quality": "high",
   "prompt": "Photorealistic straight-down top view (orthographic, camera directly above) of a modern rental go-kart with a driver in a dark helmet and dark race suit, the kart pointing straight up (nose at the top), centred, filling about 70% of the frame. Black bodywork with subtle red accents, four black slick tyres, front bumper and side pods visible. No logos, no text, no numbers. The background is a perfectly flat, uniform pure chroma-key green (#00FF00) with no shadow, no gradient, no floor texture."
+ },
+ {
+  "id": "track-r90",
+  "size": "1024x1024",
+  "quality": "high",
+  "ref": "promo/ig/_gen/refs/ref-r90.png",
+  "prompt": "Turn this flat diagram into a photorealistic straight-down drone photograph of an outdoor go-kart track in Dubai at golden hour. Keep EXACTLY the same geometry: the road (grey area) must keep the same shape, width and position in the frame, every corner must stay exactly where it is, and the red-and-white kerbs must stay exactly where they are drawn. The grey area becomes dark asphalt with subtle rubber marks; the dark outlines become thin white painted track edge lines; the beige area becomes sandy run-off with a little sparse grass. No karts, no people, no text, no logos, no extra roads. Natural colours, crisp detail."
+ },
+ {
+  "id": "track-f1",
+  "size": "1024x1024",
+  "quality": "high",
+  "ref": "promo/ig/_gen/refs/ref-f1.png",
+  "prompt": "Turn this flat diagram into a photorealistic straight-down drone photograph of an outdoor go-kart track in Dubai at golden hour. Keep EXACTLY the same geometry: the road (grey area) must keep the same shape, width and position in the frame, every corner must stay exactly where it is, and the red-and-white kerbs must stay exactly where they are drawn. The grey area becomes dark asphalt with subtle rubber marks; the dark outlines become thin white painted track edge lines; the beige area becomes sandy run-off with a little sparse grass. No karts, no people, no text, no logos, no extra roads. Natural colours, crisp detail."
+ },
+ {
+  "id": "track-sweeper",
+  "size": "1024x1024",
+  "quality": "high",
+  "ref": "promo/ig/_gen/refs/ref-sweeper.png",
+  "prompt": "Turn this flat diagram into a photorealistic straight-down drone photograph of an outdoor go-kart track in Dubai at golden hour. Keep EXACTLY the same geometry: the road (grey area) must keep the same shape, width and position in the frame, every corner must stay exactly where it is, and the red-and-white kerbs must stay exactly where they are drawn. The grey area becomes dark asphalt with subtle rubber marks; the dark outlines become thin white painted track edge lines; the beige area becomes sandy run-off with a little sparse grass. No karts, no people, no text, no logos, no extra roads. Natural colours, crisp detail."
+ },
+ {
+  "id": "track-brk",
+  "size": "1024x1024",
+  "quality": "high",
+  "ref": "promo/ig/_gen/refs/ref-brk.png",
+  "prompt": "Turn this flat diagram into a photorealistic straight-down drone photograph of an outdoor go-kart track in Dubai at golden hour. Keep EXACTLY the same geometry: the road (grey area) must keep the same shape, width and position in the frame, every corner must stay exactly where it is, and the red-and-white kerbs must stay exactly where they are drawn. The grey area becomes dark asphalt with subtle rubber marks; the dark outlines become thin white painted track edge lines; the beige area becomes sandy run-off with a little sparse grass. No karts, no people, no text, no logos, no extra roads. Natural colours, crisp detail."
+ },
+ {
+  "id": "kart-topdown-steer-green",
+  "size": "1024x1024",
+  "quality": "high",
+  "prompt": "Photorealistic straight-down top view (orthographic, camera directly above) of a modern rental go-kart with a driver in a dark helmet and dark race suit, the kart pointing straight up (nose at the top). The steering wheel is turned hard to the left and BOTH FRONT WHEELS are clearly turned about 25 degrees to the left, while the kart body points straight up. Black bodywork with subtle red accents, black slick tyres. No logos, no text, no numbers. Centred, filling about 70% of the frame. The background is a perfectly flat, uniform pure chroma-key green (#00FF00) with no shadow, no gradient, no floor texture."
+ },
+ {
+  "id": "pov-understeer",
+  "size": "1024x1536",
+  "quality": "high",
+  "prompt": "Photorealistic first-person view from the driver's seat of a rental go-kart on an outdoor track in Dubai, daylight. The driver's gloved hands turn the small round steering wheel hard to the left, about 90 degrees, and both front tyres are visibly turned sharply to the left, but the kart is still travelling straight ahead along the track: the track and the kerbs ahead run straight, and the front tyres are scrubbing with a little dust. A fast left-hand corner with red-and-white kerbs is ahead. Slight motion blur at the edges for speed. No logos, no brand names, no text, no numbers. Editorial sports photography, natural colours, sharp focus on the wheel and the front tyres. Leave the top third of the frame calm (sky and distant track) for a headline."
+ },
+ {
+  "id": "phone-on-wheel",
+  "size": "1024x1536",
+  "quality": "high",
+  "prompt": "Photorealistic close-up photo of a smartphone mounted in a small phone holder on the steering wheel of a rental go-kart, seen from the driver's seat on an outdoor kart track in Dubai, golden hour. The phone screen shows a simple dark lap-timer app with a big lap time 1:13.42 and a small track map line; the screen is crisp and readable. Gloved hands on the wheel, helmet visor edge at the top of the frame, blurred track and kerbs ahead. No brand names, no logos, no other text. Editorial sports photography. Leave the top third calm for a headline."
  }
 ]
