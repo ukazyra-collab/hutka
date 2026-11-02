@@ -1,0 +1,5 @@
+{
+ "prompt": "This is a real satellite image of a hairpin at Dubai Kartdrome. Create a photorealistic photo of THIS exact place from a low drone angle (about 30 metres up, looking down at 50 degrees), golden hour light. Keep the real layout exactly: the same track shape, the same hairpin, the same kerbs, buildings, fences and surroundings as in the satellite image; do not invent new track sections. One modern rental go-kart (generic, no logos, no text, no numbers) with a helmeted driver rotating through the hairpin. Leave the top third of the frame calm (sky, roofs or empty asphalt) for a headline. Editorial sports photography, natural colours, no text, no watermark.",
+ "model": "gpt-image-2",
+ "at": "2026-11-02T12:45:10Z"
+}
