@@ -257,5 +257,29 @@
   "size": "1536x1024",
   "quality": "high",
   "prompt": "Photorealistic photo taken from directly behind and slightly above a modern generic open-wheel single-seater racing car (Formula-style, plain dark grey and red livery, NO team names, NO logos, NO numbers, NO text), on an outdoor circuit in Dubai, daylight. The car is on the right side of the track approaching a medium-speed LEFT-hand corner; the whole corner, its red-and-white kerbs on the inside (left) and the straight after it are clearly visible ahead. The asphalt ahead is clean with no painted lines in the middle. The car is small in the lower third of the frame so most of the image shows the track ahead."
+ },
+ {
+  "id": "pov-sk2-s",
+  "model": "gpt-image-2.5-sunburst",
+  "size": "1024x1536",
+  "quality": "high",
+  "ref": "promo/ig/_gen/refs/pov-sketch2.png",
+  "prompt": "Turn this rough sketch into a photorealistic first-person photo from the driver's seat of a rental go-kart on an outdoor kart track in Dubai, daylight. Keep EXACTLY the geometry of the sketch: the two front tyres are rotated exactly as drawn, both with their front ends pointing to the upper-left of the image (both steered left, parallel). The steering wheel is rotated exactly as drawn: turned 90 degrees to the left (counter-clockwise), gloved hands on it at the top and bottom of the rim as drawn. The track ahead runs straight with white edge lines. Dark kart bodywork with a red nose. No logos, no text, no numbers. Editorial sports photography."
+ },
+ {
+  "id": "pov-sk2-f",
+  "model": "gpt-image-2.5-flare",
+  "size": "1024x1536",
+  "quality": "high",
+  "ref": "promo/ig/_gen/refs/pov-sketch2.png",
+  "prompt": "Turn this rough sketch into a photorealistic first-person photo from the driver's seat of a rental go-kart on an outdoor kart track in Dubai, daylight. Keep EXACTLY the geometry of the sketch: the two front tyres are rotated exactly as drawn, both with their front ends pointing to the upper-left of the image (both steered left, parallel). The steering wheel is rotated exactly as drawn: turned 90 degrees to the left (counter-clockwise), gloved hands on it at the top and bottom of the rim as drawn. The track ahead runs straight with white edge lines. Dark kart bodywork with a red nose. No logos, no text, no numbers. Editorial sports photography."
+ },
+ {
+  "id": "pov-sk2-g",
+  "model": "gpt-image-2",
+  "size": "1024x1536",
+  "quality": "high",
+  "ref": "promo/ig/_gen/refs/pov-sketch2.png",
+  "prompt": "Turn this rough sketch into a photorealistic first-person photo from the driver's seat of a rental go-kart on an outdoor kart track in Dubai, daylight. Keep EXACTLY the geometry of the sketch: the two front tyres are rotated exactly as drawn, both with their front ends pointing to the upper-left of the image (both steered left, parallel). The steering wheel is rotated exactly as drawn: turned 90 degrees to the left (counter-clockwise), gloved hands on it at the top and bottom of the rim as drawn. The track ahead runs straight with white edge lines. Dark kart bodywork with a red nose. No logos, no text, no numbers. Editorial sports photography."
  }
 ]
