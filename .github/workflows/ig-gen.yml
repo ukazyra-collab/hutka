@@ -21,4 +21,5 @@ jobs:
         run: |
           git config user.name "hutka-bot"; git config user.email "bot@hutka.ai"
           git add -A promo/ig/_gen/out || true
-          git diff --cached --quiet || (git commit -m "ig: generated images" && git pull --rebase -q && git push)
+          git diff --cached --quiet || git commit -m "ig: generated images"
+          for i in 1 2 3 4 5; do git pull --rebase -q && git push && break; sleep 5; done
