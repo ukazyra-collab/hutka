@@ -1,8 +1,8 @@
 https://api.openai.com/v1/images/generations: 400 {
   "error": {
-    "message": "Invalid type for 'n': expected an integer, but got a string instead.",
-    "type": "invalid_request_error",
-    "param": "n",
-    "code": "invalid_type"
+    "message": "The model 'gpt-image-1' does not exist.",
+    "type": "image_generation_user_error",
+    "param": "model",
+    "code": "invalid_value"
   }
 }
