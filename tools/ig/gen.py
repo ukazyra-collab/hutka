@@ -30,6 +30,7 @@ def openai(j):
     model = os.environ.get("IMG_MODEL", "gpt-image-2")
     h = {"Authorization": f"Bearer {OA}"}
     f = {"model": model, "prompt": j["prompt"], "size": j.get("size", "1024x1536"), "quality": j.get("quality", "high"), "n": "1"}
+    if j.get("background"): f["background"] = j["background"]
     if j.get("ref"):
         body, ct = multipart(f, [("image[]", r) for r in ([j["ref"]] if isinstance(j["ref"], str) else j["ref"])])
         r = post("https://api.openai.com/v1/images/edits", body, h, ct)
