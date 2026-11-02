@@ -1,12 +1,15 @@
-# Publishes a carousel to Instagram when promo/ig/<slug>/approved is pushed.
+# Publishes approved carousels from promo/ig/<slug>/ to Instagram, one at a time, at least 6 h apart.
+# Approve = push promo/ig/<slug>/approved. The hourly run takes the oldest approved one when the gap allows.
 name: ig-publish
 on:
+  schedule:
+    - cron: "17 * * * *"
   push:
     branches: [main]
     paths: ["promo/ig/*/approved"]
   workflow_dispatch:
     inputs:
-      slug: {description: "folder in promo/ig", required: true}
+      slug: {description: "folder in promo/ig (publishes now, ignores the gap)", required: false}
 permissions:
   contents: write
 concurrency: ig-publish
@@ -15,21 +18,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: {fetch-depth: 2}
-      - name: Which carousels
-        id: slugs
+        with: {fetch-depth: 0}
+      - name: Next in queue
+        id: next
         run: |
-          if [ -n "${{ github.event.inputs.slug }}" ]; then echo "list=${{ github.event.inputs.slug }}" >> "$GITHUB_OUTPUT"; exit 0; fi
-          list=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'promo/ig/*/approved' | cut -d/ -f3 | tr '\n' ' ')
-          echo "list=$list" >> "$GITHUB_OUTPUT"
+          if [ -n "${{ github.event.inputs.slug }}" ]; then s="${{ github.event.inputs.slug }}"; else s=$(python3 tools/ig/next.py); fi
+          echo "slug=$s" >> "$GITHUB_OUTPUT"; echo "next: ${s:-nothing}"
       - name: Publish
-        if: steps.slugs.outputs.list != ''
+        if: steps.next.outputs.slug != ''
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
-        run: python3 tools/ig/publish.py ${{ steps.slugs.outputs.list }}
+        run: python3 tools/ig/publish.py ${{ steps.next.outputs.slug }}
       - name: Record result
-        if: steps.slugs.outputs.list != ''
+        if: steps.next.outputs.slug != ''
         run: |
           git config user.name "hutka-bot"; git config user.email "bot@hutka.ai"
           git add promo/ig/*/published.json
-          git diff --cached --quiet || (git commit -m "ig: published ${{ steps.slugs.outputs.list }}" && git push)
+          git diff --cached --quiet || (git commit -m "ig: published ${{ steps.next.outputs.slug }}" && git pull --rebase -q && git push)
