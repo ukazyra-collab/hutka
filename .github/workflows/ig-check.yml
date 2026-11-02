@@ -1,0 +1,20 @@
+# Checks IG_TOKEN (no publishing) when promo/ig/_check/run is pushed; commits the result.
+name: ig-check
+on:
+  push:
+    branches: [main]
+    paths: ["promo/ig/_check/run"]
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: python3 tools/ig/check.py
+      - run: |
+          git config user.name "hutka-bot"; git config user.email "bot@hutka.ai"
+          git add promo/ig/_check/result.json
+          git commit -m "ig: token check" && git pull --rebase -q && git push
