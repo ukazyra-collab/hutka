@@ -61,6 +61,10 @@ def sat_ref(sat, path):
             url = f"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{ty}/{tx}"
             req = urllib.request.Request(url, headers={"User-Agent": "hutka-ig/1.0"})
             W.paste(Image.open(io.BytesIO(urllib.request.urlopen(req, timeout=60).read())).convert("RGB"), ((tx - x0)*256, (ty - y0)*256))
+    import statistics
+    if statistics.pstdev(list(W.convert("L").resize((64, 64)).getdata())) < 6:      # "Map data not yet available" tiles → one zoom out
+        if z <= 17: raise RuntimeError("no imagery")
+        return sat_ref({**sat, "zoom": z - 1, "px": max(128, px//2)}, path)
     cx, cy = (fx - x0)*256, (fy - y0)*256
     W.crop((int(cx - px/2), int(cy - px/2), int(cx + px/2), int(cy + px/2))).resize((1024, 1024)).save(path)
 
