@@ -1,4 +1,4 @@
-# Publishes approved carousels from promo/ig/<slug>/ to Instagram, one at a time, at least 6 h apart.
+# Publishes approved carousels/reels from promo/ig/<slug>/ to Instagram, one at a time, at least IG_GAP_HOURS apart (12).
 # Approve = push promo/ig/<slug>/approved. The hourly run takes the oldest approved one when the gap allows.
 name: ig-publish
 on:
@@ -22,7 +22,7 @@ jobs:
       - name: Next in queue
         id: next
         run: |
-          if [ -n "${{ github.event.inputs.slug }}" ]; then s="${{ github.event.inputs.slug }}"; else s=$(python3 tools/ig/next.py); fi
+          if [ -n "${{ github.event.inputs.slug }}" ]; then s="${{ github.event.inputs.slug }}"; else s=$(IG_GAP_HOURS=12 python3 tools/ig/next.py); fi
           echo "slug=$s" >> "$GITHUB_OUTPUT"; echo "next: ${s:-nothing}"
       - name: Publish
         if: steps.next.outputs.slug != ''
