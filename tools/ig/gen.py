@@ -48,7 +48,30 @@ def gemini(j):
         if "inlineData" in p: return base64.b64decode(p["inlineData"]["data"]), model
     raise SystemExit(f"gemini returned no image: {json.dumps(r)[:500]}")
 
+def sat_ref(sat, path):
+    """Satellite crop (Esri World Imagery) centred on lat/lon → PNG used as the generator's reference."""
+    import math, io
+    from PIL import Image
+    lat, lon, z, px = sat["lat"], sat["lon"], sat.get("zoom", 19), sat.get("px", 1024)
+    n = 2**z; fx = (lon + 180)/360*n; fy = (1 - math.asinh(math.tan(math.radians(lat)))/math.pi)/2*n
+    half = px/2/256; x0, x1 = int(fx - half), int(fx + half); y0, y1 = int(fy - half), int(fy + half)
+    W = Image.new("RGB", ((x1 - x0 + 1)*256, (y1 - y0 + 1)*256))
+    for tx in range(x0, x1 + 1):
+        for ty in range(y0, y1 + 1):
+            url = f"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{ty}/{tx}"
+            req = urllib.request.Request(url, headers={"User-Agent": "hutka-ig/1.0"})
+            W.paste(Image.open(io.BytesIO(urllib.request.urlopen(req, timeout=60).read())).convert("RGB"), ((tx - x0)*256, (ty - y0)*256))
+    cx, cy = (fx - x0)*256, (fy - y0)*256
+    W.crop((int(cx - px/2), int(cy - px/2), int(cx + px/2), int(cy + px/2))).resize((1024, 1024)).save(path)
+
 for j in jobs:
+    if j.get("sat"):
+        ref = f"{OUT}/{j['id']}.sat.png"
+        if not os.path.exists(ref):
+            try: sat_ref(j["sat"], ref)
+            except Exception as e:
+                open(f"{OUT}/{j['id']}.error.txt", "w").write(f"satellite: {e}"); continue
+        j["ref"] = ref
     png = f"{OUT}/{j['id']}.png"
     if os.path.exists(png) and not j.get("force"): print("skip", j["id"]); continue
     try:

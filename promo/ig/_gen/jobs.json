@@ -25,5 +25,17 @@
   "quality": "high",
   "ref": "promo/ig/_gen/ref-hairpin.png",
   "prompt": "Turn this flat diagram into a photorealistic straight-down drone photograph of an outdoor go-kart track in Dubai at golden hour. Keep EXACTLY the same geometry: the road (grey area) must keep the same shape, width and position in the frame, the 180-degree hairpin must stay exactly where it is, and the red-and-white kerb must stay exactly on the inside of the hairpin where it is drawn. The grey area becomes dark asphalt with subtle rubber marks; the dark outlines become thin white painted track edge lines; the beige area becomes sandy run-off with a little sparse grass. No karts, no people, no text, no logos, no extra roads. Natural colours, crisp detail."
+ },
+ {
+  "id": "dkd-hairpin-t9",
+  "size": "1024x1536",
+  "quality": "high",
+  "sat": {
+   "lat": 25.043891,
+   "lon": 55.239574,
+   "zoom": 19,
+   "px": 512
+  },
+  "prompt": "This is a real satellite image of a hairpin at Dubai Kartdrome. Create a photorealistic photo of THIS exact place from a low drone angle (about 30 metres up, looking down at 50 degrees), golden hour light. Keep the real layout exactly: the same track shape, the same hairpin, the same kerbs, buildings, fences and surroundings as in the satellite image; do not invent new track sections. One modern rental go-kart (generic, no logos, no text, no numbers) with a helmeted driver rotating through the hairpin. Leave the top third of the frame calm (sky, roofs or empty asphalt) for a headline. Editorial sports photography, natural colours, no text, no watermark."
  }
 ]
