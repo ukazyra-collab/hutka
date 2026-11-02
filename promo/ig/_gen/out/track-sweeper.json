@@ -1,0 +1,5 @@
+{
+ "prompt": "Turn this flat diagram into a photorealistic straight-down drone photograph of an outdoor go-kart track in Dubai at golden hour. Keep EXACTLY the same geometry: the road (grey area) must keep the same shape, width and position in the frame, every corner must stay exactly where it is, and the red-and-white kerbs must stay exactly where they are drawn. The grey area becomes dark asphalt with subtle rubber marks; the dark outlines become thin white painted track edge lines; the beige area becomes sandy run-off with a little sparse grass. No karts, no people, no text, no logos, no extra roads. Natural colours, crisp detail.",
+ "model": "gpt-image-2",
+ "at": "2026-11-02T13:06:20Z"
+}
